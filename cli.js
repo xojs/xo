@@ -38,8 +38,7 @@ var cli = meow({
 	boolean: [
 		'init',
 		'compact',
-		'stdin',
-		'esnext'
+		'stdin'
 	]
 });
 

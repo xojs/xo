@@ -29,8 +29,7 @@ var DEFAULT_CONFIG = {
 
 function handleOpts(opts) {
 	opts = objectAssign({
-		cwd: process.cwd(),
-		ignore: []
+		cwd: process.cwd()
 	}, opts);
 
 	var pkgOpts = {};
@@ -41,7 +40,7 @@ function handleOpts(opts) {
 
 	opts = objectAssign({}, pkgOpts, opts);
 
-	opts.ignore = DEFAULT_IGNORE.concat(opts.ignore);
+	opts.ignore = DEFAULT_IGNORE.concat(opts.ignore || []);
 
 	opts._config = objectAssign({}, DEFAULT_CONFIG, {
 		envs: opts.env,
