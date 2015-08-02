@@ -3,7 +3,6 @@
 var updateNotifier = require('update-notifier');
 var getStdin = require('get-stdin');
 var meow = require('meow');
-var arrify = require('arrify');
 var xo = require('./');
 
 var cli = meow({
@@ -69,9 +68,6 @@ if (opts.stdin) {
 
 	return;
 }
-
-opts.env = arrify(opts.env);
-opts.global = arrify(opts.global);
 
 xo.lintFiles(input, opts, function (err, report) {
 	if (err) {

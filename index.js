@@ -4,6 +4,7 @@ var eslint = require('eslint');
 var globby = require('globby');
 var lookUp = require('look-up');
 var objectAssign = require('object-assign');
+var arrify = require('arrify');
 
 var DEFAULT_PATTERNS = [
 	'**/*.js',
@@ -43,8 +44,8 @@ function handleOpts(opts) {
 	opts.ignore = DEFAULT_IGNORE.concat(opts.ignore || []);
 
 	opts._config = objectAssign({}, DEFAULT_CONFIG, {
-		envs: opts.env,
-		globals: opts.global
+		envs: arrify(opts.env),
+		globals: arrify(opts.global)
 	});
 
 	if (opts.space) {
