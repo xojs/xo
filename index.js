@@ -99,6 +99,8 @@ exports.lintFiles = function (patterns, opts, cb) {
 			return;
 		}
 
-		cb(null, ret, engine);
+		ret._getFormatter = engine.getFormatter;
+
+		cb(null, ret);
 	});
 };

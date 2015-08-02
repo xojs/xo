@@ -3,7 +3,6 @@
 var updateNotifier = require('update-notifier');
 var getStdin = require('get-stdin');
 var meow = require('meow');
-var eslint = require('eslint');
 var arrify = require('arrify');
 var xo = require('./');
 
@@ -48,9 +47,7 @@ var input = cli.input;
 var opts = cli.flags;
 
 function log(report) {
-	// TODO: open issue on ESLint about making `getFormatter` a static method
-	var formatter = (new eslint.CLIEngine()).getFormatter(opts.compact && 'compact');
-	console.log(formatter(report.results));
+	console.log(report._getFormatter(opts.compact && 'compact')(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
 }
 
