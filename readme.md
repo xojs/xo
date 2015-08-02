@@ -155,7 +155,7 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 
 #### Why not Standard?
 
-[Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! Unfortunately, they made a huge mistake of pushing their own style instead of the most popular one. I also think "no semicolons" is dumb. In contrast, XO is more pragmatic. XO does use tabs by default, but that's configurable since I realize not everyone wants or even can use tabs.
+The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! Unfortunately, they made the mistake of pushing their own style instead of the most popular one. I don't think it's realistic to convert everyone. In contrast, XO is more pragmatic and has no aspiration of being *the* style. XO does use tabs by default, but that's configurable since I realize not everyone wants or even can use tabs.
 
 #### Why not ESLint?
 
