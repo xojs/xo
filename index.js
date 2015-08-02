@@ -62,7 +62,12 @@ function handleOpts(opts) {
 exports.lintText = function (str, opts) {
 	opts = handleOpts(opts);
 
-	return new eslint.CLIEngine(opts._config).executeOnText(str);
+	var engine = new eslint.CLIEngine(opts._config);
+	var ret = engine.executeOnText(str);
+
+	ret._getFormatter = engine.getFormatter;
+
+	return ret;
 };
 
 exports.lintFiles = function (patterns, opts, cb) {
