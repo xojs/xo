@@ -111,7 +111,7 @@ You can configure some options in XO by putting it in `package.json`:
 {
 	"name": "my-awesome-project",
 	"xo": {
-		"env": ["node", "mocha"]
+		"envs": ["node", "mocha"]
 	}
 }
 ```
