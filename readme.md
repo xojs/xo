@@ -19,12 +19,14 @@ Uses [ESLint](http://eslint.org) underneath.
 
 ## Code style
 
-- Tab indentation *([configurable](#config))*
+- Tab indentation
 - Semicolons
 - Single-quotes
 - No unused variables
 - Space after keyword `if (condition) {}`
 - Always `===` instead of `==`
+
+*Any of these can be [overridden](#rules) if necessary.*
 
 Check out an [example](index.js) and the [ESLint rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js).
 
@@ -58,7 +60,8 @@ $ xo --help
     $ xo
     $ xo index.js
     $ xo *.js !foo.js
-    $ xo --esnext --space --env=mocha
+    $ xo --esnext --space
+    $ xo --esnext --env=node --env=mocha
 
   Tips
     Put options in package.json instead of using flags so other tools can read it.
@@ -122,20 +125,20 @@ Default: `false`
 
 Enable ES2015 support and linting rules.
 
-### env
+### envs
 
 Type: `array`  
 Default: `['node']`
 
 Which [environments](http://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
 
-### global
+### globals
 
 Type: `array`
 
 Additional global variables your code accesses during execution.
 
-### ignore
+### ignores
 
 Type: `array`
 
@@ -150,12 +153,20 @@ Set it to `true` to get 2-space indentation or specify the number of spaces.
 
 This option exists for pragmatic reasons, but I would strongly recommend you read ["Why tabs are superior"](http://lea.verou.me/2012/01/why-tabs-are-clearly-superior/).
 
+### rules
+
+Type: `object`  
+
+Override any of the [default rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js). See the [ESLint docs](http://eslint.org/docs/rules/) for more info on each rule.
+
+Please take a moment to consider if you really need to use this option.
+
 
 ## FAQ
 
 #### Why not Standard?
 
-The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! Unfortunately, they made the mistake of pushing their own style instead of the most popular one. I don't think it's realistic to convert everyone. In contrast, XO is more pragmatic and has no aspiration of being *the* style. XO does use tabs by default, but that's configurable since I realize not everyone wants or even can use tabs.
+The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! Unfortunately, they made the mistake of pushing their own style instead of the most popular one. I don't think it's realistic to convert everyone. In contrast, XO is more pragmatic and has no aspiration of being *the* style. XO does use tabs by default, but everything is configurable if necessary.
 
 #### Why not ESLint?
 

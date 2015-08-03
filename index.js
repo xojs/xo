@@ -23,9 +23,7 @@ var DEFAULT_IGNORE = [
 
 var DEFAULT_CONFIG = {
 	useEslintrc: false,
-	configFile: path.join(__dirname, 'rc', '.eslintrc'),
-	globals: [],
-	rules: {}
+	configFile: path.join(__dirname, 'rc', '.eslintrc')
 };
 
 function handleOpts(opts) {
@@ -41,11 +39,18 @@ function handleOpts(opts) {
 
 	opts = objectAssign({}, pkgOpts, opts);
 
-	opts.ignore = DEFAULT_IGNORE.concat(opts.ignore || []);
+	// alias to help humans
+	opts.envs = opts.envs || opts.env;
+	opts.globals = opts.globals || opts.global;
+	opts.ignores = opts.ignores || opts.ignore;
+	opts.rules = opts.rules || opts.rule;
+
+	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
 
 	opts._config = objectAssign({}, DEFAULT_CONFIG, {
-		envs: arrify(opts.env),
-		globals: arrify(opts.global)
+		envs: arrify(opts.envs),
+		globals: arrify(opts.globals),
+		rules: opts.rules
 	});
 
 	if (opts.space) {
@@ -83,7 +88,7 @@ exports.lintFiles = function (patterns, opts, cb) {
 		patterns = DEFAULT_PATTERNS;
 	}
 
-	globby(patterns, {ignore: opts.ignore}, function (err, paths) {
+	globby(patterns, {ignore: opts.ignores}, function (err, paths) {
 		if (err) {
 			cb(err);
 			return;

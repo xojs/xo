@@ -24,7 +24,8 @@ var cli = meow({
 		'  $ xo',
 		'  $ xo index.js',
 		'  $ xo *.js !foo.js',
-		'  $ xo --esnext --space --env=mocha',
+		'  $ xo --esnext --space',
+		'  $ xo --esnext --env=node --env=mocha',
 		'',
 		'Tips',
 		'  Put options in package.json instead of using flags so other tools can read it.'
