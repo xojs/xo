@@ -54,6 +54,10 @@ function handleOpts(opts) {
 	});
 
 	if (opts.space) {
+		if (!opts._config.rules) {
+			opts._config.rules = {};
+		}
+
 		var spaces = typeof opts.space === 'number' ? opts.space : 2;
 		opts._config.rules.indent = [2, spaces, {SwitchCase: 1}];
 	}
