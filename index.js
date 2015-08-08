@@ -75,8 +75,6 @@ exports.lintText = function (str, opts) {
 	var engine = new eslint.CLIEngine(opts._config);
 	var ret = engine.executeOnText(str);
 
-	ret._getFormatter = engine.getFormatter;
-
 	return ret;
 };
 
@@ -119,3 +117,6 @@ exports.lintFiles = function (patterns, opts, cb) {
 		cb(null, ret);
 	});
 };
+
+exports.getFormatter = eslint.CLIEngine.getFormatter;
+exports.getErrorResults = eslint.CLIEngine.getErrorResults;
