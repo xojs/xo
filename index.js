@@ -73,7 +73,7 @@ exports.lintText = function (str, opts) {
 	opts = handleOpts(opts);
 
 	var engine = new eslint.CLIEngine(opts._config);
-	var ret = engine.executeOnText(str);
+	var ret = engine.executeOnText(str, opts.filename);
 
 	return ret;
 };
