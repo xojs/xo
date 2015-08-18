@@ -14,7 +14,7 @@ Enforce strict code style. Never discuss code style on a pull request again!
 
 No decision-making. No `.eslintrc`, `.jshintrc`, `.jscsrc` to manage. It just works!
 
-Uses [ESLint](http://eslint.org) underneath.
+Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should should be opened over [there](https://github.com/eslint/eslint/issues).
 
 
 ## Code style
@@ -173,17 +173,25 @@ The [Standard style](http://standardjs.com) is a really cool idea. I too wish we
 XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/sindresorhus/eslint-config-xo).
 
 
-## Editors
+## Editor plugins
 
-- Sublime Text: [SublimeLinter-contrib-xo](https://github.com/sindresorhus/SublimeLinter-contrib-xo)
-- Atom: [atom-linter-xo](https://github.com/sindresorhus/atom-linter-xo)
+- [Sublime Text](https://github.com/sindresorhus/SublimeLinter-contrib-xo)
+- [Atom](https://github.com/sindresorhus/atom-linter-xo)
 
 
-## Related
+## Build-system plugins
+
+- [Gulp](https://github.com/sindresorhus/gulp-xo)
+- [Grunt](https://github.com/sindresorhus/grunt-xo)
+- [webpack](https://github.com/Semigradsky/xo-loader)
+
+
+## Configs
 
 - [eslint-config-xo](https://github.com/sindresorhus/eslint-config-xo) - ESLint shareable config for XO
 - [eslint-config-xo-space](https://github.com/sindresorhus/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
 - [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
+- [jscs-config-xo](https://github.com/sindresorhus/jscs-config-xo) - JSCS shareable config for XO
 
 
 ## License
