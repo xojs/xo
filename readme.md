@@ -191,7 +191,7 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [eslint-config-xo](https://github.com/sindresorhus/eslint-config-xo) - ESLint shareable config for XO
 - [eslint-config-xo-space](https://github.com/sindresorhus/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
 - [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
-- [jscs-config-xo](https://github.com/sindresorhus/jscs-config-xo) - JSCS shareable config for XO
+- [jscs-xo](https://github.com/sindresorhus/jscs-xo) - JSCS shareable preset for XO
 
 
 ## License
