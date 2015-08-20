@@ -47,20 +47,22 @@ $ xo --help
     $ xo [<file|glob> ...]
 
   Options
-    --init     Add XO to your project
-    --compact  Compact output
-    --stdin    Validate code from stdin
-    --esnext   Enable ES2015 support and rules
-    --env      Environment preset  [Can be set multiple times]
-    --global   Global variable  [Can be set multiple times]
-    --ignore   Additional paths to ignore  [Can be set multiple times]
-    --space    Use space indent instead of tabs  [Default: 2]
+    --init       Add XO to your project
+    --compact    Compact output
+    --stdin      Validate code from stdin
+    --esnext     Enable ES2015 support and rules
+    --env        Environment preset  [Can be set multiple times]
+    --global     Global variable  [Can be set multiple times]
+    --ignore     Additional paths to ignore  [Can be set multiple times]
+    --space      Use space indent instead of tabs  [Default: 2]
+    --semicolon  Use semicolon or no-semicolon style  [Default: true]
 
   Examples
     $ xo
     $ xo index.js
     $ xo *.js !foo.js
     $ xo --esnext --space
+    $ xo --esnext --semicolon=false
     $ xo --esnext --env=node --env=mocha
 
   Tips
@@ -152,6 +154,13 @@ Default: `false` *(tab indentation)*
 Set it to `true` to get 2-space indentation or specify the number of spaces.
 
 This option exists for pragmatic reasons, but I would strongly recommend you read ["Why tabs are superior"](http://lea.verou.me/2012/01/why-tabs-are-clearly-superior/).
+
+### semicolon
+
+Type: `boolean`
+Default: `true` *(required semicolons)*
+
+Set it to `false` to enforce no-semicolon style.
 
 ### rules
 

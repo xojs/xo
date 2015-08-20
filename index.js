@@ -64,6 +64,18 @@ function handleOpts(opts) {
 		opts._config.rules.indent = [2, spaces, {SwitchCase: 1}];
 	}
 
+	if (typeof opts.semicolon !== 'undefined') {
+		if (!opts._config.rules) {
+			opts._config.rules = {};
+		}
+
+		var semicolons = opts.semicolon === false || opts.semicolon === 'false';
+		var semicolonRule = semicolons ? 'never' : 'always';
+		var whitespaceAfterSemicolon = semicolons !== true;
+		opts._config.rules.semi = [2, semicolonRule];
+		opts._config.rules['semi-spacing'] = [2, {before: false, after: whitespaceAfterSemicolon}];
+	}
+
 	if (opts.esnext) {
 		opts._config.baseConfig.extends = 'xo/esnext';
 	}
