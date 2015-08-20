@@ -55,25 +55,18 @@ function handleOpts(opts) {
 		rules: opts.rules
 	});
 
-	if (opts.space) {
-		if (!opts._config.rules) {
-			opts._config.rules = {};
-		}
+	if (!opts._config.rules) {
+		opts._config.rules = {};
+	}
 
+	if (opts.space) {
 		var spaces = typeof opts.space === 'number' ? opts.space : 2;
 		opts._config.rules.indent = [2, spaces, {SwitchCase: 1}];
 	}
 
-	if (typeof opts.semicolon !== 'undefined') {
-		if (!opts._config.rules) {
-			opts._config.rules = {};
-		}
-
-		var semicolons = opts.semicolon === false || opts.semicolon === 'false';
-		var semicolonRule = semicolons ? 'never' : 'always';
-		var whitespaceAfterSemicolon = semicolons !== true;
-		opts._config.rules.semi = [2, semicolonRule];
-		opts._config.rules['semi-spacing'] = [2, {before: false, after: whitespaceAfterSemicolon}];
+	if (opts.semicolon === false) {
+		opts._config.rules.semi = [2, 'never'];
+		opts._config.rules['semi-spacing'] = [2, {before: false, after: true}];
 	}
 
 	if (opts.esnext) {
