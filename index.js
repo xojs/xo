@@ -23,7 +23,9 @@ var DEFAULT_IGNORE = [
 
 var DEFAULT_CONFIG = {
 	useEslintrc: false,
-	configFile: path.join(__dirname, 'rc', '.eslintrc')
+	baseConfig: {
+		extends: 'xo'
+	}
 };
 
 function handleOpts(opts) {
@@ -63,7 +65,7 @@ function handleOpts(opts) {
 	}
 
 	if (opts.esnext) {
-		opts._config.configFile = path.join(__dirname, 'rc', '.eslintrc-esnext');
+		opts._config.baseConfig.extends = 'xo/esnext';
 	}
 
 	return opts;

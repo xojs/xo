@@ -18,8 +18,7 @@
   },
   "files": [
     "index.js",
-    "cli.js",
-    "rc"
+    "cli.js"
   ],
   "keywords": [
     "cli-app",
@@ -52,7 +51,7 @@
   ],
   "dependencies": {
     "arrify": "^1.0.0",
-    "eslint": "^1.1.0",
+    "eslint": "^1.2.0",
     "eslint-config-xo": "^0.3.0",
     "get-stdin": "^4.0.1",
     "globby": "^2.1.0",
