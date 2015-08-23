@@ -48,7 +48,7 @@ var input = cli.input;
 var opts = cli.flags;
 
 function log(report) {
-	console.log(xo.getFormatter(opts.compact && 'compact')(report.results));
+	process.stdout.write(xo.getFormatter(opts.compact && 'compact')(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
 }
 
