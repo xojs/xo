@@ -51,8 +51,10 @@
   ],
   "dependencies": {
     "arrify": "^1.0.0",
+    "babel-eslint": "^4.1.1",
     "eslint": "^1.2.0",
-    "eslint-config-xo": "^0.4.0",
+    "eslint-config-xo": "^0.5.0",
+    "eslint-plugin-babel": "^2.1.1",
     "get-stdin": "^4.0.1",
     "globby": "^2.1.0",
     "look-up": "^0.7.1",
