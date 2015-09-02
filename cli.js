@@ -64,7 +64,7 @@ if (input[0] === '-') {
 }
 
 if (opts.stdin) {
-	getStdin(function (str) {
+	getStdin().then(function (str) {
 		log(xo.lintText(str));
 	});
 

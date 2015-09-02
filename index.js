@@ -97,12 +97,7 @@ exports.lintFiles = function (patterns, opts, cb) {
 		patterns = DEFAULT_PATTERNS;
 	}
 
-	globby(patterns, {ignore: opts.ignores}, function (err, paths) {
-		if (err) {
-			cb(err);
-			return;
-		}
-
+	globby(patterns, {ignore: opts.ignores}).then(function (paths) {
 		// when users are silly and don't specify an extension in the glob pattern
 		paths = paths.filter(function (x) {
 			var ext = path.extname(x);
@@ -122,7 +117,7 @@ exports.lintFiles = function (patterns, opts, cb) {
 		ret._getFormatter = engine.getFormatter;
 
 		cb(null, ret);
-	});
+	}).catch(cb);
 };
 
 exports.getFormatter = eslint.CLIEngine.getFormatter;
