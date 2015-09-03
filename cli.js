@@ -59,7 +59,7 @@ function log(report) {
 }
 
 if (opts.init) {
-	require('xo-init')();
+	require('xo-init')().catch(error);
 	return;
 }
 

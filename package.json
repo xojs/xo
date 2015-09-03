@@ -61,7 +61,7 @@
     "object-assign": "^4.0.1",
     "pkg-conf": "^1.0.1",
     "update-notifier": "^0.5.0",
-    "xo-init": "^0.2.0"
+    "xo-init": "^0.3.0"
   },
   "devDependencies": {
     "ava": "*",
