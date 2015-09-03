@@ -14,7 +14,7 @@ Enforce strict code style. Never discuss code style on a pull request again!
 
 No decision-making. No `.eslintrc`, `.jshintrc`, `.jscsrc` to manage. It just works!
 
-Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should should be opened over [there](https://github.com/eslint/eslint/issues).
+Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
 
 ## Code style
@@ -74,7 +74,7 @@ $ xo --help
 
 The recommended workflow is to add XO locally to your project and run it with the tests.
 
-Simply run `$ xo --init` (with any options) to add XO to your package.json:
+Simply run `$ xo --init` (with any options) to add XO to your package.json or create one.
 
 ### Before
 
@@ -105,13 +105,16 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json:
 }
 ```
 
+Then just run `$ npm test` and XO will be run before your tests.
+
+
 ## Config
 
-You can configure some options in XO by putting it in `package.json`:
+You can configure some options in XO by putting it in package.json:
 
 ```js
 {
-	"name": "my-awesome-project",
+	"name": "awesome-package",
 	"xo": {
 		"envs": [
 			"node",
@@ -180,7 +183,7 @@ Set it to `false` to enforce no-semicolon style.
 
 #### Why not Standard?
 
-The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it easier to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
+The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it simple to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
 
 #### Why not ESLint?
 
