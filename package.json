@@ -57,9 +57,9 @@
     "eslint-plugin-babel": "^2.1.1",
     "get-stdin": "^5.0.0",
     "globby": "^3.0.0",
-    "look-up": "^0.7.1",
     "meow": "^3.3.0",
     "object-assign": "^4.0.1",
+    "pkg-conf": "^1.0.1",
     "update-notifier": "^0.5.0",
     "xo-init": "^0.2.0"
   },

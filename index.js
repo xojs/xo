@@ -2,9 +2,9 @@
 var path = require('path');
 var eslint = require('eslint');
 var globby = require('globby');
-var lookUp = require('look-up');
 var objectAssign = require('object-assign');
 var arrify = require('arrify');
+var pkgConf = require('pkg-conf');
 
 var DEFAULT_PATTERNS = [
 	'**/*.js',
@@ -33,13 +33,7 @@ function handleOpts(opts) {
 		cwd: process.cwd()
 	}, opts);
 
-	var pkgOpts = {};
-
-	try {
-		pkgOpts = require(lookUp('package.json', {cwd: opts.cwd})).xo;
-	} catch (err) {}
-
-	opts = objectAssign({}, pkgOpts, opts);
+	opts = objectAssign({}, pkgConf.sync('xo', opts.cwd), opts);
 
 	// alias to help humans
 	opts.envs = opts.envs || opts.env;
