@@ -48,6 +48,11 @@ updateNotifier({pkg: cli.pkg}).notify();
 var input = cli.input;
 var opts = cli.flags;
 
+function error(err) {
+	console.error(err.stack);
+	process.exit(1);
+}
+
 function log(report) {
 	process.stdout.write(xo.getFormatter(opts.compact && 'compact')(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
@@ -72,10 +77,4 @@ if (opts.stdin) {
 	return;
 }
 
-xo.lintFiles(input, opts, function (err, report) {
-	if (err) {
-		throw err;
-	}
-
-	log(report);
-});
+xo.lintFiles(input, opts).then(log).catch(error);

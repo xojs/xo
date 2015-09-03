@@ -74,44 +74,28 @@ exports.lintText = function (str, opts) {
 	opts = handleOpts(opts);
 
 	var engine = new eslint.CLIEngine(opts._config);
-	var ret = engine.executeOnText(str, opts.filename);
 
-	return ret;
+	return engine.executeOnText(str, opts.filename);
 };
 
-exports.lintFiles = function (patterns, opts, cb) {
-	if (typeof opts !== 'object') {
-		cb = opts;
-		opts = {};
-	}
-
+exports.lintFiles = function (patterns, opts) {
 	opts = handleOpts(opts);
 
 	if (patterns.length === 0) {
 		patterns = DEFAULT_PATTERNS;
 	}
 
-	globby(patterns, {ignore: opts.ignores}).then(function (paths) {
+	return globby(patterns, {ignore: opts.ignores}).then(function (paths) {
 		// when users are silly and don't specify an extension in the glob pattern
 		paths = paths.filter(function (x) {
 			var ext = path.extname(x);
 			return ext === '.js' || ext === '.jsx';
 		});
 
-		var ret;
 		var engine = new eslint.CLIEngine(opts._config);
 
-		try {
-			ret = engine.executeOnFiles(paths);
-		} catch (err) {
-			cb(err);
-			return;
-		}
-
-		ret._getFormatter = engine.getFormatter;
-
-		cb(null, ret);
-	}).catch(cb);
+		return engine.executeOnFiles(paths);
+	});
 };
 
 exports.getFormatter = eslint.CLIEngine.getFormatter;
