@@ -19,7 +19,7 @@ Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should sh
 
 ## Code style
 
-- Tab indentation
+- Tab indentation *[(or space)](#space)*
 - Semicolons
 - Single-quotes
 - No unused variables
@@ -74,13 +74,13 @@ $ xo --help
 
 The recommended workflow is to add XO locally to your project and run it with the tests.
 
-Simply run `$ xo --init` to add XO to your `package.json`:
+Simply run `$ xo --init` (with any options) to add XO to your package.json:
 
 ### Before
 
 ```json
 {
-	"name": "my-awesome-project",
+	"name": "awesome-package",
 	"scripts": {
 		"test": "mocha"
 	},
@@ -94,13 +94,13 @@ Simply run `$ xo --init` to add XO to your `package.json`:
 
 ```json
 {
-	"name": "my-awesome-project",
+	"name": "awesome-package",
 	"scripts": {
 		"test": "xo && mocha"
 	},
 	"devDependencies": {
 		"mocha": "^2.0.0",
-		"xo": "^0.5.0"
+		"xo": "^0.8.0"
 	}
 }
 ```
@@ -113,7 +113,10 @@ You can configure some options in XO by putting it in `package.json`:
 {
 	"name": "my-awesome-project",
 	"xo": {
-		"envs": ["node", "mocha"]
+		"envs": [
+			"node",
+			"mocha"
+		]
 	}
 }
 ```
@@ -125,7 +128,9 @@ You can configure some options in XO by putting it in `package.json`:
 Type: `boolean`  
 Default: `false`
 
-Enable ES2015 support and linting rules.
+Enable ES2015+ support and linting rules.
+
+This will let you use ES2016 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait) and [decorators](https://github.com/wycats/javascript-decorators). For a full list of features see [Babel's experimental features](https://babeljs.io/docs/usage/experimental/) and their [Learn ES2015](https://babeljs.io/docs/learn-es2015/).
 
 ### envs
 
@@ -175,7 +180,7 @@ Set it to `false` to enforce no-semicolon style.
 
 #### Why not Standard?
 
-The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! Unfortunately, they made the mistake of pushing their own style instead of the most popular one. I don't think it's realistic to convert everyone. In contrast, XO is more pragmatic and has no aspiration of being *the* style. XO does use tabs by default, but everything is configurable if necessary.
+The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it easier to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
 
 #### Why not ESLint?
 
