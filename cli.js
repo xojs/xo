@@ -14,7 +14,7 @@ var cli = meow({
 		'  --init          Add XO to your project',
 		'  --compact       Compact output',
 		'  --stdin         Validate code from stdin',
-		'  --esnext        Enable ES2015 support and rules',
+		'  --esnext        Enable ES2015+ rules',
 		'  --env           Environment preset  [Can be set multiple times]',
 		'  --global        Global variable  [Can be set multiple times]',
 		'  --ignore        Additional paths to ignore  [Can be set multiple times]',

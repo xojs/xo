@@ -52,7 +52,7 @@ $ xo --help
     --init          Add XO to your project
     --compact       Compact output
     --stdin         Validate code from stdin
-    --esnext        Enable ES2015 support and rules
+    --esnext        Enable ES2015+ rules
     --env           Environment preset  [Can be set multiple times]
     --global        Global variable  [Can be set multiple times]
     --ignore        Additional paths to ignore  [Can be set multiple times]
@@ -133,7 +133,7 @@ You can configure some options in XO by putting it in package.json:
 Type: `boolean`  
 Default: `false`
 
-Enable ES2015+ support and linting rules.
+ES2015 is parsed even without this option. Enabling this will give you ES2015+ support and rules.
 
 This will let you use ES2016 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait) and [decorators](https://github.com/wycats/javascript-decorators). For a full list of features see [Babel's experimental features](https://babeljs.io/docs/usage/experimental/) and their [Learn ES2015](https://babeljs.io/docs/learn-es2015/).
 
