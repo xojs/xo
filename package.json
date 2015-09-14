@@ -14,7 +14,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "ava"
+    "test": "xo && ava"
   },
   "files": [
     "index.js",
@@ -67,6 +67,6 @@
   },
   "devDependencies": {
     "ava": "*",
-    "xo": "sindresorhus/xo#v0.7.1"
+    "xo": "sindresorhus/xo#v0.9.0"
   }
 }

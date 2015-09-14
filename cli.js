@@ -58,23 +58,18 @@ function log(report) {
 	process.exit(report.errorCount === 0 ? 0 : 1);
 }
 
-if (opts.init) {
-	require('xo-init')().catch(error);
-	return;
-}
-
 // `xo -` => `xo --stdin`
 if (input[0] === '-') {
 	opts.stdin = true;
 	input.shift();
 }
 
-if (opts.stdin) {
+if (opts.init) {
+	require('xo-init')().catch(error);
+} else if (opts.stdin) {
 	getStdin().then(function (str) {
 		log(xo.lintText(str, opts));
 	});
-
-	return;
+} else {
+	xo.lintFiles(input, opts).then(log).catch(error);
 }
-
-xo.lintFiles(input, opts).then(log).catch(error);
