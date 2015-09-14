@@ -5,6 +5,7 @@ var globby = require('globby');
 var objectAssign = require('object-assign');
 var arrify = require('arrify');
 var pkgConf = require('pkg-conf');
+var deepAssign = require('deep-assign');
 
 var DEFAULT_PATTERNS = [
 	'**/*.js',
@@ -43,7 +44,7 @@ function handleOpts(opts) {
 
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
 
-	opts._config = objectAssign({}, DEFAULT_CONFIG, {
+	opts._config = deepAssign({}, DEFAULT_CONFIG, {
 		envs: arrify(opts.envs),
 		globals: arrify(opts.globals),
 		rules: opts.rules
@@ -64,7 +65,7 @@ function handleOpts(opts) {
 	}
 
 	if (opts.esnext) {
-		opts._config.baseConfig.extends = 'xo/esnext';
+		opts._config.baseConfig = 'xo/esnext';
 	}
 
 	return opts;
