@@ -7,19 +7,15 @@ var arrify = require('arrify');
 var pkgConf = require('pkg-conf');
 var deepAssign = require('deep-assign');
 
-var DEFAULT_PATTERNS = [
-	'**/*.js',
-	'**/*.jsx'
-];
-
 var DEFAULT_IGNORE = [
 	'node_modules/**',
 	'bower_components/**',
 	'coverage/**',
-	'tmp/**',
-	'temp/**',
+	'{tmp,temp}/**',
 	'**/*.min.js',
-	'**/bundle.js'
+	'**/bundle.js',
+	'fixture.js',
+	'{test/,}fixture{s,}/**'
 ];
 
 var DEFAULT_CONFIG = {
@@ -83,7 +79,7 @@ exports.lintFiles = function (patterns, opts) {
 	opts = handleOpts(opts);
 
 	if (patterns.length === 0) {
-		patterns = DEFAULT_PATTERNS;
+		patterns = '**/*.{js,jsx}';
 	}
 
 	return globby(patterns, {ignore: opts.ignores}).then(function (paths) {
