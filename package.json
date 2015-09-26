@@ -9,7 +9,7 @@
     "email": "sindresorhus@gmail.com",
     "url": "sindresorhus.com"
   },
-  "bin": "cli.js",
+  "bin": "cli-shim.js",
   "engines": {
     "node": ">=0.10.0"
   },
@@ -62,6 +62,7 @@
     "meow": "^3.3.0",
     "object-assign": "^4.0.1",
     "pkg-conf": "^1.0.1",
+    "resolve": "^1.1.6",
     "update-notifier": "^0.5.0",
     "xo-init": "^0.3.0"
   },
