@@ -18,6 +18,7 @@
   },
   "files": [
     "index.js",
+    "cli-shim.js",
     "cli.js"
   ],
   "keywords": [
