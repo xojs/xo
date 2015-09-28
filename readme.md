@@ -197,6 +197,17 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [Sublime Text](https://github.com/sindresorhus/SublimeLinter-contrib-xo)
 - [Atom](https://github.com/sindresorhus/atom-linter-xo)
 
+### Vim
+
+You can use [Syntastic](https://github.com/scrooloose/syntastic)'s ESLint checker with the following settings in your `.vimrc` file:
+
+```vim
+let g:syntastic_javascript_eslint_generic = 1
+let g:syntastic_javascript_eslint_exec = 'xo'
+let g:syntastic_javascript_eslint_args = '--compact'
+let g:syntastic_javascript_checkers = ['eslint']
+```
+
 
 ## Build-system plugins
 
