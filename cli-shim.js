@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 'use strict';
-var resolve = require('resolve');
-
-var cliPath;
-
-try {
-	cliPath = resolve.sync('xo/cli', {basedir: process.cwd()});
-	process.env.NO_UPDATE_NOTIFIER = 1;
-} catch (e) {
-	cliPath = './cli';
-}
-
-require(cliPath);
+require('fallback-cli')({
+	path: 'xo/cli',
+	before: function (location) {
+		if (location === 'local') {
+			process.env.NO_UPDATE_NOTIFIER = 1;
+		}
+	}
+});
