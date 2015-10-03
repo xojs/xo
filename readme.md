@@ -196,6 +196,7 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 - [Sublime Text](https://github.com/sindresorhus/SublimeLinter-contrib-xo)
 - [Atom](https://github.com/sindresorhus/atom-linter-xo)
+- [TextMate 2](https://github.com/claylo/XO.tmbundle)
 
 ### Vim
 
