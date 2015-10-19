@@ -216,6 +216,7 @@ let g:syntastic_javascript_checkers = ['eslint']
 - [Gulp](https://github.com/sindresorhus/gulp-xo)
 - [Grunt](https://github.com/sindresorhus/grunt-xo)
 - [webpack](https://github.com/Semigradsky/xo-loader)
+- [Metalsmith](https://github.com/blainsmith/metalsmith-xo)
 
 
 ## Configs
