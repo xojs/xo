@@ -29,4 +29,11 @@ test('.lintText() - plugin support', t => {
 	t.end();
 });
 
+test('.lintText() - prevent use of extended native objects', t => {
+	const results = fn.lintText('[].unicorn();\n').results;
+	t.is(results[0].messages[0].ruleId, 'no-use-extend-native/no-use-extend-native');
+	t.is(results[0].messages[0].message, 'Avoid using extended native objects');
+	t.end();
+});
+
 // TODO: more tests

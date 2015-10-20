@@ -66,6 +66,8 @@ function handleOpts(opts) {
 		opts._config.baseConfig = 'xo/esnext';
 	}
 
+	opts._config.plugins.push('no-use-extend-native');
+
 	return opts;
 }
 
