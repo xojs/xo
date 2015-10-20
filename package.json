@@ -67,6 +67,7 @@
   },
   "devDependencies": {
     "ava": "*",
+    "eslint-plugin-react": "^3.5.1",
     "xo": "sindresorhus/xo#v0.9.0"
   }
 }

@@ -19,4 +19,14 @@ test('.lintText() - JSX support', t => {
 	t.end();
 });
 
+test('.lintText() - plugin support', t => {
+	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
+		plugins: ['react'],
+		rules: {'react/jsx-no-undef': 2}
+	}).results;
+	t.is(results[0].messages[0].ruleId, 'react/jsx-no-undef');
+	t.is(results[0].messages[0].message, '\'App\' is not defined.');
+	t.end();
+});
+
 // TODO: more tests

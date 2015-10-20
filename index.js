@@ -36,6 +36,7 @@ function handleOpts(opts) {
 	opts.envs = opts.envs || opts.env;
 	opts.globals = opts.globals || opts.global;
 	opts.ignores = opts.ignores || opts.ignore;
+	opts.plugins = opts.plugins || opts.plugin;
 	opts.rules = opts.rules || opts.rule;
 
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
@@ -43,6 +44,7 @@ function handleOpts(opts) {
 	opts._config = deepAssign({}, DEFAULT_CONFIG, {
 		envs: arrify(opts.envs),
 		globals: arrify(opts.globals),
+		plugins: arrify(opts.plugins),
 		rules: opts.rules
 	});
 
