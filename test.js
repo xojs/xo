@@ -36,4 +36,13 @@ test('.lintText() - prevent use of extended native objects', t => {
 	t.end();
 });
 
+test('.lintText() - extends support', t => {
+	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
+		extends: 'xo-react'
+	}).results;
+	t.is(results[0].messages[0].ruleId, 'react/jsx-no-undef');
+	t.is(results[0].messages[0].message, '\'App\' is not defined.');
+	t.end();
+});
+
 // TODO: more tests

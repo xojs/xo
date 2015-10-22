@@ -59,6 +59,7 @@ $ xo --help
     --space         Use space indent instead of tabs  [Default: 2]
     --no-semicolon  Prevent use of semicolons
     --plugin        Include third-party plugins  [Can be set multiple times]
+    --extend        Extend defaults with a custom config  [Can be set multiple times]
 
   Examples
     $ xo
@@ -187,6 +188,12 @@ Set it to `false` to enforce no-semicolon style.
 Type: `array`
 
 Include third-party [plugins](http://eslint.org/docs/user-guide/configuring.html#configuring-plugins).
+
+### extends
+
+Type: `array`, `string`
+
+Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) to override any of the default rules (like `rules` above).
 
 
 ## FAQ

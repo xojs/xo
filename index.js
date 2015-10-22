@@ -6,6 +6,7 @@ var objectAssign = require('object-assign');
 var arrify = require('arrify');
 var pkgConf = require('pkg-conf');
 var deepAssign = require('deep-assign');
+var resolveFrom = require('resolve-from');
 
 var DEFAULT_IGNORE = [
 	'node_modules/**',
@@ -38,7 +39,9 @@ function handleOpts(opts) {
 	opts.ignores = opts.ignores || opts.ignore;
 	opts.plugins = opts.plugins || opts.plugin;
 	opts.rules = opts.rules || opts.rule;
+	opts.extends = opts.extends || opts.extend;
 
+	opts.extends = arrify(opts.extends);
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
 
 	opts._config = deepAssign({}, DEFAULT_CONFIG, {
@@ -64,6 +67,21 @@ function handleOpts(opts) {
 
 	if (opts.esnext) {
 		opts._config.baseConfig = 'xo/esnext';
+	}
+
+	if (opts.extends.length > 0) {
+		// user's configs must be resolved to their absolute paths
+		var configs = opts.extends.map(function (name) {
+			if (name.indexOf('eslint-config-') === -1) {
+				name = 'eslint-config-' + name;
+			}
+
+			return resolveFrom(process.cwd(), name);
+		});
+
+		configs.unshift('xo');
+
+		opts._config.baseConfig.extends = configs;
 	}
 
 	opts._config.plugins.push('no-use-extend-native');
