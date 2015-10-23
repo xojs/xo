@@ -28,6 +28,11 @@ var DEFAULT_CONFIG = {
 	}
 };
 
+var DEFAULT_PLUGINS = [
+	'no-use-extend-native',
+	'no-empty-blocks'
+];
+
 function handleOpts(opts) {
 	opts = objectAssign({
 		cwd: process.cwd()
@@ -49,7 +54,7 @@ function handleOpts(opts) {
 	opts._config = deepAssign({}, DEFAULT_CONFIG, {
 		envs: arrify(opts.envs),
 		globals: arrify(opts.globals),
-		plugins: arrify(opts.plugins),
+		plugins: DEFAULT_PLUGINS.concat(opts.plugins || []),
 		rules: opts.rules,
 		fix: opts.fix
 	});
@@ -86,8 +91,6 @@ function handleOpts(opts) {
 
 		opts._config.baseConfig.extends = configs;
 	}
-
-	opts._config.plugins.push('no-use-extend-native');
 
 	return opts;
 }
