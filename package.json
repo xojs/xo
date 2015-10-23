@@ -55,7 +55,7 @@
     "babel-eslint": "^4.1.1",
     "deep-assign": "^2.0.0",
     "eslint": "^1.7.3",
-    "eslint-config-xo": "^0.6.0",
+    "eslint-config-xo": "^0.7.0",
     "eslint-plugin-babel": "^2.1.1",
     "eslint-plugin-no-empty-blocks": "0.0.2",
     "eslint-plugin-no-use-extend-native": "^0.1.5",
