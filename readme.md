@@ -6,7 +6,7 @@
 	<br>
 </h1>
 
-> JavaScript happiness style ❤️ [XOXO](https://en.wiktionary.org/wiki/xoxo)
+> JavaScript happiness style linter ❤️
 
 [![Build Status](https://travis-ci.org/sindresorhus/xo.svg?branch=master)](https://travis-ci.org/sindresorhus/xo)
 
@@ -17,20 +17,6 @@ No decision-making. No `.eslintrc`, `.jshintrc`, `.jscsrc` to manage. It just wo
 Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
 JSX is supported by default.
-
-
-## Code style
-
-- Tab indentation *[(or space)](#space)*
-- Semicolons
-- Single-quotes
-- No unused variables
-- Space after keyword `if (condition) {}`
-- Always `===` instead of `==`
-
-*Any of these can be [overridden](#rules) if necessary.*
-
-Check out an [example](index.js) and the [ESLint rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js).
 
 
 ## Install
@@ -74,6 +60,20 @@ $ xo --help
   Tips
     Put options in package.json instead of using flags so other tools can read it.
 ```
+
+
+## Default code style
+
+*Any of these can be [overridden](#rules) if necessary.*
+
+- Tab indentation *[(or space)](#space)*
+- Semicolons
+- Single-quotes
+- No unused variables
+- Space after keyword `if (condition) {}`
+- Always `===` instead of `==`
+
+Check out an [example](index.js) and the [ESLint rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js).
 
 
 ## Workflow
