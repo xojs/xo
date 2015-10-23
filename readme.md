@@ -157,7 +157,7 @@ Additional global variables your code accesses during execution.
 
 Type: `array`
 
-Some [paths](https://github.com/sindresorhus/xo/blob/0a6188777dda181386af9435eeca29eb3e58dbbd/index.js#L10-L19) are ignored by default. Additional ignores can be added here.
+Some [paths](https://github.com/sindresorhus/xo/blob/d19b433347c4909fdb63233fde4bc1ffa2fad036/index.js#L12-L21) are ignored by default. Additional ignores can be added here.
 
 ### space
 

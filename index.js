@@ -15,8 +15,10 @@ var DEFAULT_IGNORE = [
 	'{tmp,temp}/**',
 	'**/*.min.js',
 	'**/bundle.js',
-	'fixture.js',
-	'{test/,}fixture{s,}/**'
+	'fixture{-*,}.{js,jsx}',
+	'{test/,}fixture{s,}/**',
+	'vendor/**',
+	'dist/**'
 ];
 
 var DEFAULT_CONFIG = {
