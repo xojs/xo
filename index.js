@@ -29,8 +29,11 @@ var DEFAULT_CONFIG = {
 };
 
 var DEFAULT_PLUGINS = [
-	'no-use-extend-native',
 	'no-empty-blocks'
+
+	// disabled because of
+	// https://github.com/dustinspecker/eslint-plugin-no-use-extend-native/issues/7
+	// 'no-use-extend-native'
 ];
 
 function handleOpts(opts) {
