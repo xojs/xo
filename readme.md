@@ -199,6 +199,10 @@ Use one or more [shareable configs](http://eslint.org/docs/developer-guide/share
 
 ## FAQ
 
+#### What does XO mean?
+
+It means [hugs and kisses](https://en.wiktionary.org/wiki/xoxo).
+
 #### Why not Standard?
 
 The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it simple to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
