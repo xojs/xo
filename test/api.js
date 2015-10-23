@@ -1,5 +1,5 @@
 import test from 'ava';
-import fn from './';
+import fn from '../';
 
 function hasRule(results, ruleId) {
 	return results[0].messages.some(x => x.ruleId === ruleId);
@@ -45,5 +45,3 @@ test('.lintText() - extends support', t => {
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 	t.end();
 });
-
-// TODO: more tests

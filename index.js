@@ -50,7 +50,8 @@ function handleOpts(opts) {
 		envs: arrify(opts.envs),
 		globals: arrify(opts.globals),
 		plugins: arrify(opts.plugins),
-		rules: opts.rules
+		rules: opts.rules,
+		fix: opts.fix
 	});
 
 	if (!opts._config.rules) {
@@ -121,3 +122,4 @@ exports.lintFiles = function (patterns, opts) {
 
 exports.getFormatter = eslint.CLIEngine.getFormatter;
 exports.getErrorResults = eslint.CLIEngine.getErrorResults;
+exports.outputFixes = eslint.CLIEngine.outputFixes;

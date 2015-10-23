@@ -50,6 +50,7 @@ $ xo --help
 
   Options
     --init          Add XO to your project
+    --fix           Automagically fix issues
     --compact       Compact output
     --stdin         Validate code from stdin
     --esnext        Enable ES2015+ rules

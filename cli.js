@@ -12,6 +12,7 @@ var cli = meow({
 		'',
 		'Options',
 		'  --init          Add XO to your project',
+		'  --fix           Automagically fix issues',
 		'  --compact       Compact output',
 		'  --stdin         Validate code from stdin',
 		'  --esnext        Enable ES2015+ rules',
@@ -42,7 +43,8 @@ var cli = meow({
 	boolean: [
 		'init',
 		'compact',
-		'stdin'
+		'stdin',
+		'fix'
 	]
 });
 
@@ -71,8 +73,19 @@ if (opts.init) {
 	require('xo-init')().catch(error);
 } else if (opts.stdin) {
 	getStdin().then(function (str) {
+		if (opts.fix) {
+			console.error('The `fix` option is not supported on stdin');
+			process.exit(1);
+		}
+
 		log(xo.lintText(str, opts));
 	});
 } else {
-	xo.lintFiles(input, opts).then(log).catch(error);
+	xo.lintFiles(input, opts).then(function (report) {
+		if (opts.fix) {
+			xo.outputFixes(report);
+		}
+
+		log(report);
+	}).catch(error);
 }
