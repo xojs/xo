@@ -60,7 +60,7 @@
     "eslint-plugin-no-use-extend-native": "^0.1.5",
     "get-stdin": "^5.0.0",
     "globby": "^3.0.0",
-    "meow": "^3.3.0",
+    "meow": "^3.4.2",
     "object-assign": "^4.0.1",
     "pkg-conf": "^1.0.1",
     "resolve-from": "^1.0.1",

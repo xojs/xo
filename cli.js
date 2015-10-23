@@ -53,11 +53,6 @@ updateNotifier({pkg: cli.pkg}).notify();
 var input = cli.input;
 var opts = cli.flags;
 
-function error(err) {
-	console.error(err.stack);
-	process.exit(1);
-}
-
 function log(report) {
 	process.stdout.write(xo.getFormatter(opts.compact && 'compact')(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
@@ -70,7 +65,7 @@ if (input[0] === '-') {
 }
 
 if (opts.init) {
-	require('xo-init')().catch(error);
+	require('xo-init')();
 } else if (opts.stdin) {
 	getStdin().then(function (str) {
 		if (opts.fix) {
@@ -87,5 +82,5 @@ if (opts.init) {
 		}
 
 		log(report);
-	}).catch(error);
+	});
 }
