@@ -7,6 +7,7 @@ var arrify = require('arrify');
 var pkgConf = require('pkg-conf');
 var deepAssign = require('deep-assign');
 var resolveFrom = require('resolve-from');
+var homeOrTmp = require('home-or-tmp');
 
 var DEFAULT_IGNORE = [
 	'node_modules/**',
@@ -23,6 +24,8 @@ var DEFAULT_IGNORE = [
 
 var DEFAULT_CONFIG = {
 	useEslintrc: false,
+	cache: true,
+	cacheLocation: path.join(homeOrTmp, '.xo-cache/'),
 	baseConfig: {
 		extends: 'xo'
 	}
