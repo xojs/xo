@@ -1,6 +1,6 @@
 <h1 align="center">
 	<br>
-	<img width="400" src="https://cdn.rawgit.com/sindresorhus/xo/bb540ee5cee63c32dae6b6d8e3d1626cb24ba8e8/media/logo.svg" alt="XO">
+	<img width="400" src="https://cdn.rawgit.com/sindresorhus/xo/5d23bf1e280f574579825dc1a29ed22c69790acf/media/logo.svg" alt="XO">
 	<br>
 	<br>
 	<br>
