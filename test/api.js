@@ -45,3 +45,12 @@ test('.lintText() - extends support', t => {
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 	t.end();
 });
+
+test('.lintText() - extends support with `esnext` option', t => {
+	const results = fn.lintText('import path from \'path\';\nvar React;\nReact.render(<App/>);\n', {
+		esnext: true,
+		extends: 'xo-react'
+	}).results;
+	t.true(hasRule(results, 'react/jsx-no-undef'));
+	t.end();
+});

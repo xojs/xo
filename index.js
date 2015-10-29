@@ -77,7 +77,7 @@ function handleOpts(opts) {
 	}
 
 	if (opts.esnext) {
-		opts._config.baseConfig = 'xo/esnext';
+		opts._config.baseConfig.extends = 'xo/esnext';
 	}
 
 	if (opts.extends.length > 0) {
@@ -90,7 +90,7 @@ function handleOpts(opts) {
 			return resolveFrom(process.cwd(), name);
 		});
 
-		configs.unshift('xo');
+		configs.unshift(opts._config.baseConfig.extends);
 
 		opts._config.baseConfig.extends = configs;
 	}
