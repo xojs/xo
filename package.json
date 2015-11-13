@@ -58,7 +58,7 @@
     "eslint-config-xo": "^0.7.0",
     "eslint-plugin-babel": "^2.1.1",
     "eslint-plugin-no-empty-blocks": "0.0.2",
-    "eslint-plugin-no-use-extend-native": "^0.1.5",
+    "eslint-plugin-no-use-extend-native": "^0.3.1",
     "get-stdin": "^5.0.0",
     "globby": "^3.0.0",
     "home-or-tmp": "^2.0.0",
