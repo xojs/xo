@@ -88,7 +88,7 @@ function handleOpts(opts) {
 				name = 'eslint-config-' + name;
 			}
 
-			return resolveFrom(process.cwd(), name);
+			return resolveFrom(opts.cwd, name);
 		});
 
 		configs.unshift(opts._config.baseConfig.extends);
