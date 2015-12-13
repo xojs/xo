@@ -28,10 +28,10 @@ test('.lintText() - plugin support', t => {
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
-// test('.lintText() - prevent use of extended native objects', t => {
-// 	const results = fn.lintText('[].unicorn();\n').results;
-// 	t.true(hasRule(results, 'no-use-extend-native/no-use-extend-native'));
-// });
+test('.lintText() - prevent use of extended native objects', t => {
+	const results = fn.lintText('[].unicorn();\n').results;
+	t.true(hasRule(results, 'no-use-extend-native/no-use-extend-native'));
+});
 
 test('.lintText() - extends support', t => {
 	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
