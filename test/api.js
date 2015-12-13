@@ -47,3 +47,8 @@ test('.lintText() - extends support with `esnext` option', t => {
 	}).results;
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
+
+test('always use the Babel parser so esnext syntax won\'t throw in normal mode', t => {
+	const results = fn.lintText('async function foo() {}\n\nfoo();\n').results;
+	t.is(results[0].errorCount, 0);
+});

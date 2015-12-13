@@ -138,9 +138,9 @@ You can configure some options in XO by putting it in package.json:
 Type: `boolean`  
 Default: `false`
 
-ES2015 is parsed even without this option. Enabling this will give you ES2015+ support and rules.
+Enable ES2015+ rules.
 
-This will let you use ES2016 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait) and [decorators](https://github.com/wycats/javascript-decorators). For a full list of features see [Babel's experimental features](https://babeljs.io/docs/usage/experimental/) and their [Learn ES2015](https://babeljs.io/docs/learn-es2015/).
+*ES2015+ is parsed even without this option. You can already use ES2016 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait) and [decorators](https://github.com/wycats/javascript-decorators). For a full list of features see [Babel's experimental features](https://babeljs.io/docs/usage/experimental/) and their [Learn ES2015](https://babeljs.io/docs/learn-es2015/).*
 
 ### envs
 

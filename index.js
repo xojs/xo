@@ -79,6 +79,15 @@ function handleOpts(opts) {
 
 	if (opts.esnext) {
 		opts._config.baseConfig.extends = 'xo/esnext';
+	} else {
+		// always use the Babel parser so it won't throw
+		// on esnext features in normal mode
+		opts._config.parser = 'babel-eslint';
+		opts._config.plugins = ['babel'];
+		opts._config.rules['generator-star-spacing'] = 0;
+		opts._config.rules['arrow-parens'] = 0;
+		opts._config.rules['object-curly-spacing'] = 0;
+		opts._config.rules['babel/object-curly-spacing'] = [2, 'never'];
 	}
 
 	if (opts.extends.length > 0) {
