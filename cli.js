@@ -2,7 +2,9 @@
 'use strict';
 var updateNotifier = require('update-notifier');
 var getStdin = require('get-stdin');
+var spawn = require('child_process').spawn;
 var meow = require('meow');
+var path = require('path');
 var xo = require('./');
 
 var cli = meow({
@@ -23,6 +25,7 @@ var cli = meow({
 		'  --no-semicolon  Prevent use of semicolons',
 		'  --plugin        Include third-party plugins  [Can be set multiple times]',
 		'  --extend        Extend defaults with a custom config  [Can be set multiple times]',
+		'  --open          Open files with issues in your editor',
 		'',
 		'Examples',
 		'  $ xo',
@@ -44,7 +47,8 @@ var cli = meow({
 		'init',
 		'compact',
 		'stdin',
-		'fix'
+		'fix',
+		'open'
 	]
 });
 
@@ -56,6 +60,44 @@ var opts = cli.flags;
 function log(report) {
 	process.stdout.write(xo.getFormatter(opts.compact && 'compact')(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
+}
+
+function open(report) {
+	if (report.errorCount === 0) {
+		return;
+	}
+
+	var editor = process.env.EDITOR;
+
+	if (!editor) {
+		console.log();
+		console.log('`open` option was used, but your $EDITOR environment variable is empty.');
+		console.log('Fix it by setting path to your editor of choice in ~/.bashrc or ~/.zshrc:');
+		console.log();
+		console.log('    export EDITOR=atom');
+		console.log();
+		return;
+	}
+
+	var executableName = editor.split(path.sep).pop();
+
+	var files = report.results
+		.filter(function (file) {
+			return file.errorCount > 0;
+		})
+		.map(function (file) {
+			// Sublime Text and Atom support opening file at exact position
+			if (['subl', 'atom'].indexOf(executableName) >= 0) {
+				return file.filePath + ':' + file.messages[0].line + ':' + file.messages[0].column;
+			}
+
+			return file.filePath;
+		});
+
+	spawn(editor, files, {
+		detached: true,
+		stdio: 'ignore'
+	}).unref();
 }
 
 // `xo -` => `xo --stdin`
@@ -73,12 +115,21 @@ if (opts.init) {
 			process.exit(1);
 		}
 
+		if (opts.open) {
+			console.error('The `open` option is not supported on stdin');
+			process.exit(1);
+		}
+
 		log(xo.lintText(str, opts));
 	});
 } else {
 	xo.lintFiles(input, opts).then(function (report) {
 		if (opts.fix) {
 			xo.outputFixes(report);
+		}
+
+		if (opts.open) {
+			open(report);
 		}
 
 		log(report);
