@@ -89,10 +89,10 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
 {
 	"name": "awesome-package",
 	"scripts": {
-		"test": "mocha"
+		"test": "ava"
 	},
 	"devDependencies": {
-		"mocha": "^2.0.0"
+		"ava": "^0.7.0"
 	}
 }
 ```
@@ -103,11 +103,11 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
 {
 	"name": "awesome-package",
 	"scripts": {
-		"test": "xo && mocha"
+		"test": "xo && ava"
 	},
 	"devDependencies": {
-		"mocha": "^2.0.0",
-		"xo": "^0.8.0"
+		"ava": "^0.7.0",
+		"xo": "^0.12.0"
 	}
 }
 ```
@@ -123,10 +123,7 @@ You can configure some options in XO by putting it in package.json:
 {
 	"name": "awesome-package",
 	"xo": {
-		"envs": [
-			"node",
-			"mocha"
-		]
+		"esnext": true
 	}
 }
 ```
