@@ -183,6 +183,7 @@ test('groupConfigs', t => {
 	const paths = [
 		'/user/foo/hello.js',
 		'/user/foo/goodbye.js',
+		'/user/foo/howdy.js',
 		'/user/bar/hello.js'
 	];
 
@@ -192,8 +193,12 @@ test('groupConfigs', t => {
 
 	const overrides = [
 		{
-			files: '**/bar/*',
+			files: '**/foo/*',
 			esnext: false
+		},
+		{
+			files: '**/foo/howdy.js',
+			space: 3
 		}
 	];
 
@@ -201,11 +206,15 @@ test('groupConfigs', t => {
 
 	t.same(result, [
 		{
-			opts: {esnext: true},
+			opts: {esnext: false},
 			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
 		},
 		{
-			opts: {esnext: false},
+			opts: {esnext: false, space: 3},
+			paths: ['/user/foo/howdy.js']
+		},
+		{
+			opts: {esnext: true},
 			paths: ['/user/bar/hello.js']
 		}
 	]);
