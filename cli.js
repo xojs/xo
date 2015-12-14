@@ -81,20 +81,39 @@ function open(report) {
 
 	var executableName = editor.split(path.sep).pop();
 
-	var files = report.results
+	function lineColumn(message) {
+		return message.line + ':' + message.column;
+	}
+
+	var args = [];
+
+	report.results
 		.filter(function (file) {
 			return file.errorCount > 0;
 		})
-		.map(function (file) {
+		.forEach(function (file) {
 			// Sublime Text and Atom support opening file at exact position
 			if (['subl', 'atom'].indexOf(executableName) >= 0) {
-				return file.filePath + ':' + file.messages[0].line + ':' + file.messages[0].column;
+				args.push(file.filePath + ':' + lineColumn(file.messages[0]));
+				return;
 			}
 
-			return file.filePath;
+			// WebStorm supports opening file on a specific line (no column support)
+			if (executableName === 'wstorm') {
+				args.push(file.filePath + ':' + file.messages[0].line);
+				return;
+			}
+
+			// TextMate requires a `--line` option
+			if (executableName === 'mate') {
+				args.push('--line', lineColumn(file.messages[0]), file.filePath);
+				return;
+			}
+
+			args.push(file.filePath);
 		});
 
-	spawn(editor, files, {
+	spawn(editor, args, {
 		detached: true,
 		stdio: 'ignore'
 	}).unref();
