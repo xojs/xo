@@ -1,14 +1,12 @@
 import test from 'ava';
 import proxyquire from 'proxyquire';
 
-const manager = proxyquire('../opts', {
-	'resolve-from': function(cwd, path) {
-		return 'cwd/' + path;
-	}
+const manager = proxyquire('../options-manager', {
+	'resolve-from': (cwd, path) => `cwd/${path}`
 });
 
 test('normalizeOpts: makes all the opts plural and arrays', t => {
-	var opts = {
+	let opts = {
 		env: 'node',
 		global: 'foo',
 		ignore: 'test.js',
@@ -17,7 +15,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		extend: 'foo'
 	};
 
-	manager.normalizeOpts(opts);
+	opts = manager.normalizeOpts(opts);
 
 	t.same(opts, {
 		envs: ['node'],
@@ -30,15 +28,15 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 });
 
 test('normalizeOpts: falsie values stay falsie', t => {
-	var opts = {};
+	let opts = {};
 
-	manager.normalizeOpts(opts);
+	opts = manager.normalizeOpts(opts);
 
 	t.same(opts, {});
 });
 
 test('buildConfig: defaults', t => {
-	var config = manager.buildConfig({});
+	const config = manager.buildConfig({});
 
 	t.true(/[\\\/]\.xo-cache[\\\/]?$/.test(config.cacheLocation));
 	delete config.cacheLocation;
@@ -59,7 +57,7 @@ test('buildConfig: defaults', t => {
 });
 
 test('buildConfig: esnext', t => {
-	var config = manager.buildConfig({
+	const config = manager.buildConfig({
 		esnext: true
 	});
 
@@ -77,7 +75,7 @@ test('buildConfig: esnext', t => {
 });
 
 test('buildConfig: space: true', t => {
-	var config = manager.buildConfig({
+	const config = manager.buildConfig({
 		space: true
 	});
 
@@ -100,7 +98,7 @@ test('buildConfig: space: true', t => {
 });
 
 test('buildConfig: space: 4', t => {
-	var config = manager.buildConfig({
+	const config = manager.buildConfig({
 		space: 4
 	});
 
@@ -123,7 +121,7 @@ test('buildConfig: space: 4', t => {
 });
 
 test('buildConfig: semicolon', t => {
-	var config = manager.buildConfig({
+	const config = manager.buildConfig({
 		semicolon: false
 	});
 	delete config.cacheLocation;
@@ -146,7 +144,7 @@ test('buildConfig: semicolon', t => {
 });
 
 test('buildConfig: extends is resolved to cwd', t => {
-	var config = manager.buildConfig({
+	const config = manager.buildConfig({
 		extends: ['foo']
 	});
 
@@ -167,3 +165,48 @@ test('buildConfig: extends is resolved to cwd', t => {
 	});
 });
 
+test('findApplicableOverrides', t => {
+	const result = manager.findApplicableOverrides('/user/dir/foo.js', [
+		{files: '**/f*.js'},
+		{files: '**/bar.js'},
+		{files: '**/*oo.js'},
+		{files: '**/*.txt'}
+	]);
+	t.is(result.hash, parseInt('1010', 2));
+	t.same(result.applicable, [
+		{files: '**/f*.js'},
+		{files: '**/*oo.js'}
+	]);
+});
+
+test('groupConfigs', t => {
+	const paths = [
+		'/user/foo/hello.js',
+		'/user/foo/goodbye.js',
+		'/user/bar/hello.js'
+	];
+
+	const opts = {
+		esnext: true
+	};
+
+	const overrides = [
+		{
+			files: '**/bar/*',
+			esnext: false
+		}
+	];
+
+	const result = manager.groupConfigs(paths, opts, overrides);
+
+	t.same(result, [
+		{
+			opts: {esnext: true},
+			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
+		},
+		{
+			opts: {esnext: false},
+			paths: ['/user/bar/hello.js']
+		}
+	]);
+});

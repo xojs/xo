@@ -18,6 +18,7 @@
   },
   "files": [
     "index.js",
+    "options-manager.js",
     "cli.js"
   ],
   "keywords": [
@@ -64,7 +65,9 @@
     "globby": "^4.0.0",
     "home-or-tmp": "^2.0.0",
     "meow": "^3.4.2",
+    "multimatch": "^2.1.0",
     "object-assign": "^4.0.1",
+    "pinkie-promise": "^2.0.0",
     "pkg-conf": "^1.0.1",
     "resolve-cwd": "^1.0.0",
     "resolve-from": "^2.0.0",

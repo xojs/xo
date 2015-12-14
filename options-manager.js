@@ -6,6 +6,7 @@ var deepAssign = require('deep-assign');
 var resolveFrom = require('resolve-from');
 var objectAssign = require('object-assign');
 var homeOrTmp = require('home-or-tmp');
+var mutlimatch = require('multimatch');
 
 var DEFAULT_IGNORE = [
 	'node_modules/**',
@@ -36,6 +37,7 @@ var DEFAULT_PLUGINS = [
 ];
 
 function normalizeOpts(opts) {
+	opts = objectAssign({}, opts);
 	// alias to help humans
 	['env', 'global', 'ignore', 'plugin', 'rule', 'extend'].forEach(function (singular) {
 		var plural = singular + 's';
@@ -119,8 +121,59 @@ function buildConfig(opts) {
 	return config;
 }
 
+// Builds a list of overrides for a particular path, and a hash value.
+// The hash value is a binary representation of which elements in the `overrides` array apply to the path.
+//
+// If overrides.length === 4, and only the first and third elements apply, then our hash is: 1010 (in binary)
+function findApplicableOverrides(path, overrides) {
+	var hash = 0;
+	var applicable = [];
+	overrides.forEach(function (override) {
+		hash <<= 1;
+		if (mutlimatch(path, override.files).length > 0) {
+			applicable.push(override);
+			hash |= 1;
+		}
+	});
+	return {
+		hash: hash,
+		applicable: applicable
+	};
+}
+
+// Creates grouped sets of merged options together with the paths they apply to.
+function groupConfigs(paths, baseOptions, overrides) {
+	var map = {};
+	var arr = [];
+
+	paths.forEach(function (x) {
+		var data = findApplicableOverrides(x, overrides);
+		if (!map[data.hash]) {
+			var mergedOpts = deepAssign.apply(null, [{}, baseOptions].concat(data.applicable));
+			delete mergedOpts.files;
+			arr.push(map[data.hash] = {
+				opts: mergedOpts,
+				paths: []
+			});
+		}
+		map[data.hash].paths.push(x);
+	});
+
+	return arr;
+}
+
+function preprocess(opts) {
+	opts = mergeWithPkgConf(opts);
+	opts = normalizeOpts(opts);
+	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+	return opts;
+}
+
 exports.DEFAULT_IGNORE = DEFAULT_IGNORE;
 exports.DEFAULT_CONFIG = DEFAULT_CONFIG;
 exports.mergeWithPkgConf = mergeWithPkgConf;
 exports.normalizeOpts = normalizeOpts;
 exports.buildConfig = buildConfig;
+exports.findApplicableOverrides = findApplicableOverrides;
+exports.groupConfigs = groupConfigs;
+exports.preprocess = preprocess;

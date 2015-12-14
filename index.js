@@ -2,17 +2,11 @@
 var path = require('path');
 var eslint = require('eslint');
 var globby = require('globby');
-var optsHandler = require('./opts');
-
-function optsToConfig(opts) {
-	opts = optsHandler.mergeWithPkgConf(opts);
-	opts = optsHandler.normalizeOpts(opts);
-	opts.ignores = opts.ignore = optsHandler.DEFAULT_IGNORE.concat(opts.ignores || []);
-	return optsHandler.buildConfig(opts);
-}
+var optionsManager = require('./options-manager');
 
 exports.lintText = function (str, opts) {
-	opts = optsToConfig(opts);
+	opts = optionsManager.preprocess(opts);
+	opts = optionsManager.buildConfig(opts);
 
 	var engine = new eslint.CLIEngine(opts);
 
@@ -20,7 +14,7 @@ exports.lintText = function (str, opts) {
 };
 
 exports.lintFiles = function (patterns, opts) {
-	opts = optsToConfig(opts);
+	opts = optionsManager.preprocess(opts);
 
 	if (patterns.length === 0) {
 		patterns = '**/*.{js,jsx}';
@@ -33,11 +27,41 @@ exports.lintFiles = function (patterns, opts) {
 			return ext === '.js' || ext === '.jsx';
 		});
 
-		var engine = new eslint.CLIEngine(opts);
+		if (!(opts.overrides && opts.overrides.length)) {
+			return runEslint(paths, opts);
+		}
 
-		return engine.executeOnFiles(paths);
+		var overrides = opts.overrides;
+		delete opts.overrides;
+
+		var grouped = optionsManager.groupConfigs(paths, opts, overrides);
+
+		return Promise.all(grouped.map(function (data) {
+			return runEslint(data.paths, data.opts);
+		})).then(function (reports) {
+			// merge multiple reports into a single report
+			var results = [];
+			var errorCount = 0;
+			var warningCount = 0;
+			reports.forEach(function (report) {
+				results = results.concat(report.results);
+				errorCount += report.errorCount;
+				warningCount += report.warningCount;
+			});
+			return {
+				errorCount: errorCount,
+				warningCount: warningCount,
+				results: results
+			};
+		});
 	});
 };
+
+function runEslint(paths, opts) {
+	var config = optionsManager.buildConfig(opts);
+	var engine = new eslint.CLIEngine(config);
+	return engine.executeOnFiles(paths, config);
+}
 
 exports.getFormatter = eslint.CLIEngine.getFormatter;
 exports.getErrorResults = eslint.CLIEngine.getErrorResults;
