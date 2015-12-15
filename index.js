@@ -83,7 +83,7 @@ function handleOpts(opts) {
 		// always use the Babel parser so it won't throw
 		// on esnext features in normal mode
 		opts._config.parser = 'babel-eslint';
-		opts._config.plugins = ['babel'];
+		opts._config.plugins = ['babel'].concat(opts._config.plugins);
 		opts._config.rules['generator-star-spacing'] = 0;
 		opts._config.rules['arrow-parens'] = 0;
 		opts._config.rules['object-curly-spacing'] = 0;
