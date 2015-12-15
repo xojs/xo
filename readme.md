@@ -62,6 +62,8 @@ $ xo --help
     Put options in package.json instead of using flags so other tools can read it.
 ```
 
+*Note that the CLI will use your local install of XO when available, even when run globally.*
+
 
 ## Default code style
 
