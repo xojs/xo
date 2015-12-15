@@ -1,5 +1,18 @@
 #!/usr/bin/env node
 'use strict';
+
+var debug = require('debug')('xo');
+
+// Prefer the local installation of XO.
+var resolveCwd = require('resolve-cwd');
+var localCLI = resolveCwd('xo/cli');
+
+if (localCLI && localCLI !== __filename) {
+	debug('Using local install of XO.');
+	require(localCLI);
+	return;
+}
+
 var updateNotifier = require('update-notifier');
 var getStdin = require('get-stdin');
 var spawn = require('child_process').spawn;
