@@ -10,8 +10,8 @@ var resolveFrom = require('resolve-from');
 var homeOrTmp = require('home-or-tmp');
 
 var DEFAULT_IGNORE = [
-	'node_modules/**',
-	'bower_components/**',
+	'**/node_modules/**',
+	'**/bower_components/**',
 	'coverage/**',
 	'{tmp,temp}/**',
 	'**/*.min.js',
