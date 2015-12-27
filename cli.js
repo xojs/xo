@@ -5,9 +5,10 @@ var debug = require('debug')('xo');
 
 // Prefer the local installation of XO.
 var resolveCwd = require('resolve-cwd');
+var hasFlag = require('has-flag');
 var localCLI = resolveCwd('xo/cli');
 
-if (localCLI && localCLI !== __filename) {
+if (!hasFlag('no-local') && localCLI && localCLI !== __filename) {
 	debug('Using local install of XO.');
 	require(localCLI);
 	return;
