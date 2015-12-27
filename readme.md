@@ -199,7 +199,7 @@ Use one or more [shareable configs](http://eslint.org/docs/developer-guide/share
 
 ## Config Overrides
 
-XO makes it easy to override configs for specific files, using the `overrides` config option. The `overrides` option is an array of objects. Each of which must contain a `files` property which specifies a glob string (or array of glob strings). The remaining properties are identical to those described above, and will be used to override the values of the base config. Every override who's glob string(s) match is applied in the order specified in the array (this means the overrides specified lower down take precedence). Consider the following configuration.
+XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
  
 ```json
 {
