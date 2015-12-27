@@ -31,9 +31,8 @@ var DEFAULT_CONFIG = {
 };
 
 var DEFAULT_PLUGINS = [
-	'no-empty-blocks'
-	// https://github.com/dustinspecker/eslint-plugin-no-use-extend-native/issues/16
-	// 'no-use-extend-native'
+	'no-empty-blocks',
+	'no-use-extend-native'
 ];
 
 function normalizeOpts(opts) {
@@ -96,7 +95,7 @@ function buildConfig(opts) {
 		// always use the Babel parser so it won't throw
 		// on esnext features in normal mode
 		config.parser = 'babel-eslint';
-		config.plugins = ['babel'];
+		config.plugins = ['babel'].concat(config.plugins);
 		config.rules['generator-star-spacing'] = 0;
 		config.rules['arrow-parens'] = 0;
 		config.rules['object-curly-spacing'] = 0;

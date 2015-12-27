@@ -45,7 +45,7 @@ test('buildConfig: defaults', t => {
 		useEslintrc: false,
 		cache: true,
 		baseConfig: {extends: 'xo'},
-		plugins: ['babel'],
+		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
 		rules: {
 			'generator-star-spacing': 0,
 			'arrow-parens': 0,
@@ -70,7 +70,7 @@ test('buildConfig: esnext', t => {
 		baseConfig: {extends: 'xo/esnext'},
 		rules: {},
 		// TODO: Note that all plugins are blown away if esnext !== true
-		plugins: ['no-empty-blocks']
+		plugins: ['no-empty-blocks', 	'no-use-extend-native']
 	});
 });
 
@@ -85,7 +85,7 @@ test('buildConfig: space: true', t => {
 		useEslintrc: false,
 		cache: true,
 		baseConfig: {extends: 'xo'},
-		plugins: ['babel'],
+		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
 		rules: {
 			'indent': [2, 2, {SwitchCase: 1}],
 			'generator-star-spacing': 0,
@@ -108,7 +108,7 @@ test('buildConfig: space: 4', t => {
 		useEslintrc: false,
 		cache: true,
 		baseConfig: {extends: 'xo'},
-		plugins: ['babel'],
+		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
 		rules: {
 			'indent': [2, 4, {SwitchCase: 1}],
 			'generator-star-spacing': 0,
@@ -130,7 +130,7 @@ test('buildConfig: semicolon', t => {
 		useEslintrc: false,
 		cache: true,
 		baseConfig: {extends: 'xo'},
-		plugins: ['babel'],
+		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
 		rules: {
 			'semi': [2, 'never'],
 			'semi-spacing': [2, {before: false, after: true}],
@@ -154,7 +154,7 @@ test('buildConfig: extends is resolved to cwd', t => {
 		useEslintrc: false,
 		cache: true,
 		baseConfig: {extends: ['xo', 'cwd/eslint-config-foo']},
-		plugins: ['babel'],
+		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
 		rules: {
 			'generator-star-spacing': 0,
 			'arrow-parens': 0,
