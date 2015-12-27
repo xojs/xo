@@ -8,7 +8,7 @@ global.Promise = Promise;
 
 test('fix option', async t => {
 	const filepath = await tempWrite('var foo = 0; foo ++;', 'fix.js');
-	await execa('../cli.js', ['--fix', filepath]);
+	await execa('../cli.js', ['--no-local', '--fix', filepath]);
 	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'var foo = 0; foo++;');
 });
 
