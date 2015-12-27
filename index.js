@@ -36,26 +36,28 @@ exports.lintFiles = function (patterns, opts) {
 
 		var grouped = optionsManager.groupConfigs(paths, opts, overrides);
 
-		return Promise.all(grouped.map(function (data) {
+		return mergeReports(grouped.map(function (data) {
 			return runEslint(data.paths, data.opts);
-		})).then(function (reports) {
-			// merge multiple reports into a single report
-			var results = [];
-			var errorCount = 0;
-			var warningCount = 0;
-			reports.forEach(function (report) {
-				results = results.concat(report.results);
-				errorCount += report.errorCount;
-				warningCount += report.warningCount;
-			});
-			return {
-				errorCount: errorCount,
-				warningCount: warningCount,
-				results: results
-			};
-		});
+		}));
 	});
 };
+
+function mergeReports(reports) {
+	// merge multiple reports into a single report
+	var results = [];
+	var errorCount = 0;
+	var warningCount = 0;
+	reports.forEach(function (report) {
+		results = results.concat(report.results);
+		errorCount += report.errorCount;
+		warningCount += report.warningCount;
+	});
+	return {
+		errorCount: errorCount,
+		warningCount: warningCount,
+		results: results
+	};
+}
 
 function runEslint(paths, opts) {
 	var config = optionsManager.buildConfig(opts);

@@ -6,7 +6,7 @@ var deepAssign = require('deep-assign');
 var resolveFrom = require('resolve-from');
 var objectAssign = require('object-assign');
 var homeOrTmp = require('home-or-tmp');
-var mutlimatch = require('multimatch');
+var multimatch = require('multimatch');
 
 var DEFAULT_IGNORE = [
 	'**/node_modules/**',
@@ -129,7 +129,7 @@ function findApplicableOverrides(path, overrides) {
 	var applicable = [];
 	overrides.forEach(function (override) {
 		hash <<= 1;
-		if (mutlimatch(path, override.files).length > 0) {
+		if (multimatch(path, override.files).length > 0) {
 			applicable.push(override);
 			hash |= 1;
 		}
