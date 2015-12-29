@@ -13,6 +13,6 @@ test('fix option', async t => {
 });
 
 test('fixture', async t => {
-	const cwd = path.join(__dirname, 'fixture');
+	const cwd = path.join(__dirname, 'fixtures');
 	await execa('../../cli.js', ['--no-local'], {cwd});
 });
