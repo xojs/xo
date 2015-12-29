@@ -197,6 +197,53 @@ Type: `array`, `string`
 Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) to override any of the default rules (like `rules` above).
 
 
+## Config Overrides
+
+XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
+ 
+```json
+{
+  "xo": {
+    "semicolons": false,
+    "space": 2,
+    "overrides": [
+      {
+        "files": "test/*.js",
+        "esnext": true,
+        "space": 3
+      },
+      {
+         "files": "test/foo.js",
+         "esnext": false
+      }
+    ]
+  }
+}
+```
+
+- The base configuration is simply `space: 2`, `semicolons: false`. These settings are used  used for every file unless otherwise noted below. 
+
+- For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`, and the `esnext` option is set to `true`. The resultant config is:
+
+  ```json
+  {
+    "esnext": true,
+    "semicolons": false,
+    "space": 3
+  }
+  ```
+
+- For `test/foo.js`, the base config is first applied, followed the first overrides config (it's glob pattern also matches `test/foo.js`), finally the second override config is applied. The resultant config is: 
+
+  ```json
+  {
+    "esnext": false,
+    "semicolons": false,
+    "space": 3
+  }
+  ```
+
+
 ## FAQ
 
 #### What does XO mean?

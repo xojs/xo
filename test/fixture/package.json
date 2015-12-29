@@ -1,0 +1,17 @@
+{
+  "xo": {
+    "space": 2,
+    "semicolon": false,
+    "overrides": [
+      {
+        "files": "test/*.js",
+        "esnext": true,
+        "space": 3
+      },
+      {
+        "files": "test/foo.js",
+        "space": 4
+      }
+    ]
+  }
+}
