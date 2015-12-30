@@ -71,13 +71,9 @@ function buildConfig(opts) {
 		envs: opts.envs,
 		globals: opts.globals,
 		plugins: DEFAULT_PLUGINS.concat(opts.plugins || []),
-		rules: opts.rules,
+		rules: {},
 		fix: opts.fix
 	});
-
-	if (!config.rules) {
-		config.rules = {};
-	}
 
 	if (opts.space) {
 		var spaces = typeof opts.space === 'number' ? opts.space : 2;
@@ -100,6 +96,10 @@ function buildConfig(opts) {
 		config.rules['arrow-parens'] = 0;
 		config.rules['object-curly-spacing'] = 0;
 		config.rules['babel/object-curly-spacing'] = [2, 'never'];
+	}
+
+	if (opts.rules) {
+		objectAssign(config.rules, opts.rules);
 	}
 
 	if (opts.extends && opts.extends.length > 0) {

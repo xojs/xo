@@ -143,6 +143,29 @@ test('buildConfig: semicolon', t => {
 	});
 });
 
+test('buildConfig: rules', t => {
+	const config = manager.buildConfig({
+		rules: {
+			'babel/object-curly-spacing': [2, 'always']
+		}
+	});
+	delete config.cacheLocation;
+
+	t.same(config, {
+		useEslintrc: false,
+		cache: true,
+		baseConfig: {extends: 'xo'},
+		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
+		rules: {
+			'generator-star-spacing': 0,
+			'arrow-parens': 0,
+			'object-curly-spacing': 0,
+			'babel/object-curly-spacing': [2, 'always']
+		},
+		parser: 'babel-eslint'
+	});
+});
+
 test('buildConfig: extends is resolved to cwd', t => {
 	const config = manager.buildConfig({
 		extends: ['foo']
