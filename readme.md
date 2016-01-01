@@ -8,7 +8,7 @@
 
 > JavaScript happiness style linter ❤️
 
-[![Build Status](https://travis-ci.org/sindresorhus/xo.svg?branch=master)](https://travis-ci.org/sindresorhus/xo)
+[![Build Status](https://travis-ci.org/sindresorhus/xo.svg?branch=master)](https://travis-ci.org/sindresorhus/xo) [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 
 Enforce strict code style. Never discuss code style on a pull request again!
 
@@ -200,7 +200,7 @@ Use one or more [shareable configs](http://eslint.org/docs/developer-guide/share
 ## Config Overrides
 
 XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
- 
+
 ```json
 {
   "xo": {
@@ -221,7 +221,7 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 }
 ```
 
-- The base configuration is simply `space: 2`, `semicolons: false`. These settings are used  used for every file unless otherwise noted below. 
+- The base configuration is simply `space: 2`, `semicolons: false`. These settings are used  used for every file unless otherwise noted below.
 
 - For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`, and the `esnext` option is set to `true`. The resultant config is:
 
@@ -233,7 +233,7 @@ XO makes it easy to override configs for specific files. The `overrides` propert
   }
   ```
 
-- For `test/foo.js`, the base config is first applied, followed the first overrides config (it's glob pattern also matches `test/foo.js`), finally the second override config is applied. The resultant config is: 
+- For `test/foo.js`, the base config is first applied, followed the first overrides config (it's glob pattern also matches `test/foo.js`), finally the second override config is applied. The resultant config is:
 
   ```json
   {
@@ -266,7 +266,7 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [TextMate 2](https://github.com/claylo/XO.tmbundle)
 - [VSCode](https://github.com/SamVerschueren/vscode-linter-xo)
 
-### Vim
+#### Vim
 
 You can use [Syntastic](https://github.com/scrooloose/syntastic)'s ESLint checker with the following settings in your `.vimrc` file:
 
@@ -292,6 +292,15 @@ let g:syntastic_javascript_checkers = ['eslint']
 - [eslint-config-xo-space](https://github.com/sindresorhus/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
 - [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
 - [jscs-xo](https://github.com/sindresorhus/jscs-xo) - JSCS shareable preset for XO
+
+
+## Badge
+
+Show the world you're using XO → [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
+
+```md
+[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
+```
 
 
 ## License
