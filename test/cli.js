@@ -12,7 +12,12 @@ test('fix option', async t => {
 	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'var foo = 0; foo++;');
 });
 
-test('fixture', async t => {
-	const cwd = path.join(__dirname, 'fixtures');
-	await execa('../../cli.js', ['--no-local'], {cwd});
+test('overrides fixture', async t => {
+	const cwd = path.join(__dirname, 'fixtures/overrides');
+	await execa('../../../cli.js', ['--no-local'], {cwd});
+});
+
+test('ignores fixture', async t => {
+	const cwd = path.join(__dirname, 'fixtures/ignores');
+	t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
