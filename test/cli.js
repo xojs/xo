@@ -17,7 +17,7 @@ test('overrides fixture', async t => {
 	await execa('../../../cli.js', ['--no-local'], {cwd});
 });
 
-test('ignores fixture', async t => {
+test.skip('ignores fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
 	t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
