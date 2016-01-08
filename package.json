@@ -63,6 +63,7 @@
     "babel-eslint": "^4.1.1",
     "debug": "^2.2.0",
     "deep-assign": "^1.0.0",
+    "dir-glob": "^1.0.1",
     "eslint": "^1.10.3",
     "eslint-config-xo": "^0.9.0",
     "eslint-plugin-babel": "^3.0.0",
