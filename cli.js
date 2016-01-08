@@ -84,12 +84,14 @@ function open(report) {
 	var editor = process.env.EDITOR;
 
 	if (!editor) {
-		console.log();
-		console.log('`open` option was used, but your $EDITOR environment variable is empty.');
-		console.log('Fix it by setting path to your editor of choice in ~/.bashrc or ~/.zshrc:');
-		console.log();
-		console.log('    export EDITOR=atom');
-		console.log();
+		console.log([
+			'',
+			'`open` option was used, but your $EDITOR environment variable is empty.',
+			'Fix it by setting path to your editor of choice in ~/.bashrc or ~/.zshrc:',
+			'',
+			'    export EDITOR=atom',
+			''
+		].join('\n'));
 		return;
 	}
 

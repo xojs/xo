@@ -47,11 +47,13 @@ function mergeReports(reports) {
 	var results = [];
 	var errorCount = 0;
 	var warningCount = 0;
+
 	reports.forEach(function (report) {
 		results = results.concat(report.results);
 		errorCount += report.errorCount;
 		warningCount += report.warningCount;
 	});
+
 	return {
 		errorCount: errorCount,
 		warningCount: warningCount,

@@ -29,9 +29,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 
 test('normalizeOpts: falsie values stay falsie', t => {
 	let opts = {};
-
 	opts = manager.normalizeOpts(opts);
-
 	t.same(opts, {});
 });
 
@@ -124,6 +122,7 @@ test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({
 		semicolon: false
 	});
+
 	delete config.cacheLocation;
 
 	t.same(config, {
@@ -149,6 +148,7 @@ test('buildConfig: rules', t => {
 			'babel/object-curly-spacing': [2, 'always']
 		}
 	});
+
 	delete config.cacheLocation;
 
 	t.same(config, {
@@ -195,6 +195,7 @@ test('findApplicableOverrides', t => {
 		{files: '**/*oo.js'},
 		{files: '**/*.txt'}
 	]);
+
 	t.is(result.hash, parseInt('1010', 2));
 	t.same(result.applicable, [
 		{files: '**/f*.js'},
