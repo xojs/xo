@@ -113,7 +113,6 @@ function buildConfig(opts) {
 		});
 
 		configs.unshift(config.baseConfig.extends);
-
 		config.baseConfig.extends = configs;
 	}
 
@@ -127,13 +126,16 @@ function buildConfig(opts) {
 function findApplicableOverrides(path, overrides) {
 	var hash = 0;
 	var applicable = [];
+
 	overrides.forEach(function (override) {
 		hash <<= 1;
+
 		if (multimatch(path, override.files).length > 0) {
 			applicable.push(override);
 			hash |= 1;
 		}
 	});
+
 	return {
 		hash: hash,
 		applicable: applicable
@@ -147,14 +149,17 @@ function groupConfigs(paths, baseOptions, overrides) {
 
 	paths.forEach(function (x) {
 		var data = findApplicableOverrides(x, overrides);
+
 		if (!map[data.hash]) {
 			var mergedOpts = deepAssign.apply(null, [{}, baseOptions].concat(data.applicable));
 			delete mergedOpts.files;
+
 			arr.push(map[data.hash] = {
 				opts: mergedOpts,
 				paths: []
 			});
 		}
+
 		map[data.hash].paths.push(x);
 	});
 
