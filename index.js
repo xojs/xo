@@ -2,6 +2,7 @@
 var path = require('path');
 var eslint = require('eslint');
 var globby = require('globby');
+var dirGlob = require('dir-glob');
 var optionsManager = require('./options-manager');
 
 exports.lintText = function (str, opts) {
@@ -20,25 +21,27 @@ exports.lintFiles = function (patterns, opts) {
 		patterns = '**/*.{js,jsx}';
 	}
 
-	return globby(patterns, {ignore: opts.ignores}).then(function (paths) {
-		// when users are silly and don't specify an extension in the glob pattern
-		paths = paths.filter(function (x) {
-			var ext = path.extname(x);
-			return ext === '.js' || ext === '.jsx';
+	return dirGlob(opts.ignores).then(function (ignores) {
+		return globby(patterns, {ignore: ignores}).then(function (paths) {
+			// when users are silly and don't specify an extension in the glob pattern
+			paths = paths.filter(function (x) {
+				var ext = path.extname(x);
+				return ext === '.js' || ext === '.jsx';
+			});
+
+			if (!(opts.overrides && opts.overrides.length)) {
+				return runEslint(paths, opts);
+			}
+
+			var overrides = opts.overrides;
+			delete opts.overrides;
+
+			var grouped = optionsManager.groupConfigs(paths, opts, overrides);
+
+			return mergeReports(grouped.map(function (data) {
+				return runEslint(data.paths, data.opts);
+			}));
 		});
-
-		if (!(opts.overrides && opts.overrides.length)) {
-			return runEslint(paths, opts);
-		}
-
-		var overrides = opts.overrides;
-		delete opts.overrides;
-
-		var grouped = optionsManager.groupConfigs(paths, opts, overrides);
-
-		return mergeReports(grouped.map(function (data) {
-			return runEslint(data.paths, data.opts);
-		}));
 	});
 };
 
