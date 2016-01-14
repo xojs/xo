@@ -204,7 +204,7 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 ```json
 {
   "xo": {
-    "semicolons": false,
+    "semicolon": false,
     "space": 2,
     "overrides": [
       {
@@ -221,14 +221,14 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 }
 ```
 
-- The base configuration is simply `space: 2`, `semicolons: false`. These settings are used  used for every file unless otherwise noted below.
+- The base configuration is simply `space: 2`, `semicolon: false`. These settings are used  used for every file unless otherwise noted below.
 
 - For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`, and the `esnext` option is set to `true`. The resultant config is:
 
   ```json
   {
     "esnext": true,
-    "semicolons": false,
+    "semicolon": false,
     "space": 3
   }
   ```
@@ -238,7 +238,7 @@ XO makes it easy to override configs for specific files. The `overrides` propert
   ```json
   {
     "esnext": false,
-    "semicolons": false,
+    "semicolon": false,
     "space": 3
   }
   ```
