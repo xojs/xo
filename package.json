@@ -63,8 +63,8 @@
     "babel-eslint": "^4.1.1",
     "debug": "^2.2.0",
     "deep-assign": "^1.0.0",
-    "eslint": "^1.10.3",
-    "eslint-config-xo": "^0.9.0",
+    "eslint": "^2.0.0",
+    "eslint-config-xo": "^0.10.1",
     "eslint-plugin-babel": "^3.0.0",
     "eslint-plugin-no-empty-blocks": "0.0.2",
     "eslint-plugin-no-use-extend-native": "^0.3.2",
@@ -86,10 +86,10 @@
     "ava": "*",
     "eslint-config-xo-react": "^0.3.0",
     "eslint-plugin-react": "^3.5.1",
-    "execa": "^0.1.1",
+    "execa": "^0.2.2",
     "proxyquire": "^1.7.3",
     "temp-write": "^2.0.1",
-    "xo": "sindresorhus/xo#v0.11.2"
+    "xo": "sindresorhus/xo#v0.12.1"
   },
   "xo": {
     "ignores": [
