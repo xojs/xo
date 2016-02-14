@@ -16,7 +16,7 @@ No decision-making. No `.eslintrc`, `.jshintrc`, `.jscsrc` to manage. It just wo
 
 Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
-JSX is supported by default.
+JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react#use-with-xo) for React specific linting.
 
 
 ## Install
