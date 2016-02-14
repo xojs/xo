@@ -3,7 +3,6 @@ var path = require('path');
 var arrify = require('arrify');
 var pkgConf = require('pkg-conf');
 var deepAssign = require('deep-assign');
-var resolveFrom = require('resolve-from');
 var objectAssign = require('object-assign');
 var homeOrTmp = require('home-or-tmp');
 var multimatch = require('multimatch');
@@ -26,14 +25,13 @@ var DEFAULT_CONFIG = {
 	cache: true,
 	cacheLocation: path.join(homeOrTmp, '.xo-cache/'),
 	baseConfig: {
-		extends: 'xo'
+		extends: [
+			'xo',
+			path.join(__dirname, 'config/overrides.js'),
+			path.join(__dirname, 'config/plugins.js')
+		]
 	}
 };
-
-var DEFAULT_PLUGINS = [
-	'no-empty-blocks',
-	'no-use-extend-native'
-];
 
 function normalizeOpts(opts) {
 	opts = objectAssign({}, opts);
@@ -70,7 +68,7 @@ function buildConfig(opts) {
 	var config = deepAssign({}, DEFAULT_CONFIG, {
 		envs: opts.envs,
 		globals: opts.globals,
-		plugins: DEFAULT_PLUGINS.concat(opts.plugins || []),
+		plugins: opts.plugins,
 		rules: {},
 		fix: opts.fix
 	});
@@ -86,16 +84,7 @@ function buildConfig(opts) {
 	}
 
 	if (opts.esnext) {
-		config.baseConfig.extends = 'xo/esnext';
-	} else {
-		// always use the Babel parser so it won't throw
-		// on esnext features in normal mode
-		config.parser = 'babel-eslint';
-		config.plugins = ['babel'].concat(config.plugins);
-		config.rules['generator-star-spacing'] = 0;
-		config.rules['arrow-parens'] = 0;
-		config.rules['object-curly-spacing'] = 0;
-		config.rules['babel/object-curly-spacing'] = [2, 'never'];
+		config.baseConfig.extends = ['xo/esnext', path.join(__dirname, 'config/plugins.js')];
 	}
 
 	if (opts.rules) {
@@ -103,17 +92,7 @@ function buildConfig(opts) {
 	}
 
 	if (opts.extends && opts.extends.length > 0) {
-		// user's configs must be resolved to their absolute paths
-		var configs = opts.extends.map(function (name) {
-			if (name.indexOf('eslint-config-') === -1) {
-				name = 'eslint-config-' + name;
-			}
-
-			return resolveFrom(opts.cwd, name);
-		});
-
-		configs.unshift(config.baseConfig.extends);
-		config.baseConfig.extends = configs;
+		config.baseConfig.extends = config.baseConfig.extends.concat(opts.extends);
 	}
 
 	return config;

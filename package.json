@@ -25,8 +25,9 @@
   },
   "files": [
     "index.js",
+    "cli.js",
     "options-manager.js",
-    "cli.js"
+    "config"
   ],
   "keywords": [
     "❤️",
@@ -84,9 +85,9 @@
   },
   "devDependencies": {
     "ava": "*",
-    "eslint-config-xo-react": "^0.3.0",
-    "eslint-plugin-react": "^3.5.1",
     "execa": "^0.2.2",
+    "eslint-config-xo-react": "^0.4.0",
+    "eslint-plugin-react": "^3.16.1",
     "proxyquire": "^1.7.3",
     "temp-write": "^2.0.1",
     "xo": "sindresorhus/xo#v0.12.1"

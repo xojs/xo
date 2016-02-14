@@ -35,157 +35,39 @@ test('normalizeOpts: falsie values stay falsie', t => {
 
 test('buildConfig: defaults', t => {
 	const config = manager.buildConfig({});
-
 	t.true(/[\\\/]\.xo-cache[\\\/]?$/.test(config.cacheLocation));
-	delete config.cacheLocation;
-
-	t.same(config, {
-		useEslintrc: false,
-		cache: true,
-		baseConfig: {extends: 'xo'},
-		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
-		rules: {
-			'generator-star-spacing': 0,
-			'arrow-parens': 0,
-			'object-curly-spacing': 0,
-			'babel/object-curly-spacing': [2, 'never']
-		},
-		parser: 'babel-eslint'
-	});
+	t.is(config.useEslintrc, false);
+	t.is(config.cache, true);
+	t.is(config.baseConfig.extends[0], 'xo');
 });
 
 test('buildConfig: esnext', t => {
-	const config = manager.buildConfig({
-		esnext: true
-	});
-
-	t.true(/[\\\/]\.xo-cache[\\\/]?$/.test(config.cacheLocation));
-	delete config.cacheLocation;
-
-	t.same(config, {
-		useEslintrc: false,
-		cache: true,
-		baseConfig: {extends: 'xo/esnext'},
-		rules: {},
-		// TODO: Note that all plugins are blown away if esnext !== true
-		plugins: ['no-empty-blocks', 	'no-use-extend-native']
-	});
+	const config = manager.buildConfig({esnext: true});
+	t.is(config.baseConfig.extends[0], 'xo/esnext');
 });
 
 test('buildConfig: space: true', t => {
-	const config = manager.buildConfig({
-		space: true
-	});
-
-	delete config.cacheLocation;
-
-	t.same(config, {
-		useEslintrc: false,
-		cache: true,
-		baseConfig: {extends: 'xo'},
-		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
-		rules: {
-			'indent': [2, 2, {SwitchCase: 1}],
-			'generator-star-spacing': 0,
-			'arrow-parens': 0,
-			'object-curly-spacing': 0,
-			'babel/object-curly-spacing': [2, 'never']
-		},
-		parser: 'babel-eslint'
-	});
+	const config = manager.buildConfig({space: true});
+	t.same(config.rules, {indent: [2, 2, {SwitchCase: 1}]});
 });
 
 test('buildConfig: space: 4', t => {
-	const config = manager.buildConfig({
-		space: 4
-	});
-
-	delete config.cacheLocation;
-
-	t.same(config, {
-		useEslintrc: false,
-		cache: true,
-		baseConfig: {extends: 'xo'},
-		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
-		rules: {
-			'indent': [2, 4, {SwitchCase: 1}],
-			'generator-star-spacing': 0,
-			'arrow-parens': 0,
-			'object-curly-spacing': 0,
-			'babel/object-curly-spacing': [2, 'never']
-		},
-		parser: 'babel-eslint'
-	});
+	const config = manager.buildConfig({space: 4});
+	t.same(config.rules, {indent: [2, 4, {SwitchCase: 1}]});
 });
 
 test('buildConfig: semicolon', t => {
-	const config = manager.buildConfig({
-		semicolon: false
-	});
-
-	delete config.cacheLocation;
-
-	t.same(config, {
-		useEslintrc: false,
-		cache: true,
-		baseConfig: {extends: 'xo'},
-		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
-		rules: {
-			'semi': [2, 'never'],
-			'semi-spacing': [2, {before: false, after: true}],
-			'generator-star-spacing': 0,
-			'arrow-parens': 0,
-			'object-curly-spacing': 0,
-			'babel/object-curly-spacing': [2, 'never']
-		},
-		parser: 'babel-eslint'
+	const config = manager.buildConfig({semicolon: false});
+	t.same(config.rules, {
+		'semi': [2, 'never'],
+		'semi-spacing': [2, {before: false, after: true}]
 	});
 });
 
 test('buildConfig: rules', t => {
-	const config = manager.buildConfig({
-		rules: {
-			'babel/object-curly-spacing': [2, 'always']
-		}
-	});
-
-	delete config.cacheLocation;
-
-	t.same(config, {
-		useEslintrc: false,
-		cache: true,
-		baseConfig: {extends: 'xo'},
-		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
-		rules: {
-			'generator-star-spacing': 0,
-			'arrow-parens': 0,
-			'object-curly-spacing': 0,
-			'babel/object-curly-spacing': [2, 'always']
-		},
-		parser: 'babel-eslint'
-	});
-});
-
-test('buildConfig: extends is resolved to cwd', t => {
-	const config = manager.buildConfig({
-		extends: ['foo']
-	});
-
-	delete config.cacheLocation;
-
-	t.same(config, {
-		useEslintrc: false,
-		cache: true,
-		baseConfig: {extends: ['xo', 'cwd/eslint-config-foo']},
-		plugins: ['babel', 'no-empty-blocks', 'no-use-extend-native'],
-		rules: {
-			'generator-star-spacing': 0,
-			'arrow-parens': 0,
-			'object-curly-spacing': 0,
-			'babel/object-curly-spacing': [2, 'never']
-		},
-		parser: 'babel-eslint'
-	});
+	const rules = {'babel/object-curly-spacing': [2, 'always']};
+	const config = manager.buildConfig({rules: rules});
+	t.same(config.rules, rules);
 });
 
 test('findApplicableOverrides', t => {

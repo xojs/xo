@@ -1,3 +1,4 @@
+import path from 'path';
 import test from 'ava';
 import fn from '../';
 
@@ -6,8 +7,8 @@ function hasRule(results, ruleId) {
 }
 
 test('.lintText()', t => {
-	const results = fn.lintText('\'use strict\';\nconsole.log("unicorn");\n').results;
-	t.true(hasRule(results, 'quotes'));
+	const results = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`).results;
+	t.true(hasRule(results, 'semi'));
 });
 
 test('.lintText() - `esnext` option', t => {
@@ -51,4 +52,11 @@ test('.lintText() - extends support with `esnext` option', t => {
 test('always use the Babel parser so esnext syntax won\'t throw in normal mode', t => {
 	const results = fn.lintText('async function foo() {}\n\nfoo();\n').results;
 	t.is(results[0].errorCount, 0);
+});
+
+test('.lintText() - regression test for #71', t => {
+	const results = fn.lintText(`var foo = { key: 'value' };\nconsole.log(foo);\n`, {
+		extends: path.join(__dirname, 'fixtures/extends.js')
+	}).results;
+	t.is(results[0].errorCount, 0, results[0]);
 });
