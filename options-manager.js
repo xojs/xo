@@ -35,8 +35,16 @@ var DEFAULT_CONFIG = {
 
 function normalizeOpts(opts) {
 	opts = objectAssign({}, opts);
+
 	// alias to help humans
-	['env', 'global', 'ignore', 'plugin', 'rule', 'extend'].forEach(function (singular) {
+	[
+		'env',
+		'global',
+		'ignore',
+		'plugin',
+		'rule',
+		'extend'
+	].forEach(function (singular) {
 		var plural = singular + 's';
 		var value = opts[plural] || opts[singular];
 
@@ -57,9 +65,7 @@ function normalizeOpts(opts) {
 }
 
 function mergeWithPkgConf(opts) {
-	opts = objectAssign({
-		cwd: process.cwd()
-	}, opts);
+	opts = objectAssign({cwd: process.cwd()}, opts);
 
 	return objectAssign({}, pkgConf.sync('xo', opts.cwd), opts);
 }

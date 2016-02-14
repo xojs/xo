@@ -89,13 +89,13 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
 
 ```json
 {
-	"name": "awesome-package",
-	"scripts": {
-		"test": "ava"
-	},
-	"devDependencies": {
-		"ava": "^0.7.0"
-	}
+  "name": "awesome-package",
+  "scripts": {
+    "test": "ava"
+  },
+  "devDependencies": {
+    "ava": "^0.11.0"
+  }
 }
 ```
 
@@ -103,14 +103,14 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
 
 ```json
 {
-	"name": "awesome-package",
-	"scripts": {
-		"test": "xo && ava"
-	},
-	"devDependencies": {
-		"ava": "^0.7.0",
-		"xo": "^0.12.0"
-	}
+  "name": "awesome-package",
+  "scripts": {
+    "test": "xo && ava"
+  },
+  "devDependencies": {
+    "ava": "^0.11.0",
+    "xo": "^0.12.0"
+  }
 }
 ```
 
@@ -121,12 +121,12 @@ Then just run `$ npm test` and XO will be run before your tests.
 
 You can configure some options in XO by putting it in package.json:
 
-```js
+```json
 {
-	"name": "awesome-package",
-	"xo": {
-		"esnext": true
-	}
+  "name": "awesome-package",
+  "xo": {
+    "esnext": true
+  }
 }
 ```
 
@@ -134,7 +134,7 @@ You can configure some options in XO by putting it in package.json:
 
 ### esnext
 
-Type: `boolean`  
+Type: `boolean`<br>
 Default: `false`
 
 Enable ES2015+ rules.
@@ -143,7 +143,7 @@ Enable ES2015+ rules.
 
 ### envs
 
-Type: `array`  
+Type: `array`<br>
 Default: `['node']`
 
 Which [environments](http://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
@@ -162,7 +162,7 @@ Some [paths](https://github.com/sindresorhus/xo/blob/7644b9d9faf517b5b8f049b2083
 
 ### space
 
-Type: `boolean`, `number`  
+Type: `boolean`, `number`<br>
 Default: `false` *(tab indentation)*
 
 Set it to `true` to get 2-space indentation or specify the number of spaces.
@@ -171,7 +171,7 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 
 ### rules
 
-Type: `object`  
+Type: `object`
 
 Override any of the [default rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js). See the [ESLint docs](http://eslint.org/docs/rules/) for more info on each rule.
 
@@ -179,7 +179,7 @@ Please take a moment to consider if you really need to use this option.
 
 ### semicolon
 
-Type: `boolean`  
+Type: `boolean`<br>
 Default: `true` *(semicolons required)*
 
 Set it to `false` to enforce no-semicolon style.
@@ -221,27 +221,27 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 }
 ```
 
-- The base configuration is simply `space: 2`, `semicolon: false`. These settings are used  used for every file unless otherwise noted below.
+- The base configuration is simply `space: 2`, `semicolon: false`. These settings are used for every file unless otherwise noted below.
 
-- For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`, and the `esnext` option is set to `true`. The resultant config is:
+- For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`, and the `esnext` option is set to `true`. The resulting config is:
 
-  ```json
-  {
-    "esnext": true,
-    "semicolon": false,
-    "space": 3
-  }
-  ```
+```json
+{
+  "esnext": true,
+  "semicolon": false,
+  "space": 3
+}
+```
 
-- For `test/foo.js`, the base config is first applied, followed the first overrides config (it's glob pattern also matches `test/foo.js`), finally the second override config is applied. The resultant config is:
+- For `test/foo.js`, the base config is first applied, followed the first overrides config (its glob pattern also matches `test/foo.js`), finally the second override config is applied. The resulting config is:
 
-  ```json
-  {
-    "esnext": false,
-    "semicolon": false,
-    "space": 3
-  }
-  ```
+```json
+{
+  "esnext": false,
+  "semicolon": false,
+  "space": 3
+}
+```
 
 
 ## FAQ
