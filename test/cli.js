@@ -7,9 +7,19 @@ import path from 'path';
 global.Promise = Promise;
 
 test('fix option', async t => {
-	const filepath = await tempWrite('var foo = 0; foo ++;', 'fix.js');
+	const filepath = await tempWrite('var foo = 0; foo ++;', 'x.js');
 	await execa('../cli.js', ['--no-local', '--fix', filepath]);
 	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'var foo = 0; foo++;');
+});
+
+test('reporter option', async t => {
+	const filepath = await tempWrite('console.log()\n', 'x.js');
+
+	try {
+		await execa('../cli.js', ['--no-local', '--reporter=compact', filepath]);
+	} catch (err) {
+		t.true(err.stdout.indexOf('Error - ') !== -1);
+	}
 });
 
 test('overrides fixture', async () => {

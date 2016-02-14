@@ -29,7 +29,7 @@ var cli = meow({
 		'Options',
 		'  --init          Add XO to your project',
 		'  --fix           Automagically fix issues',
-		'  --compact       Compact output',
+		'  --reporter      Reporter to use',
 		'  --stdin         Validate code from stdin',
 		'  --esnext        Enable ES2015+ rules',
 		'  --env           Environment preset  [Can be set multiple times]',
@@ -72,7 +72,13 @@ var input = cli.input;
 var opts = cli.flags;
 
 function log(report) {
-	process.stdout.write(xo.getFormatter(opts.compact && 'compact')(report.results));
+	// legacy
+	// TODO: remove in 1.0.0
+	if (opts.compact) {
+		opts.reporter = 'compact';
+	}
+
+	process.stdout.write(xo.getFormatter(opts.reporter)(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
 }
 

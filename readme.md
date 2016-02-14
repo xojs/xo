@@ -37,7 +37,7 @@ $ xo --help
   Options
     --init          Add XO to your project
     --fix           Automagically fix issues
-    --compact       Compact output
+    --reporter      Reporter to use
     --stdin         Validate code from stdin
     --esnext        Enable ES2015+ rules
     --env           Environment preset  [Can be set multiple times]
@@ -273,7 +273,7 @@ You can use [Syntastic](https://github.com/scrooloose/syntastic)'s ESLint checke
 ```vim
 let g:syntastic_javascript_eslint_generic = 1
 let g:syntastic_javascript_eslint_exec = 'xo'
-let g:syntastic_javascript_eslint_args = '--compact'
+let g:syntastic_javascript_eslint_args = '--reporter=compact'
 let g:syntastic_javascript_checkers = ['eslint']
 ```
 
