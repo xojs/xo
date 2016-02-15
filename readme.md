@@ -284,6 +284,7 @@ let g:syntastic_javascript_checkers = ['eslint']
 - [Grunt](https://github.com/sindresorhus/grunt-xo)
 - [webpack](https://github.com/Semigradsky/xo-loader)
 - [Metalsmith](https://github.com/blainsmith/metalsmith-xo)
+- [Fly](https://github.com/lukeed/fly-xo)
 
 
 ## Configs
