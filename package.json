@@ -61,7 +61,7 @@
   ],
   "dependencies": {
     "arrify": "^1.0.0",
-    "babel-eslint": "^4.1.1",
+    "babel-eslint": "^5.0.0",
     "debug": "^2.2.0",
     "deep-assign": "^1.0.0",
     "eslint": "^2.0.0",
@@ -83,9 +83,9 @@
   },
   "devDependencies": {
     "ava": "*",
+    "eslint-config-xo-react": "^0.5.0",
+    "eslint-plugin-react": "^4.1.0",
     "execa": "^0.2.2",
-    "eslint-config-xo-react": "^0.4.0",
-    "eslint-plugin-react": "^3.16.1",
     "proxyquire": "^1.7.3",
     "temp-write": "^2.0.1",
     "xo": "sindresorhus/xo#v0.12.1"
