@@ -1,6 +1,6 @@
 {
   "name": "xo",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "description": "JavaScript happiness style linter ❤️",
   "license": "MIT",
   "repository": "sindresorhus/xo",
