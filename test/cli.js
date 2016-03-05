@@ -32,7 +32,7 @@ test.skip('ignores fixture', async t => {
 	t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
 
-test('supports shareable config', async () => {
+test('supports being extended with a shareable config', async () => {
 	const cwd = path.join(__dirname, 'fixtures/project');
 	await execa('../../../cli.js', ['--no-local'], {cwd});
 });

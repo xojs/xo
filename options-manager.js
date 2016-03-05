@@ -6,6 +6,8 @@ var deepAssign = require('deep-assign');
 var objectAssign = require('object-assign');
 var homeOrTmp = require('home-or-tmp');
 var multimatch = require('multimatch');
+var resolveFrom = require('resolve-from');
+var pathExists = require('path-exists');
 
 var DEFAULT_IGNORE = [
 	'**/node_modules/**',
@@ -98,7 +100,22 @@ function buildConfig(opts) {
 	}
 
 	if (opts.extends && opts.extends.length > 0) {
-		config.baseConfig.extends = config.baseConfig.extends.concat(opts.extends);
+		// TODO: this logic needs to be improved, preferably use the same code as ESLint
+		// user's configs must be resolved to their absolute paths
+		var configs = opts.extends.map(function (name) {
+			// don't do anything if it's a filepath
+			if (pathExists.sync(name)) {
+				return name;
+			}
+
+			if (name.indexOf('eslint-config-') === -1) {
+				name = 'eslint-config-' + name;
+			}
+
+			return resolveFrom(opts.cwd, name);
+		});
+
+		config.baseConfig.extends = config.baseConfig.extends.concat(configs);
 	}
 
 	return config;
