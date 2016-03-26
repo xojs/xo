@@ -2,10 +2,12 @@
 module.exports = {
 	plugins: [
 		'no-empty-blocks',
-		'no-use-extend-native'
+		'no-use-extend-native',
+		'import-order'
 	],
 	rules: {
 		'no-empty-blocks/no-empty-blocks': [2, 'allowCatch'],
-		'no-use-extend-native/no-use-extend-native': 2
+		'no-use-extend-native/no-use-extend-native': 2,
+		'import-order/import-order': 2
 	}
 };
