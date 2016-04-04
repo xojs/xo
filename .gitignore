@@ -1,2 +1,4 @@
 node_modules
 !test/fixtures/project/node_modules
+.nyc_output
+coverage

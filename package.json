@@ -21,7 +21,8 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "xo && ava"
+    "test": "xo && nyc ava",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "files": [
     "index.js",
@@ -86,9 +87,11 @@
   },
   "devDependencies": {
     "ava": "*",
+    "coveralls": "^2.11.9",
     "eslint-config-xo-react": "^0.5.0",
     "eslint-plugin-react": "^4.1.0",
     "execa": "^0.2.2",
+    "nyc": "^6.1.1",
     "proxyquire": "^1.7.3",
     "temp-write": "^2.0.1",
     "xo": "sindresorhus/xo#v0.13.0"
