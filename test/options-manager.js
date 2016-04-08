@@ -17,7 +17,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 
 	opts = manager.normalizeOpts(opts);
 
-	t.same(opts, {
+	t.deepEqual(opts, {
 		envs: ['node'],
 		globals: ['foo'],
 		ignores: ['test.js'],
@@ -30,7 +30,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 test('normalizeOpts: falsie values stay falsie', t => {
 	let opts = {};
 	opts = manager.normalizeOpts(opts);
-	t.same(opts, {});
+	t.deepEqual(opts, {});
 });
 
 test('buildConfig: defaults', t => {
@@ -48,17 +48,17 @@ test('buildConfig: esnext', t => {
 
 test('buildConfig: space: true', t => {
 	const config = manager.buildConfig({space: true});
-	t.same(config.rules, {indent: [2, 2, {SwitchCase: 1}]});
+	t.deepEqual(config.rules, {indent: [2, 2, {SwitchCase: 1}]});
 });
 
 test('buildConfig: space: 4', t => {
 	const config = manager.buildConfig({space: 4});
-	t.same(config.rules, {indent: [2, 4, {SwitchCase: 1}]});
+	t.deepEqual(config.rules, {indent: [2, 4, {SwitchCase: 1}]});
 });
 
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false});
-	t.same(config.rules, {
+	t.deepEqual(config.rules, {
 		'semi': [2, 'never'],
 		'semi-spacing': [2, {before: false, after: true}]
 	});
@@ -67,7 +67,7 @@ test('buildConfig: semicolon', t => {
 test('buildConfig: rules', t => {
 	const rules = {'babel/object-curly-spacing': [2, 'always']};
 	const config = manager.buildConfig({rules: rules});
-	t.same(config.rules, rules);
+	t.deepEqual(config.rules, rules);
 });
 
 test('findApplicableOverrides', t => {
@@ -79,7 +79,7 @@ test('findApplicableOverrides', t => {
 	]);
 
 	t.is(result.hash, parseInt('1010', 2));
-	t.same(result.applicable, [
+	t.deepEqual(result.applicable, [
 		{files: '**/f*.js'},
 		{files: '**/*oo.js'}
 	]);
@@ -110,7 +110,7 @@ test('groupConfigs', t => {
 
 	const result = manager.groupConfigs(paths, opts, overrides);
 
-	t.same(result, [
+	t.deepEqual(result, [
 		{
 			opts: {esnext: false},
 			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
