@@ -17,7 +17,8 @@ var DEFAULT_IGNORE = [
 	'**/*.min.js',
 	'**/bundle.js',
 	'fixture{-*,}.{js,jsx}',
-	'{test/,}fixture{s,}/**',
+	'fixture{s,}/**',
+	'{test,tests,spec,__tests__}/fixture{s,}/**',
 	'vendor/**',
 	'dist/**'
 ];
