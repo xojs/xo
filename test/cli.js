@@ -7,9 +7,9 @@ import path from 'path';
 global.Promise = Promise;
 
 test('fix option', async t => {
-	const filepath = await tempWrite('var foo = 0; foo ++;', 'x.js');
+	const filepath = await tempWrite('console.log(0)\n', 'x.js');
 	await execa('../cli.js', ['--no-local', '--fix', filepath]);
-	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'var foo = 0; foo++;');
+	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'console.log(0);');
 });
 
 test('reporter option', async t => {
