@@ -5,12 +5,17 @@ var globby = require('globby');
 var optionsManager = require('./options-manager');
 
 exports.lintText = function (str, opts) {
+	// need to grab filename here as `buildConfig` excludes unknown options for some reason
+	// TODO: find a better way to handle this
+	opts = opts || {};
+	var filename = opts.filename;
+
 	opts = optionsManager.preprocess(opts);
 	opts = optionsManager.buildConfig(opts);
 
 	var engine = new eslint.CLIEngine(opts);
 
-	return engine.executeOnText(str, opts.filename);
+	return engine.executeOnText(str, filename);
 };
 
 exports.lintFiles = function (patterns, opts) {
