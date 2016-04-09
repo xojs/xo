@@ -74,13 +74,18 @@ function mergeWithPkgConf(opts) {
 }
 
 function buildConfig(opts) {
-	var config = deepAssign({}, DEFAULT_CONFIG, {
-		envs: opts.envs,
-		globals: opts.globals,
-		plugins: opts.plugins || [],
-		rules: {},
-		fix: opts.fix
-	});
+	var config = deepAssign(
+		// define the shape of deep properties for deepAssign
+		{
+			rules: {},
+			globals: [],
+			envs: [],
+			plugins: [],
+			extends: []
+		},
+		DEFAULT_CONFIG,
+		opts
+	);
 
 	if (opts.space) {
 		var spaces = typeof opts.space === 'number' ? opts.space : 2;
