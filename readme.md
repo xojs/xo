@@ -305,6 +305,13 @@ Show the world you're using XO → [![XO code style](https://img.shields.io/badg
 ```
 
 
+## Team
+
+[![Sindre Sorhus](https://avatars.githubusercontent.com/u/170270?s=130)](https://sindresorhus.com) | [![James Talmage](https://avatars.githubusercontent.com/u/4082216?s=130)](https://github.com/jamestalmage)
+---|---
+[Sindre Sorhus](https://sindresorhus.com) | [James Talmage](https://github.com/jamestalmage)
+
+
 ## License
 
 MIT © [Sindre Sorhus](http://sindresorhus.com)
