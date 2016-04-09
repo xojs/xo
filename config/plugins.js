@@ -5,9 +5,13 @@ module.exports = {
 		'no-use-extend-native',
 		'import-order',
 		'ava',
+		'xo',
 		'promise'
 	],
-	extends: 'plugin:ava/recommended',
+	extends: [
+		'plugin:ava/recommended',
+		'plugin:xo/recommended'
+	],
 	rules: {
 		'no-empty-blocks/no-empty-blocks': [2, 'allowCatch'],
 		'no-use-extend-native/no-use-extend-native': 2,

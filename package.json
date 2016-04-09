@@ -73,6 +73,7 @@
     "eslint-plugin-no-empty-blocks": "0.0.2",
     "eslint-plugin-no-use-extend-native": "^0.3.2",
     "eslint-plugin-promise": "^1.1.0",
+    "eslint-plugin-xo": "^0.1.0",
     "get-stdin": "^5.0.0",
     "globby": "^4.0.0",
     "has-flag": "^1.0.0",
