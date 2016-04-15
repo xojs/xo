@@ -12,7 +12,7 @@
 
 Enforce strict code style. Never discuss code style on a pull request again!
 
-No decision-making. No `.eslintrc`, `.jshintrc`, `.jscsrc` to manage. It just works!
+No decision-making. No `.eslintrc` or `.jshintrc` to manage. It just works!
 
 Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
@@ -293,7 +293,6 @@ let g:syntastic_javascript_checkers = ['eslint']
 - [eslint-config-xo](https://github.com/sindresorhus/eslint-config-xo) - ESLint shareable config for XO
 - [eslint-config-xo-space](https://github.com/sindresorhus/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
 - [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
-- [jscs-xo](https://github.com/sindresorhus/jscs-xo) - JSCS shareable preset for XO
 
 
 ## Badge
