@@ -295,6 +295,11 @@ let g:syntastic_javascript_checkers = ['eslint']
 - [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
 
 
+## Related
+
+- [eslint-plugin-xo](https://github.com/sindresorhus/eslint-plugin-xo) - Additional ESLint rules *(Bundled in XO)*
+
+
 ## Badge
 
 Show the world you're using XO → [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
