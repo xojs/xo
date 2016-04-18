@@ -19,6 +19,7 @@ var getStdin = require('get-stdin');
 var spawn = require('child_process').spawn;
 var meow = require('meow');
 var path = require('path');
+var formatterPretty = require('eslint-formatter-pretty');
 var xo = require('./');
 
 var cli = meow({
@@ -78,7 +79,9 @@ function log(report) {
 		opts.reporter = 'compact';
 	}
 
-	process.stdout.write(xo.getFormatter(opts.reporter)(report.results));
+	var reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
+
+	process.stdout.write(reporter(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
 }
 
