@@ -85,6 +85,8 @@ function buildConfig(opts) {
 	if (opts.space) {
 		var spaces = typeof opts.space === 'number' ? opts.space : 2;
 		config.rules.indent = [2, spaces, {SwitchCase: 1}];
+		config.rules['react/jsx-indent-props'] = [2, spaces];
+		config.rules['react/jsx-indent'] = [2, spaces];
 	}
 
 	if (opts.semicolon === false) {
