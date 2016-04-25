@@ -48,12 +48,12 @@ test('buildConfig: esnext', t => {
 
 test('buildConfig: space: true', t => {
 	const config = manager.buildConfig({space: true});
-	t.deepEqual(config.rules, {indent: [2, 2, {SwitchCase: 1}]});
+	t.deepEqual(config.rules.indent, [2, 2, {SwitchCase: 1}]);
 });
 
 test('buildConfig: space: 4', t => {
 	const config = manager.buildConfig({space: 4});
-	t.deepEqual(config.rules, {indent: [2, 4, {SwitchCase: 1}]});
+	t.deepEqual(config.rules.indent, [2, 4, {SwitchCase: 1}]);
 });
 
 test('buildConfig: semicolon', t => {

@@ -77,7 +77,7 @@ function buildConfig(opts) {
 	var config = deepAssign({}, DEFAULT_CONFIG, {
 		envs: opts.envs,
 		globals: opts.globals,
-		plugins: opts.plugins,
+		plugins: opts.plugins || [],
 		rules: {},
 		fix: opts.fix
 	});
@@ -85,8 +85,13 @@ function buildConfig(opts) {
 	if (opts.space) {
 		var spaces = typeof opts.space === 'number' ? opts.space : 2;
 		config.rules.indent = [2, spaces, {SwitchCase: 1}];
-		config.rules['react/jsx-indent-props'] = [2, spaces];
-		config.rules['react/jsx-indent'] = [2, spaces];
+
+		// only apply if the user has the React plugin
+		if (opts.cwd && resolveFrom(opts.cwd, 'eslint-plugin-react')) {
+			config.plugins = config.plugins.concat('react');
+			config.rules['react/jsx-indent-props'] = [2, spaces];
+			config.rules['react/jsx-indent'] = [2, spaces];
+		}
 	}
 
 	if (opts.semicolon === false) {
