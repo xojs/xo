@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable import-order/import-order */
 'use strict';
 
 var debug = require('debug')('xo');

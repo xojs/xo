@@ -50,13 +50,16 @@ test('.lintText() - extends support with `esnext` option', t => {
 });
 
 test('always use the Babel parser so esnext syntax won\'t throw in normal mode', t => {
-	const results = fn.lintText('async function foo() {}\n\nfoo();\n').results;
+	// TODO: remove the `filename` option when https://github.com/sindresorhus/eslint-plugin-xo/issues/19 is fixed
+	const results = fn.lintText('async function foo() {}\n\nfoo();\n', {filename: 'x'}).results;
 	t.is(results[0].errorCount, 0);
 });
 
 test('.lintText() - regression test for #71', t => {
+	// TODO: remove the `filename` option when https://github.com/sindresorhus/eslint-plugin-xo/issues/19 is fixed
 	const results = fn.lintText(`var foo = { key: 'value' };\nconsole.log(foo);\n`, {
-		extends: path.join(__dirname, 'fixtures/extends.js')
+		extends: path.join(__dirname, 'fixtures/extends.js'),
+		filename: 'x'
 	}).results;
 	t.is(results[0].errorCount, 0, results[0]);
 });

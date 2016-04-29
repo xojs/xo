@@ -65,18 +65,18 @@
     "babel-eslint": "^6.0.0",
     "debug": "^2.2.0",
     "deep-assign": "^1.0.0",
-    "eslint": "^2.7.0",
-    "eslint-config-xo": "^0.13.0",
-    "eslint-formatter-pretty": "^0.1.0",
+    "eslint": "^2.9.0",
+    "eslint-config-xo": "^0.14.0",
+    "eslint-formatter-pretty": "^0.2.1",
     "eslint-plugin-ava": "^2.0.0",
     "eslint-plugin-babel": "^3.1.0",
     "eslint-plugin-import-order": "^2.0.0",
     "eslint-plugin-no-use-extend-native": "^0.3.2",
     "eslint-plugin-promise": "^1.1.0",
-    "eslint-plugin-xo": "^0.1.0",
+    "eslint-plugin-xo": "^0.3.1",
     "get-stdin": "^5.0.0",
     "globby": "^4.0.0",
-    "has-flag": "^1.0.0",
+    "has-flag": "^2.0.0",
     "home-or-tmp": "^2.0.0",
     "meow": "^3.4.2",
     "multimatch": "^2.1.0",
@@ -93,15 +93,10 @@
     "coveralls": "^2.11.9",
     "eslint-config-xo-react": "^0.7.0",
     "eslint-plugin-react": "^5.0.1",
-    "execa": "^0.2.2",
+    "execa": "^0.4.0",
     "nyc": "^6.1.1",
     "proxyquire": "^1.7.3",
     "temp-write": "^2.0.1",
-    "xo": "sindresorhus/xo#v0.13.0"
-  },
-  "xo": {
-    "ignores": [
-      "cli.js"
-    ]
+    "xo": "file:."
   }
 }

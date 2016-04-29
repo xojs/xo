@@ -1,8 +1,8 @@
 import fs from 'fs';
+import path from 'path';
 import test from 'ava';
 import tempWrite from 'temp-write';
 import execa from 'execa';
-import path from 'path';
 
 global.Promise = Promise;
 
@@ -27,7 +27,7 @@ test('overrides fixture', async () => {
 	await execa('../../../cli.js', ['--no-local'], {cwd});
 });
 
-test.skip('ignores fixture', async t => {
+test.skip('ignores fixture', async t => { // eslint-disable-line
 	const cwd = path.join(__dirname, 'fixtures/ignores');
 	t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
