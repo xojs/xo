@@ -39,7 +39,7 @@ $ xo --help
     --fix           Automagically fix issues
     --reporter      Reporter to use
     --stdin         Validate code from stdin
-    --esnext        Enable ES2015+ rules
+    --esnext        Enforce ES2015+ rules
     --env           Environment preset  [Can be set multiple times]
     --global        Global variable  [Can be set multiple times]
     --ignore        Additional paths to ignore  [Can be set multiple times]
@@ -137,7 +137,7 @@ You can configure some options in XO by putting it in package.json:
 Type: `boolean`<br>
 Default: `false`
 
-Enable ES2015+ rules.
+Enforce ES2015+ rules. Enabling this will *prefer* ES2015+ syntax and conventions.
 
 *ES2015+ is parsed even without this option. You can already use ES2016 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait) and [decorators](https://github.com/wycats/javascript-decorators). For a full list of features see [Babel's experimental features](https://babeljs.io/docs/usage/experimental/) and their [Learn ES2015](https://babeljs.io/docs/learn-es2015/).*
 

@@ -33,7 +33,7 @@ var cli = meow({
 		'  --fix           Automagically fix issues',
 		'  --reporter      Reporter to use',
 		'  --stdin         Validate code from stdin',
-		'  --esnext        Enable ES2015+ rules',
+		'  --esnext        Enforce ES2015+ rules',
 		'  --env           Environment preset  [Can be set multiple times]',
 		'  --global        Global variable  [Can be set multiple times]',
 		'  --ignore        Additional paths to ignore  [Can be set multiple times]',
