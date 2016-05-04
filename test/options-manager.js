@@ -104,7 +104,8 @@ test('groupConfigs', t => {
 		},
 		{
 			files: '**/foo/howdy.js',
-			space: 3
+			space: 3,
+			env: 'mocha'
 		}
 	];
 
@@ -116,12 +117,15 @@ test('groupConfigs', t => {
 			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
 		},
 		{
-			opts: {esnext: false, space: 3},
+			opts: {esnext: false, space: 3, envs: ['mocha']},
 			paths: ['/user/foo/howdy.js']
 		},
 		{
 			opts: {esnext: true},
 			paths: ['/user/bar/hello.js']
 		}
-	]);
+	].map(obj => {
+		obj.opts = Object.assign(manager.emptyOptions(), obj.opts);
+		return obj;
+	}));
 });
