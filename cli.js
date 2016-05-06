@@ -83,7 +83,11 @@ function log(report) {
 	var reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
 
 	process.stdout.write(reporter(report.results));
-	process.exit(report.errorCount === 0 ? 0 : 1);
+
+	setTimeout(function () {
+		// give stdout time to flush.
+		process.exit(report.errorCount === 0 ? 0 : 1);
+	}, 100);
 }
 
 function open(report) {
