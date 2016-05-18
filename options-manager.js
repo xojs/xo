@@ -73,14 +73,23 @@ function mergeWithPkgConf(opts) {
 	return objectAssign({}, pkgConf.sync('xo', opts.cwd), opts);
 }
 
-function buildConfig(opts) {
-	var config = deepAssign({}, DEFAULT_CONFIG, {
-		envs: opts.envs,
-		globals: opts.globals,
-		plugins: opts.plugins || [],
+// define the shape of deep properties for deepAssign
+function emptyOptions() {
+	return {
 		rules: {},
-		fix: opts.fix
-	});
+		globals: [],
+		envs: [],
+		plugins: [],
+		extends: []
+	};
+}
+
+function buildConfig(opts) {
+	var config = deepAssign(
+		emptyOptions(),
+		DEFAULT_CONFIG,
+		opts
+	);
 
 	if (opts.space) {
 		var spaces = typeof opts.space === 'number' ? opts.space : 2;
@@ -161,7 +170,7 @@ function groupConfigs(paths, baseOptions, overrides) {
 		var data = findApplicableOverrides(x, overrides);
 
 		if (!map[data.hash]) {
-			var mergedOpts = deepAssign.apply(null, [{}, baseOptions].concat(data.applicable));
+			var mergedOpts = deepAssign.apply(null, [emptyOptions(), baseOptions].concat(data.applicable.map(normalizeOpts)));
 			delete mergedOpts.files;
 
 			arr.push(map[data.hash] = {
@@ -191,3 +200,4 @@ exports.buildConfig = buildConfig;
 exports.findApplicableOverrides = findApplicableOverrides;
 exports.groupConfigs = groupConfigs;
 exports.preprocess = preprocess;
+exports.emptyOptions = emptyOptions;
