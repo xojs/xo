@@ -22,6 +22,7 @@ var meow = require('meow');
 var path = require('path');
 var formatterPretty = require('eslint-formatter-pretty');
 var xo = require('./');
+var exit = require('exit');
 
 var cli = meow({
 	help: [
@@ -83,7 +84,8 @@ function log(report) {
 	var reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
 
 	process.stdout.write(reporter(report.results));
-	process.exit(report.errorCount === 0 ? 0 : 1);
+
+	exit(report.errorCount === 0 ? 0 : 1);
 }
 
 function open(report) {
@@ -157,12 +159,14 @@ if (opts.init) {
 	getStdin().then(function (str) {
 		if (opts.fix) {
 			console.error('The `fix` option is not supported on stdin');
-			process.exit(1);
+			exit(1);
+			return;
 		}
 
 		if (opts.open) {
 			console.error('The `open` option is not supported on stdin');
-			process.exit(1);
+			exit(1);
+			return;
 		}
 
 		log(xo.lintText(str, opts));

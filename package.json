@@ -74,6 +74,7 @@
     "eslint-plugin-no-use-extend-native": "^0.3.2",
     "eslint-plugin-promise": "^1.1.0",
     "eslint-plugin-xo": "^0.3.1",
+    "exit": "^0.1.2",
     "get-stdin": "^5.0.0",
     "globby": "^4.0.0",
     "has-flag": "^2.0.0",
