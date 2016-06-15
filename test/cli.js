@@ -27,7 +27,8 @@ test('overrides fixture', async () => {
 	await execa('../../../cli.js', ['--no-local'], {cwd});
 });
 
-test.skip('ignores fixture', async t => { // eslint-disable-line
+// https://github.com/sindresorhus/xo/issues/65
+test.failing('ignores fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
 	t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
 });

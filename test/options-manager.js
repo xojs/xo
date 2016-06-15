@@ -60,7 +60,10 @@ test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false});
 	t.deepEqual(config.rules, {
 		'semi': [2, 'never'],
-		'semi-spacing': [2, {before: false, after: true}]
+		'semi-spacing': [2, {
+			before: false,
+			after: true
+		}]
 	});
 });
 
@@ -113,15 +116,23 @@ test('groupConfigs', t => {
 
 	t.deepEqual(result, [
 		{
-			opts: {esnext: false},
+			opts: {
+				esnext: false
+			},
 			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
 		},
 		{
-			opts: {esnext: false, space: 3, envs: ['mocha']},
+			opts: {
+				esnext: false,
+				space: 3,
+				envs: ['mocha']
+			},
 			paths: ['/user/foo/howdy.js']
 		},
 		{
-			opts: {esnext: true},
+			opts: {
+				esnext: true
+			},
 			paths: ['/user/bar/hello.js']
 		}
 	].map(obj => {

@@ -105,7 +105,10 @@ function buildConfig(opts) {
 
 	if (opts.semicolon === false) {
 		config.rules.semi = [2, 'never'];
-		config.rules['semi-spacing'] = [2, {before: false, after: true}];
+		config.rules['semi-spacing'] = [2, {
+			before: false,
+			after: true
+		}];
 	}
 
 	if (opts.esnext) {
