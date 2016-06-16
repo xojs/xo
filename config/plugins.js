@@ -20,8 +20,11 @@ module.exports = {
 		// disabled because of https://github.com/benmosher/eslint-plugin-import/issues/268
 		// 'import/default': 2,
 		'import/export': 2,
-		// disabled because of https://github.com/benmosher/eslint-plugin-import/issues/378
-		// 'import/extensions': [2, 'never'],
+		'import/extensions': [2, {
+			js: 'never',
+			json: 'never',
+			jsx: 'never'
+		}],
 		'import/imports-first': 2,
 		// disabled because of https://github.com/benmosher/eslint-plugin-import/issues/268
 		// 'import/named': 2,
