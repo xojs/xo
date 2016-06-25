@@ -20,7 +20,7 @@ We're always looking for more opinions on discussions in the issue tracker. It's
 
 ### Submitting an issue
 
-- The issue tracker is for issues. Use Stack Overflow or support.
+- The issue tracker is for issues. Use Stack Overflow for support.
 - Search the issue tracker before opening an issue.
 - Ensure you're using the latest version of XO.
 - Use a clear and descriptive title.
