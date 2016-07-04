@@ -6,6 +6,18 @@ var optionsManager = require('./options-manager');
 
 exports.lintText = function (str, opts) {
 	opts = optionsManager.preprocess(opts);
+
+	if (opts.overrides && opts.overrides.length) {
+		var overrides = opts.overrides;
+		delete opts.overrides;
+
+		var filename = path.relative(opts.cwd || process.cwd(), opts.filename);
+		var grouped = optionsManager.groupConfigs([filename], opts, overrides);
+		if (grouped[0].paths[0] === filename) {
+			opts = grouped[0].opts;
+		}
+	}
+
 	opts = optionsManager.buildConfig(opts);
 
 	var engine = new eslint.CLIEngine(opts);
