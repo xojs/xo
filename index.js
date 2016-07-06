@@ -10,8 +10,8 @@ exports.lintText = function (str, opts) {
 
 	var engine = new eslint.CLIEngine(opts);
 	var report = engine.executeOnText(str, opts.filename);
-	report.results = opts.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
-	return report;
+
+	return processReport(report, opts);
 };
 
 exports.lintFiles = function (patterns, opts) {
@@ -66,6 +66,11 @@ function runEslint(paths, opts) {
 	var config = optionsManager.buildConfig(opts);
 	var engine = new eslint.CLIEngine(config);
 	var report = engine.executeOnFiles(paths, config);
+
+	return processReport(report, opts);
+}
+
+function processReport(report, opts) {
 	report.results = opts.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
 	return report;
 }
