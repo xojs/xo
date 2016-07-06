@@ -9,8 +9,9 @@ exports.lintText = function (str, opts) {
 	opts = optionsManager.buildConfig(opts);
 
 	var engine = new eslint.CLIEngine(opts);
-
-	return engine.executeOnText(str, opts.filename);
+	var report = engine.executeOnText(str, opts.filename);
+	report.results = opts.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
+	return report;
 };
 
 exports.lintFiles = function (patterns, opts) {

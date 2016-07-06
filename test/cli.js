@@ -37,3 +37,13 @@ test('supports being extended with a shareable config', async () => {
 	const cwd = path.join(__dirname, 'fixtures/project');
 	await execa('../../../cli.js', ['--no-local'], {cwd});
 });
+
+test('quiet option', async t => {
+	const filepath = await tempWrite('// TODO: quiet\nconsole.log()\n', 'x.js');
+
+	try {
+		await execa('../cli.js', ['--no-local', '--quiet', '--reporter=compact', filepath]);
+	} catch (err) {
+		t.true(err.stdout.indexOf('warning') === -1);
+	}
+});

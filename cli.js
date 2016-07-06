@@ -42,6 +42,7 @@ var cli = meow({
 		'  --plugin        Include third-party plugins  [Can be set multiple times]',
 		'  --extend        Extend defaults with a custom config  [Can be set multiple times]',
 		'  --open          Open files with issues in your editor',
+		'  --quiet         Show only errors and no warnings',
 		'',
 		'Examples',
 		'  $ xo',
