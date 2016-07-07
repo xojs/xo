@@ -40,6 +40,6 @@ test('supports being extended with a shareable config', async () => {
 
 test('quiet option', async t => {
 	const filepath = await tempWrite('// TODO: quiet\nconsole.log()\n', 'x.js');
-	var err = await t.throws(execa('../cli.js', ['--no-local', '--quiet', '--reporter=compact', filepath]));
+	const err = await t.throws(execa('../cli.js', ['--no-local', '--quiet', '--reporter=compact', filepath]));
 	t.is(err.stdout.indexOf('warning'), -1);
 });
