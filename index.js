@@ -12,10 +12,8 @@ exports.lintText = function (str, opts) {
 		delete opts.overrides;
 
 		var filename = path.relative(opts.cwd, opts.filename);
-		var grouped = optionsManager.groupConfigs([filename], opts, overrides);
-		if (grouped[0].paths[0] === filename) {
-			opts = grouped[0].opts;
-		}
+		var foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
+		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
 	}
 
 	opts = optionsManager.buildConfig(opts);
