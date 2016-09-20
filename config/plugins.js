@@ -3,13 +3,13 @@ module.exports = {
 	plugins: [
 		'no-use-extend-native',
 		'ava',
-		'xo',
+		'unicorn',
 		'promise',
 		'import'
 	],
 	extends: [
 		'plugin:ava/recommended',
-		'plugin:xo/recommended'
+		'plugin:unicorn/recommended'
 	],
 	settings: {
 		'import/extensions': ['.js'] // TODO: remove this when eslint-plugin-import@2 is out

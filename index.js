@@ -28,7 +28,7 @@ exports.lintFiles = function (patterns, opts) {
 			return ext === '.js' || ext === '.jsx';
 		});
 
-		if (!(opts.overrides && opts.overrides.length)) {
+		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
 		}
 

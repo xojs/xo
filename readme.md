@@ -298,7 +298,7 @@ let g:syntastic_javascript_checkers = ['eslint']
 
 ## Related
 
-- [eslint-plugin-xo](https://github.com/sindresorhus/eslint-plugin-xo) - Additional ESLint rules *(Bundled in XO)*
+- [eslint-plugin-unicorn](https://github.com/sindresorhus/eslint-plugin-unicorn) - Various awesome ESLint rules *(Bundled in XO)*
 
 
 ## Badge
@@ -319,4 +319,4 @@ Show the world you're using XO → [![XO code style](https://img.shields.io/badg
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+MIT © [Sindre Sorhus](https://sindresorhus.com)
