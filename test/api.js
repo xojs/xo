@@ -2,9 +2,7 @@ import path from 'path';
 import test from 'ava';
 import fn from '../';
 
-function hasRule(results, ruleId) {
-	return results[0].messages.some(x => x.ruleId === ruleId);
-}
+const hasRule = (results, ruleId) => results[0].messages.some(x => x.ruleId === ruleId);
 
 test('.lintText()', t => {
 	const results = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`).results;
@@ -50,16 +48,13 @@ test('.lintText() - extends support with `esnext` option', t => {
 });
 
 test('always use the Babel parser so esnext syntax won\'t throw in normal mode', t => {
-	// TODO: remove the `filename` option when https://github.com/sindresorhus/eslint-plugin-xo/issues/19 is fixed
-	const results = fn.lintText('async function foo() {}\n\nfoo();\n', {filename: 'x'}).results;
+	const results = fn.lintText('async function foo() {}\n\nfoo();\n').results;
 	t.is(results[0].errorCount, 0);
 });
 
 test('.lintText() - regression test for #71', t => {
-	// TODO: remove the `filename` option when https://github.com/sindresorhus/eslint-plugin-xo/issues/19 is fixed
 	const results = fn.lintText(`var foo = { key: 'value' };\nconsole.log(foo);\n`, {
-		extends: path.join(__dirname, 'fixtures/extends.js'),
-		filename: 'x'
+		extends: path.join(__dirname, 'fixtures/extends.js')
 	}).results;
 	t.is(results[0].errorCount, 0, results[0]);
 });
