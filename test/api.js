@@ -10,8 +10,8 @@ test('.lintText()', t => {
 });
 
 test('.lintText() - `esnext` option', t => {
-	const results = fn.lintText('function dec() {}\nconst x = {\n\t@dec()\n\ta: 1\n};\n', {esnext: true}).results;
-	t.true(hasRule(results, 'no-unused-vars'));
+	const results = fn.lintText('var foo = true;', {esnext: true}).results;
+	t.true(hasRule(results, 'no-var'));
 });
 
 test('.lintText() - JSX support', t => {
@@ -47,7 +47,7 @@ test('.lintText() - extends support with `esnext` option', t => {
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
-test('always use the Babel parser so esnext syntax won\'t throw in normal mode', t => {
+test('always use the latest ECMAScript parser so esnext syntax won\'t throw in normal mode', t => {
 	const results = fn.lintText('async function foo() {}\n\nfoo();\n').results;
 	t.is(results[0].errorCount, 0);
 });

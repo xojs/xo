@@ -140,7 +140,7 @@ Default: `false`
 
 Enforce ES2015+ rules. Enabling this will *prefer* ES2015+ syntax and conventions.
 
-*ES2015+ is parsed even without this option. You can already use ES2016 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait) and [decorators](https://github.com/wycats/javascript-decorators). For a full list of features see [Babel's experimental features](https://babeljs.io/docs/plugins/#stage-x-experimental-presets) and their [Learn ES2015](https://babeljs.io/docs/learn-es2015/).*
+*ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
 
 ### envs
 

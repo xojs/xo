@@ -1,5 +1,14 @@
 'use strict';
 module.exports = {
+	// repeated here from eslint-config-xo in case some plugins set something different
+	parserOptions: {
+		ecmaVersion: 2017,
+		sourceType: 'module',
+		ecmaFeatures: {
+			jsx: true,
+			experimentalObjectRestSpread: true
+		}
+	},
 	plugins: [
 		'no-use-extend-native',
 		'ava',
