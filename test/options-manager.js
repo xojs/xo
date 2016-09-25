@@ -68,7 +68,7 @@ test('buildConfig: semicolon', t => {
 });
 
 test('buildConfig: rules', t => {
-	const rules = {'babel/object-curly-spacing': [2, 'always']};
+	const rules = {'object-curly-spacing': [2, 'always']};
 	const config = manager.buildConfig({rules: rules});
 	t.deepEqual(config.rules, rules);
 });

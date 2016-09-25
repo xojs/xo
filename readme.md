@@ -48,6 +48,7 @@ $ xo --help
     --plugin        Include third-party plugins  [Can be set multiple times]
     --extend        Extend defaults with a custom config  [Can be set multiple times]
     --open          Open files with issues in your editor
+    --quiet         Show only errors and no warnings
 
   Examples
     $ xo
@@ -139,7 +140,7 @@ Default: `false`
 
 Enforce ES2015+ rules. Enabling this will *prefer* ES2015+ syntax and conventions.
 
-*ES2015+ is parsed even without this option. You can already use ES2016 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait) and [decorators](https://github.com/wycats/javascript-decorators). For a full list of features see [Babel's experimental features](https://babeljs.io/docs/plugins/#stage-x-experimental-presets) and their [Learn ES2015](https://babeljs.io/docs/learn-es2015/).*
+*ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
 
 ### envs
 
@@ -297,7 +298,7 @@ let g:syntastic_javascript_checkers = ['eslint']
 
 ## Related
 
-- [eslint-plugin-xo](https://github.com/sindresorhus/eslint-plugin-xo) - Additional ESLint rules *(Bundled in XO)*
+- [eslint-plugin-unicorn](https://github.com/sindresorhus/eslint-plugin-unicorn) - Various awesome ESLint rules *(Bundled in XO)*
 
 
 ## Badge
@@ -318,4 +319,4 @@ Show the world you're using XO → [![XO code style](https://img.shields.io/badg
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+MIT © [Sindre Sorhus](https://sindresorhus.com)

@@ -19,8 +19,9 @@ exports.lintText = function (str, opts) {
 	opts = optionsManager.buildConfig(opts);
 
 	var engine = new eslint.CLIEngine(opts);
+	var report = engine.executeOnText(str, opts.filename);
 
-	return engine.executeOnText(str, opts.filename);
+	return processReport(report, opts);
 };
 
 exports.lintFiles = function (patterns, opts) {
@@ -37,7 +38,7 @@ exports.lintFiles = function (patterns, opts) {
 			return ext === '.js' || ext === '.jsx';
 		});
 
-		if (!(opts.overrides && opts.overrides.length)) {
+		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
 		}
 
@@ -74,7 +75,14 @@ function mergeReports(reports) {
 function runEslint(paths, opts) {
 	var config = optionsManager.buildConfig(opts);
 	var engine = new eslint.CLIEngine(config);
-	return engine.executeOnFiles(paths, config);
+	var report = engine.executeOnFiles(paths, config);
+
+	return processReport(report, opts);
+}
+
+function processReport(report, opts) {
+	report.results = opts.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
+	return report;
 }
 
 exports.getFormatter = eslint.CLIEngine.getFormatter;
