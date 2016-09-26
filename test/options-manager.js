@@ -6,16 +6,14 @@ const manager = proxyquire('../options-manager', {
 });
 
 test('normalizeOpts: makes all the opts plural and arrays', t => {
-	let opts = {
+	const opts = manager.normalizeOpts({
 		env: 'node',
 		global: 'foo',
 		ignore: 'test.js',
 		plugin: 'my-plugin',
 		rule: {'my-rule': 'foo'},
 		extend: 'foo'
-	};
-
-	opts = manager.normalizeOpts(opts);
+	});
 
 	t.deepEqual(opts, {
 		envs: ['node'],
@@ -28,9 +26,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 });
 
 test('normalizeOpts: falsie values stay falsie', t => {
-	let opts = {};
-	opts = manager.normalizeOpts(opts);
-	t.deepEqual(opts, {});
+	t.deepEqual(manager.normalizeOpts({}), {});
 });
 
 test('buildConfig: defaults', t => {
@@ -69,7 +65,7 @@ test('buildConfig: semicolon', t => {
 
 test('buildConfig: rules', t => {
 	const rules = {'object-curly-spacing': [2, 'always']};
-	const config = manager.buildConfig({rules: rules});
+	const config = manager.buildConfig({rules});
 	t.deepEqual(config.rules, rules);
 });
 

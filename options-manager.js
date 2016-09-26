@@ -1,15 +1,14 @@
 'use strict';
-var path = require('path');
-var arrify = require('arrify');
-var pkgConf = require('pkg-conf');
-var deepAssign = require('deep-assign');
-var objectAssign = require('object-assign');
-var homeOrTmp = require('home-or-tmp');
-var multimatch = require('multimatch');
-var resolveFrom = require('resolve-from');
-var pathExists = require('path-exists');
+const os = require('os');
+const path = require('path');
+const arrify = require('arrify');
+const pkgConf = require('pkg-conf');
+const deepAssign = require('deep-assign');
+const multimatch = require('multimatch');
+const resolveFrom = require('resolve-from');
+const pathExists = require('path-exists');
 
-var DEFAULT_IGNORE = [
+const DEFAULT_IGNORE = [
 	'**/node_modules/**',
 	'**/bower_components/**',
 	'coverage/**',
@@ -23,10 +22,10 @@ var DEFAULT_IGNORE = [
 	'dist/**'
 ];
 
-var DEFAULT_CONFIG = {
+const DEFAULT_CONFIG = {
 	useEslintrc: false,
 	cache: true,
-	cacheLocation: path.join(homeOrTmp, '.xo-cache/'),
+	cacheLocation: path.join(os.homedir() || os.tmpdir(), '.xo-cache/'),
 	baseConfig: {
 		extends: [
 			'xo',
@@ -37,7 +36,7 @@ var DEFAULT_CONFIG = {
 };
 
 function normalizeOpts(opts) {
-	opts = objectAssign({}, opts);
+	opts = Object.assign({}, opts);
 
 	// alias to help humans
 	[
@@ -47,9 +46,9 @@ function normalizeOpts(opts) {
 		'plugin',
 		'rule',
 		'extend'
-	].forEach(function (singular) {
-		var plural = singular + 's';
-		var value = opts[plural] || opts[singular];
+	].forEach(singular => {
+		const plural = singular + 's';
+		let value = opts[plural] || opts[singular];
 
 		delete opts[singular];
 
@@ -68,9 +67,9 @@ function normalizeOpts(opts) {
 }
 
 function mergeWithPkgConf(opts) {
-	opts = objectAssign({cwd: process.cwd()}, opts);
+	opts = Object.assign({cwd: process.cwd()}, opts);
 
-	return objectAssign({}, pkgConf.sync('xo', opts.cwd), opts);
+	return Object.assign({}, pkgConf.sync('xo', opts.cwd), opts);
 }
 
 // define the shape of deep properties for deepAssign
@@ -85,14 +84,14 @@ function emptyOptions() {
 }
 
 function buildConfig(opts) {
-	var config = deepAssign(
+	const config = deepAssign(
 		emptyOptions(),
 		DEFAULT_CONFIG,
 		opts
 	);
 
 	if (opts.space) {
-		var spaces = typeof opts.space === 'number' ? opts.space : 2;
+		const spaces = typeof opts.space === 'number' ? opts.space : 2;
 		config.rules.indent = [2, spaces, {SwitchCase: 1}];
 
 		// only apply if the user has the React plugin
@@ -116,20 +115,20 @@ function buildConfig(opts) {
 	}
 
 	if (opts.rules) {
-		objectAssign(config.rules, opts.rules);
+		Object.assign(config.rules, opts.rules);
 	}
 
 	if (opts.extends && opts.extends.length > 0) {
 		// TODO: this logic needs to be improved, preferably use the same code as ESLint
 		// user's configs must be resolved to their absolute paths
-		var configs = opts.extends.map(function (name) {
+		const configs = opts.extends.map(name => {
 			// don't do anything if it's a filepath
 			if (pathExists.sync(name)) {
 				return name;
 			}
 
-			if (name.indexOf('eslint-config-') === -1) {
-				name = 'eslint-config-' + name;
+			if (!name.includes('eslint-config-')) {
+				name = `eslint-config-${name}`;
 			}
 
 			return resolveFrom(opts.cwd, name);
@@ -146,10 +145,10 @@ function buildConfig(opts) {
 //
 // If overrides.length === 4, and only the first and third elements apply, then our hash is: 1010 (in binary)
 function findApplicableOverrides(path, overrides) {
-	var hash = 0;
-	var applicable = [];
+	let hash = 0;
+	const applicable = [];
 
-	overrides.forEach(function (override) {
+	overrides.forEach(override => {
 		hash <<= 1;
 
 		if (multimatch(path, override.files).length > 0) {
@@ -159,8 +158,8 @@ function findApplicableOverrides(path, overrides) {
 	});
 
 	return {
-		hash: hash,
-		applicable: applicable
+		hash,
+		applicable
 	};
 }
 
@@ -170,14 +169,14 @@ function mergeApplicableOverrides(baseOptions, applicableOverrides) {
 
 // Creates grouped sets of merged options together with the paths they apply to.
 function groupConfigs(paths, baseOptions, overrides) {
-	var map = {};
-	var arr = [];
+	const map = {};
+	const arr = [];
 
-	paths.forEach(function (x) {
-		var data = findApplicableOverrides(x, overrides);
+	paths.forEach(x => {
+		const data = findApplicableOverrides(x, overrides);
 
 		if (!map[data.hash]) {
-			var mergedOpts = mergeApplicableOverrides(baseOptions, data.applicable);
+			const mergedOpts = mergeApplicableOverrides(baseOptions, data.applicable);
 			delete mergedOpts.files;
 
 			arr.push(map[data.hash] = {

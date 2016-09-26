@@ -144,20 +144,20 @@ Enforce ES2015+ rules. Enabling this will *prefer* ES2015+ syntax and convention
 
 ### envs
 
-Type: `array`<br>
+Type: `Array`<br>
 Default: `['node']`
 
 Which [environments](http://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
 
 ### globals
 
-Type: `array`
+Type: `Array`
 
 Additional global variables your code accesses during execution.
 
 ### ignores
 
-Type: `array`
+Type: `Array`
 
 Some [paths](https://github.com/sindresorhus/xo/blob/master/options-manager.js) are ignored by default. Additional ignores can be added here.
 
@@ -172,7 +172,7 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 
 ### rules
 
-Type: `object`
+Type: `Object`
 
 Override any of the [default rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js). See the [ESLint docs](http://eslint.org/docs/rules/) for more info on each rule.
 
@@ -187,13 +187,13 @@ Set it to `false` to enforce no-semicolon style.
 
 ### plugins
 
-Type: `array`
+Type: `Array`
 
 Include third-party [plugins](http://eslint.org/docs/user-guide/configuring.html#configuring-plugins).
 
 ### extends
 
-Type: `array`, `string`
+Type: `Array`, `string`
 
 Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) to override any of the default rules (like `rules` above).
 

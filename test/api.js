@@ -4,7 +4,7 @@ import test from 'ava';
 import pify from 'pify';
 import fn from '../';
 
-const readFile = pify(fs.readFile, Promise);
+const readFile = pify(fs.readFile);
 
 const hasRule = (results, ruleId) => results[0].messages.some(x => x.ruleId === ruleId);
 
@@ -57,7 +57,7 @@ test('always use the latest ECMAScript parser so esnext syntax won\'t throw in n
 });
 
 test('.lintText() - regression test for #71', t => {
-	const results = fn.lintText(`var foo = { key: 'value' };\nconsole.log(foo);\n`, {
+	const results = fn.lintText(`const foo = { key: 'value' };\nconsole.log(foo);\n`, {
 		extends: path.join(__dirname, 'fixtures/extends.js')
 	}).results;
 	t.is(results[0].errorCount, 0, results[0]);

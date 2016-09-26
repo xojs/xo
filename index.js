@@ -1,40 +1,40 @@
 'use strict';
-var path = require('path');
-var eslint = require('eslint');
-var globby = require('globby');
-var optionsManager = require('./options-manager');
+const path = require('path');
+const eslint = require('eslint');
+const globby = require('globby');
+const optionsManager = require('./options-manager');
 
-exports.lintText = function (str, opts) {
+exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
 	if (opts.overrides && opts.overrides.length) {
-		var overrides = opts.overrides;
+		const overrides = opts.overrides;
 		delete opts.overrides;
 
-		var filename = path.relative(opts.cwd, opts.filename);
-		var foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
+		const filename = path.relative(opts.cwd, opts.filename);
+		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
 		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
 	}
 
 	opts = optionsManager.buildConfig(opts);
 
-	var engine = new eslint.CLIEngine(opts);
-	var report = engine.executeOnText(str, opts.filename);
+	const engine = new eslint.CLIEngine(opts);
+	const report = engine.executeOnText(str, opts.filename);
 
 	return processReport(report, opts);
 };
 
-exports.lintFiles = function (patterns, opts) {
+exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
 
 	if (patterns.length === 0) {
 		patterns = '**/*.{js,jsx}';
 	}
 
-	return globby(patterns, {ignore: opts.ignores}).then(function (paths) {
+	return globby(patterns, {ignore: opts.ignores}).then(paths => {
 		// when users are silly and don't specify an extension in the glob pattern
-		paths = paths.filter(function (x) {
-			var ext = path.extname(x);
+		paths = paths.filter(x => {
+			const ext = path.extname(x);
 			return ext === '.js' || ext === '.jsx';
 		});
 
@@ -42,40 +42,38 @@ exports.lintFiles = function (patterns, opts) {
 			return runEslint(paths, opts);
 		}
 
-		var overrides = opts.overrides;
+		const overrides = opts.overrides;
 		delete opts.overrides;
 
-		var grouped = optionsManager.groupConfigs(paths, opts, overrides);
+		const grouped = optionsManager.groupConfigs(paths, opts, overrides);
 
-		return mergeReports(grouped.map(function (data) {
-			return runEslint(data.paths, data.opts);
-		}));
+		return mergeReports(grouped.map(data => runEslint(data.paths, data.opts)));
 	});
 };
 
 function mergeReports(reports) {
 	// merge multiple reports into a single report
-	var results = [];
-	var errorCount = 0;
-	var warningCount = 0;
+	let results = [];
+	let errorCount = 0;
+	let warningCount = 0;
 
-	reports.forEach(function (report) {
+	reports.forEach(report => {
 		results = results.concat(report.results);
 		errorCount += report.errorCount;
 		warningCount += report.warningCount;
 	});
 
 	return {
-		errorCount: errorCount,
-		warningCount: warningCount,
-		results: results
+		errorCount,
+		warningCount,
+		results
 	};
 }
 
 function runEslint(paths, opts) {
-	var config = optionsManager.buildConfig(opts);
-	var engine = new eslint.CLIEngine(config);
-	var report = engine.executeOnFiles(paths, config);
+	const config = optionsManager.buildConfig(opts);
+	const engine = new eslint.CLIEngine(config);
+	const report = engine.executeOnFiles(paths, config);
 
 	return processReport(report, opts);
 }
