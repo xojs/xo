@@ -93,6 +93,7 @@
     "eslint-plugin-react": "^6.3.0",
     "execa": "^0.4.0",
     "nyc": "^8.3.0",
+    "pify": "^2.3.0",
     "proxyquire": "^1.7.3",
     "temp-write": "^2.0.1",
     "xo": "sindresorhus/xo#v0.16.0"

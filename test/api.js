@@ -1,6 +1,10 @@
+import fs from 'fs';
 import path from 'path';
 import test from 'ava';
+import pify from 'pify';
 import fn from '../';
+
+const readFile = pify(fs.readFile, Promise);
 
 const hasRule = (results, ruleId) => results[0].messages.some(x => x.ruleId === ruleId);
 
@@ -57,4 +61,19 @@ test('.lintText() - regression test for #71', t => {
 		extends: path.join(__dirname, 'fixtures/extends.js')
 	}).results;
 	t.is(results[0].errorCount, 0, results[0]);
+});
+
+test('lintText() - overrides support', async t => {
+	const cwd = path.join(__dirname, 'fixtures/overrides');
+	const bar = path.join(cwd, 'test/bar.js');
+	const barResults = fn.lintText(await readFile(bar, 'utf8'), {filename: bar, cwd}).results;
+	t.is(barResults[0].errorCount, 0, barResults[0]);
+
+	const foo = path.join(cwd, 'test/foo.js');
+	const fooResults = fn.lintText(await readFile(foo, 'utf8'), {filename: foo, cwd}).results;
+	t.is(fooResults[0].errorCount, 0, fooResults[0]);
+
+	const index = path.join(cwd, 'test/index.js');
+	const indexResults = fn.lintText(await readFile(bar, 'utf8'), {filename: index, cwd}).results;
+	t.is(indexResults[0].errorCount, 0, indexResults[0]);
 });

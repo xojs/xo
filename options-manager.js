@@ -164,6 +164,10 @@ function findApplicableOverrides(path, overrides) {
 	};
 }
 
+function mergeApplicableOverrides(baseOptions, applicableOverrides) {
+	return deepAssign.apply(null, [emptyOptions(), baseOptions].concat(applicableOverrides.map(normalizeOpts)));
+}
+
 // Creates grouped sets of merged options together with the paths they apply to.
 function groupConfigs(paths, baseOptions, overrides) {
 	var map = {};
@@ -173,7 +177,7 @@ function groupConfigs(paths, baseOptions, overrides) {
 		var data = findApplicableOverrides(x, overrides);
 
 		if (!map[data.hash]) {
-			var mergedOpts = deepAssign.apply(null, [emptyOptions(), baseOptions].concat(data.applicable.map(normalizeOpts)));
+			var mergedOpts = mergeApplicableOverrides(baseOptions, data.applicable);
 			delete mergedOpts.files;
 
 			arr.push(map[data.hash] = {
@@ -201,6 +205,7 @@ exports.mergeWithPkgConf = mergeWithPkgConf;
 exports.normalizeOpts = normalizeOpts;
 exports.buildConfig = buildConfig;
 exports.findApplicableOverrides = findApplicableOverrides;
+exports.mergeApplicableOverrides = mergeApplicableOverrides;
 exports.groupConfigs = groupConfigs;
 exports.preprocess = preprocess;
 exports.emptyOptions = emptyOptions;
