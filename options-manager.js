@@ -197,10 +197,8 @@ function preprocess(opts) {
 	opts = normalizeOpts(opts);
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
 
-	if (opts.useGitignore) {
-		const gitignore = parseGitignore('.gitignore');
-		opts.ignores = opts.ignores.concat(gitignore || []);
-	}
+	const gitignore = parseGitignore('.gitignore');
+	opts.ignores = opts.ignores.concat(gitignore || []);
 
 	return opts;
 }
