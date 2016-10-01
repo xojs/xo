@@ -192,13 +192,19 @@ function groupConfigs(paths, baseOptions, overrides) {
 	return arr;
 }
 
+function getIgnores(opts) {
+	const gitignore = parseGitignore('.gitignore');
+
+	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+	opts.ignores = opts.ignores.concat(gitignore || []);
+
+	return opts;
+}
+
 function preprocess(opts) {
 	opts = mergeWithPkgConf(opts);
 	opts = normalizeOpts(opts);
-	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
-
-	const gitignore = parseGitignore('.gitignore');
-	opts.ignores = opts.ignores.concat(gitignore || []);
+	opts = getIgnores(opts);
 
 	return opts;
 }
@@ -213,3 +219,4 @@ exports.mergeApplicableOverrides = mergeApplicableOverrides;
 exports.groupConfigs = groupConfigs;
 exports.preprocess = preprocess;
 exports.emptyOptions = emptyOptions;
+exports.getIgnores = getIgnores;
