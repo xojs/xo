@@ -136,3 +136,8 @@ test('groupConfigs', t => {
 		return obj;
 	}));
 });
+
+test('gitignore', t => {
+	const result = manager.getIgnores({});
+	t.not(result.ignores.indexOf('test/**'), -1);
+});
