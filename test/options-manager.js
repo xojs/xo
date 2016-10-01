@@ -139,5 +139,5 @@ test('groupConfigs', t => {
 
 test('gitignore', t => {
 	const result = manager.getIgnores({});
-	t.not(result.ignores.indexOf('test/**'), -1);
+	t.not(result.ignores.indexOf('foo/**'), -1);
 });
