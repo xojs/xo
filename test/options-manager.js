@@ -77,7 +77,7 @@ test('findApplicableOverrides', t => {
 		{files: '**/*.txt'}
 	]);
 
-	t.is(result.hash, parseInt('1010', 2));
+	t.is(result.hash, 0b1010);
 	t.deepEqual(result.applicable, [
 		{files: '**/f*.js'},
 		{files: '**/*oo.js'}

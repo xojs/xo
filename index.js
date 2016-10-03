@@ -7,7 +7,7 @@ const optionsManager = require('./options-manager');
 exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-	if (opts.overrides && opts.overrides.length) {
+	if (opts.overrides && opts.overrides.length > 0) {
 		const overrides = opts.overrides;
 		delete opts.overrides;
 
