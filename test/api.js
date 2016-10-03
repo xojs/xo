@@ -26,7 +26,7 @@ test('.lintText() - JSX support', t => {
 test('.lintText() - plugin support', t => {
 	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
 		plugins: ['react'],
-		rules: {'react/jsx-no-undef': 2}
+		rules: {'react/jsx-no-undef': 'error'}
 	}).results;
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });

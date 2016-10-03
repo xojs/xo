@@ -28,36 +28,36 @@ module.exports = {
 		]
 	},
 	rules: {
-		'no-use-extend-native/no-use-extend-native': 2,
-		'promise/param-names': 2,
-		'import/default': 2,
-		'import/export': 2,
-		'import/extensions': [2, {
+		'no-use-extend-native/no-use-extend-native': 'error',
+		'promise/param-names': 'error',
+		'import/default': 'error',
+		'import/export': 'error',
+		'import/extensions': ['error', {
 			js: 'never',
 			json: 'never',
 			jsx: 'never'
 		}],
-		'import/first': 2,
-		'import/named': 2,
-		'import/namespace': [2, {allowComputed: true}],
-		'import/no-absolute-path': 2,
-		'import/no-dynamic-require': 2,
-		'import/no-webpack-loader-syntax': 2,
-		'import/newline-after-import': 2,
-		'import/no-amd': 2,
+		'import/first': 'error',
+		'import/named': 'error',
+		'import/namespace': ['error', {allowComputed: true}],
+		'import/no-absolute-path': 'error',
+		'import/no-dynamic-require': 'error',
+		'import/no-webpack-loader-syntax': 'error',
+		'import/newline-after-import': 'error',
+		'import/no-amd': 'error',
 		// enable this sometime in the future when Node.js has ES2015 module support
-		// 'import/unambiguous': 2,
+		// 'import/unambiguous': 'error',
 		// enable this sometime in the future when Node.js has ES2015 module support
-		// 'import/no-commonjs': 2,
+		// 'import/no-commonjs': 'error',
 		// looks useful, but too unstable at the moment
-		// 'import/no-deprecated': 2,
-		'import/no-extraneous-dependencies': 2,
-		'import/no-mutable-exports': 2,
-		'import/no-named-as-default-member': 2,
-		'import/no-named-as-default': 2,
-		'import/no-unresolved': [2, {commonjs: true}],
-		'import/order': 2,
-		'import/prefer-default-export': 2,
-		'import/no-unassigned-import': 2
+		// 'import/no-deprecated': 'error',
+		'import/no-extraneous-dependencies': 'error',
+		'import/no-mutable-exports': 'error',
+		'import/no-named-as-default-member': 'error',
+		'import/no-named-as-default': 'error',
+		'import/no-unresolved': ['error', {commonjs: true}],
+		'import/order': 'error',
+		'import/prefer-default-export': 'error',
+		'import/no-unassigned-import': 'error'
 	}
 };

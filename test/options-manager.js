@@ -44,19 +44,19 @@ test('buildConfig: esnext', t => {
 
 test('buildConfig: space: true', t => {
 	const config = manager.buildConfig({space: true});
-	t.deepEqual(config.rules.indent, [2, 2, {SwitchCase: 1}]);
+	t.deepEqual(config.rules.indent, ['error', 2, {SwitchCase: 1}]);
 });
 
 test('buildConfig: space: 4', t => {
 	const config = manager.buildConfig({space: 4});
-	t.deepEqual(config.rules.indent, [2, 4, {SwitchCase: 1}]);
+	t.deepEqual(config.rules.indent, ['error', 4, {SwitchCase: 1}]);
 });
 
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false});
 	t.deepEqual(config.rules, {
-		'semi': [2, 'never'],
-		'semi-spacing': [2, {
+		'semi': ['error', 'never'],
+		'semi-spacing': ['error', {
 			before: false,
 			after: true
 		}]
@@ -64,7 +64,7 @@ test('buildConfig: semicolon', t => {
 });
 
 test('buildConfig: rules', t => {
-	const rules = {'object-curly-spacing': [2, 'always']};
+	const rules = {'object-curly-spacing': ['error', 'always']};
 	const config = manager.buildConfig({rules});
 	t.deepEqual(config.rules, rules);
 });

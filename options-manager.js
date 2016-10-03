@@ -92,19 +92,19 @@ function buildConfig(opts) {
 
 	if (opts.space) {
 		const spaces = typeof opts.space === 'number' ? opts.space : 2;
-		config.rules.indent = [2, spaces, {SwitchCase: 1}];
+		config.rules.indent = ['error', spaces, {SwitchCase: 1}];
 
 		// only apply if the user has the React plugin
 		if (opts.cwd && resolveFrom(opts.cwd, 'eslint-plugin-react')) {
 			config.plugins = config.plugins.concat('react');
-			config.rules['react/jsx-indent-props'] = [2, spaces];
-			config.rules['react/jsx-indent'] = [2, spaces];
+			config.rules['react/jsx-indent-props'] = ['error', spaces];
+			config.rules['react/jsx-indent'] = ['error', spaces];
 		}
 	}
 
 	if (opts.semicolon === false) {
-		config.rules.semi = [2, 'never'];
-		config.rules['semi-spacing'] = [2, {
+		config.rules.semi = ['error', 'never'];
+		config.rules['semi-spacing'] = ['error', {
 			before: false,
 			after: true
 		}];
