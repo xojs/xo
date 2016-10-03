@@ -31,6 +31,16 @@ test.failing('ignores fixture', async t => {
 	t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
 
+test('gitignore fixture', async t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	try {
+		await execa('../../../cli.js', ['--no-local'], {cwd});
+	} catch (err) {
+		t.is(err.stdout.indexOf('foo.js'), -1);
+		t.true(err.stdout.indexOf('bar.js') !== -1);
+	}
+});
+
 test('supports being extended with a shareable config', async () => {
 	const cwd = path.join(__dirname, 'fixtures/project');
 	await execa('../../../cli.js', ['--no-local'], {cwd});

@@ -7,6 +7,8 @@ const deepAssign = require('deep-assign');
 const multimatch = require('multimatch');
 const resolveFrom = require('resolve-from');
 const pathExists = require('path-exists');
+const globby = require('globby');
+const gitignore = require('parse-gitignore');
 
 const DEFAULT_IGNORE = [
 	'**/node_modules/**',
@@ -195,6 +197,13 @@ function preprocess(opts) {
 	opts = mergeWithPkgConf(opts);
 	opts = normalizeOpts(opts);
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+
+	// append .gitignore contents if present
+	const paths = globby.sync('.gitignore', {});
+	if (paths.length === 1) {
+		opts.ignores = opts.ignores.concat(gitignore(paths[0]));
+	}
+
 	return opts;
 }
 
