@@ -35,21 +35,20 @@ $ xo --help
     $ xo [<file|glob> ...]
 
   Options
-    --init           Add XO to your project
-    --fix            Automagically fix issues
-    --reporter       Reporter to use
-    --stdin          Validate code from stdin
-    --esnext         Enforce ES2015+ rules
-    --env            Environment preset  [Can be set multiple times]
-    --global         Global variable  [Can be set multiple times]
-    --ignore         Additional paths to ignore  [Can be set multiple times]
-    --space          Use space indent instead of tabs  [Default: 2]
-    --no-semicolon   Prevent use of semicolons
-    --plugin         Include third-party plugins  [Can be set multiple times]
-    --extend         Extend defaults with a custom config  [Can be set multiple times]
-    --open           Open files with issues in your editor
-    --quiet          Show only errors and no warnings
-    --any-extension  Allow files of any extension to be linted
+    --init          Add XO to your project
+    --fix           Automagically fix issues
+    --reporter      Reporter to use
+    --stdin         Validate code from stdin
+    --esnext        Enforce ES2015+ rules
+    --env           Environment preset  [Can be set multiple times]
+    --global        Global variable  [Can be set multiple times]
+    --ignore        Additional paths to ignore  [Can be set multiple times]
+    --space         Use space indent instead of tabs  [Default: 2]
+    --no-semicolon  Prevent use of semicolons
+    --plugin        Include third-party plugins  [Can be set multiple times]
+    --extend        Extend defaults with a custom config  [Can be set multiple times]
+    --open          Open files with issues in your editor
+    --quiet         Show only errors and no warnings
 
   Examples
     $ xo
@@ -197,13 +196,6 @@ Include third-party [plugins](http://eslint.org/docs/user-guide/configuring.html
 Type: `Array`, `string`
 
 Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) to override any of the default rules (like `rules` above).
-
-### anyExtension
-
-Type: `boolean`<br>
-Default: `false` *(only .js and .jsx may be linted)*
-
-Set it to `true` to allow xo to lint any file extension.
 
 
 ## Config Overrides

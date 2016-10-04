@@ -33,12 +33,10 @@ exports.lintFiles = (patterns, opts) => {
 
 	return globby(patterns, {ignore: opts.ignores}).then(paths => {
 		// when users are silly and don't specify an extension in the glob pattern
-		if (!opts.anyExtension) {
-			paths = paths.filter(x => {
-				const ext = path.extname(x);
-				return ext === '.js' || ext === '.jsx';
-			});
-		}
+		paths = paths.filter(x => {
+			const ext = path.extname(x);
+			return ext === '.js' || ext === '.jsx';
+		});
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
