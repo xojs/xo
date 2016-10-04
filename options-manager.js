@@ -211,7 +211,7 @@ function getIgnores(opts) {
 	});
 
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || [], ignores);
-	
+
 	return opts;
 }
 
