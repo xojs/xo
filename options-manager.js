@@ -8,6 +8,7 @@ const multimatch = require('multimatch');
 const resolveFrom = require('resolve-from');
 const pathExists = require('path-exists');
 const parseGitignore = require('parse-gitignore');
+const globby = require('globby');
 
 const DEFAULT_IGNORE = [
 	'**/node_modules/**',
@@ -193,11 +194,24 @@ function groupConfigs(paths, baseOptions, overrides) {
 }
 
 function getIgnores(opts) {
-	const gitignore = parseGitignore('.gitignore');
+	const gitignores = globby.sync('**/.gitignore');
+	let ignores = [];
 
-	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
-	opts.ignores = opts.ignores.concat(gitignore || []);
+	gitignores.forEach(path => {
+		const result = parseGitignore(path);
+		const location = path.substring(0, path.length - 10);
+		const fullPathResult = [];
 
+		result.forEach(file => {
+			file = location + file;
+			fullPathResult.push(file);
+		});
+
+		ignores = ignores.concat(fullPathResult || []);
+	});
+
+	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || [], ignores);
+	
 	return opts;
 }
 
