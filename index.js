@@ -37,7 +37,7 @@ exports.lintFiles = (patterns, opts) => {
 		paths = paths.filter(x => {
 			// Remove dot before the actual extension
 			const ext = path.extname(x).replace('.', '');
-			return opts.extensions.indexOf(ext) > -1;
+			return opts.extensions.indexOf(ext) !== -1;
 		});
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {
