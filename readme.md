@@ -49,6 +49,7 @@ $ xo --help
     --extend        Extend defaults with a custom config  [Can be set multiple times]
     --open          Open files with issues in your editor
     --quiet         Show only errors and no warnings
+    --extension     Additional extensions to lint [Can be set multiple times]
 
   Examples
     $ xo
@@ -58,6 +59,7 @@ $ xo --help
     $ xo --env=node --env=mocha
     $ xo --init --esnext
     $ xo --plugin=react
+    $ xo --plugin=html --extension=html
 
   Tips
     Put options in package.json instead of using flags so other tools can read it.
@@ -196,6 +198,12 @@ Include third-party [plugins](http://eslint.org/docs/user-guide/configuring.html
 Type: `Array`, `string`
 
 Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) to override any of the default rules (like `rules` above).
+
+### extensions
+
+Type: `Array`, `string`
+
+Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're supported by ESLint or an ESLint plugin.
 
 
 ## Config Overrides
