@@ -28,7 +28,7 @@ exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
 
 	if (patterns.length === 0) {
-		patterns = '**/*.{js,jsx}';
+		patterns = '**/*';
 	}
 
 	return globby(patterns, {ignore: opts.ignores}).then(paths => {
