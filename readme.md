@@ -49,7 +49,7 @@ $ xo --help
     --extend        Extend defaults with a custom config  [Can be set multiple times]
     --open          Open files with issues in your editor
     --quiet         Show only errors and no warnings
-    --extension     Additional extensions to lint [Can be set multiple times]
+    --extension     Additional extension to lint [Can be set multiple times]
 
   Examples
     $ xo
@@ -201,7 +201,7 @@ Use one or more [shareable configs](http://eslint.org/docs/developer-guide/share
 
 ### extensions
 
-Type: `Array`, `string`
+Type: `Array`
 
 Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're supported by ESLint or an ESLint plugin.
 
