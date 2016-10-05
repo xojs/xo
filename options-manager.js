@@ -195,20 +195,14 @@ function groupConfigs(paths, baseOptions, overrides) {
 
 function getIgnores(opts) {
 	const gitignores = globby.sync('**/.gitignore');
-	let ignores = [];
+	const ignores = gitignores
+	.map(pathToGitignore => {
+		const result = parseGitignore(pathToGitignore);
+		const location = path.dirname(pathToGitignore);
 
-	gitignores.forEach(path => {
-		const result = parseGitignore(path);
-		const location = path.substring(0, path.length - 10);
-		const fullPathResult = [];
-
-		result.forEach(file => {
-			file = location + file;
-			fullPathResult.push(file);
-		});
-
-		ignores = ignores.concat(fullPathResult || []);
-	});
+		return result.map(file => path.join(location, file));
+	})
+	.reduce((a, b) => a.concat(b), []);
 
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || [], ignores);
 
