@@ -1,3 +1,4 @@
+import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
 
@@ -139,6 +140,6 @@ test('groupConfigs', t => {
 
 test('gitignore', t => {
 	const result = manager.getIgnores({});
-	t.not(result.ignores.indexOf('foo/**'), -1);
-	t.not(result.ignores.indexOf('bar/foo.js'), -1);
+	t.not(result.ignores.indexOf(path.join('foo', '**')), -1);
+	t.not(result.ignores.indexOf(path.join('bar', 'foo.js')), -1);
 });
