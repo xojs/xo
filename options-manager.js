@@ -22,6 +22,11 @@ const DEFAULT_IGNORE = [
 	'dist/**'
 ];
 
+const DEFAULT_EXTENSION = [
+	'js',
+	'jsx'
+];
+
 const DEFAULT_CONFIG = {
 	useEslintrc: false,
 	cache: true,
@@ -45,7 +50,8 @@ function normalizeOpts(opts) {
 		'ignore',
 		'plugin',
 		'rule',
-		'extend'
+		'extend',
+		'extension'
 	].forEach(singular => {
 		const plural = singular + 's';
 		let value = opts[plural] || opts[singular];
@@ -201,6 +207,7 @@ function preprocess(opts) {
 	opts = mergeWithPkgConf(opts);
 	opts = normalizeOpts(opts);
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+	opts.extensions = DEFAULT_EXTENSION.concat(opts.extensions || []);
 	return opts;
 }
 

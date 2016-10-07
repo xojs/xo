@@ -12,7 +12,8 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		ignore: 'test.js',
 		plugin: 'my-plugin',
 		rule: {'my-rule': 'foo'},
-		extend: 'foo'
+		extend: 'foo',
+		extension: 'html'
 	});
 
 	t.deepEqual(opts, {
@@ -21,7 +22,8 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		ignores: ['test.js'],
 		plugins: ['my-plugin'],
 		rules: {'my-rule': 'foo'},
-		extends: ['foo']
+		extends: ['foo'],
+		extensions: ['html']
 	});
 });
 
