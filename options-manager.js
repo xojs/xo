@@ -131,7 +131,13 @@ function buildConfig(opts) {
 				name = `eslint-config-${name}`;
 			}
 
-			return resolveFrom(opts.cwd, name);
+			const ret = resolveFrom(opts.cwd, name);
+
+			if (!ret) {
+				throw new Error(`Couldn't find ESLint config: ${name}`);
+			}
+
+			return ret;
 		});
 
 		config.baseConfig.extends = config.baseConfig.extends.concat(configs);
