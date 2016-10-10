@@ -252,6 +252,10 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 }
 ```
 
+## Using a parent's config
+If you have a directory structured with nested `package.json` files
+and you want one of the child manifests to be skipped you can do so
+by setting `"xo": false`.
 
 ## FAQ
 
