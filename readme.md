@@ -180,6 +180,12 @@ Override any of the [default rules](https://github.com/sindresorhus/eslint-confi
 
 Please take a moment to consider if you really need to use this option.
 
+### settings
+
+Type: `object`
+
+Anything you put here gets passed to `settings` in the ESLint configuration; some of the ESLint plugins use this. For example, to configure the `import` ruleset to use the webpack configuration for determining search paths, you can put `{'import/resolver': 'webpack'}` here.
+
 ### semicolon
 
 Type: `boolean`<br>
