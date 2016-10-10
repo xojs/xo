@@ -122,6 +122,10 @@ function buildConfig(opts) {
 		config.baseConfig.extends = ['xo/esnext', path.join(__dirname, 'config/plugins.js')];
 	}
 
+	if (opts.parser) {
+		config.baseConfig.parser = opts.parser;
+	}
+
 	if (opts.rules) {
 		Object.assign(config.rules, opts.rules);
 	}

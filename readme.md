@@ -211,6 +211,11 @@ Type: `Array`
 
 Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're supported by ESLint or an ESLint plugin.
 
+### parser
+
+Type: `string`
+
+Tell ESLint what parser to use, e.g. `"babel-eslint"` if you are using language features that ESLint doesn't support yet.
 
 ## Config Overrides
 

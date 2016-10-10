@@ -76,6 +76,12 @@ test('buildConfig: rules', t => {
 	t.deepEqual(config.rules, rules);
 });
 
+test('buildConfig: parser', t => {
+	const parser = 'babel-eslint';
+	const config = manager.buildConfig({parser});
+	t.deepEqual(config.baseConfig.parser, parser);
+});
+
 test('buildConfig: settings', t => {
 	const settings = {'import/resolver': 'webpack'};
 	const config = manager.buildConfig({settings});
