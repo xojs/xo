@@ -26,7 +26,7 @@ test('.lintText() - JSX support', t => {
 test('.lintText() - plugin support', t => {
 	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
 		plugins: ['react'],
-		rules: {'react/jsx-no-undef': 2}
+		rules: {'react/jsx-no-undef': 'error'}
 	}).results;
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
@@ -76,4 +76,17 @@ test('lintText() - overrides support', async t => {
 	const index = path.join(cwd, 'test/index.js');
 	const indexResults = fn.lintText(await readFile(bar, 'utf8'), {filename: index, cwd}).results;
 	t.is(indexResults[0].errorCount, 0, indexResults[0]);
+});
+
+test('.lintFiles() - only accepts whitelisted extensions', async t => {
+	// Markdown files will always produce linter errors and will not be going away
+	const mdGlob = path.join(__dirname, '..', '*.md');
+
+	// No files should be linted = no errors
+	const noOptionsResults = await fn.lintFiles(mdGlob, {});
+	t.is(noOptionsResults.errorCount, 0);
+
+	// Markdown files linted (with no plugin for it) = errors
+	const moreExtensionsResults = await fn.lintFiles(mdGlob, {extensions: ['md']});
+	t.true(moreExtensionsResults.errorCount > 0);
 });

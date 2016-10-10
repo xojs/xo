@@ -42,6 +42,7 @@ const cli = meow(`
 	  --extend        Extend defaults with a custom config  [Can be set multiple times]
 	  --open          Open files with issues in your editor
 	  --quiet         Show only errors and no warnings
+	  --extension     Additional extension to lint [Can be set multiple times]
 
 	Examples
 	  $ xo
@@ -51,6 +52,7 @@ const cli = meow(`
 	  $ xo --env=node --env=mocha
 	  $ xo --init --esnext
 	  $ xo --plugin=react
+	  $ xo --plugin=html --extension=html
 
 	Tips
 	  Put options in package.json instead of using flags so other tools can read it.

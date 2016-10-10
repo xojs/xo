@@ -24,6 +24,11 @@ const DEFAULT_IGNORE = [
 	'dist/**'
 ];
 
+const DEFAULT_EXTENSION = [
+	'js',
+	'jsx'
+];
+
 const DEFAULT_CONFIG = {
 	useEslintrc: false,
 	cache: true,
@@ -47,7 +52,8 @@ function normalizeOpts(opts) {
 		'ignore',
 		'plugin',
 		'rule',
-		'extend'
+		'extend',
+		'extension'
 	].forEach(singular => {
 		const plural = singular + 's';
 		let value = opts[plural] || opts[singular];
@@ -70,8 +76,8 @@ function normalizeOpts(opts) {
 
 function mergeWithPkgConf(opts) {
 	opts = Object.assign({cwd: process.cwd()}, opts);
-
-	return Object.assign({}, pkgConf.sync('xo', opts.cwd), opts);
+	const conf = pkgConf.sync('xo', {cwd: opts.cwd, skipOnFalse: true});
+	return Object.assign({}, conf, opts);
 }
 
 // define the shape of deep properties for deepAssign
@@ -94,19 +100,19 @@ function buildConfig(opts) {
 
 	if (opts.space) {
 		const spaces = typeof opts.space === 'number' ? opts.space : 2;
-		config.rules.indent = [2, spaces, {SwitchCase: 1}];
+		config.rules.indent = ['error', spaces, {SwitchCase: 1}];
 
 		// only apply if the user has the React plugin
 		if (opts.cwd && resolveFrom(opts.cwd, 'eslint-plugin-react')) {
 			config.plugins = config.plugins.concat('react');
-			config.rules['react/jsx-indent-props'] = [2, spaces];
-			config.rules['react/jsx-indent'] = [2, spaces];
+			config.rules['react/jsx-indent-props'] = ['error', spaces];
+			config.rules['react/jsx-indent'] = ['error', spaces];
 		}
 	}
 
 	if (opts.semicolon === false) {
-		config.rules.semi = [2, 'never'];
-		config.rules['semi-spacing'] = [2, {
+		config.rules.semi = ['error', 'never'];
+		config.rules['semi-spacing'] = ['error', {
 			before: false,
 			after: true
 		}];
@@ -133,7 +139,13 @@ function buildConfig(opts) {
 				name = `eslint-config-${name}`;
 			}
 
-			return resolveFrom(opts.cwd, name);
+			const ret = resolveFrom(opts.cwd, name);
+
+			if (!ret) {
+				throw new Error(`Couldn't find ESLint config: ${name}`);
+			}
+
+			return ret;
 		});
 
 		config.baseConfig.extends = config.baseConfig.extends.concat(configs);
@@ -214,6 +226,7 @@ function preprocess(opts) {
 	opts = mergeWithPkgConf(opts);
 	opts = normalizeOpts(opts);
 	opts = getIgnores(opts);
+	opts.extensions = DEFAULT_EXTENSION.concat(opts.extensions || []);
 
 	return opts;
 }

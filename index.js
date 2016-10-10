@@ -7,7 +7,7 @@ const optionsManager = require('./options-manager');
 exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-	if (opts.overrides && opts.overrides.length) {
+	if (opts.overrides && opts.overrides.length > 0) {
 		const overrides = opts.overrides;
 		delete opts.overrides;
 
@@ -28,14 +28,16 @@ exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
 
 	if (patterns.length === 0) {
-		patterns = '**/*.{js,jsx}';
+		patterns = '**/*';
 	}
 
 	return globby(patterns, {ignore: opts.ignores}).then(paths => {
-		// when users are silly and don't specify an extension in the glob pattern
+		// filter out unwanted file extensions
+		// for silly users that don't specify an extension in the glob pattern
 		paths = paths.filter(x => {
-			const ext = path.extname(x);
-			return ext === '.js' || ext === '.jsx';
+			// Remove dot before the actual extension
+			const ext = path.extname(x).replace('.', '');
+			return opts.extensions.indexOf(ext) !== -1;
 		});
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {

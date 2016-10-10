@@ -1,6 +1,8 @@
 import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
+import parentConfig from './fixtures/nested/package.json';
+import childConfig from './fixtures/nested/child/package.json';
 
 const manager = proxyquire('../options-manager', {
 	'resolve-from': (cwd, path) => `cwd/${path}`
@@ -13,7 +15,8 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		ignore: 'test.js',
 		plugin: 'my-plugin',
 		rule: {'my-rule': 'foo'},
-		extend: 'foo'
+		extend: 'foo',
+		extension: 'html'
 	});
 
 	t.deepEqual(opts, {
@@ -22,7 +25,8 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		ignores: ['test.js'],
 		plugins: ['my-plugin'],
 		rules: {'my-rule': 'foo'},
-		extends: ['foo']
+		extends: ['foo'],
+		extensions: ['html']
 	});
 });
 
@@ -45,19 +49,19 @@ test('buildConfig: esnext', t => {
 
 test('buildConfig: space: true', t => {
 	const config = manager.buildConfig({space: true});
-	t.deepEqual(config.rules.indent, [2, 2, {SwitchCase: 1}]);
+	t.deepEqual(config.rules.indent, ['error', 2, {SwitchCase: 1}]);
 });
 
 test('buildConfig: space: 4', t => {
 	const config = manager.buildConfig({space: 4});
-	t.deepEqual(config.rules.indent, [2, 4, {SwitchCase: 1}]);
+	t.deepEqual(config.rules.indent, ['error', 4, {SwitchCase: 1}]);
 });
 
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false});
 	t.deepEqual(config.rules, {
-		'semi': [2, 'never'],
-		'semi-spacing': [2, {
+		'semi': ['error', 'never'],
+		'semi-spacing': ['error', {
 			before: false,
 			after: true
 		}]
@@ -65,7 +69,7 @@ test('buildConfig: semicolon', t => {
 });
 
 test('buildConfig: rules', t => {
-	const rules = {'object-curly-spacing': [2, 'always']};
+	const rules = {'object-curly-spacing': ['error', 'always']};
 	const config = manager.buildConfig({rules});
 	t.deepEqual(config.rules, rules);
 });
@@ -78,7 +82,7 @@ test('findApplicableOverrides', t => {
 		{files: '**/*.txt'}
 	]);
 
-	t.is(result.hash, parseInt('1010', 2));
+	t.is(result.hash, 0b1010);
 	t.deepEqual(result.applicable, [
 		{files: '**/f*.js'},
 		{files: '**/*oo.js'}
@@ -154,4 +158,31 @@ test('ignore ignored .gitignore', t => {
 	const result = manager.getIgnores(opts);
 
 	t.is(result.ignores.indexOf(path.join('bar', 'foobar', 'bar.js')), -1);
+});
+
+test('mergeWithPkgConf: use child if closest', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child');
+	const result = manager.mergeWithPkgConf({cwd});
+	const expected = Object.assign({}, childConfig.xo, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: use parent if closest', t => {
+	const cwd = path.resolve('fixtures', 'nested');
+	const result = manager.mergeWithPkgConf({cwd});
+	const expected = Object.assign({}, parentConfig.xo, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: use parent if child is ignored', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child-ignore');
+	const result = manager.mergeWithPkgConf({cwd});
+	const expected = Object.assign({}, parentConfig.xo, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: use child if child is empty', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
+	const result = manager.mergeWithPkgConf({cwd});
+	t.deepEqual(result, {cwd});
 });
