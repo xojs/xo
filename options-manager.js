@@ -194,7 +194,8 @@ function groupConfigs(paths, baseOptions, overrides) {
 }
 
 function getIgnores(opts) {
-	const gitignores = globby.sync('**/.gitignore');
+	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+	const gitignores = globby.sync('**/.gitignore', {ignore: opts.ignores});
 	const ignores = gitignores
 	.map(pathToGitignore => {
 		const result = parseGitignore(pathToGitignore);
@@ -204,7 +205,7 @@ function getIgnores(opts) {
 	})
 	.reduce((a, b) => a.concat(b), []);
 
-	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || [], ignores);
+	opts.ignores = opts.ignores.concat(ignores);
 
 	return opts;
 }
