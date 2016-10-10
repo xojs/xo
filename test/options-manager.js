@@ -1,5 +1,8 @@
+import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
+import parentConfig from './fixtures/nested/package.json';
+import childConfig from './fixtures/nested/child/package.json';
 
 const manager = proxyquire('../options-manager', {
 	'resolve-from': (cwd, path) => `cwd/${path}`
@@ -137,4 +140,31 @@ test('groupConfigs', t => {
 		obj.opts = Object.assign(manager.emptyOptions(), obj.opts);
 		return obj;
 	}));
+});
+
+test('mergeWithPkgConf: use child if closest', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child');
+	const result = manager.mergeWithPkgConf({cwd});
+	const expected = Object.assign({}, childConfig.xo, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: use parent if closest', t => {
+	const cwd = path.resolve('fixtures', 'nested');
+	const result = manager.mergeWithPkgConf({cwd});
+	const expected = Object.assign({}, parentConfig.xo, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: use parent if child is ignored', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child-ignore');
+	const result = manager.mergeWithPkgConf({cwd});
+	const expected = Object.assign({}, parentConfig.xo, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: use child if child is empty', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
+	const result = manager.mergeWithPkgConf({cwd});
+	t.deepEqual(result, {cwd});
 });

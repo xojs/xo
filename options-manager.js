@@ -74,8 +74,8 @@ function normalizeOpts(opts) {
 
 function mergeWithPkgConf(opts) {
 	opts = Object.assign({cwd: process.cwd()}, opts);
-
-	return Object.assign({}, pkgConf.sync('xo', opts.cwd), opts);
+	const conf = pkgConf.sync('xo', {cwd: opts.cwd, skipOnFalse: true});
+	return Object.assign({}, conf, opts);
 }
 
 // define the shape of deep properties for deepAssign
