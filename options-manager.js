@@ -52,6 +52,7 @@ function normalizeOpts(opts) {
 		'ignore',
 		'plugin',
 		'rule',
+		'setting',
 		'extend',
 		'extension'
 	].forEach(singular => {
@@ -64,7 +65,7 @@ function normalizeOpts(opts) {
 			return;
 		}
 
-		if (singular !== 'rule') {
+		if (singular !== 'rule' && singular !== 'setting') {
 			value = arrify(value);
 		}
 
@@ -84,6 +85,7 @@ function mergeWithPkgConf(opts) {
 function emptyOptions() {
 	return {
 		rules: {},
+		settings: {},
 		globals: [],
 		envs: [],
 		plugins: [],
@@ -122,8 +124,16 @@ function buildConfig(opts) {
 		config.baseConfig.extends = ['xo/esnext', path.join(__dirname, 'config/plugins.js')];
 	}
 
+	if (opts.parser) {
+		config.baseConfig.parser = opts.parser;
+	}
+
 	if (opts.rules) {
 		Object.assign(config.rules, opts.rules);
+	}
+
+	if (opts.settings) {
+		config.baseConfig.settings = opts.settings;
 	}
 
 	if (opts.extends && opts.extends.length > 0) {

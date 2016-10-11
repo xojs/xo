@@ -15,6 +15,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		ignore: 'test.js',
 		plugin: 'my-plugin',
 		rule: {'my-rule': 'foo'},
+		setting: {'my-rule': 'bar'},
 		extend: 'foo',
 		extension: 'html'
 	});
@@ -25,6 +26,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		ignores: ['test.js'],
 		plugins: ['my-plugin'],
 		rules: {'my-rule': 'foo'},
+		settings: {'my-rule': 'bar'},
 		extends: ['foo'],
 		extensions: ['html']
 	});
@@ -72,6 +74,18 @@ test('buildConfig: rules', t => {
 	const rules = {'object-curly-spacing': ['error', 'always']};
 	const config = manager.buildConfig({rules});
 	t.deepEqual(config.rules, rules);
+});
+
+test('buildConfig: parser', t => {
+	const parser = 'babel-eslint';
+	const config = manager.buildConfig({parser});
+	t.deepEqual(config.baseConfig.parser, parser);
+});
+
+test('buildConfig: settings', t => {
+	const settings = {'import/resolver': 'webpack'};
+	const config = manager.buildConfig({settings});
+	t.deepEqual(config.baseConfig.settings, settings);
 });
 
 test('findApplicableOverrides', t => {
