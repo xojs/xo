@@ -142,6 +142,24 @@ test('groupConfigs', t => {
 	}));
 });
 
+test('gitignore', t => {
+	const result = manager.getIgnores({});
+	t.not(result.ignores.indexOf(path.join('foo', '**')), -1);
+	t.not(result.ignores.indexOf(path.join('bar', 'foo.js')), -1);
+});
+
+test('ignore ignored .gitignore', t => {
+	const opts = {
+		ignores: [
+			'**/foobar/**'
+		]
+	};
+
+	const result = manager.getIgnores(opts);
+
+	t.is(result.ignores.indexOf(path.join('bar', 'foobar', 'bar.js')), -1);
+});
+
 test('mergeWithPkgConf: use child if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
 	const result = manager.mergeWithPkgConf({cwd});

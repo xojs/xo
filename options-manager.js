@@ -7,6 +7,8 @@ const deepAssign = require('deep-assign');
 const multimatch = require('multimatch');
 const resolveFrom = require('resolve-from');
 const pathExists = require('path-exists');
+const parseGitignore = require('parse-gitignore');
+const globby = require('globby');
 
 const DEFAULT_IGNORE = [
 	'**/node_modules/**',
@@ -203,11 +205,29 @@ function groupConfigs(paths, baseOptions, overrides) {
 	return arr;
 }
 
+function getIgnores(opts) {
+	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+	const gitignores = globby.sync('**/.gitignore', {ignore: opts.ignores, cwd: opts.cwd || process.cwd()});
+	const ignores = gitignores
+	.map(pathToGitignore => {
+		const patterns = parseGitignore(pathToGitignore);
+		const base = path.dirname(pathToGitignore);
+
+		return patterns.map(file => path.join(base, file));
+	})
+	.reduce((a, b) => a.concat(b), []);
+
+	opts.ignores = opts.ignores.concat(ignores);
+
+	return opts;
+}
+
 function preprocess(opts) {
 	opts = mergeWithPkgConf(opts);
 	opts = normalizeOpts(opts);
-	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+	opts = getIgnores(opts);
 	opts.extensions = DEFAULT_EXTENSION.concat(opts.extensions || []);
+
 	return opts;
 }
 
@@ -221,3 +241,4 @@ exports.mergeApplicableOverrides = mergeApplicableOverrides;
 exports.groupConfigs = groupConfigs;
 exports.preprocess = preprocess;
 exports.emptyOptions = emptyOptions;
+exports.getIgnores = getIgnores;
