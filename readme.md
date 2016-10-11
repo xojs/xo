@@ -6,17 +6,32 @@
 	<br>
 </h1>
 
-> JavaScript happiness style linter ❤️
+> JavaScript happiness style linter
 
 [![Build Status: Linux](https://travis-ci.org/sindresorhus/xo.svg?branch=master)](https://travis-ci.org/sindresorhus/xo) [![Build status: Windows](https://ci.appveyor.com/api/projects/status/mydb56kve054n2h5/branch/master?svg=true)](https://ci.appveyor.com/project/sindresorhus/xo/branch/master) [![Coverage Status](https://coveralls.io/repos/github/sindresorhus/xo/badge.svg?branch=master)](https://coveralls.io/github/sindresorhus/xo?branch=master) [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 
-Enforce strict code style. Never discuss code style on a pull request again!
-
-No decision-making. No `.eslintrc` or `.jshintrc` to manage. It just works!
+Opionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` or `.jshintrc` to manage. It just works!
 
 Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
-JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react#use-with-xo) for React specific linting.
+*JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react#use-with-xo) for React specific linting.*
+
+![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/master/screenshot.png)
+
+
+## Highlights
+
+- Beautiful output.
+- Zero-config, but [configurable when needed](#config).
+- Enforces readable code, because you read more code than you write.
+- No need to specify file paths to lint as it lints all JS files except for [commonly ignored paths](#ignores).
+- [Config overrides per files/globs.](#config-overrides) *(ESLint doesn't support this)*
+- Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), and more.
+- Super simple to add XO to a project with `$ xo --init`.
+- Fix many issues automagically with `$ xo --fix`.
+- Open all files with errors at the correct line in your editor with `$ xo --open`.
+- Specify [indent](#indent) and [semicolon](#semicolon) preferences easily without messing with the rule config.
+- Great [editor plugins](#editor-plugins).
 
 
 ## Install
@@ -73,7 +88,7 @@ $ xo --help
 *Any of these can be [overridden](#rules) if necessary.*
 
 - Tab indentation *[(or space)](#space)*
-- Semicolons
+- Semicolons *[(or not)](#semicolon)*
 - Single-quotes
 - No unused variables
 - Space after keyword `if (condition) {}`
@@ -97,7 +112,7 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
     "test": "ava"
   },
   "devDependencies": {
-    "ava": "^0.11.0"
+    "ava": "^0.16.0"
   }
 }
 ```
@@ -111,8 +126,8 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
     "test": "xo && ava"
   },
   "devDependencies": {
-    "ava": "^0.11.0",
-    "xo": "^0.12.0"
+    "ava": "^0.16.0",
+    "xo": "^0.17.0"
   }
 }
 ```
