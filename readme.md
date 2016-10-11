@@ -180,12 +180,6 @@ Override any of the [default rules](https://github.com/sindresorhus/eslint-confi
 
 Please take a moment to consider if you really need to use this option.
 
-### settings
-
-Type: `object`
-
-Anything you put here gets passed to `settings` in the ESLint configuration; some of the ESLint plugins use this. For example, to configure the `import` ruleset to use the webpack configuration for determining search paths, you can put `{'import/resolver': 'webpack'}` here.
-
 ### semicolon
 
 Type: `boolean`<br>
@@ -211,11 +205,18 @@ Type: `Array`
 
 Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're supported by ESLint or an ESLint plugin.
 
+### settings
+
+Type: `Object`
+
+[Shared ESLint settings](http://eslint.org/docs/user-guide/configuring#adding-shared-settings) exposed to rules. For example, to configure the [`import`](https://github.com/benmosher/eslint-plugin-import#settings) plugin to use your webpack configuration for determining search paths, you can put `{"import/resolver": "webpack"}` here.
+
 ### parser
 
 Type: `string`
 
-Tell ESLint what parser to use, e.g. `"babel-eslint"` if you are using language features that ESLint doesn't support yet.
+ESLint parser. For example, [`babel-eslint`](https://github.com/babel/babel-eslint) if you're using language features that ESLint doesn't yet support.
+
 
 ## Config Overrides
 
