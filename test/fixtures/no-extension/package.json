@@ -1,8 +1,0 @@
-{
-  "xo": {
-    "extensions": ["", ".js"],
-    "ignores": [
-      "child/**"
-    ]
-  }
-}
