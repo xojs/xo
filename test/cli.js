@@ -59,11 +59,6 @@ test('ignore files in .gitignore', async t => {
 	}
 });
 
-test('ignore directories when accepting files without extensions', async () => {
-	const cwd = path.join(__dirname, 'fixtures/no-extension');
-	await execa('../../../cli.js', ['--no-local'], {cwd});
-});
-
 test('supports being extended with a shareable config', async () => {
 	const cwd = path.join(__dirname, 'fixtures/project');
 	await execa('../../../cli.js', ['--no-local'], {cwd});
