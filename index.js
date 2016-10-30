@@ -56,7 +56,7 @@ exports.lintFiles = (patterns, opts) => {
 		patterns = '**/*';
 	}
 
-	return globby(patterns, {ignore: opts.ignores}).then(paths => {
+	return globby(patterns, {'ignore': opts.ignores, 'no-dir': true}).then(paths => {
 		// filter out unwanted file extensions
 		// for silly users that don't specify an extension in the glob pattern
 		paths = paths.filter(x => {
