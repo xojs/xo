@@ -91,9 +91,10 @@ test('buildConfig: settings', t => {
 test('buildConfig: extends', t => {
 	const extendsOption = ['plugin:foo/bar', 'eslint-config-foo-bar', 'foo-bar-two'];
 	const config = manager.buildConfig({extends: extendsOption});
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'plugin:foo/bar');
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'cwd/eslint-config-foo-bar');
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'cwd/eslint-config-foo-bar-two');
+	const extendsConfig = config.baseConfig.extends;
+	t.is(extendsConfig[extendsConfig.length - 3], 'plugin:foo/bar');
+	t.is(extendsConfig[extendsConfig.length - 2], 'cwd/eslint-config-foo-bar');
+	t.is(extendsConfig[extendsConfig.length - 1], 'cwd/eslint-config-foo-bar-two');
 });
 
 test('findApplicableOverrides', t => {

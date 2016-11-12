@@ -146,7 +146,7 @@ function buildConfig(opts) {
 			}
 
 			// don't do anything if it's a config from a plugin
-			if (name.indexOf('plugin:') === 0) {
+			if (name.startsWith('plugin:')) {
 				return name;
 			}
 
