@@ -145,6 +145,11 @@ function buildConfig(opts) {
 				return name;
 			}
 
+			// don't do anything if it's a config from a plugin
+			if (name.indexOf('plugin:') === 0) {
+				return name;
+			}
+
 			if (!name.includes('eslint-config-')) {
 				name = `eslint-config-${name}`;
 			}
