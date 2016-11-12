@@ -88,6 +88,14 @@ test('buildConfig: settings', t => {
 	t.deepEqual(config.baseConfig.settings, settings);
 });
 
+test('buildConfig: extends', t => {
+	const extendsOption = ['plugin:foo/bar', 'eslint-config-foo-bar', 'foo-bar-two'];
+	const config = manager.buildConfig({extends: extendsOption});
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'plugin:foo/bar');
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'cwd/eslint-config-foo-bar');
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'cwd/eslint-config-foo-bar-two');
+});
+
 test('findApplicableOverrides', t => {
 	const result = manager.findApplicableOverrides('/user/dir/foo.js', [
 		{files: '**/f*.js'},
