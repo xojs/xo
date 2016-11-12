@@ -212,7 +212,7 @@ Include third-party [plugins](http://eslint.org/docs/user-guide/configuring.html
 
 Type: `Array`, `string`
 
-Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) to override any of the default rules (like `rules` above).
+Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) or [plugin configs](http://eslint.org/docs/user-guide/configuring#using-the-configuration-from-a-plugin) to override any of the default rules (like `rules` above).
 
 ### extensions
 
