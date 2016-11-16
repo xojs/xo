@@ -5,9 +5,16 @@ import tempWrite from 'temp-write';
 import execa from 'execa';
 
 test('fix option', async t => {
-	const filepath = await tempWrite('console.log(0)\n', 'x.js');
+	const filepath = await tempWrite('console.log()\n', 'x.js');
 	await execa('../cli.js', ['--no-local', '--fix', filepath]);
-	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'console.log(0);');
+	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'console.log();');
+});
+
+test('fix option with stdin', async t => {
+	const {stdout} = await execa('../cli.js', ['--no-local', '--fix', '--stdin'], {
+		input: 'console.log()\n'
+	});
+	t.is(stdout.trim(), 'console.log();');
 });
 
 test('reporter option', async t => {

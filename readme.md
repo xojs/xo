@@ -53,7 +53,7 @@ $ xo --help
     --init          Add XO to your project
     --fix           Automagically fix issues
     --reporter      Reporter to use
-    --stdin         Validate code from stdin
+    --stdin         Validate/fix code from stdin
     --esnext        Enforce ES2015+ rules
     --env           Environment preset  [Can be set multiple times]
     --global        Global variable  [Can be set multiple times]
@@ -75,6 +75,7 @@ $ xo --help
     $ xo --init --esnext
     $ xo --plugin=react
     $ xo --plugin=html --extension=html
+    $ echo 'const x=true' | xo --stdin --fix
 
   Tips
     Put options in package.json instead of using flags so other tools can read it.

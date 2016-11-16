@@ -31,7 +31,7 @@ const cli = meow(`
 	  --init          Add XO to your project
 	  --fix           Automagically fix issues
 	  --reporter      Reporter to use
-	  --stdin         Validate code from stdin
+	  --stdin         Validate/fix code from stdin
 	  --esnext        Enforce ES2015+ rules
 	  --env           Environment preset  [Can be set multiple times]
 	  --global        Global variable  [Can be set multiple times]
@@ -53,6 +53,7 @@ const cli = meow(`
 	  $ xo --init --esnext
 	  $ xo --plugin=react
 	  $ xo --plugin=html --extension=html
+	  $ echo 'const x=true' | xo --stdin --fix
 
 	Tips
 	  Put options in package.json instead of using flags so other tools can read it.
@@ -153,8 +154,8 @@ if (opts.init) {
 } else if (opts.stdin) {
 	getStdin().then(str => {
 		if (opts.fix) {
-			console.error('The `fix` option is not supported on stdin');
-			process.exit(1);
+			console.log(xo.lintText(str, opts).results[0].output);
+			return;
 		}
 
 		if (opts.open) {
