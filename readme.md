@@ -322,6 +322,13 @@ let g:syntastic_javascript_eslint_args = '--reporter=compact'
 let g:syntastic_javascript_checkers = ['eslint']
 ```
 
+You can also use [vim-autoformat](https://github.com/Chiel92/vim-autoformat) to format your code with XO, using the following settings in your `.vimrc` file:
+
+```vim
+let g:formatdef_xo = '"xo --fix --stdin"'
+let g:formatters_javascript = ['xo']
+```
+
 
 ## Build-system plugins
 
