@@ -4,6 +4,8 @@ import test from 'ava';
 import tempWrite from 'temp-write';
 import execa from 'execa';
 
+process.chdir(__dirname);
+
 test('fix option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
 	await execa('../cli.js', ['--no-local', '--fix', filepath]);

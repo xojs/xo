@@ -4,6 +4,8 @@ import proxyquire from 'proxyquire';
 import parentConfig from './fixtures/nested/package.json';
 import childConfig from './fixtures/nested/child/package.json';
 
+process.chdir(__dirname);
+
 const manager = proxyquire('../options-manager', {
 	'resolve-from': (cwd, path) => `cwd/${path}`
 });

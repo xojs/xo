@@ -4,6 +4,8 @@ import test from 'ava';
 import pify from 'pify';
 import fn from '../';
 
+process.chdir(__dirname);
+
 const readFile = pify(fs.readFile);
 
 const hasRule = (results, ruleId) => results[0].messages.some(x => x.ruleId === ruleId);
