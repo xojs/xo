@@ -14,6 +14,11 @@
       "name": "James Talmage",
       "email": "james@talmage.io",
       "url": "github.com/jamestalmage"
+    },
+    {
+      "name": "Mario Nebl",
+      "email": "hello@mario-nebl.de",
+      "url": "github.com/marionebl"
     }
   ],
   "bin": "cli.js",
