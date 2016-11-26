@@ -27,6 +27,7 @@ Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be
 - No need to specify file paths to lint as it lints all JS files except for [commonly ignored paths](#ignores).
 - [Config overrides per files/globs.](#config-overrides) *(ESLint doesn't support this)*
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), and more.
+- Caches results between runs for much better performance.
 - Super simple to add XO to a project with `$ xo --init`.
 - Fix many issues automagically with `$ xo --fix`.
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
