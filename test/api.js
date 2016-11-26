@@ -20,6 +20,33 @@ test('.lintText() - `esnext` option', t => {
 	t.true(hasRule(results, 'no-var'));
 });
 
+test('.lintText() - `ignores` option', t => {
+	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+		cwd: process.cwd(),
+		filename: 'ignored/index.js',
+		ignores: ['ignored/**/*.js']
+	});
+	t.is(result.errorCount, 0);
+	t.is(result.warningCount, 0);
+});
+
+test('.lintText() - `ignores` option without cwd', t => {
+	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+		filename: 'ignored/index.js',
+		ignores: ['ignored/**/*.js']
+	});
+	t.is(result.errorCount, 0);
+	t.is(result.warningCount, 0);
+});
+
+test('.lintText() - `ignores` option without filename', t => {
+	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+		ignores: ['ignored/**/*.js']
+	});
+	t.is(result.errorCount, 1);
+	t.is(result.warningCount, 0);
+});
+
 test('.lintText() - JSX support', t => {
 	const results = fn.lintText('var app = <div className="appClass">Hello, React!</div>;\n', {esnext: false}).results;
 	t.true(hasRule(results, 'no-unused-vars'));

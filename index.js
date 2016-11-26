@@ -2,16 +2,35 @@
 const path = require('path');
 const eslint = require('eslint');
 const globby = require('globby');
+const multimatch = require('multimatch');
 const optionsManager = require('./options-manager');
 
 exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
+
+	if (opts.cwd && opts.filename) {
+		const filename = path.relative(opts.cwd, opts.filename);
+
+		if (multimatch([filename], opts.ignores)) {
+			return {
+				errorCount: 0,
+				warningCount: 0,
+				results: [{
+					errorCount: 0,
+					filePath: filename,
+					messages: [],
+					warningCount: 0
+				}]
+			};
+		}
+	}
 
 	if (opts.overrides && opts.overrides.length > 0) {
 		const overrides = opts.overrides;
 		delete opts.overrides;
 
 		const filename = path.relative(opts.cwd, opts.filename);
+
 		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
 		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
 	}
