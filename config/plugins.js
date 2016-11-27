@@ -28,10 +28,6 @@ module.exports = {
 		]
 	},
 	rules: {
-		// TODO: remove these when eslint-plugin-ava@4 is out
-		'ava/no-async-fn-without-await': 'error',
-		'ava/no-duplicate-modifiers': 'error',
-
 		'no-use-extend-native/no-use-extend-native': 'error',
 		'promise/param-names': 'error',
 		'import/default': 'error',
