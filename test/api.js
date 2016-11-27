@@ -20,9 +20,16 @@ test('.lintText() - `esnext` option', t => {
 	t.true(hasRule(results, 'no-var'));
 });
 
+test('.lintText() - default `ignores`', t => {
+	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+		filename: 'node_modules/ignored/index.js'
+	});
+	t.is(result.errorCount, 0);
+	t.is(result.warningCount, 0);
+});
+
 test('.lintText() - `ignores` option', t => {
 	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
-		cwd: process.cwd(),
 		filename: 'ignored/index.js',
 		ignores: ['ignored/**/*.js']
 	});
@@ -39,12 +46,27 @@ test('.lintText() - `ignores` option without cwd', t => {
 	t.is(result.warningCount, 0);
 });
 
-test('.lintText() - `ignores` option without filename', t => {
+test('.lintText() - respect overrides', t => {
 	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
-		ignores: ['ignored/**/*.js']
+		filename: 'ignored/index.js',
+		ignores: ['ignored/**/*.js'],
+		overrides: [
+			{
+				files: ['ignored/**/*.js'],
+				ignores: []
+			}
+		]
 	});
 	t.is(result.errorCount, 1);
 	t.is(result.warningCount, 0);
+});
+
+test('.lintText() - `ignores` option without filename', t => {
+	t.throws(() => {
+		fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+			ignores: ['ignored/**/*.js']
+		});
+	}, /opts\.filename must be string when providing opts\.ignores/);
 });
 
 test('.lintText() - JSX support', t => {

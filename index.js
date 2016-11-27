@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const arrayEqual = require('array-equal');
 const eslint = require('eslint');
 const globby = require('globby');
 const multimatch = require('multimatch');
@@ -8,7 +9,24 @@ const optionsManager = require('./options-manager');
 exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-	if (opts.cwd && opts.filename) {
+	if (opts.overrides && opts.overrides.length > 0) {
+		const overrides = opts.overrides;
+		delete opts.overrides;
+
+		const filename = path.relative(opts.cwd, opts.filename);
+
+		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
+		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
+	}
+
+	opts = optionsManager.buildConfig(opts);
+	const defaultIgnores = optionsManager.getIgnores({}).ignores;
+
+	if (opts.ignores && !arrayEqual(defaultIgnores, opts.ignores) && typeof opts.filename !== 'string') {
+		throw new Error(`xo: opts.filename must be string when providing opts.ignores. Received value "${opts.filename}" of type "${typeof opts.filename}" for opts.filename.`);
+	}
+
+	if (opts.ignores && opts.ignores.length > 0 && opts.filename) {
 		const filename = path.relative(opts.cwd, opts.filename);
 
 		if (multimatch([filename], opts.ignores)) {
@@ -24,18 +42,6 @@ exports.lintText = (str, opts) => {
 			};
 		}
 	}
-
-	if (opts.overrides && opts.overrides.length > 0) {
-		const overrides = opts.overrides;
-		delete opts.overrides;
-
-		const filename = path.relative(opts.cwd, opts.filename);
-
-		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
-		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
-	}
-
-	opts = optionsManager.buildConfig(opts);
 
 	const engine = new eslint.CLIEngine(opts);
 	const report = engine.executeOnText(str, opts.filename);
