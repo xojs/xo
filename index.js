@@ -1,8 +1,8 @@
 'use strict';
 const path = require('path');
-const arrayEqual = require('array-equal');
 const eslint = require('eslint');
 const globby = require('globby');
+const isEqual = require('lodash.isequal');
 const multimatch = require('multimatch');
 const optionsManager = require('./options-manager');
 
@@ -22,8 +22,8 @@ exports.lintText = (str, opts) => {
 	opts = optionsManager.buildConfig(opts);
 	const defaultIgnores = optionsManager.getIgnores({}).ignores;
 
-	if (opts.ignores && !arrayEqual(defaultIgnores, opts.ignores) && typeof opts.filename !== 'string') {
-		throw new Error(`xo: opts.filename must be string when providing opts.ignores. Received value "${opts.filename}" of type "${typeof opts.filename}" for opts.filename.`);
+	if (opts.ignores && !isEqual(defaultIgnores, opts.ignores) && typeof opts.filename !== 'string') {
+		throw new Error('The `ignores` option requires the `filename` option to be defined.');
 	}
 
 	if (opts.ignores && opts.ignores.length > 0 && opts.filename) {
