@@ -61,12 +61,26 @@ test('.lintText() - respect overrides', t => {
 	t.is(result.warningCount, 0);
 });
 
+test('.lintText() - overriden ignore', t => {
+	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+		filename: 'unignored.js',
+		overrides: [
+			{
+				files: ['unignored.js'],
+				ignores: ['unignored.js']
+			}
+		]
+	});
+	t.is(result.errorCount, 0);
+	t.is(result.warningCount, 0);
+});
+
 test('.lintText() - `ignores` option without filename', t => {
 	t.throws(() => {
 		fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
 			ignores: ['ignored/**/*.js']
 		});
-	}, /opts\.filename must be string when providing opts\.ignores/);
+	}, /The `ignores` option requires the `filename` option to be defined./);
 });
 
 test('.lintText() - JSX support', t => {
