@@ -80,6 +80,7 @@
     "get-stdin": "^5.0.0",
     "globby": "^6.0.0",
     "has-flag": "^2.0.0",
+    "lodash.isequal": "^4.4.0",
     "meow": "^3.4.2",
     "multimatch": "^2.1.0",
     "parse-gitignore": "^0.3.1",

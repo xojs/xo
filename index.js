@@ -2,6 +2,8 @@
 const path = require('path');
 const eslint = require('eslint');
 const globby = require('globby');
+const isEqual = require('lodash.isequal');
+const multimatch = require('multimatch');
 const optionsManager = require('./options-manager');
 
 exports.lintText = (str, opts) => {
@@ -12,11 +14,34 @@ exports.lintText = (str, opts) => {
 		delete opts.overrides;
 
 		const filename = path.relative(opts.cwd, opts.filename);
+
 		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
 		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
 	}
 
 	opts = optionsManager.buildConfig(opts);
+	const defaultIgnores = optionsManager.getIgnores({}).ignores;
+
+	if (opts.ignores && !isEqual(defaultIgnores, opts.ignores) && typeof opts.filename !== 'string') {
+		throw new Error('The `ignores` option requires the `filename` option to be defined.');
+	}
+
+	if (opts.ignores && opts.ignores.length > 0 && opts.filename) {
+		const filename = path.relative(opts.cwd, opts.filename);
+
+		if (multimatch([filename], opts.ignores)) {
+			return {
+				errorCount: 0,
+				warningCount: 0,
+				results: [{
+					errorCount: 0,
+					filePath: filename,
+					messages: [],
+					warningCount: 0
+				}]
+			};
+		}
+	}
 
 	const engine = new eslint.CLIEngine(opts);
 	const report = engine.executeOnText(str, opts.filename);
