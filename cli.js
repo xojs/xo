@@ -19,6 +19,8 @@ const path = require('path');
 const spawn = require('child_process').spawn;
 const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
+const chokidar = require('chokidar');
+const chalk = require('chalk');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
 const xo = require('./');
@@ -43,6 +45,7 @@ const cli = meow(`
 	  --open          Open files with issues in your editor
 	  --quiet         Show only errors and no warnings
 	  --extension     Additional extension to lint [Can be set multiple times]
+	  --watch         Re-run XO when files change
 
 	Examples
 	  $ xo
@@ -66,7 +69,8 @@ const cli = meow(`
 		'compact',
 		'stdin',
 		'fix',
-		'open'
+		'open',
+		'watch'
 	]
 });
 
@@ -85,7 +89,14 @@ function log(report) {
 	const reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
 
 	process.stdout.write(reporter(report.results));
-	process.exit(report.errorCount === 0 ? 0 : 1);
+
+	if (opts.watch) {
+		if (report.errorCount === 0) {
+			console.log('\n  ' + chalk.green('0 errors'));
+		}
+	} else {
+		process.exit(report.errorCount === 0 ? 0 : 1);
+	}
 }
 
 function open(report) {
@@ -163,7 +174,23 @@ if (opts.init) {
 			process.exit(1);
 		}
 
-		log(xo.lintText(str, opts));
+		const report = xo.lintText(str, opts);
+		log(report);
+	});
+} else if (opts.watch) {
+	xo.lintFiles(input, opts).then(log);
+
+	if (input.length === 0) {
+		input.push('**/*');
+	}
+
+	const watcher = chokidar.watch(input, {
+		ignored: opts.ignores,
+		awaitWriteFinish: true
+	});
+
+	watcher.on('change', () => {
+		xo.lintFiles(input, opts).then(log);
 	});
 } else {
 	xo.lintFiles(input, opts).then(report => {
