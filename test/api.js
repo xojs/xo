@@ -15,11 +15,6 @@ test('.lintText()', t => {
 	t.true(hasRule(results, 'semi'));
 });
 
-test('.lintText() - `esnext` option', t => {
-	const results = fn.lintText('var foo = true;', {esnext: true}).results;
-	t.true(hasRule(results, 'no-var'));
-});
-
 test('.lintText() - default `ignores`', t => {
 	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
 		filename: 'node_modules/ignored/index.js'
@@ -84,7 +79,7 @@ test('.lintText() - `ignores` option without filename', t => {
 });
 
 test('.lintText() - JSX support', t => {
-	const results = fn.lintText('var app = <div className="appClass">Hello, React!</div>;\n', {esnext: false}).results;
+	const results = fn.lintText('const app = <div className="appClass">Hello, React!</div>;\n').results;
 	t.true(hasRule(results, 'no-unused-vars'));
 });
 
@@ -109,8 +104,7 @@ test('.lintText() - extends support', t => {
 });
 
 test('.lintText() - extends support with `esnext` option', t => {
-	const results = fn.lintText('import path from \'path\';\nvar React;\nReact.render(<App/>);\n', {
-		esnext: true,
+	const results = fn.lintText('import path from \'path\';\nlet React;\nReact.render(<App/>);\n', {
 		extends: 'xo-react'
 	}).results;
 	t.true(hasRule(results, 'react/jsx-no-undef'));

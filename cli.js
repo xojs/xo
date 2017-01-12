@@ -32,7 +32,6 @@ const cli = meow(`
 	  --fix           Automagically fix issues
 	  --reporter      Reporter to use
 	  --stdin         Validate/fix code from stdin
-	  --esnext        Enforce ES2015+ rules
 	  --env           Environment preset  [Can be set multiple times]
 	  --global        Global variable  [Can be set multiple times]
 	  --ignore        Additional paths to ignore  [Can be set multiple times]
@@ -43,14 +42,15 @@ const cli = meow(`
 	  --open          Open files with issues in your editor
 	  --quiet         Show only errors and no warnings
 	  --extension     Additional extension to lint [Can be set multiple times]
+	  --no-esnext     Don't enforce ES2015+ rules
 
 	Examples
 	  $ xo
 	  $ xo index.js
 	  $ xo *.js !foo.js
-	  $ xo --esnext --space
+	  $ xo --space
 	  $ xo --env=node --env=mocha
-	  $ xo --init --esnext
+	  $ xo --init --space
 	  $ xo --plugin=react
 	  $ xo --plugin=html --extension=html
 	  $ echo 'const x=true' | xo --stdin --fix

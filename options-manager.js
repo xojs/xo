@@ -120,7 +120,7 @@ function buildConfig(opts) {
 		}];
 	}
 
-	if (opts.esnext) {
+	if (opts.esnext !== false) {
 		config.baseConfig.extends = ['xo/esnext', path.join(__dirname, 'config/plugins.js')];
 	}
 

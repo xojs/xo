@@ -43,12 +43,12 @@ test('buildConfig: defaults', t => {
 	t.true(/[\\\/]\.xo-cache[\\\/]?$/.test(config.cacheLocation));
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
-	t.is(config.baseConfig.extends[0], 'xo');
+	t.is(config.baseConfig.extends[0], 'xo/esnext');
 });
 
 test('buildConfig: esnext', t => {
-	const config = manager.buildConfig({esnext: true});
-	t.is(config.baseConfig.extends[0], 'xo/esnext');
+	const config = manager.buildConfig({esnext: false});
+	t.is(config.baseConfig.extends[0], 'xo');
 });
 
 test('buildConfig: space: true', t => {
@@ -128,13 +128,13 @@ test('groupConfigs', t => {
 	];
 
 	const opts = {
-		esnext: true
+		esnext: false
 	};
 
 	const overrides = [
 		{
 			files: '**/foo/*',
-			esnext: false
+			esnext: true
 		},
 		{
 			files: '**/foo/howdy.js',
@@ -148,13 +148,13 @@ test('groupConfigs', t => {
 	t.deepEqual(result, [
 		{
 			opts: {
-				esnext: false
+				esnext: true
 			},
 			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
 		},
 		{
 			opts: {
-				esnext: false,
+				esnext: true,
 				space: 3,
 				envs: ['mocha']
 			},
@@ -162,7 +162,7 @@ test('groupConfigs', t => {
 		},
 		{
 			opts: {
-				esnext: true
+				esnext: false
 			},
 			paths: ['/user/bar/hello.js']
 		}
