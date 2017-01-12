@@ -308,27 +308,10 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 - [Sublime Text](https://github.com/sindresorhus/SublimeLinter-contrib-xo)
 - [Atom](https://github.com/sindresorhus/atom-linter-xo)
+- [Vim](https://github.com/sindresorhus/vim-xo)
 - [TextMate 2](https://github.com/claylo/XO.tmbundle)
 - [VSCode](https://github.com/SamVerschueren/vscode-linter-xo)
 - [Emacs](https://github.com/j-em/xo-emacs)
-
-#### Vim
-
-You can use [Syntastic](https://github.com/scrooloose/syntastic)'s ESLint checker with the following settings in your `.vimrc` file:
-
-```vim
-let g:syntastic_javascript_eslint_generic = 1
-let g:syntastic_javascript_eslint_exec = 'xo'
-let g:syntastic_javascript_eslint_args = '--reporter=compact'
-let g:syntastic_javascript_checkers = ['eslint']
-```
-
-You can also use [vim-autoformat](https://github.com/Chiel92/vim-autoformat) to format your code with XO, using the following settings in your `.vimrc` file:
-
-```vim
-let g:formatdef_xo = '"xo --fix --stdin"'
-let g:formatters_javascript = ['xo']
-```
 
 
 ## Build-system plugins
