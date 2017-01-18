@@ -51,21 +51,22 @@ $ xo --help
     $ xo [<file|glob> ...]
 
   Options
-    --init          Add XO to your project
-    --fix           Automagically fix issues
-    --reporter      Reporter to use
-    --stdin         Validate/fix code from stdin
-    --env           Environment preset  [Can be set multiple times]
-    --global        Global variable  [Can be set multiple times]
-    --ignore        Additional paths to ignore  [Can be set multiple times]
-    --space         Use space indent instead of tabs  [Default: 2]
-    --no-semicolon  Prevent use of semicolons
-    --plugin        Include third-party plugins  [Can be set multiple times]
-    --extend        Extend defaults with a custom config  [Can be set multiple times]
-    --open          Open files with issues in your editor
-    --quiet         Show only errors and no warnings
-    --extension     Additional extension to lint [Can be set multiple times]
-    --no-esnext     Don't enforce ES2015+ rules
+	  --init                   Add XO to your project
+	  --fix                    Automagically fix issues
+	  --reporter               Reporter to use
+	  --stdin                  Validate/fix code from stdin
+	  --env                    Environment preset  [Can be set multiple times]
+	  --global                 Global variable  [Can be set multiple times]
+	  --ignore                 Additional paths to ignore  [Can be set multiple times]
+	  --space                  Use space indent instead of tabs  [Default: 2]
+	  --no-semicolon           Prevent use of semicolons
+	  --plugin                 Include third-party plugins  [Can be set multiple times]
+	  --skip-default-extenders Do not add the default extenders
+	  --extend                 Extend defaults with a custom config  [Can be set multiple times]
+	  --open                   Open files with issues in your editor
+	  --quiet                  Show only errors and no warnings
+	  --extension              Additional extension to lint [Can be set multiple times]
+	  --no-esnext              Don't enforce ES2015+ rules
 
   Examples
     $ xo
@@ -200,6 +201,13 @@ Set it to `false` to enforce no-semicolon style.
 Type: `Array`
 
 Include third-party [plugins](http://eslint.org/docs/user-guide/configuring.html#configuring-plugins).
+
+### skipDefaultExtenders
+
+Type: `boolean`<br>
+Default: `false`
+
+Set it to `true` to not include default extenders. Note that this does not affect the value of `esnext`.
 
 ### extends
 
