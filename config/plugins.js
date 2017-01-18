@@ -45,7 +45,6 @@ module.exports = {
 		'import/named': 'error',
 		'import/namespace': ['error', {allowComputed: true}],
 		'import/no-absolute-path': 'error',
-		'import/no-dynamic-require': 'error',
 		'import/no-webpack-loader-syntax': 'error',
 		'import/newline-after-import': 'error',
 		'import/no-amd': 'error',
