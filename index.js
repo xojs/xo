@@ -29,7 +29,7 @@ exports.lintText = (str, opts) => {
 	if (opts.ignores && opts.ignores.length > 0 && opts.filename) {
 		const filename = path.relative(opts.cwd, opts.filename);
 
-		if (multimatch([filename], opts.ignores)) {
+		if (multimatch([filename], opts.ignores).length > 0) {
 			return {
 				errorCount: 0,
 				warningCount: 0,
