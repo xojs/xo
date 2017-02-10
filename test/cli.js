@@ -19,6 +19,14 @@ test('fix option with stdin', async t => {
 	t.is(stdout.trim(), 'console.log();');
 });
 
+test('stdin-filename option with stdin', async t => {
+	const {stdout} = await execa('../cli.js', ['--no-local', '--stdin', '--stdin-filename=unicorn-file'], {
+		input: 'console.log()\n',
+		reject: false
+	});
+	t.regex(stdout, /unicorn-file:/);
+});
+
 test('reporter option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
 
