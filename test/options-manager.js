@@ -52,7 +52,6 @@ test('buildConfig: esnext', t => {
 });
 
 test('buildConfig: skip-default-extenders', t => {
-
 	const config = manager.buildConfig({
 		esnext: false,
 		skipDefaultExtenders: true,
