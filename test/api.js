@@ -149,3 +149,25 @@ test('.lintFiles() - only accepts whitelisted extensions', async t => {
 	const moreExtensionsResults = await fn.lintFiles(mdGlob, {extensions: ['md']});
 	t.true(moreExtensionsResults.errorCount > 0);
 });
+
+test('.lintFiles() - ignores dirs for empty extensions', async t => {
+	{
+		const glob = path.join(__dirname, 'fixtures/nodir/*');
+		const results = await fn.lintFiles(glob, {extensions: ['', 'js']});
+		const {results: [fileResult]} = results;
+
+		// only fixtures/nodir/noextension should be linted
+		t.is(path.relative(__dirname, fileResult.filePath), 'fixtures/nodir/noextension');
+		t.is(results.errorCount, 1);
+	}
+
+	{
+		const glob = path.join(__dirname, 'fixtures/nodir/nested/*');
+		const results = await fn.lintFiles(glob);
+		const {results: [fileResult]} = results;
+
+		// ensure nodir/nested **would** report if globbed
+		t.is(path.relative(__dirname, fileResult.filePath), 'fixtures/nodir/nested/index.js');
+		t.is(results.errorCount, 1);
+	}
+});
