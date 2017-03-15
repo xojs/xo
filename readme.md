@@ -289,6 +289,10 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 
 If you have a directory structure with nested `package.json` files and you want one of the child manifests to be skipped, you can do so by setting `"xo": false`. For example, when you have separate app and dev `package.json` files with `electron-builder`.
 
+### Monorepo
+
+Put a `package.json` with your config at the root and add `"xo": false` to the `package.json` in your bundled packages.
+
 
 ## FAQ
 
