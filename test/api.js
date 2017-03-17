@@ -157,7 +157,9 @@ test('.lintFiles() - ignores dirs for empty extensions', async t => {
 		const {results: [fileResult]} = results;
 
 		// only fixtures/nodir/noextension should be linted
-		t.is(path.relative(__dirname, fileResult.filePath), 'fixtures/nodir/noextension');
+		const expected = 'fixtures/nodir/noextension'.split('/').join(path.sep);
+		const actual = path.relative(__dirname, fileResult.filePath);
+		t.is(actual, expected);
 		t.is(results.errorCount, 1);
 	}
 
@@ -167,7 +169,9 @@ test('.lintFiles() - ignores dirs for empty extensions', async t => {
 		const {results: [fileResult]} = results;
 
 		// ensure nodir/nested **would** report if globbed
-		t.is(path.relative(__dirname, fileResult.filePath), 'fixtures/nodir/nested/index.js');
+		const expected = 'fixtures/nodir/nested/index.js'.split('/').join(path.sep);
+		const actual = path.relative(__dirname, fileResult.filePath);
+		t.is(actual, expected);
 		t.is(results.errorCount, 1);
 	}
 });
