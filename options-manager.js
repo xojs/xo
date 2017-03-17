@@ -222,24 +222,30 @@ function groupConfigs(paths, baseOptions, overrides) {
 
 function getIgnores(opts) {
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
+	return opts;
+}
 
+function getGitIgnores(opts) {
 	const gitignores = globby.sync('**/.gitignore', {
-		ignore: opts.ignores,
+		ignore: opts.ignores || [],
 		cwd: opts.cwd || process.cwd()
 	});
 
-	const ignores = gitignores
+	return gitignores
 		.map(pathToGitignore => {
 			const patterns = parseGitignore(pathToGitignore);
 			const base = path.dirname(pathToGitignore);
 
-			return patterns.map(file => path.join(base, file));
+			return patterns
+				.map(pattern => {
+					const negate = !pattern.startsWith('!');
+					const patternPath = negate ? pattern : pattern.substr(1);
+					return {negate, pattern: path.join(base, patternPath)};
+				})
+				.sort(pattern => pattern.negate ? 1 : -1)
+				.map(item => item.negate ? `!${item.pattern}` : item.pattern);
 		})
 		.reduce((a, b) => a.concat(b), []);
-
-	opts.ignores = opts.ignores.concat(ignores);
-
-	return opts;
 }
 
 function preprocess(opts) {
@@ -262,3 +268,4 @@ exports.groupConfigs = groupConfigs;
 exports.preprocess = preprocess;
 exports.emptyOptions = emptyOptions;
 exports.getIgnores = getIgnores;
+exports.getGitIgnores = getGitIgnores;

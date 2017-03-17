@@ -26,10 +26,12 @@ exports.lintText = (str, opts) => {
 		throw new Error('The `ignores` option requires the `filename` option to be defined.');
 	}
 
-	if (opts.ignores && opts.ignores.length > 0 && opts.filename) {
+	if (opts.filename) {
+		const gitIgnores = optionsManager.getGitIgnores(opts);
 		const filename = path.relative(opts.cwd, opts.filename);
+		const glob = [filename].concat(gitIgnores);
 
-		if (multimatch([filename], opts.ignores).length > 0) {
+		if (multimatch(glob, opts.ignores).length > 0) {
 			return {
 				errorCount: 0,
 				warningCount: 0,
@@ -49,14 +51,18 @@ exports.lintText = (str, opts) => {
 	return processReport(report, opts);
 };
 
-exports.lintFiles = (patterns, opts) => {
+exports.lintFiles = (pattern, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-	if (patterns.length === 0) {
-		patterns = '**/*';
+	if (pattern.length === 0) {
+		pattern = '**/*';
 	}
 
-	return globby(patterns, {ignore: opts.ignores}).then(paths => {
+	const gitIgnores = optionsManager.getGitIgnores(opts);
+	const patterns = Array.isArray(pattern) ? pattern : [pattern];
+	const glob = patterns.concat(gitIgnores);
+
+	return globby(glob, {ignore: opts.ignores}).then(paths => {
 		// filter out unwanted file extensions
 		// for silly users that don't specify an extension in the glob pattern
 		paths = paths.filter(x => {
