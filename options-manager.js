@@ -192,8 +192,10 @@ function findApplicableOverrides(path, overrides) {
 	};
 }
 
-function mergeApplicableOverrides(baseOptions, applicableOverrides) {
-	return deepAssign.apply(null, [emptyOptions(), baseOptions].concat(applicableOverrides.map(normalizeOpts)));
+const mergeApplicableOverrides = (baseOptions, applicableOverrides) => {
+	applicableOverrides = applicableOverrides.map(normalizeOpts);
+	const overrides = [emptyOptions(), baseOptions].concat(applicableOverrides);
+	return deepAssign.apply(null, overrides);
 }
 
 // Creates grouped sets of merged options together with the paths they apply to.
