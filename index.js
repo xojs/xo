@@ -63,7 +63,7 @@ exports.lintFiles = (pattern, opts) => {
 	const glob = patterns.concat(gitIgnores);
 
 	return globby(glob, {ignore: opts.ignores, nodir: true}).then(paths => {
-		// filter out unwanted file extensions
+		// Filter out unwanted file extensions
 		// for silly users that don't specify an extension in the glob pattern
 		paths = paths.filter(x => {
 			// Remove dot before the actual extension
@@ -85,7 +85,7 @@ exports.lintFiles = (pattern, opts) => {
 };
 
 function mergeReports(reports) {
-	// merge multiple reports into a single report
+	// Merge multiple reports into a single report
 	let results = [];
 	let errorCount = 0;
 	let warningCount = 0;

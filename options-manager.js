@@ -45,7 +45,7 @@ const DEFAULT_CONFIG = {
 function normalizeOpts(opts) {
 	opts = Object.assign({}, opts);
 
-	// alias to help humans
+	// Alias to help humans
 	[
 		'env',
 		'global',
@@ -81,7 +81,7 @@ function mergeWithPkgConf(opts) {
 	return Object.assign({}, conf, opts);
 }
 
-// define the shape of deep properties for deepAssign
+// Define the shape of deep properties for deepAssign
 function emptyOptions() {
 	return {
 		rules: {},
@@ -104,7 +104,7 @@ function buildConfig(opts) {
 		const spaces = typeof opts.space === 'number' ? opts.space : 2;
 		config.rules.indent = ['error', spaces, {SwitchCase: 1}];
 
-		// only apply if the user has the React plugin
+		// Only apply if the user has the React plugin
 		if (opts.cwd && resolveFrom(opts.cwd, 'eslint-plugin-react')) {
 			config.plugins = config.plugins.concat('react');
 			config.rules['react/jsx-indent-props'] = ['error', spaces];
@@ -140,12 +140,12 @@ function buildConfig(opts) {
 		// TODO: this logic needs to be improved, preferably use the same code as ESLint
 		// user's configs must be resolved to their absolute paths
 		const configs = opts.extends.map(name => {
-			// don't do anything if it's a filepath
+			// Don't do anything if it's a filepath
 			if (pathExists.sync(name)) {
 				return name;
 			}
 
-			// don't do anything if it's a config from a plugin
+			// Don't do anything if it's a config from a plugin
 			if (name.startsWith('plugin:')) {
 				return name;
 			}

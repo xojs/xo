@@ -1,4 +1,4 @@
 'use strict';
 module.exports = {
-	// put rule overrides here
+	// Put rule overrides here
 };

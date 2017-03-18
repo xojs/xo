@@ -1,6 +1,6 @@
 'use strict';
 module.exports = {
-	// repeated here from eslint-config-xo in case some plugins set something different
+	// Repeated here from eslint-config-xo in case some plugins set something different
 	parserOptions: {
 		ecmaVersion: 2017,
 		sourceType: 'module',
@@ -32,7 +32,7 @@ module.exports = {
 		'promise/param-names': 'error',
 		'promise/no-promise-in-callback': 'error',
 		'promise/no-callback-in-promise': 'error',
-		// enable this sometime in the future when Node.js has async/await support
+		// Enable this sometime in the future when Node.js has async/await support
 		// 'promise/prefer-await-to-then': 'error',
 		'import/default': 'error',
 		'import/export': 'error',
@@ -49,7 +49,7 @@ module.exports = {
 		'import/newline-after-import': 'error',
 		'import/no-amd': 'error',
 		'import/no-duplicates': 'error',
-		// enable this sometime in the future when Node.js has ES2015 module support
+		// Enable this sometime in the future when Node.js has ES2015 module support
 		// 'import/unambiguous': 'error',
 		// enable this sometime in the future when Node.js has ES2015 module support
 		// 'import/no-commonjs': 'error',

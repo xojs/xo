@@ -45,7 +45,7 @@ test('overrides fixture', async () => {
 // https://github.com/sindresorhus/xo/issues/65
 test.failing('ignores fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
-	t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
+	await t.throws(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
 
 test('ignore files in .gitignore', async t => {

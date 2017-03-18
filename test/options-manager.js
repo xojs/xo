@@ -1,8 +1,8 @@
 import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
-import parentConfig from './fixtures/nested/package.json';
-import childConfig from './fixtures/nested/child/package.json';
+import parentConfig from './fixtures/nested/package';
+import childConfig from './fixtures/nested/child/package';
 
 process.chdir(__dirname);
 
@@ -40,7 +40,7 @@ test('normalizeOpts: falsie values stay falsie', t => {
 
 test('buildConfig: defaults', t => {
 	const config = manager.buildConfig({});
-	t.true(/[\\\/]\.xo-cache[\\\/]?$/.test(config.cacheLocation));
+	t.true(/[\\/]\.xo-cache[\\/]?$/.test(config.cacheLocation));
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
 	t.is(config.baseConfig.extends[0], 'xo/esnext');
@@ -64,7 +64,7 @@ test('buildConfig: space: 4', t => {
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false});
 	t.deepEqual(config.rules, {
-		'semi': ['error', 'never'],
+		semi: ['error', 'never'],
 		'semi-spacing': ['error', {
 			before: false,
 			after: true
