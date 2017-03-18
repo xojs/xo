@@ -33,6 +33,7 @@
     "index.js",
     "cli.js",
     "options-manager.js",
+    "gitignore-parser.js",
     "config"
   ],
   "keywords": [

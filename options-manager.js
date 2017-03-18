@@ -7,8 +7,9 @@ const deepAssign = require('deep-assign');
 const multimatch = require('multimatch');
 const resolveFrom = require('resolve-from');
 const pathExists = require('path-exists');
-const parseGitignore = require('parse-gitignore');
 const globby = require('globby');
+
+const GitignoreParser = require('./gitignore-parser');
 
 const DEFAULT_IGNORE = [
 	'**/node_modules/**',
@@ -230,20 +231,8 @@ const getGitIgnores = opts => globby
 		ignore: opts.ignores || [],
 		cwd: opts.cwd || process.cwd()
 	})
-	.map(pathToGitignore => {
-		const patterns = parseGitignore(pathToGitignore);
-		const base = path.dirname(pathToGitignore);
-
-		return patterns
-			.map(pattern => {
-				const negate = !pattern.startsWith('!');
-				const patternPath = negate ? pattern : pattern.substr(1);
-				return {negate, pattern: path.join(base, patternPath)};
-			})
-			.sort(pattern => pattern.negate ? 1 : -1)
-			.map(item => item.negate ? `!${item.pattern}` : item.pattern);
-	})
-	.reduce((a, b) => a.concat(b), []);
+	.map(new GitignoreParser(opts).parseFile)
+	.reduce((patterns, pattern) => patterns.concat(pattern), []);
 
 const preprocess = opts => {
 	opts = mergeWithPkgConf(opts);
