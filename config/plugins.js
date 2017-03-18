@@ -48,6 +48,7 @@ module.exports = {
 		'import/no-webpack-loader-syntax': 'error',
 		'import/newline-after-import': 'error',
 		'import/no-amd': 'error',
+		'import/no-duplicates': 'error',
 		// enable this sometime in the future when Node.js has ES2015 module support
 		// 'import/unambiguous': 'error',
 		// enable this sometime in the future when Node.js has ES2015 module support

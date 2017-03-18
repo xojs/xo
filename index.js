@@ -62,7 +62,7 @@ exports.lintFiles = (pattern, opts) => {
 	const patterns = Array.isArray(pattern) ? pattern : [pattern];
 	const glob = patterns.concat(gitIgnores);
 
-	return globby(glob, {ignore: opts.ignores}).then(paths => {
+	return globby(glob, {ignore: opts.ignores, nodir: true}).then(paths => {
 		// filter out unwanted file extensions
 		// for silly users that don't specify an extension in the glob pattern
 		paths = paths.filter(x => {
