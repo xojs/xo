@@ -53,6 +53,7 @@ test('ignore files in .gitignore', async t => {
 
 	try {
 		await execa('../../../cli.js', ['--no-local'], {cwd});
+		t.fail();
 	} catch (err) {
 		t.is(err.stdout.indexOf('foo.js'), -1);
 		t.true(err.stdout.indexOf('bar.js') !== -1);
@@ -64,6 +65,7 @@ test.failing('negative gitignores', async t => {
 
 	try {
 		await execa(`../../../cli.js`, [`${cwd}/bar.js`, '--no-local'], {cwd});
+		t.fail();
 	} catch (err) {
 		t.is(err.stdout.indexOf('foo.js'), -1, 'Should not lint foo.js');
 	}
