@@ -53,7 +53,7 @@ test('ignore files in .gitignore', async t => {
 
 	try {
 		const result = await execa('../../../cli.js', ['--no-local'], {cwd});
-		console.log(result, result.stdout);
+		console.log(result, result.stdout, result.stderr);
 		t.fail();
 	} catch (err) {
 		t.is(err.stdout.indexOf('foo.js'), -1);
