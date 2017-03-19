@@ -130,7 +130,7 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
   },
   "devDependencies": {
     "ava": "^0.16.0",
-    "xo": "^0.17.0"
+    "xo": "^0.18.0"
   }
 }
 ```
