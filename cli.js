@@ -79,7 +79,7 @@ updateNotifier({pkg: cli.pkg}).notify();
 const input = cli.input;
 const opts = cli.flags;
 
-function log(report) {
+const log = report => {
 	// legacy
 	// TODO: remove in 1.0.0
 	if (opts.compact) {
@@ -92,7 +92,7 @@ function log(report) {
 	process.exit(report.errorCount === 0 ? 0 : 1);
 }
 
-function open(report) {
+const open = report => {
 	if (report.errorCount === 0) {
 		return;
 	}
@@ -110,11 +110,7 @@ Fix it by setting path to your editor of choice in ~/.bashrc or ~/.zshrc:
 	}
 
 	const executableName = editor.split(path.sep).pop();
-
-	function lineColumn(message) {
-		return `${message.line}:${message.column}`;
-	}
-
+	const lineColumn = message => `${message.line}:${message.column}`;
 	const args = [];
 
 	report.results

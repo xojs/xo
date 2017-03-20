@@ -42,7 +42,7 @@ const DEFAULT_CONFIG = {
 	}
 };
 
-function normalizeOpts(opts) {
+const normalizeOpts = opts => {
 	opts = Object.assign({}, opts);
 
 	// Alias to help humans
@@ -75,25 +75,23 @@ function normalizeOpts(opts) {
 	return opts;
 }
 
-function mergeWithPkgConf(opts) {
+const mergeWithPkgConf = opts => {
 	opts = Object.assign({cwd: process.cwd()}, opts);
 	const conf = pkgConf.sync('xo', {cwd: opts.cwd, skipOnFalse: true});
 	return Object.assign({}, conf, opts);
 }
 
 // Define the shape of deep properties for deepAssign
-function emptyOptions() {
-	return {
-		rules: {},
-		settings: {},
-		globals: [],
-		envs: [],
-		plugins: [],
-		extends: []
-	};
-}
+const emptyOptions = () => ({
+	rules: {},
+	settings: {},
+	globals: [],
+	envs: [],
+	plugins: [],
+	extends: []
+});
 
-function buildConfig(opts) {
+const buildConfig = opts => {
 	const config = deepAssign(
 		emptyOptions(),
 		DEFAULT_CONFIG,
@@ -173,7 +171,7 @@ function buildConfig(opts) {
 // The hash value is a binary representation of which elements in the `overrides` array apply to the path.
 //
 // If overrides.length === 4, and only the first and third elements apply, then our hash is: 1010 (in binary)
-function findApplicableOverrides(path, overrides) {
+const findApplicableOverrides = (path, overrides) => {
 	let hash = 0;
 	const applicable = [];
 
@@ -192,12 +190,14 @@ function findApplicableOverrides(path, overrides) {
 	};
 }
 
-function mergeApplicableOverrides(baseOptions, applicableOverrides) {
-	return deepAssign.apply(null, [emptyOptions(), baseOptions].concat(applicableOverrides.map(normalizeOpts)));
+const mergeApplicableOverrides = (baseOptions, applicableOverrides) => {
+	applicableOverrides = applicableOverrides.map(normalizeOpts);
+	const overrides = [emptyOptions(), baseOptions].concat(applicableOverrides);
+	return deepAssign.apply(null, overrides);
 }
 
 // Creates grouped sets of merged options together with the paths they apply to.
-function groupConfigs(paths, baseOptions, overrides) {
+const groupConfigs = (paths, baseOptions, overrides) => {
 	const map = {};
 	const arr = [];
 
@@ -220,35 +220,32 @@ function groupConfigs(paths, baseOptions, overrides) {
 	return arr;
 }
 
-function getIgnores(opts) {
+const getIgnores = opts => {
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
 	return opts;
 }
 
-function getGitIgnores(opts) {
-	const gitignores = globby.sync('**/.gitignore', {
+const getGitIgnores = opts => globby
+	.sync('**/.gitignore', {
 		ignore: opts.ignores || [],
 		cwd: opts.cwd || process.cwd()
-	});
+	})
+	.map(pathToGitignore => {
+		const patterns = parseGitignore(pathToGitignore);
+		const base = path.dirname(pathToGitignore);
 
-	return gitignores
-		.map(pathToGitignore => {
-			const patterns = parseGitignore(pathToGitignore);
-			const base = path.dirname(pathToGitignore);
+		return patterns
+			.map(pattern => {
+				const negate = !pattern.startsWith('!');
+				const patternPath = negate ? pattern : pattern.substr(1);
+				return {negate, pattern: path.join(base, patternPath)};
+			})
+			.sort(pattern => pattern.negate ? 1 : -1)
+			.map(item => item.negate ? `!${item.pattern}` : item.pattern);
+	})
+	.reduce((a, b) => a.concat(b), []);
 
-			return patterns
-				.map(pattern => {
-					const negate = !pattern.startsWith('!');
-					const patternPath = negate ? pattern : pattern.substr(1);
-					return {negate, pattern: path.join(base, patternPath)};
-				})
-				.sort(pattern => pattern.negate ? 1 : -1)
-				.map(item => item.negate ? `!${item.pattern}` : item.pattern);
-		})
-		.reduce((a, b) => a.concat(b), []);
-}
-
-function preprocess(opts) {
+const preprocess = opts => {
 	opts = mergeWithPkgConf(opts);
 	opts = normalizeOpts(opts);
 	opts = getIgnores(opts);

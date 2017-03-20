@@ -27,8 +27,8 @@ exports.lintText = (str, opts) => {
 	}
 
 	if (opts.filename) {
-		const gitIgnores = optionsManager.getGitIgnores(opts);
 		const filename = path.relative(opts.cwd, opts.filename);
+		const gitIgnores = optionsManager.getGitIgnores(opts);
 		const glob = [filename].concat(gitIgnores);
 
 		if (multimatch(glob, opts.ignores).length > 0) {
@@ -51,15 +51,11 @@ exports.lintText = (str, opts) => {
 	return processReport(report, opts);
 };
 
-exports.lintFiles = (pattern, opts) => {
+exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
-
-	if (pattern.length === 0) {
-		pattern = '**/*';
-	}
+	patterns = patterns.length === 0 ? ['**/*'] : Array.isArray(patterns) ? patterns : [patterns];
 
 	const gitIgnores = optionsManager.getGitIgnores(opts);
-	const patterns = Array.isArray(pattern) ? pattern : [pattern];
 	const glob = patterns.concat(gitIgnores);
 
 	return globby(glob, {ignore: opts.ignores, nodir: true}).then(paths => {
