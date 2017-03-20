@@ -174,9 +174,9 @@ test('groupConfigs', t => {
 
 test('gitignore', t => {
 	const ignores = manager.getGitIgnores({});
-	t.true(ignores.includes('!' + path.join('foo', '**')));
-	t.true(ignores.includes('!' + path.join('bar', 'foo.js')));
-	t.true(ignores.includes(path.join('bar', 'bar.js')));
+	t.true(ignores.includes('!foo/**'));
+	t.true(ignores.includes('!bar/foo.js'));
+	t.true(ignores.includes('bar/bar.js'));
 });
 
 test('ignore ignored .gitignore', t => {
@@ -187,7 +187,7 @@ test('ignore ignored .gitignore', t => {
 	};
 
 	const ignores = manager.getGitIgnores(opts);
-	t.false(ignores.includes('!' + path.join('bar', 'foobar', 'bar.js')));
+	t.false(ignores.includes('!bar/foobar/bar.js'));
 });
 
 test('mergeWithPkgConf: use child if closest', t => {

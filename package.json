@@ -89,6 +89,7 @@
     "pkg-conf": "^2.0.0",
     "resolve-cwd": "^1.0.0",
     "resolve-from": "^2.0.0",
+    "slash": "^1.0.0",
     "update-notifier": "^2.1.0",
     "xo-init": "^0.5.0"
   },

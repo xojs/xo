@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const slash = require('slash');
 const parseGitignore = require('parse-gitignore');
 
 class GitignoreParser
@@ -24,12 +25,13 @@ class GitignoreParser
 	}
 
 	parsePattern(pattern, baseDirectory) {
+		baseDirectory = slash(baseDirectory);
 		const isIgnorePattern = !pattern.startsWith('!');
 
 		if (isIgnorePattern) {
-			pattern = '!' + path.join(baseDirectory, pattern);
+			pattern = '!' + path.posix.join(baseDirectory, pattern);
 		} else {
-			pattern = path.join(baseDirectory, pattern.substr(1));
+			pattern = path.posix.join(baseDirectory, pattern.substr(1));
 		}
 
 		return {isIgnorePattern, pattern};
