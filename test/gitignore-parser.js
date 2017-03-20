@@ -5,7 +5,7 @@ import GitignoreParser from '../gitignore-parser';
 
 process.chdir(__dirname);
 
-test('positive patters should be translated to negative patterns', t => {
+test('positive patterns should be translated to negative patterns', t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore/test');
 	const parser = new GitignoreParser({cwd});
 	const result = parser.parseFile(path.join(cwd, '.gitignore'));
@@ -13,14 +13,14 @@ test('positive patters should be translated to negative patterns', t => {
 	t.true(result.includes('!foo.js'));
 });
 
-test('patters should be translated according to process.cwd()', t => {
+test('patterns should be translated according to process.cwd()', t => {
 	const parser = new GitignoreParser();
 	const result = parser.parseFile('fixtures/gitignore/test/.gitignore');
 
 	t.true(result.includes('!fixtures/gitignore/test/foo.js'));
 });
 
-test('patters should be translated according to cwd', t => {
+test('patterns should be translated according to cwd', t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore/test');
 	const parser = new GitignoreParser({cwd});
 	const result = parser.parseFile('.gitignore');
