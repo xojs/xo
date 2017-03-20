@@ -4,6 +4,7 @@ const eslint = require('eslint');
 const globby = require('globby');
 const isEqual = require('lodash.isequal');
 const multimatch = require('multimatch');
+const arrify = require('arrify');
 const optionsManager = require('./options-manager');
 
 exports.lintText = (str, opts) => {
@@ -53,7 +54,7 @@ exports.lintText = (str, opts) => {
 
 exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
-	patterns = patterns.length === 0 ? ['**/*'] : Array.isArray(patterns) ? patterns : [patterns];
+	patterns = patterns.length === 0 ? ['**/*'] : arrify(patterns);
 
 	const gitIgnores = optionsManager.getGitIgnores(opts);
 	const glob = patterns.concat(gitIgnores);
