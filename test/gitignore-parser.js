@@ -1,5 +1,6 @@
 import path from 'path';
 import test from 'ava';
+import globby from 'globby';
 
 import GitignoreParser from '../gitignore-parser';
 
@@ -26,4 +27,24 @@ test('patterns should be translated according to cwd', t => {
 	const result = parser.parseFile('.gitignore');
 
 	t.true(result.includes('!foo.js'));
+});
+
+test('multiple negative patterns should act as positive patterns', async t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore-double-negation');
+	const parser = new GitignoreParser({cwd});
+	const patterns = ['**/*'].concat(parser.parseFile('.gitignore'));
+	const paths = await globby(patterns, {cwd});
+	paths.sort();
+
+	t.deepEqual(paths, ['!!unicorn.js', '!unicorn.js']);
+});
+
+test('multiple negative patterns should act as positive patterns according to process.cwd()', async t => {
+	const joinCwd = p => path.posix.join('fixtures', 'gitignore-double-negation', p);
+	const parser = new GitignoreParser();
+	const patterns = [joinCwd('**/*')].concat(parser.parseFile(joinCwd('.gitignore')));
+	const paths = await globby(patterns);
+	paths.sort();
+
+	t.deepEqual(paths, ['!!unicorn.js', '!unicorn.js'].map(joinCwd));
 });

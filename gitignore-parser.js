@@ -19,22 +19,23 @@ class GitignoreParser
 		const baseDirectory = path.relative(this.opts.cwd, path.dirname(filepath));
 
 		return parseGitignore(filepath)
-			.map(pattern => this.parsePattern(pattern, baseDirectory))
-			.sort(patternInfo => patternInfo.isIgnorePattern ? 1 : -1)
-			.map(patternInfo => patternInfo.pattern);
+			.map(pattern => this.parsePattern(pattern, baseDirectory));
 	}
 
 	parsePattern(pattern, baseDirectory) {
 		baseDirectory = slash(baseDirectory);
-		const isIgnorePattern = !pattern.startsWith('!');
 
-		if (isIgnorePattern) {
-			pattern = '!' + path.posix.join(baseDirectory, pattern);
-		} else {
-			pattern = path.posix.join(baseDirectory, pattern.substr(1));
+		if (!pattern.startsWith('!')) {
+			return '!' + path.posix.join(baseDirectory, pattern);
 		}
 
-		return {isIgnorePattern, pattern};
+		pattern = pattern.substr(1);
+
+		if (pattern.startsWith('!')) {
+			pattern = `@(${pattern})`;
+		}
+
+		return path.posix.join(baseDirectory, pattern);
 	}
 }
 
