@@ -94,6 +94,7 @@
   },
   "devDependencies": {
     "ava": "*",
+    "babel-polyfill": "^6.23.0",
     "coveralls": "^2.11.9",
     "eslint-config-xo-react": "^0.10.0",
     "eslint-plugin-react": "^6.3.0",
@@ -106,5 +107,10 @@
   },
   "xo": {
     "esnext": true
+  },
+  "ava": {
+    "require": [
+      "babel-polyfill"
+    ]
   }
 }

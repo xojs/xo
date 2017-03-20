@@ -33,7 +33,7 @@ test('reporter option', async t => {
 	try {
 		await execa('../cli.js', ['--no-local', '--reporter=compact', filepath]);
 	} catch (err) {
-		t.true(err.stdout.indexOf('Error - ') !== -1);
+		t.true(err.stdout.includes('Error - '));
 	}
 });
 
@@ -54,8 +54,8 @@ test('ignore files in .gitignore', async t => {
 	try {
 		await execa('../../../cli.js', ['--no-local'], {cwd});
 	} catch (err) {
-		t.is(err.stdout.indexOf('foo.js'), -1);
-		t.true(err.stdout.indexOf('bar.js') !== -1);
+		t.false(err.stdout.includes('foo.js'));
+		t.true(err.stdout.includes('bar.js'));
 	}
 });
 
@@ -67,5 +67,5 @@ test('supports being extended with a shareable config', async () => {
 test('quiet option', async t => {
 	const filepath = await tempWrite('// TODO: quiet\nconsole.log()\n', 'x.js');
 	const err = await t.throws(execa('../cli.js', ['--no-local', '--quiet', '--reporter=compact', filepath]));
-	t.is(err.stdout.indexOf('warning'), -1);
+	t.false(err.stdout.includes('warning'));
 });
