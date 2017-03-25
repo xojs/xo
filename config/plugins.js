@@ -30,8 +30,6 @@ module.exports = {
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
 		'promise/param-names': 'error',
-		'promise/no-promise-in-callback': 'error',
-		'promise/no-callback-in-promise': 'error',
 		// Enable this sometime in the future when Node.js has async/await support
 		// 'promise/prefer-await-to-then': 'error',
 		'import/default': 'error',
