@@ -231,10 +231,9 @@ const getIgnores = opts => {
 const getGitIgnoreFilter = opts => {
 	const ignore = opts.ignores || [];
 	const cwd = opts.cwd || process.cwd();
-	const i = gitIgnore();
 
-	globby.sync('**/.gitignore', {ignore, cwd})
-		.forEach(file => {
+	const i = globby.sync('**/.gitignore', {ignore, cwd})
+		.reduce((ignores, file) => {
 			const fileName = path.join(cwd, file);
 			const base = slash(path.relative(cwd, path.dirname(fileName)));
 
@@ -245,14 +244,15 @@ const getGitIgnoreFilter = opts => {
 				.filter(l => l.charAt(0) !== '#')
 				.map(l => {
 					const negated = l.charAt(0) === '!';
-					const pattern = path.join(base, negated ? l.slice(1) : l);
+					const pattern = path.posix.join(base, negated ? l.slice(1) : l);
 					return negated ? '!' + pattern : pattern;
 				});
 
-			i.add(lines);
-		});
+			ignores.add(lines);
+			return ignores;
+		}, gitIgnore());
 
-	return p => !i.ignores(path.relative(cwd, p));
+	return p => !i.ignores(slash(path.relative(cwd, p)));
 }
 
 const preprocess = opts => {
