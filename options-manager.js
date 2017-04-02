@@ -1,14 +1,16 @@
 'use strict';
+const fs = require('fs');
 const os = require('os');
 const path = require('path');
+
 const arrify = require('arrify');
-const pkgConf = require('pkg-conf');
 const deepAssign = require('deep-assign');
-const multimatch = require('multimatch');
-const resolveFrom = require('resolve-from');
-const pathExists = require('path-exists');
-const parseGitignore = require('parse-gitignore');
 const globby = require('globby');
+const gitIgnore = require('ignore');
+const multimatch = require('multimatch');
+const pathExists = require('path-exists');
+const pkgConf = require('pkg-conf');
+const resolveFrom = require('resolve-from');
 const slash = require('slash');
 
 const DEFAULT_IGNORE = [
@@ -226,26 +228,31 @@ const getIgnores = opts => {
 	return opts;
 }
 
-const getGitIgnores = opts => {
+const getGitIgnoreFilter = opts => {
 	const ignore = opts.ignores || [];
 	const cwd = opts.cwd || process.cwd();
+	const i = gitIgnore();
 
-	return globby
-		.sync('**/.gitignore', {ignore, cwd})
-		.map(filename => {
-			const fullFilename = path.join(cwd, filename);
-			const patterns = parseGitignore(fullFilename);
-			const base = slash(path.relative(cwd, path.dirname(fullFilename)));
+	globby.sync('**/.gitignore', {ignore, cwd})
+		.forEach(file => {
+			const fileName = path.join(cwd, file);
+			const base = slash(path.relative(cwd, path.dirname(fileName)));
 
-			return patterns
-				.map(pattern => {
-					const negate = !pattern.startsWith('!');
-					const patternPath = negate ? pattern : pattern.substr(1);
-					return {negate, pattern: path.posix.join(base, patternPath)};
-				})
-				.map(item => item.negate ? `!${item.pattern}` : item.pattern);
-		})
-		.reduce((a, b) => a.concat(b), []);
+			const lines = fs.readFileSync(fileName)
+				.toString()
+				.split(/\r\n|\n/)
+				.filter(Boolean)
+				.filter(l => l.charAt(0) !== '#')
+				.map(l => {
+					const negated = l.charAt(0) === '!';
+					const pattern = path.join(base, negated ? l.slice(1) : l);
+					return negated ? '!' + pattern : pattern;
+				});
+
+			i.add(lines);
+		});
+
+	return p => !i.ignores(path.relative(cwd, p));
 }
 
 const preprocess = opts => {
@@ -268,4 +275,4 @@ exports.groupConfigs = groupConfigs;
 exports.preprocess = preprocess;
 exports.emptyOptions = emptyOptions;
 exports.getIgnores = getIgnores;
-exports.getGitIgnores = getGitIgnores;
+exports.getGitIgnoreFilter = getGitIgnoreFilter;

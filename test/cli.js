@@ -55,16 +55,23 @@ test.failing('ignores fixture', async t => {
 
 test('ignore files in .gitignore', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
-	const err = await t.throws(cli(['--no-local'], {cwd}));
-	t.is(err.stdout.indexOf('foo.js'), -1);
-	t.true(err.stdout.indexOf('bar.js') !== -1);
+	const err = await t.throws(cli(['--no-local', '--reporter=json'], {cwd}));
+	const reports = JSON.parse(err.stdout);
+	const files = reports.map(report => path.relative(cwd, report.filePath));
+	t.deepEqual(files, ['index.js', 'test/bar.js']);
 });
 
-test.failing('negative gitignores', async t => {
-	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+test('ignore explicit files when in .gitgnore', async t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	await t.notThrows(cli(['test/foo.js', '--no-local', '--reporter=json'], {cwd}));
+});
 
-	const err = await t.throws(cli([`${cwd}/bar.js`, '--no-local'], {cwd}));
-	t.is(err.stdout.indexOf('foo.js'), -1, 'Should not lint foo.js');
+test('negative gitignores', async t => {
+	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+	const err = await t.throws(cli(['--no-local', '--reporter=json'], {cwd}));
+	const reports = JSON.parse(err.stdout);
+	const files = reports.map(report => path.relative(cwd, report.filePath));
+	t.deepEqual(files, ['foo.js']);
 });
 
 test('supports being extended with a shareable config', async t => {

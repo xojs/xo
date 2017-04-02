@@ -137,6 +137,37 @@ test('lintText() - overrides support', async t => {
 	t.is(indexResults[0].errorCount, 0, indexResults[0]);
 });
 
+test('.lintText() - do not lint gitignored files if filename is given', async t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
+	const ignored = await readFile(ignoredPath, 'utf-8');
+	const {results} = fn.lintText(ignored, {filename: ignoredPath, cwd});
+	t.is(results[0].errorCount, 0);
+});
+
+test('.lintText() - lint gitignored files if filename is not given', async t => {
+	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
+	const ignored = await readFile(ignoredPath, 'utf-8');
+	const {results} = fn.lintText(ignored);
+	t.true(results[0].errorCount > 0);
+});
+
+test('.lintText() - do not lint gitignored files in file with negative gitignores', async t => {
+	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+	const ignoredPath = path.resolve('fixtures/negative-gitignore/bar.js');
+	const ignored = await readFile(ignoredPath, 'utf-8');
+	const {results} = fn.lintText(ignored, {filename: ignoredPath, cwd});
+	t.is(results[0].errorCount, 0);
+});
+
+test('.lintText() - lint negatively gitignored files', async t => {
+	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+	const glob = path.posix.join(cwd, '*');
+	const {results} = await fn.lintFiles(glob, {cwd});
+
+	t.true(results[0].errorCount > 0);
+});
+
 test('.lintFiles() - only accepts whitelisted extensions', async t => {
 	// Markdown files will always produce linter errors and will not be going away
 	const mdGlob = path.join(__dirname, '..', '*.md');
@@ -174,4 +205,40 @@ test('.lintFiles() - ignores dirs for empty extensions', async t => {
 		t.is(actual, expected);
 		t.is(results.errorCount, 1);
 	}
+});
+
+test('.lintFiles() - do not lint gitignored files', async t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	const glob = path.posix.join(cwd, '**/*');
+	const ignored = path.resolve('fixtures/gitignore/test/foo.js');
+	const {results} = await fn.lintFiles(glob, {cwd});
+
+	t.is(results.some(r => r.filePath === ignored), false);
+});
+
+test('.lintFiles() - do not lint gitignored files in file with negative gitignores', async t => {
+	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+	const glob = path.posix.join(cwd, '*');
+	const ignored = path.resolve('fixtures/negative-gitignore/bar.js');
+	const {results} = await fn.lintFiles(glob, {cwd});
+
+	t.is(results.some(r => r.filePath === ignored), false);
+});
+
+test('.lintFiles() - lint negatively gitignored files', async t => {
+	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+	const glob = path.posix.join(cwd, '*');
+	const negative = path.resolve('fixtures/negative-gitignore/foo.js');
+	const {results} = await fn.lintFiles(glob, {cwd});
+
+	t.is(results.some(r => r.filePath === negative), true);
+});
+
+test('.lintFiles() - do not lint inapplicable negatively gitignored files', async t => {
+	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+	const glob = path.posix.join(cwd, 'bar.js');
+	const negative = path.resolve('fixtures/negative-gitignore/foo.js');
+	const {results} = await fn.lintFiles(glob, {cwd});
+
+	t.is(results.some(r => r.filePath === negative), false);
 });
