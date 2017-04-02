@@ -232,13 +232,13 @@ const getGitIgnores = opts => globby
 	})
 	.map(pathToGitignore => {
 		const patterns = parseGitignore(pathToGitignore);
-		const base = path.dirname(pathToGitignore);
+		const base = path.posix.dirname(pathToGitignore);
 
 		return patterns
 			.map(pattern => {
 				const negate = !pattern.startsWith('!');
 				const patternPath = negate ? pattern : pattern.substr(1);
-				return {negate, pattern: path.join(base, patternPath)};
+				return {negate, pattern: path.posix.join(base, patternPath)};
 			})
 			.sort(pattern => pattern.negate ? 1 : -1)
 			.map(item => item.negate ? `!${item.pattern}` : item.pattern);
