@@ -203,7 +203,6 @@ test('patterns should be translated according to process.cwd()', t => {
 	process.chdir(cwd);
 	const result = manager.getGitIgnores({});
 	const expected = ['!test/foo.js', '!test/foo.js/**'];
-
 	t.deepEqual(result, expected);
 	process.chdir(previous);
 });
