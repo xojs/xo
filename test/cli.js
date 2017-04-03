@@ -37,9 +37,9 @@ test('reporter option', async t => {
 	}
 });
 
-test('overrides fixture', async () => {
+test('overrides fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/overrides');
-	await execa('../../../cli.js', ['--no-local'], {cwd});
+	await t.notThrows(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
 
 // https://github.com/sindresorhus/xo/issues/65
@@ -59,9 +59,9 @@ test('ignore files in .gitignore', async t => {
 	}
 });
 
-test('supports being extended with a shareable config', async () => {
+test('supports being extended with a shareable config', async t => {
 	const cwd = path.join(__dirname, 'fixtures/project');
-	await execa('../../../cli.js', ['--no-local'], {cwd});
+	await t.notThrows(execa('../../../cli.js', ['--no-local'], {cwd}));
 });
 
 test('quiet option', async t => {
