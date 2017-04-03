@@ -33,6 +33,7 @@
     "index.js",
     "cli.js",
     "options-manager.js",
+    "gitignore-parser.js",
     "config"
   ],
   "keywords": [
@@ -83,16 +84,18 @@
     "lodash.isequal": "^4.4.0",
     "meow": "^3.4.2",
     "multimatch": "^2.1.0",
-    "parse-gitignore": "^0.3.1",
+    "parse-gitignore": "^0.4.0",
     "path-exists": "^3.0.0",
     "pkg-conf": "^2.0.0",
     "resolve-cwd": "^1.0.0",
     "resolve-from": "^2.0.0",
+    "slash": "^1.0.0",
     "update-notifier": "^2.1.0",
     "xo-init": "^0.5.0"
   },
   "devDependencies": {
     "ava": "*",
+    "babel-polyfill": "^6.23.0",
     "coveralls": "^2.11.9",
     "eslint-config-xo-react": "^0.10.0",
     "eslint-plugin-react": "^6.3.0",
@@ -105,5 +108,10 @@
   },
   "xo": {
     "esnext": true
+  },
+  "ava": {
+    "require": [
+      "babel-polyfill"
+    ]
   }
 }
