@@ -70,11 +70,11 @@ test('quiet option', async t => {
 	t.is(err.stdout.indexOf('warning'), -1);
 });
 
-test('use local xo and init', async t => {
+test('init option', async t => {
 	const filepath = await tempWrite('{}', 'package.json');
 	await execa(path.join(__dirname, '../cli.js'), ['--init'], {
-		cwd: filepath.replace('package.json', '')
+		cwd: path.dirname(filepath)
 	});
-	const packagejson = await fs.readFileSync(filepath, 'utf8');
-	t.regex(JSON.stringify(JSON.parse(packagejson)), /{"scripts":{"test":"xo"},"devDependencies":{"xo":"\^[0-9]+\.[0-9]+\.[0-9]+"}}/);
+	const packagejson = fs.readFileSync(filepath, 'utf8');
+	t.deepEqual(JSON.parse(packagejson).scripts, {"test":"xo"});
 });
