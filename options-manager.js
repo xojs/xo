@@ -227,14 +227,11 @@ const getIgnores = opts => {
 }
 
 const getGitIgnores = opts => {
-	const ignores = opts.ignores || [];
+	const ignore = opts.ignores || [];
 	const cwd = opts.cwd || process.cwd();
 
 	return globby
-		.sync('**/.gitignore', {
-			ignore: ignores,
-			cwd: cwd
-		})
+		.sync('**/.gitignore', {ignore, cwd})
 		.map(filename => {
 			const fullFilename = path.join(cwd, filename);
 			const patterns = parseGitignore(fullFilename);
