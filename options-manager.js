@@ -228,6 +228,24 @@ const getIgnores = opts => {
 	return opts;
 }
 
+const mapGitIgnorePatternTo = base => {
+	return ignore => {
+		const negated = ignore.charAt(0) === '!';
+		const pattern = path.posix.join(base, negated ? ignore.slice(1) : ignore);
+		return negated ? '!' + pattern : pattern;
+	};
+}
+
+const parseGitIgnore = (content, opts) => {
+	const base = slash(path.relative(opts.cwd, path.dirname(opts.fileName)));
+
+	return content
+		.split(/\r\n|\n/)
+		.filter(Boolean)
+		.filter(l => l.charAt(0) !== '#')
+		.map(mapGitIgnorePatternTo(base));
+}
+
 const getGitIgnoreFilter = opts => {
 	const ignore = opts.ignores || [];
 	const cwd = opts.cwd || process.cwd();
@@ -235,20 +253,8 @@ const getGitIgnoreFilter = opts => {
 	const i = globby.sync('**/.gitignore', {ignore, cwd})
 		.reduce((ignores, file) => {
 			const fileName = path.join(cwd, file);
-			const base = slash(path.relative(cwd, path.dirname(fileName)));
-
-			const lines = fs.readFileSync(fileName)
-				.toString()
-				.split(/\r\n|\n/)
-				.filter(Boolean)
-				.filter(l => l.charAt(0) !== '#')
-				.map(l => {
-					const negated = l.charAt(0) === '!';
-					const pattern = path.posix.join(base, negated ? l.slice(1) : l);
-					return negated ? '!' + pattern : pattern;
-				});
-
-			ignores.add(lines);
+			const content = fs.readFileSync(fileName).toString();
+			ignores.add(parseGitIgnore(content, {cwd, fileName}));
 			return ignores;
 		}, gitIgnore());
 
