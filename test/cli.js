@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import test from 'ava';
-import tempWrite from 'temp-write';
 import execa from 'execa';
+import slash from 'slash';
+import tempWrite from 'temp-write';
 
 process.chdir(__dirname);
 
@@ -57,7 +58,9 @@ test('ignore files in .gitignore', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	const err = await t.throws(cli(['--no-local', '--reporter=json'], {cwd}));
 	const reports = JSON.parse(err.stdout);
-	const files = reports.map(report => path.relative(cwd, report.filePath));
+	const files = reports
+		.map(report => path.relative(cwd, report.filePath))
+		.map(slash);
 	t.deepEqual(files, ['index.js', 'test/bar.js']);
 });
 
