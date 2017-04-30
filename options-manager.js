@@ -9,6 +9,7 @@ const resolveFrom = require('resolve-from');
 const pathExists = require('path-exists');
 const parseGitignore = require('parse-gitignore');
 const globby = require('globby');
+const slash = require('slash');
 
 const DEFAULT_IGNORE = [
 	'**/node_modules/**',
@@ -225,25 +226,27 @@ const getIgnores = opts => {
 	return opts;
 }
 
-const getGitIgnores = opts => globby
-	.sync('**/.gitignore', {
-		ignore: opts.ignores || [],
-		cwd: opts.cwd || process.cwd()
-	})
-	.map(pathToGitignore => {
-		const patterns = parseGitignore(pathToGitignore);
-		const base = path.posix.dirname(pathToGitignore);
+const getGitIgnores = opts => {
+	const ignore = opts.ignores || [];
+	const cwd = opts.cwd || process.cwd();
 
-		return patterns
-			.map(pattern => {
-				const negate = !pattern.startsWith('!');
-				const patternPath = negate ? pattern : pattern.substr(1);
-				return {negate, pattern: path.posix.join(base, patternPath)};
-			})
-			.sort(pattern => pattern.negate ? 1 : -1)
-			.map(item => item.negate ? `!${item.pattern}` : item.pattern);
-	})
-	.reduce((a, b) => a.concat(b), []);
+	return globby
+		.sync('**/.gitignore', {ignore, cwd})
+		.map(filename => {
+			const fullFilename = path.join(cwd, filename);
+			const patterns = parseGitignore(fullFilename);
+			const base = slash(path.relative(cwd, path.dirname(fullFilename)));
+
+			return patterns
+				.map(pattern => {
+					const negate = !pattern.startsWith('!');
+					const patternPath = negate ? pattern : pattern.substr(1);
+					return {negate, pattern: path.posix.join(base, patternPath)};
+				})
+				.map(item => item.negate ? `!${item.pattern}` : item.pattern);
+		})
+		.reduce((a, b) => a.concat(b), []);
+}
 
 const preprocess = opts => {
 	opts = mergeWithPkgConf(opts);

@@ -190,6 +190,32 @@ test('ignore ignored .gitignore', t => {
 	t.is(ignores.indexOf('!bar/foobar/bar.js'), -1);
 });
 
+test('positive patterns should be translated to negative patterns', t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore/test');
+	const result = manager.getGitIgnores({cwd});
+
+	t.deepEqual(result, ['!foo.js', '!foo.js/**']);
+});
+
+test('patterns should be translated according to process.cwd()', t => {
+	const previous = process.cwd();
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	process.chdir(cwd);
+	const result = manager.getGitIgnores({});
+	const expected = ['!test/foo.js', '!test/foo.js/**'];
+
+	t.deepEqual(result, expected);
+	process.chdir(previous);
+});
+
+test('patterns should be translated according to cwd', t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	const result = manager.getGitIgnores({cwd});
+	const expected = ['!test/foo.js', '!test/foo.js/**'];
+
+	t.deepEqual(result, expected);
+});
+
 test('mergeWithPkgConf: use child if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
 	const result = manager.mergeWithPkgConf({cwd});
