@@ -199,10 +199,10 @@ test('positive patterns should be translated to negative patterns', t => {
 
 test('patterns should be translated according to process.cwd()', t => {
 	const previous = process.cwd();
-	const cwd = path.join(__dirname, 'fixtures/gitignore/test');
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	process.chdir(cwd);
 	const result = manager.getGitIgnores({});
-	const expected = ['!foo.js', '!foo.js/**'];
+	const expected = ['!test/foo.js', '!test/foo.js/**'];
 
 	t.deepEqual(result, expected);
 	process.chdir(previous);
