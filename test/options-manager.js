@@ -51,6 +51,24 @@ test('buildConfig: esnext', t => {
 	t.is(config.baseConfig.extends[0], 'xo');
 });
 
+test('buildConfig: skip-default-extenders', t => {
+	const config = manager.buildConfig({
+		esnext: false,
+		skipDefaultExtenders: true,
+		extends: [
+			'plugin:foo/bar',
+			'eslint-config-foo-bar',
+			'foo-bar-two'
+		]
+	});
+
+	t.deepEqual(config.baseConfig.extends, [
+		'plugin:foo/bar',
+		'cwd/eslint-config-foo-bar',
+		'cwd/eslint-config-foo-bar-two'
+	]);
+});
+
 test('buildConfig: space: true', t => {
 	const config = manager.buildConfig({space: true});
 	t.deepEqual(config.rules.indent, ['error', 2, {SwitchCase: 1}]);

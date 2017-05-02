@@ -32,16 +32,18 @@ const DEFAULT_EXTENSION = [
 	'jsx'
 ];
 
+const DEFAULT_EXTENDERS = [
+	'xo',
+	path.join(__dirname, 'config/overrides.js'),
+	path.join(__dirname, 'config/plugins.js')
+];
+
 const DEFAULT_CONFIG = {
 	useEslintrc: false,
 	cache: true,
 	cacheLocation: path.join(os.homedir() || os.tmpdir(), '.xo-cache/'),
 	baseConfig: {
-		extends: [
-			'xo',
-			path.join(__dirname, 'config/overrides.js'),
-			path.join(__dirname, 'config/plugins.js')
-		]
+		extends: []
 	}
 };
 
@@ -135,6 +137,10 @@ const buildConfig = opts => {
 
 	if (opts.parser) {
 		config.baseConfig.parser = opts.parser;
+	}
+
+	if (!opts.skipDefaultExtenders) {
+		config.baseConfig.extends = config.baseConfig.extends.concat(DEFAULT_EXTENDERS);
 	}
 
 	if (opts.extends && opts.extends.length > 0) {
