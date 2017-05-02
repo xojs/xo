@@ -75,6 +75,6 @@ test('init option', async t => {
 	await execa(path.join(__dirname, '../cli.js'), ['--init'], {
 		cwd: path.dirname(filepath)
 	});
-	const packagejson = fs.readFileSync(filepath, 'utf8');
-	t.deepEqual(JSON.parse(packagejson).scripts, {"test":"xo"});
+	const packageJson = fs.readFileSync(filepath, 'utf8');
+	t.deepEqual(JSON.parse(packageJson).scripts, {test: 'xo'});
 });
