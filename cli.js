@@ -116,8 +116,13 @@ Fix it by setting path to your editor of choice in ~/.bashrc or ~/.zshrc:
 	report.results
 		.filter(file => file.errorCount > 0)
 		.forEach(file => {
-			// Sublime Text and Atom support opening file at exact position
-			if (['subl', 'atom'].indexOf(executableName) >= 0) {
+			// VS Code requires --goto option for path:line:column
+			if (executableName === 'code') {
+				args.push('--goto');
+			}
+
+			// Sublime Text, Atom, and VS Code support opening file at exact position
+			if (['subl', 'atom', 'code'].indexOf(executableName) >= 0) {
 				args.push(file.filePath + ':' + lineColumn(file.messages[0]));
 				return;
 			}
