@@ -80,6 +80,7 @@ const normalizeOpts = opts => {
 
 const mergeWithPkgConf = opts => {
 	opts = Object.assign({cwd: process.cwd()}, opts);
+	opts.cwd = path.resolve(opts.cwd);
 	const conf = pkgConf.sync('xo', {cwd: opts.cwd, skipOnFalse: true});
 	return Object.assign({}, conf, opts);
 }

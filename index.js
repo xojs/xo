@@ -58,7 +58,7 @@ exports.lintFiles = (patterns, opts) => {
 
 	const ignoreFilter = optionsManager.getGitIgnoreFilter(opts);
 
-	return globby(patterns, {ignore: opts.ignores, nodir: true}).then(paths => {
+	return globby(patterns, {ignore: opts.ignores, nodir: true, cwd: opts.cwd}).then(paths => {
 		// Filter out unwanted file extensions
 		// for silly users that don't specify an extension in the glob pattern
 

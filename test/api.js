@@ -207,6 +207,13 @@ test('.lintFiles() - ignores dirs for empty extensions', async t => {
 	}
 });
 
+test('cwd option', async t => {
+	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/cwd'});
+	const paths = results.map(r => path.relative(__dirname, r.filePath));
+	paths.sort();
+	t.deepEqual(paths, [path.join('fixtures', 'cwd', 'unicorn.js')]);
+});
+
 test('.lintFiles() - do not lint gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	const glob = path.posix.join(cwd, '**/*');
