@@ -74,3 +74,12 @@ test('quiet option', async t => {
 	const err = await t.throws(cli(['--no-local', '--quiet', '--reporter=compact', filepath]));
 	t.is(err.stdout.indexOf('warning'), -1);
 });
+
+test('init option', async t => {
+	const filepath = await tempWrite('{}', 'package.json');
+	await execa(path.join(__dirname, '../cli.js'), ['--init'], {
+		cwd: path.dirname(filepath)
+	});
+	const packageJson = fs.readFileSync(filepath, 'utf8');
+	t.deepEqual(JSON.parse(packageJson).scripts, {test: 'xo'});
+});
