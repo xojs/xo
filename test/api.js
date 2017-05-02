@@ -160,6 +160,14 @@ test('.lintText() - do not lint gitignored files in file with negative gitignore
 	t.is(results[0].errorCount, 0);
 });
 
+test('.lintText() - multiple negative patterns should act as positive patterns', async t => {
+	const cwd = path.join(__dirname, 'fixtures', 'gitignore-multiple-negation');
+	const filename = path.join(cwd, '!!!unicorn.js');
+	const text = await readFile(filename, 'utf-8');
+	const {results} = fn.lintText(text, {filename, cwd});
+	t.is(results[0].errorCount, 0);
+});
+
 test('.lintText() - lint negatively gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
 	const glob = path.posix.join(cwd, '*');
@@ -241,4 +249,13 @@ test('.lintFiles() - do not lint inapplicable negatively gitignored files', asyn
 	const {results} = await fn.lintFiles(glob, {cwd});
 
 	t.is(results.some(r => r.filePath === negative), false);
+});
+
+test('.lintFiles() - multiple negative patterns should act as positive patterns', async t => {
+	const cwd = path.join(__dirname, 'fixtures', 'gitignore-multiple-negation');
+	const {results} = await fn.lintFiles('**/*', {cwd});
+	const paths = results.map(r => path.basename(r.filePath));
+	paths.sort();
+
+	t.deepEqual(paths, ['!!unicorn.js', '!unicorn.js']);
 });
