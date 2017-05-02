@@ -29,10 +29,10 @@ exports.lintText = (str, opts) => {
 
 	if (opts.filename) {
 		const filename = path.relative(opts.cwd, opts.filename);
-		const gitIgnores = optionsManager.getGitIgnores(opts);
-		const glob = [filename].concat(gitIgnores);
+		const isIgnored = multimatch(filename, opts.ignores).length > 0;
+		const isGitIgnored = !optionsManager.getGitIgnoreFilter(opts)(opts.filename);
 
-		if (multimatch(glob, opts.ignores).length > 0) {
+		if (isIgnored || isGitIgnored) {
 			return {
 				errorCount: 0,
 				warningCount: 0,
@@ -56,17 +56,19 @@ exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
 	patterns = patterns.length === 0 ? ['**/*'] : arrify(patterns);
 
-	const gitIgnores = optionsManager.getGitIgnores(opts);
-	const glob = patterns.concat(gitIgnores);
+	const ignoreFilter = optionsManager.getGitIgnoreFilter(opts);
 
-	return globby(glob, {ignore: opts.ignores, nodir: true}).then(paths => {
+	return globby(patterns, {ignore: opts.ignores, nodir: true}).then(paths => {
 		// Filter out unwanted file extensions
 		// for silly users that don't specify an extension in the glob pattern
-		paths = paths.filter(x => {
-			// Remove dot before the actual extension
-			const ext = path.extname(x).replace('.', '');
-			return opts.extensions.indexOf(ext) !== -1;
-		});
+
+		paths = paths
+			.filter(ignoreFilter)
+			.filter(x => {
+				// Remove dot before the actual extension
+				const ext = path.extname(x).replace('.', '');
+				return opts.extensions.indexOf(ext) !== -1;
+			});
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);

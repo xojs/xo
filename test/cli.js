@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import test from 'ava';
-import tempWrite from 'temp-write';
 import execa from 'execa';
+import slash from 'slash';
+import tempWrite from 'temp-write';
 
 process.chdir(__dirname);
 
@@ -55,13 +56,25 @@ test.failing('ignores fixture', async t => {
 
 test('ignore files in .gitignore', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	const err = await t.throws(cli(['--no-local', '--reporter=json'], {cwd}));
+	const reports = JSON.parse(err.stdout);
+	const files = reports
+		.map(report => path.relative(cwd, report.filePath))
+		.map(slash);
+	t.deepEqual(files, ['index.js', 'test/bar.js']);
+});
 
-	try {
-		await cli(['--no-local'], {cwd});
-	} catch (err) {
-		t.is(err.stdout.indexOf('foo.js'), -1);
-		t.true(err.stdout.indexOf('bar.js') !== -1);
-	}
+test('ignore explicit files when in .gitgnore', async t => {
+	const cwd = path.join(__dirname, 'fixtures/gitignore');
+	await t.notThrows(cli(['test/foo.js', '--no-local', '--reporter=json'], {cwd}));
+});
+
+test('negative gitignores', async t => {
+	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
+	const err = await t.throws(cli(['--no-local', '--reporter=json'], {cwd}));
+	const reports = JSON.parse(err.stdout);
+	const files = reports.map(report => path.relative(cwd, report.filePath));
+	t.deepEqual(files, ['foo.js']);
 });
 
 test('supports being extended with a shareable config', async t => {
@@ -71,8 +84,9 @@ test('supports being extended with a shareable config', async t => {
 
 test('quiet option', async t => {
 	const filepath = await tempWrite('// TODO: quiet\nconsole.log()\n', 'x.js');
-	const err = await t.throws(cli(['--no-local', '--quiet', '--reporter=compact', filepath]));
-	t.is(err.stdout.indexOf('warning'), -1);
+	const err = await t.throws(cli(['--no-local', '--quiet', '--reporter=json', filepath]));
+	const [report] = JSON.parse(err.stdout);
+	t.is(report.warningCount, 0);
 });
 
 test('init option', async t => {

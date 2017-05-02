@@ -1,14 +1,16 @@
 'use strict';
+const fs = require('fs');
 const os = require('os');
 const path = require('path');
+
 const arrify = require('arrify');
-const pkgConf = require('pkg-conf');
 const deepAssign = require('deep-assign');
-const multimatch = require('multimatch');
-const resolveFrom = require('resolve-from');
-const pathExists = require('path-exists');
-const parseGitignore = require('parse-gitignore');
 const globby = require('globby');
+const gitIgnore = require('ignore');
+const multimatch = require('multimatch');
+const pathExists = require('path-exists');
+const pkgConf = require('pkg-conf');
+const resolveFrom = require('resolve-from');
 const slash = require('slash');
 
 const DEFAULT_IGNORE = [
@@ -226,26 +228,37 @@ const getIgnores = opts => {
 	return opts;
 }
 
-const getGitIgnores = opts => {
+const mapGitIgnorePatternTo = base => {
+	return ignore => {
+		const negated = ignore.charAt(0) === '!';
+		const pattern = path.posix.join(base, negated ? ignore.slice(1) : ignore);
+		return negated ? '!' + pattern : pattern;
+	};
+}
+
+const parseGitIgnore = (content, opts) => {
+	const base = slash(path.relative(opts.cwd, path.dirname(opts.fileName)));
+
+	return content
+		.split(/\r\n|\n/)
+		.filter(Boolean)
+		.filter(l => l.charAt(0) !== '#')
+		.map(mapGitIgnorePatternTo(base));
+}
+
+const getGitIgnoreFilter = opts => {
 	const ignore = opts.ignores || [];
 	const cwd = opts.cwd || process.cwd();
 
-	return globby
-		.sync('**/.gitignore', {ignore, cwd})
-		.map(filename => {
-			const fullFilename = path.join(cwd, filename);
-			const patterns = parseGitignore(fullFilename);
-			const base = slash(path.relative(cwd, path.dirname(fullFilename)));
+	const i = globby.sync('**/.gitignore', {ignore, cwd})
+		.reduce((ignores, file) => {
+			const fileName = path.join(cwd, file);
+			const content = fs.readFileSync(fileName).toString();
+			ignores.add(parseGitIgnore(content, {cwd, fileName}));
+			return ignores;
+		}, gitIgnore());
 
-			return patterns
-				.map(pattern => {
-					const negate = !pattern.startsWith('!');
-					const patternPath = negate ? pattern : pattern.substr(1);
-					return {negate, pattern: path.posix.join(base, patternPath)};
-				})
-				.map(item => item.negate ? `!${item.pattern}` : item.pattern);
-		})
-		.reduce((a, b) => a.concat(b), []);
+	return p => !i.ignores(slash(path.relative(cwd, p)));
 }
 
 const preprocess = opts => {
@@ -268,4 +281,4 @@ exports.groupConfigs = groupConfigs;
 exports.preprocess = preprocess;
 exports.emptyOptions = emptyOptions;
 exports.getIgnores = getIgnores;
-exports.getGitIgnores = getGitIgnores;
+exports.getGitIgnoreFilter = getGitIgnoreFilter;
