@@ -234,9 +234,11 @@ const getIgnores = opts => {
 };
 
 const mapGitIgnorePatternTo = base => ignore => {
-	const negated = ignore.charAt(0) === '!';
-	const pattern = path.posix.join(base, negated ? ignore.slice(1) : ignore);
-	return negated ? '!' + pattern : pattern;
+	if (ignore.startsWith('!')) {
+		return '!' + path.posix.join(base, ignore.substr(1));
+	}
+
+	return path.posix.join(base, ignore);
 };
 
 const parseGitIgnore = (content, opts) => {
