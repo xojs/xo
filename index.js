@@ -89,11 +89,11 @@ function mergeReports(reports) {
 	let errorCount = 0;
 	let warningCount = 0;
 
-	reports.forEach(report => {
+	for (const report of reports) {
 		results = results.concat(report.results);
 		errorCount += report.errorCount;
 		warningCount += report.warningCount;
-	});
+	}
 
 	return {
 		errorCount,

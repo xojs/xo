@@ -2,7 +2,6 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-
 const arrify = require('arrify');
 const deepAssign = require('deep-assign');
 const globby = require('globby');
@@ -48,8 +47,8 @@ const DEFAULT_CONFIG = {
 const normalizeOpts = opts => {
 	opts = Object.assign({}, opts);
 
-	// Alias to help humans
-	[
+	// Aliases for humans
+	const aliases = [
 		'env',
 		'global',
 		'ignore',
@@ -58,14 +57,16 @@ const normalizeOpts = opts => {
 		'setting',
 		'extend',
 		'extension'
-	].forEach(singular => {
+	];
+
+	for (const singular of aliases) {
 		const plural = singular + 's';
 		let value = opts[plural] || opts[singular];
 
 		delete opts[singular];
 
 		if (value === undefined) {
-			return;
+			continue;
 		}
 
 		if (singular !== 'rule' && singular !== 'setting') {
@@ -73,17 +74,17 @@ const normalizeOpts = opts => {
 		}
 
 		opts[plural] = value;
-	});
+	}
 
 	return opts;
-}
+};
 
 const mergeWithPkgConf = opts => {
 	opts = Object.assign({cwd: process.cwd()}, opts);
 	opts.cwd = path.resolve(opts.cwd);
 	const conf = pkgConf.sync('xo', {cwd: opts.cwd, skipOnFalse: true});
 	return Object.assign({}, conf, opts);
-}
+};
 
 // Define the shape of deep properties for deepAssign
 const emptyOptions = () => ({
@@ -123,7 +124,10 @@ const buildConfig = opts => {
 	}
 
 	if (opts.esnext !== false) {
-		config.baseConfig.extends = ['xo/esnext', path.join(__dirname, 'config/plugins.js')];
+		config.baseConfig.extends = [
+			'xo/esnext',
+			path.join(__dirname, 'config/plugins.js')
+		];
 	}
 
 	if (opts.rules) {
@@ -139,7 +143,7 @@ const buildConfig = opts => {
 	}
 
 	if (opts.extends && opts.extends.length > 0) {
-		// TODO: this logic needs to be improved, preferably use the same code as ESLint
+		// TODO: This logic needs to be improved, preferably use the same code as ESLint
 		// user's configs must be resolved to their absolute paths
 		const configs = opts.extends.map(name => {
 			// Don't do anything if it's a filepath
@@ -169,7 +173,7 @@ const buildConfig = opts => {
 	}
 
 	return config;
-}
+};
 
 // Builds a list of overrides for a particular path, and a hash value.
 // The hash value is a binary representation of which elements in the `overrides` array apply to the path.
@@ -179,33 +183,33 @@ const findApplicableOverrides = (path, overrides) => {
 	let hash = 0;
 	const applicable = [];
 
-	overrides.forEach(override => {
+	for (const override of overrides) {
 		hash <<= 1;
 
 		if (multimatch(path, override.files).length > 0) {
 			applicable.push(override);
 			hash |= 1;
 		}
-	});
+	}
 
 	return {
 		hash,
 		applicable
 	};
-}
+};
 
 const mergeApplicableOverrides = (baseOptions, applicableOverrides) => {
 	applicableOverrides = applicableOverrides.map(normalizeOpts);
 	const overrides = [emptyOptions(), baseOptions].concat(applicableOverrides);
 	return deepAssign.apply(null, overrides);
-}
+};
 
 // Creates grouped sets of merged options together with the paths they apply to.
 const groupConfigs = (paths, baseOptions, overrides) => {
 	const map = {};
 	const arr = [];
 
-	paths.forEach(x => {
+	for (const x of paths) {
 		const data = findApplicableOverrides(x, overrides);
 
 		if (!map[data.hash]) {
@@ -219,33 +223,31 @@ const groupConfigs = (paths, baseOptions, overrides) => {
 		}
 
 		map[data.hash].paths.push(x);
-	});
+	}
 
 	return arr;
-}
+};
 
 const getIgnores = opts => {
 	opts.ignores = DEFAULT_IGNORE.concat(opts.ignores || []);
 	return opts;
-}
+};
 
-const mapGitIgnorePatternTo = base => {
-	return ignore => {
-		const negated = ignore.charAt(0) === '!';
-		const pattern = path.posix.join(base, negated ? ignore.slice(1) : ignore);
-		return negated ? '!' + pattern : pattern;
-	};
-}
+const mapGitIgnorePatternTo = base => ignore => {
+	const negated = ignore.charAt(0) === '!';
+	const pattern = path.posix.join(base, negated ? ignore.slice(1) : ignore);
+	return negated ? '!' + pattern : pattern;
+};
 
 const parseGitIgnore = (content, opts) => {
 	const base = slash(path.relative(opts.cwd, path.dirname(opts.fileName)));
 
 	return content
-		.split(/\r\n|\n/)
+		.split(/\r?\n/)
 		.filter(Boolean)
 		.filter(l => l.charAt(0) !== '#')
 		.map(mapGitIgnorePatternTo(base));
-}
+};
 
 const getGitIgnoreFilter = opts => {
 	const ignore = opts.ignores || [];
@@ -254,13 +256,13 @@ const getGitIgnoreFilter = opts => {
 	const i = globby.sync('**/.gitignore', {ignore, cwd})
 		.reduce((ignores, file) => {
 			const fileName = path.join(cwd, file);
-			const content = fs.readFileSync(fileName).toString();
+			const content = fs.readFileSync(fileName, 'utf8');
 			ignores.add(parseGitIgnore(content, {cwd, fileName}));
 			return ignores;
 		}, gitIgnore());
 
 	return p => !i.ignores(slash(path.relative(cwd, p)));
-}
+};
 
 const preprocess = opts => {
 	opts = mergeWithPkgConf(opts);
@@ -269,7 +271,7 @@ const preprocess = opts => {
 	opts.extensions = DEFAULT_EXTENSION.concat(opts.extensions || []);
 
 	return opts;
-}
+};
 
 exports.DEFAULT_IGNORE = DEFAULT_IGNORE;
 exports.DEFAULT_CONFIG = DEFAULT_CONFIG;

@@ -21,7 +21,7 @@ const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
-const xo = require('./');
+const xo = require('.');
 
 const cli = meow(`
 	Usage
@@ -82,7 +82,7 @@ const opts = cli.flags;
 
 const log = report => {
 	// legacy
-	// TODO: remove in 1.0.0
+	// TODO: Remove in 1.0.0
 	if (opts.compact) {
 		opts.reporter = 'compact';
 	}
