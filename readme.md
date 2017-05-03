@@ -65,6 +65,7 @@ $ xo --help
     --quiet           Show only errors and no warnings
     --extension       Additional extension to lint [Can be set multiple times]
     --no-esnext       Don't enforce ES2015+ rules
+    --cwd=<dir>       Working directory for files
     --stdin           Validate/fix code from stdin
     --stdin-filename  Specify a filename for the --stdin option
 
