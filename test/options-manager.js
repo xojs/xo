@@ -192,15 +192,18 @@ test('ignore ignored .gitignore', t => {
 	t.deepEqual(actual, expected);
 });
 
-test('patterns should be translated according to process.cwd()', t => {
+test.serial('patterns should be translated according to process.cwd()', t => {
 	const previous = process.cwd();
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	process.chdir(cwd);
-	const filter = manager.getGitIgnoreFilter({});
-	const actual = ['bar.js', 'test/foo.js', 'test/bar.js'].filter(filter);
-	const expected = ['bar.js', 'test/bar.js'];
-	t.deepEqual(actual, expected);
-	process.chdir(previous);
+	try {
+		const filter = manager.getGitIgnoreFilter({});
+		const actual = ['bar.js', 'test/foo.js', 'test/bar.js'].filter(filter);
+		const expected = ['bar.js', 'test/bar.js'];
+		t.deepEqual(actual, expected);
+	} finally {
+		process.chdir(previous);
+	}
 });
 
 test('mergeWithPkgConf: use child if closest', t => {
