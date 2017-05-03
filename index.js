@@ -7,6 +7,38 @@ const multimatch = require('multimatch');
 const arrify = require('arrify');
 const optionsManager = require('./options-manager');
 
+const mergeReports = reports => {
+	// Merge multiple reports into a single report
+	let results = [];
+	let errorCount = 0;
+	let warningCount = 0;
+
+	for (const report of reports) {
+		results = results.concat(report.results);
+		errorCount += report.errorCount;
+		warningCount += report.warningCount;
+	}
+
+	return {
+		errorCount,
+		warningCount,
+		results
+	};
+};
+
+const processReport = (report, opts) => {
+	report.results = opts.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
+	return report;
+};
+
+const runEslint = (paths, opts) => {
+	const config = optionsManager.buildConfig(opts);
+	const engine = new eslint.CLIEngine(config);
+	const report = engine.executeOnFiles(paths, config);
+
+	return processReport(report, opts);
+};
+
 exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
@@ -82,38 +114,6 @@ exports.lintFiles = (patterns, opts) => {
 		return mergeReports(grouped.map(data => runEslint(data.paths, data.opts)));
 	});
 };
-
-function mergeReports(reports) {
-	// Merge multiple reports into a single report
-	let results = [];
-	let errorCount = 0;
-	let warningCount = 0;
-
-	for (const report of reports) {
-		results = results.concat(report.results);
-		errorCount += report.errorCount;
-		warningCount += report.warningCount;
-	}
-
-	return {
-		errorCount,
-		warningCount,
-		results
-	};
-}
-
-function runEslint(paths, opts) {
-	const config = optionsManager.buildConfig(opts);
-	const engine = new eslint.CLIEngine(config);
-	const report = engine.executeOnFiles(paths, config);
-
-	return processReport(report, opts);
-}
-
-function processReport(report, opts) {
-	report.results = opts.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
-	return report;
-}
 
 exports.getFormatter = eslint.CLIEngine.getFormatter;
 exports.getErrorResults = eslint.CLIEngine.getErrorResults;
