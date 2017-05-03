@@ -30,6 +30,7 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "files": [
+    "gitignore-filter.js",
     "index.js",
     "cli.js",
     "options-manager.js",
