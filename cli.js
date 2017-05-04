@@ -21,6 +21,7 @@ const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
+const openEditor = require('open-editor');
 const xo = require('.');
 
 const cli = meow(`
@@ -98,56 +99,12 @@ const open = report => {
 		return;
 	}
 
-	const editor = process.env.EDITOR;
-
-	if (!editor) {
-		console.log(`
-\`open\` option was used, but your $EDITOR environment variable is empty.
-Fix it by setting path to your editor of choice in ~/.bashrc or ~/.zshrc:
-
-    export EDITOR=atom
-`);
-		return;
-	}
-
-	const executableName = editor.split(path.sep).pop();
-	const lineColumn = message => `${message.line}:${message.column}`;
-	const args = [];
-
-	report.results
+	const files = report.results
 		.filter(file => file.errorCount > 0)
-		.forEach(file => {
-			// VS Code requires --goto option for path:line:column
-			if (executableName === 'code') {
-				args.push('--goto');
-			}
+		.map(file => file.filePath);
 
-			// Sublime Text, Atom, and VS Code support opening file at exact position
-			if (['subl', 'atom', 'code'].indexOf(executableName) >= 0) {
-				args.push(file.filePath + ':' + lineColumn(file.messages[0]));
-				return;
-			}
-
-			// WebStorm supports opening file on a specific line (no column support)
-			if (executableName === 'wstorm') {
-				args.push(file.filePath + ':' + file.messages[0].line);
-				return;
-			}
-
-			// TextMate requires a `--line` option
-			if (executableName === 'mate') {
-				args.push('--line', lineColumn(file.messages[0]), file.filePath);
-				return;
-			}
-
-			args.push(file.filePath);
-		});
-
-	spawn(editor, args, {
-		detached: true,
-		stdio: 'ignore'
-	}).unref();
-}
+	openEditor(files);
+};
 
 // `xo -` => `xo --stdin`
 if (input[0] === '-') {
