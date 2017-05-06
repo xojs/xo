@@ -23,7 +23,8 @@ const DEFAULT_IGNORE = [
 	'fixture{s,}/**',
 	'{test,tests,spec,__tests__}/fixture{s,}/**',
 	'vendor/**',
-	'dist/**'
+	'dist/**',
+	'yarn-cache/**'
 ];
 
 const DEFAULT_EXTENSION = [
