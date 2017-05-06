@@ -4,7 +4,7 @@ import proxyquire from 'proxyquire';
 
 process.chdir(__dirname);
 
-const manager = proxyquire('../options-manager', {
+const manager = proxyquire('../lib/options-manager', {
 	'resolve-from': (cwd, path) => `cwd/${path}`
 });
 

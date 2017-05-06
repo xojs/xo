@@ -6,7 +6,7 @@ import childConfig from './fixtures/nested/child/package';
 
 process.chdir(__dirname);
 
-const manager = proxyquire('../options-manager', {
+const manager = proxyquire('../lib/options-manager', {
 	'resolve-from': (cwd, path) => `cwd/${path}`
 });
 

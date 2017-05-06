@@ -5,7 +5,7 @@ const globby = require('globby');
 const isEqual = require('lodash.isequal');
 const multimatch = require('multimatch');
 const arrify = require('arrify');
-const optionsManager = require('./options-manager');
+const optionsManager = require('./lib/options-manager');
 
 const mergeReports = reports => {
 	// Merge multiple reports into a single report
