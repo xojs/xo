@@ -15,8 +15,6 @@ if (!hasFlag('no-local') && localCLI && localCLI !== __filename) {
 	return;
 }
 
-const path = require('path');
-const spawn = require('child_process').spawn;
 const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
 const meow = require('meow');
@@ -101,7 +99,11 @@ const open = report => {
 
 	const files = report.results
 		.filter(file => file.errorCount > 0)
-		.map(file => file.filePath);
+		.map(file => ({
+			file: file.filePath,
+			line: file.messages[0].line,
+			column: file.messages[0].column
+		}));
 
 	openEditor(files);
 };
