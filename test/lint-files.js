@@ -1,6 +1,6 @@
 import path from 'path';
 import test from 'ava';
-import fn from '../';
+import fn from '..';
 
 process.chdir(__dirname);
 

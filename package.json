@@ -102,9 +102,6 @@
     "pify": "^2.3.0",
     "proxyquire": "^1.7.3",
     "temp-write": "^3.1.0",
-    "xo": "sindresorhus/xo#v0.17.1"
-  },
-  "xo": {
-    "esnext": true
+    "xo": "sindresorhus/xo#v0.18.2"
   }
 }

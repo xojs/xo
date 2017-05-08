@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import test from 'ava';
 import pify from 'pify';
-import fn from '../';
+import fn from '..';
 
 process.chdir(__dirname);
 

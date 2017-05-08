@@ -68,7 +68,6 @@ $ xo --help
     --cwd=<dir>       Working directory for files
     --stdin           Validate/fix code from stdin
     --stdin-filename  Specify a filename for the --stdin option
-    --version         Show the version number
 
   Examples
     $ xo
@@ -117,7 +116,7 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
     "test": "ava"
   },
   "devDependencies": {
-    "ava": "^0.16.0"
+    "ava": "^0.19.0"
   }
 }
 ```
@@ -131,7 +130,7 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
     "test": "xo && ava"
   },
   "devDependencies": {
-    "ava": "^0.16.0",
+    "ava": "^0.19.0",
     "xo": "^0.18.0"
   }
 }
