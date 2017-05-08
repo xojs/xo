@@ -19,6 +19,11 @@
       "name": "Mario Nebl",
       "email": "hello@mario-nebl.de",
       "url": "github.com/marionebl"
+    },
+    {
+      "name": "Michael Mayer",
+      "email": "michael@schnittstabil.de",
+      "url": "github.com/schnittstabil"
     }
   ],
   "bin": "cli.js",
