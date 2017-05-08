@@ -6,7 +6,7 @@ import childConfig from './fixtures/nested/child/package';
 
 process.chdir(__dirname);
 
-const manager = proxyquire('../options-manager', {
+const manager = proxyquire('../lib/options-manager', {
 	'resolve-from': (cwd, path) => `cwd/${path}`
 });
 
@@ -170,37 +170,6 @@ test('groupConfigs', t => {
 		obj.opts = Object.assign(manager.emptyOptions(), obj.opts);
 		return obj;
 	}));
-});
-
-test('gitignore', t => {
-	const cwd = path.join(__dirname, 'fixtures/gitignore/test');
-	const filter = manager.getGitIgnoreFilter({cwd});
-	const actual = ['foo.js', 'bar.js'].filter(filter);
-	const expected = ['bar.js'];
-	t.deepEqual(actual, expected);
-});
-
-test('ignore ignored .gitignore', t => {
-	const opts = {
-		cwd: path.join(__dirname, 'fixtures/gitignore'),
-		ignores: ['**/test/**']
-	};
-
-	const filter = manager.getGitIgnoreFilter(opts);
-	const actual = ['foo.js'].filter(filter);
-	const expected = ['foo.js'];
-	t.deepEqual(actual, expected);
-});
-
-test('patterns should be translated according to process.cwd()', t => {
-	const previous = process.cwd();
-	const cwd = path.join(__dirname, 'fixtures/gitignore');
-	process.chdir(cwd);
-	const filter = manager.getGitIgnoreFilter({});
-	const actual = ['bar.js', 'test/foo.js', 'test/bar.js'].filter(filter);
-	const expected = ['bar.js', 'test/bar.js'];
-	t.deepEqual(actual, expected);
-	process.chdir(previous);
 });
 
 test('mergeWithPkgConf: use child if closest', t => {

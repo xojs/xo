@@ -26,14 +26,13 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "xo && nyc ava",
+    "test": "node main.js && xo && nyc ava",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "files": [
-    "index.js",
-    "cli.js",
-    "options-manager.js",
-    "config"
+    "config",
+    "lib",
+    "*.js"
   ],
   "keywords": [
     "❤️",

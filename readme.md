@@ -68,6 +68,7 @@ $ xo --help
     --cwd=<dir>       Working directory for files
     --stdin           Validate/fix code from stdin
     --stdin-filename  Specify a filename for the --stdin option
+    --version         Show the version number
 
   Examples
     $ xo
