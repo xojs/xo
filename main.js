@@ -77,20 +77,20 @@ const log = report => {
 	process.exit(report.errorCount === 0 ? 0 : 1);
 };
 
+const files = (report, predicate) => report.results
+	.filter(predicate)
+	.map(result => ({
+		file: result.filePath,
+		line: result.messages[0].line,
+		column: result.messages[0].column
+	}));
+
 const open = report => {
-	if (report.errorCount === 0) {
-		return;
+	if (report.errorCount > 0) {
+		openEditor(files(report, result => result.errorCount > 0));
+	}	else if (report.warningCount > 0) {
+		openEditor(files(report, result => result.warningCount > 0));
 	}
-
-	const files = report.results
-		.filter(file => file.errorCount > 0)
-		.map(file => ({
-			file: file.filePath,
-			line: file.messages[0].line,
-			column: file.messages[0].column
-		}));
-
-	openEditor(files);
 };
 
 // `xo -` => `xo --stdin`
