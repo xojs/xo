@@ -171,7 +171,7 @@ Additional global variables your code accesses during execution.
 
 Type: `Array`
 
-Some [paths](https://github.com/sindresorhus/xo/blob/master/options-manager.js) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
+Some [paths](https://github.com/sindresorhus/xo/blob/master/lib/options-manager.js) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
 
 ### space
 
