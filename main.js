@@ -79,6 +79,7 @@ const log = report => {
 
 const files = (report, predicate) => report.results
 	.filter(predicate)
+	.sort((a, b) => a.errorCount + b.errorCount > 0 ? (a.errorCount - b.errorCount) : (a.warningCount - b.warningCount))
 	.map(result => ({
 		file: result.filePath,
 		line: result.messages[0].line,
