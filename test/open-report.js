@@ -3,27 +3,24 @@ import path from 'path';
 import proxyquire from 'proxyquire';
 import fn from '..';
 
-const openReport = proxyquire('../lib/open-report', {
-	'open-editor': files => files
-});
-
 process.chdir(__dirname);
 
 test('opens nothing when there are no errors nor warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/successes/*');
 	const results = await fn.lintFiles(glob);
 
-	const actual = openReport(results);
-	const expected = [];
+	const openReport = proxyquire('../lib/open-report', {
+		'open-editor': () => t.fail()
+	});
 
-	t.deepEqual(actual, expected);
+	openReport(results);
+	t.pass();
 });
 
 test('only opens errors if there are errors and warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/**');
 	const results = await fn.lintFiles(glob);
 
-	const actual = openReport(results);
 	const expected = [
 		{
 			file: path.join(__dirname, 'fixtures/open-report/errors/one.js'),
@@ -42,14 +39,16 @@ test('only opens errors if there are errors and warnings', async t => {
 		}
 	];
 
-	t.deepEqual(actual, expected);
+	const openReport = proxyquire('../lib/open-report', {
+		'open-editor': files => t.deepEqual(files, expected)
+	});
+	openReport(results);
 });
 
 test('only opens warnings if there are no errors', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/warnings/*');
 	const results = await fn.lintFiles(glob);
 
-	const actual = openReport(results);
 	const expected = [
 		{
 			file: path.join(__dirname, 'fixtures/open-report/warnings/one.js'),
@@ -63,5 +62,8 @@ test('only opens warnings if there are no errors', async t => {
 		}
 	];
 
-	t.deepEqual(actual, expected);
+	const openReport = proxyquire('../lib/open-report', {
+		'open-editor': files => t.deepEqual(files, expected)
+	});
+	openReport(results);
 });
