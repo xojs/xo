@@ -70,7 +70,7 @@
     "simple"
   ],
   "dependencies": {
-    "arrify": "^1.0.0",
+    "arrify": "^1.0.1",
     "debug": "^2.2.0",
     "deep-assign": "^1.0.0",
     "eslint": "^3.18.0",
