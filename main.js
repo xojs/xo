@@ -49,11 +49,20 @@ const cli = meow(`
 	],
 	boolean: [
 		'init',
-		'compact',
-		'stdin',
 		'fix',
-		'open'
+		// TODO: We need to be able to tell whether it was specified
+		// or not as CLI arguments overrides package.json config
+		// 'semicolon',
+		'open',
+		'quiet',
+		'esnext',
+		'stdin',
+		'compact'
 	],
+	default: {
+		// -semicolon: true,
+		esnext: true
+	},
 	alias: {
 		'stdin-filename': 'filename'
 	}
