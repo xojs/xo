@@ -84,23 +84,24 @@ exports.lintText = (str, opts) => {
 	return processReport(report, opts);
 };
 
-exports.lintFiles = (patterns, opts) => {
+exports.lintFiles = (inputPatterns, opts) => {
 	opts = optionsManager.preprocess(opts);
-	patterns = patterns.length === 0 ? ['**/*'] : arrify(patterns);
 
+	const defaultPattern = `**/*.{${opts.extensions.join(',')}}`;
+	const patterns = inputPatterns.length === 0 ? [defaultPattern] : arrify(inputPatterns);
 	const ignoreFilter = optionsManager.getGitIgnoreFilter(opts);
 
 	return globby(patterns, {ignore: opts.ignores, nodir: true, cwd: opts.cwd}).then(paths => {
 		// Filter out unwanted file extensions
-		// for silly users that don't specify an extension in the glob pattern
-
-		paths = paths
-			.filter(ignoreFilter)
-			.filter(x => {
-				// Remove dot before the actual extension
-				const ext = path.extname(x).replace('.', '');
+		// For silly users that don't specify an extension in the glob pattern
+		if (inputPatterns.length > 0) {
+			paths = paths.filter(filePath => {
+				const ext = path.extname(filePath).replace('.', '');
 				return opts.extensions.indexOf(ext) !== -1;
 			});
+		}
+
+		paths = paths.filter(ignoreFilter);
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
