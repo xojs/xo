@@ -84,17 +84,19 @@ exports.lintText = (str, opts) => {
 	return processReport(report, opts);
 };
 
-exports.lintFiles = (inputPatterns, opts) => {
+exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
 
+	const isEmptyPatterns = patterns.length === 0;
 	const defaultPattern = `**/*.{${opts.extensions.join(',')}}`;
-	const patterns = inputPatterns.length === 0 ? [defaultPattern] : arrify(inputPatterns);
 	const ignoreFilter = optionsManager.getGitIgnoreFilter(opts);
+
+	patterns = isEmptyPatterns ? [defaultPattern] : arrify(patterns);
 
 	return globby(patterns, {ignore: opts.ignores, nodir: true, cwd: opts.cwd}).then(paths => {
 		// Filter out unwanted file extensions
 		// For silly users that don't specify an extension in the glob pattern
-		if (inputPatterns.length > 0) {
+		if (!isEmptyPatterns) {
 			paths = paths.filter(filePath => {
 				const ext = path.extname(filePath).replace('.', '');
 				return opts.extensions.indexOf(ext) !== -1;
