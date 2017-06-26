@@ -4,7 +4,7 @@ const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
-const openEditor = require('open-editor');
+const openReport = require('./lib/open-report');
 const xo = require('.');
 
 const cli = meow(`
@@ -86,22 +86,6 @@ const log = report => {
 	process.exit(report.errorCount === 0 ? 0 : 1);
 };
 
-const open = report => {
-	if (report.errorCount === 0) {
-		return;
-	}
-
-	const files = report.results
-		.filter(file => file.errorCount > 0)
-		.map(file => ({
-			file: file.filePath,
-			line: file.messages[0].line,
-			column: file.messages[0].column
-		}));
-
-	openEditor(files);
-};
-
 // `xo -` => `xo --stdin`
 if (input[0] === '-') {
 	opts.stdin = true;
@@ -131,7 +115,7 @@ if (opts.init) {
 		}
 
 		if (opts.open) {
-			open(report);
+			openReport(report);
 		}
 
 		log(report);
