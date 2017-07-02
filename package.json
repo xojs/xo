@@ -91,8 +91,8 @@
 		"open-editor": "^1.0.1",
 		"path-exists": "^3.0.0",
 		"pkg-conf": "^2.0.0",
-		"resolve-cwd": "^1.0.0",
-		"resolve-from": "^2.0.0",
+		"resolve-cwd": "^2.0.0",
+		"resolve-from": "^3.0.0",
 		"slash": "^1.0.0",
 		"update-notifier": "^2.1.0",
 		"xo-init": "^0.5.0"
@@ -100,11 +100,11 @@
 	"devDependencies": {
 		"ava": "*",
 		"coveralls": "^2.11.9",
-		"eslint-config-xo-react": "^0.10.0",
-		"eslint-plugin-react": "^6.3.0",
-		"execa": "^0.6.1",
-		"nyc": "^10.1.2",
-		"pify": "^2.3.0",
+		"eslint-config-xo-react": "^0.12.0",
+		"eslint-plugin-react": "^7.1.0",
+		"execa": "^0.7.0",
+		"nyc": "^11.0.3",
+		"pify": "^3.0.0",
 		"proxyquire": "^1.7.3",
 		"temp-write": "^3.1.0",
 		"xo": "sindresorhus/xo#v0.18.2"

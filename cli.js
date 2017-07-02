@@ -4,7 +4,7 @@
 const resolveCwd = require('resolve-cwd');
 const hasFlag = require('has-flag');
 
-const localCLI = resolveCwd('xo/cli');
+const localCLI = resolveCwd.silent('xo/cli');
 
 // Prefer the local installation of XO
 if (!hasFlag('no-local') && localCLI && localCLI !== __filename) {

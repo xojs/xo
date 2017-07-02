@@ -111,13 +111,13 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
 
 ```json
 {
-  "name": "awesome-package",
-  "scripts": {
-    "test": "ava"
-  },
-  "devDependencies": {
-    "ava": "^0.19.0"
-  }
+	"name": "awesome-package",
+	"scripts": {
+		"test": "ava"
+	},
+	"devDependencies": {
+		"ava": "^0.20.0"
+	}
 }
 ```
 
@@ -125,14 +125,14 @@ Simply run `$ xo --init` (with any options) to add XO to your package.json or cr
 
 ```json
 {
-  "name": "awesome-package",
-  "scripts": {
-    "test": "xo && ava"
-  },
-  "devDependencies": {
-    "ava": "^0.19.0",
-    "xo": "^0.18.0"
-  }
+	"name": "awesome-package",
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"devDependencies": {
+		"ava": "^0.20.0",
+		"xo": "^0.18.0"
+	}
 }
 ```
 
@@ -145,10 +145,10 @@ You can configure some options in XO by putting it in package.json:
 
 ```json
 {
-  "name": "awesome-package",
-  "xo": {
-    "space": true
-  }
+	"name": "awesome-package",
+	"xo": {
+		"space": true
+	}
 }
 ```
 
@@ -243,21 +243,21 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 
 ```json
 {
-  "xo": {
-    "semicolon": false,
-    "space": 2,
-    "overrides": [
-      {
-        "files": "test/*.js",
-        "esnext": false,
-        "space": 3
-      },
-      {
-         "files": "test/foo.js",
-         "esnext": true
-      }
-    ]
-  }
+	"xo": {
+		"semicolon": false,
+		"space": 2,
+		"overrides": [
+			{
+				"files": "test/*.js",
+				"esnext": false,
+				"space": 3
+			},
+			{
+				 "files": "test/foo.js",
+				 "esnext": true
+			}
+		]
+	}
 }
 ```
 
@@ -267,9 +267,9 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 
 ```json
 {
-  "esnext": false,
-  "semicolon": false,
-  "space": 3
+	"esnext": false,
+	"semicolon": false,
+	"space": 3
 }
 ```
 
@@ -277,9 +277,9 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 
 ```json
 {
-  "esnext": true,
-  "semicolon": false,
-  "space": 3
+	"esnext": true,
+	"semicolon": false,
+	"space": 3
 }
 ```
 
