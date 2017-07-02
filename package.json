@@ -1,112 +1,112 @@
 {
-  "name": "xo",
-  "version": "0.18.2",
-  "description": "JavaScript happiness style linter ❤️",
-  "license": "MIT",
-  "repository": "sindresorhus/xo",
-  "author": {
-    "name": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "sindresorhus.com"
-  },
-  "maintainers": [
-    {
-      "name": "James Talmage",
-      "email": "james@talmage.io",
-      "url": "github.com/jamestalmage"
-    },
-    {
-      "name": "Mario Nebl",
-      "email": "hello@mario-nebl.de",
-      "url": "github.com/marionebl"
-    },
-    {
-      "name": "Michael Mayer",
-      "email": "michael@schnittstabil.de",
-      "url": "github.com/schnittstabil"
-    }
-  ],
-  "bin": "cli.js",
-  "engines": {
-    "node": ">=4"
-  },
-  "scripts": {
-    "test": "node main.js && xo && nyc ava",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
-  },
-  "files": [
-    "config",
-    "lib",
-    "*.js"
-  ],
-  "keywords": [
-    "❤️",
-    "cli-app",
-    "cli",
-    "xo",
-    "xoxo",
-    "hugs",
-    "kisses",
-    "happy",
-    "happiness",
-    "code",
-    "quality",
-    "style",
-    "lint",
-    "linter",
-    "jscs",
-    "jshint",
-    "jslint",
-    "eslint",
-    "validate",
-    "code style",
-    "standard",
-    "strict",
-    "check",
-    "checker",
-    "verify",
-    "enforce",
-    "hint",
-    "simple"
-  ],
-  "dependencies": {
-    "arrify": "^1.0.0",
-    "debug": "^2.2.0",
-    "deep-assign": "^1.0.0",
-    "eslint": "^3.18.0",
-    "eslint-config-xo": "^0.18.0",
-    "eslint-formatter-pretty": "^1.0.0",
-    "eslint-plugin-ava": "^4.2.0",
-    "eslint-plugin-import": "^2.0.0",
-    "eslint-plugin-no-use-extend-native": "^0.3.2",
-    "eslint-plugin-promise": "^3.4.0",
-    "eslint-plugin-unicorn": "^2.1.0",
-    "get-stdin": "^5.0.0",
-    "globby": "^6.0.0",
-    "has-flag": "^2.0.0",
-    "ignore": "^3.2.6",
-    "lodash.isequal": "^4.4.0",
-    "meow": "^3.4.2",
-    "multimatch": "^2.1.0",
-    "open-editor": "^1.0.1",
-    "path-exists": "^3.0.0",
-    "pkg-conf": "^2.0.0",
-    "resolve-cwd": "^1.0.0",
-    "resolve-from": "^2.0.0",
-    "slash": "^1.0.0",
-    "update-notifier": "^2.1.0",
-    "xo-init": "^0.5.0"
-  },
-  "devDependencies": {
-    "ava": "*",
-    "coveralls": "^2.11.9",
-    "eslint-config-xo-react": "^0.10.0",
-    "eslint-plugin-react": "^6.3.0",
-    "execa": "^0.6.1",
-    "nyc": "^10.1.2",
-    "pify": "^2.3.0",
-    "proxyquire": "^1.7.3",
-    "temp-write": "^3.1.0",
-    "xo": "sindresorhus/xo#v0.18.2"
-  }
+	"name": "xo",
+	"version": "0.18.2",
+	"description": "JavaScript happiness style linter ❤️",
+	"license": "MIT",
+	"repository": "sindresorhus/xo",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},
+	"maintainers": [
+		{
+			"name": "James Talmage",
+			"email": "james@talmage.io",
+			"url": "github.com/jamestalmage"
+		},
+		{
+			"name": "Mario Nebl",
+			"email": "hello@mario-nebl.de",
+			"url": "github.com/marionebl"
+		},
+		{
+			"name": "Michael Mayer",
+			"email": "michael@schnittstabil.de",
+			"url": "github.com/schnittstabil"
+		}
+	],
+	"bin": "cli.js",
+	"engines": {
+		"node": ">=4"
+	},
+	"scripts": {
+		"test": "node main.js && xo && nyc ava",
+		"coveralls": "nyc report --reporter=text-lcov | coveralls"
+	},
+	"files": [
+		"config",
+		"lib",
+		"*.js"
+	],
+	"keywords": [
+		"❤️",
+		"cli-app",
+		"cli",
+		"xo",
+		"xoxo",
+		"hugs",
+		"kisses",
+		"happy",
+		"happiness",
+		"code",
+		"quality",
+		"style",
+		"lint",
+		"linter",
+		"jscs",
+		"jshint",
+		"jslint",
+		"eslint",
+		"validate",
+		"code style",
+		"standard",
+		"strict",
+		"check",
+		"checker",
+		"verify",
+		"enforce",
+		"hint",
+		"simple"
+	],
+	"dependencies": {
+		"arrify": "^1.0.0",
+		"debug": "^2.2.0",
+		"deep-assign": "^1.0.0",
+		"eslint": "^3.18.0",
+		"eslint-config-xo": "^0.18.0",
+		"eslint-formatter-pretty": "^1.0.0",
+		"eslint-plugin-ava": "^4.2.0",
+		"eslint-plugin-import": "^2.0.0",
+		"eslint-plugin-no-use-extend-native": "^0.3.2",
+		"eslint-plugin-promise": "^3.4.0",
+		"eslint-plugin-unicorn": "^2.1.0",
+		"get-stdin": "^5.0.0",
+		"globby": "^6.0.0",
+		"has-flag": "^2.0.0",
+		"ignore": "^3.2.6",
+		"lodash.isequal": "^4.4.0",
+		"meow": "^3.4.2",
+		"multimatch": "^2.1.0",
+		"open-editor": "^1.0.1",
+		"path-exists": "^3.0.0",
+		"pkg-conf": "^2.0.0",
+		"resolve-cwd": "^1.0.0",
+		"resolve-from": "^2.0.0",
+		"slash": "^1.0.0",
+		"update-notifier": "^2.1.0",
+		"xo-init": "^0.5.0"
+	},
+	"devDependencies": {
+		"ava": "*",
+		"coveralls": "^2.11.9",
+		"eslint-config-xo-react": "^0.10.0",
+		"eslint-plugin-react": "^6.3.0",
+		"execa": "^0.6.1",
+		"nyc": "^10.1.2",
+		"pify": "^2.3.0",
+		"proxyquire": "^1.7.3",
+		"temp-write": "^3.1.0",
+		"xo": "sindresorhus/xo#v0.18.2"
+	}
 }
