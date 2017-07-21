@@ -86,7 +86,7 @@
 		"has-flag": "^2.0.0",
 		"ignore": "^3.2.6",
 		"lodash.isequal": "^4.4.0",
-		"meow": "^3.4.2",
+		"meow": "^3.7.0",
 		"multimatch": "^2.1.0",
 		"open-editor": "^1.0.1",
 		"path-exists": "^3.0.0",
