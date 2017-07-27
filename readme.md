@@ -358,7 +358,7 @@ Show the world you're using XO → [![XO code style](https://img.shields.io/badg
 
 ## Team
 
-[![Sindre Sorhus](https://avatars.githubusercontent.com/u/170270?s=130)](https://sindresorhus.com) | [![James Talmage](https://avatars.githubusercontent.com/u/4082216?s=130)](https://github.com/jamestalmage) | [![Mario Nebl](https://avatars.githubusercontent.com/u/4248851?s=130)](https://github.com/marionebl) | [![Michael Mayer](https://avatars.githubusercontent.com/u/6059032?s=130)](https://github.com/schnittstabil)
+[![Sindre Sorhus](https://github.com/sindresorhus.png?size=130)](https://sindresorhus.com) | [![James Talmage](https://github.com/jamestalmage.png?size=130)](https://github.com/jamestalmage) | [![Mario Nebl](https://github.com/marionebl.png?size=130)](https://github.com/marionebl) | [![Michael Mayer](https://github.com/schnittstabil.png?size=130)](https://github.com/schnittstabil)
 ---|---|---|---
 [Sindre Sorhus](https://sindresorhus.com) | [James Talmage](https://github.com/jamestalmage) | [Mario Nebl](https://github.com/marionebl) | [Michael Mayer](https://github.com/schnittstabil)
 
