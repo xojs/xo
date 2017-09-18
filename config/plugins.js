@@ -15,7 +15,8 @@ module.exports = {
 		'ava',
 		'unicorn',
 		'promise',
-		'import'
+		'import',
+		'no-shit'
 	],
 	extends: [
 		'plugin:ava/recommended',
@@ -60,6 +61,7 @@ module.exports = {
 		'import/no-unresolved': ['error', {commonjs: true}],
 		'import/order': 'error',
 		'import/prefer-default-export': 'error',
-		'import/no-unassigned-import': 'error'
+		'import/no-unassigned-import': 'error',
+		'no-shit/be-polite': ['warn', {nsfw: true}]
 	}
 };

@@ -95,6 +95,11 @@ test('prevent use of extended native objects', t => {
 	t.true(hasRule(results, 'no-use-extend-native/no-use-extend-native'));
 });
 
+test('prevent offensive language', t => {
+	const results = fn.lintText('var shit;').results;
+	t.true(hasRule(results, 'no-shit/be-polite'));
+});
+
 test('extends support', t => {
 	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
 		extends: 'xo-react'
