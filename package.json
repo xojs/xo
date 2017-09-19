@@ -101,6 +101,7 @@
 		"ava": "*",
 		"coveralls": "^2.11.9",
 		"eslint-config-xo-react": "^0.12.0",
+		"eslint-plugin-no-shit": "0.0.2",
 		"eslint-plugin-react": "^7.1.0",
 		"execa": "^0.7.0",
 		"nyc": "^11.0.3",
