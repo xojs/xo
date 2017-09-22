@@ -72,7 +72,6 @@
 	"dependencies": {
 		"arrify": "^1.0.0",
 		"debug": "^2.2.0",
-		"deep-assign": "^1.0.0",
 		"eslint": "^3.18.0",
 		"eslint-config-xo": "^0.18.0",
 		"eslint-formatter-pretty": "^1.0.0",
@@ -86,6 +85,7 @@
 		"has-flag": "^2.0.0",
 		"ignore": "^3.2.6",
 		"lodash.isequal": "^4.4.0",
+		"lodash.mergewith": "^4.6.0",
 		"meow": "^3.4.2",
 		"multimatch": "^2.1.0",
 		"open-editor": "^1.0.1",
