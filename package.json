@@ -31,7 +31,7 @@
 		"node": ">=4"
 	},
 	"scripts": {
-		"test": "node main.js && xo && nyc ava",
+		"test": "node main.js && eslint . && nyc ava",
 		"coveralls": "nyc report --reporter=text-lcov | coveralls"
 	},
 	"files": [
@@ -106,7 +106,12 @@
 		"nyc": "^11.0.3",
 		"pify": "^3.0.0",
 		"proxyquire": "^1.7.3",
-		"temp-write": "^3.1.0",
-		"xo": "sindresorhus/xo#v0.18.2"
-	}
+		"temp-write": "^3.1.0"
+	},
+	"eslintConfig": {
+		"extends": "eslint-config-xo"
+	},
+	"eslintIgnore": [
+		"test/fixtures"
+	]
 }
