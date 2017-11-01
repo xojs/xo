@@ -309,6 +309,10 @@ The [Standard style](http://standardjs.com) is a really cool idea. I too wish we
 
 XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/sindresorhus/eslint-config-xo).
 
+#### Does it support TypeScript?
+
+Not yet, but we have a [shareable config for TSLint](https://github.com/sindresorhus/tslint-xo).
+
 
 ## Editor plugins
 
@@ -336,6 +340,7 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
 - [stylelint-config-xo](https://github.com/sindresorhus/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/sindresorhus/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
+- [tslint-xo](https://github.com/sindresorhus/tslint-xo) - TSLint shareable config for XO
 
 
 ## Support
