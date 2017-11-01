@@ -331,9 +331,11 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 ## Configs
 
-- [eslint-config-xo](https://github.com/sindresorhus/eslint-config-xo) - ESLint shareable config for XO
+- [eslint-config-xo](https://github.com/sindresorhus/eslint-config-xo) - ESLint shareable config for XO with tab indent
 - [eslint-config-xo-space](https://github.com/sindresorhus/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
 - [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
+- [stylelint-config-xo](https://github.com/sindresorhus/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
+- [stylelint-config-xo-space](https://github.com/sindresorhus/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
 
 
 ## Support
