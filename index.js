@@ -89,7 +89,7 @@ module.exports.lintFiles = (patterns, opts) => {
 
 	const globbyOptions = {
 		cwd: opts.cwd,
-		gitIgnore: true,
+		gitignore: true,
 		ignore: opts.ignores,
 		nodir: true
 	};
