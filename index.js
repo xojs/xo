@@ -90,8 +90,7 @@ module.exports.lintFiles = (patterns, opts) => {
 	const globbyOptions = {
 		cwd: opts.cwd,
 		gitignore: true,
-		ignore: opts.ignores,
-		nodir: true
+		ignore: opts.ignores
 	};
 
 	const isEmptyPatterns = patterns.length === 0;
