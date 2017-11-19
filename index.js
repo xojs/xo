@@ -61,10 +61,10 @@ module.exports.lintText = (str, opts) => {
 
 	if (opts.filename) {
 		const filename = path.relative(opts.cwd, opts.filename);
-		const isIgnored = multimatch(filename, opts.ignores).length > 0;
-		const isGitIgnored = !optionsManager.getGitIgnoreFilter(opts)(opts.filename);
+		const isIgnored = f => multimatch(f, opts.ignores).length > 0;
+		const isGitIgnored = globby.gitignore.sync({cwd: opts.cwd, ignore: opts.ignores});
 
-		if (isIgnored || isGitIgnored) {
+		if (isIgnored(filename) || isGitIgnored(opts.filename)) {
 			return {
 				errorCount: 0,
 				warningCount: 0,
