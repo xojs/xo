@@ -15,7 +15,8 @@ module.exports = {
 		'ava',
 		'unicorn',
 		'promise',
-		'import'
+		'import',
+		'node'
 	],
 	extends: [
 		'plugin:ava/recommended',
@@ -64,6 +65,22 @@ module.exports = {
 		'import/prefer-default-export': 'error',
 		'import/no-unassigned-import': ['error', {
 			allow: ['babel-polyfill', '@babel/polyfill', 'babel-register', '@babel/register']
-		}]
+		}],
+		// Redundant with import/no-extraneous-dependencies
+		// 'node/no-extraneous-import': 'error',
+		// 'node/no-extraneous-require': 'error',
+		// Redundant with import/no-unresolved
+		// 'node/no-missing-import': 'error',
+		// 'node/no-missing-require': 'error',
+		'node/no-unpublished-bin': 'error',
+		'node/no-unpublished-import': ['error', {allowModules: ['electron', 'atom']}],
+		'node/no-unpublished-require': ['error', {allowModules: ['electron', 'atom']}],
+		// Disabled as the rule doesn't allow to exclude compiled sources
+		// 'node/no-unsupported-features': 'error',
+		'node/process-exit-as-throw': 'error',
+		// Disable as the rule doesn't exclude scripts executed with node but not referenced in "bin" (i.e main.js)
+		// 'node/shebang': 'error',
+		'node/no-deprecated-api': 'error',
+		'node/exports-style': ['error', 'module.exports', {allowBatchAssign: true}]
 	}
 };

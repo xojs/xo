@@ -78,6 +78,7 @@
 		"eslint-plugin-ava": "^4.2.0",
 		"eslint-plugin-import": "^2.0.0",
 		"eslint-plugin-no-use-extend-native": "^0.3.2",
+		"eslint-plugin-node": "^5.2.1",
 		"eslint-plugin-promise": "^3.6.0",
 		"eslint-plugin-unicorn": "^2.1.0",
 		"get-stdin": "^5.0.0",
