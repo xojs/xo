@@ -109,6 +109,28 @@ test('extends support with `esnext` option', t => {
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
+test('disable style rules when `prettier` option is enabled', t => {
+	const withoutPrettier = fn.lintText('(a) => {}\n', {}).results;
+	// `arrow-parens` is enabled
+	t.true(hasRule(withoutPrettier, 'arrow-parens'));
+	// `prettier/prettier` is disabled
+	t.false(hasRule(withoutPrettier, 'prettier/prettier'));
+
+	const withPrettier = fn.lintText('(a) => {}\n', {prettier: true}).results;
+	// `arrow-parens` is disabled by `eslint-config-prettier`
+	t.false(hasRule(withPrettier, 'arrow-parens'));
+	// `prettier/prettier` is enabled
+	t.true(hasRule(withPrettier, 'prettier/prettier'));
+});
+
+test('extends `react` support with `prettier` option', t => {
+	const results = fn.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true}).results;
+	// `react/jsx-curly-spacing` is disabled by `eslint-config-prettier`
+	t.false(hasRule(results, 'react/jsx-curly-spacing'));
+	// `prettier/prettier` is enabled
+	t.true(hasRule(results, 'prettier/prettier'));
+});
+
 test('always use the latest ECMAScript parser so esnext syntax won\'t throw in normal mode', t => {
 	const results = fn.lintText('async function foo() {}\n\nfoo();\n').results;
 	t.is(results[0].errorCount, 0);

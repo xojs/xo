@@ -72,6 +72,15 @@ test('buildConfig: semicolon', t => {
 	});
 });
 
+test('buildConfig: prettier: true', t => {
+	const config = manager.buildConfig({prettier: true, extends: ['xo-react']});
+
+	t.deepEqual(config.plugins, ['prettier']);
+	t.deepEqual(config.rules, {'prettier/prettier': 'error'});
+	// eslint-prettier-config must always be last
+	t.deepEqual(config.baseConfig.extends.slice(-1), ['prettier']);
+});
+
 test('buildConfig: rules', t => {
 	const rules = {'object-curly-spacing': ['error', 'always']};
 	const config = manager.buildConfig({rules});
