@@ -54,7 +54,7 @@ module.exports = {
 		// 'import/unambiguous': 'error',
 		// enable this sometime in the future when Node.js has ES2015 module support
 		// 'import/no-commonjs': 'error',
-		// looks useful, but too unstable at the moment
+		// Looks useful, but too unstable at the moment
 		// 'import/no-deprecated': 'error',
 		'import/no-extraneous-dependencies': 'error',
 		'import/no-mutable-exports': 'error',
@@ -78,7 +78,7 @@ module.exports = {
 		// Disabled as the rule doesn't allow to exclude compiled sources
 		// 'node/no-unsupported-features': 'error',
 		'node/process-exit-as-throw': 'error',
-		// Disable as the rule doesn't exclude scripts executed with node but not referenced in "bin" (i.e main.js)
+		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin" (i.e main.js)
 		// 'node/shebang': 'error',
 		'node/no-deprecated-api': 'error',
 		'node/exports-style': ['error', 'module.exports', {allowBatchAssign: true}]
