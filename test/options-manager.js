@@ -76,9 +76,24 @@ test('buildConfig: prettier: true', t => {
 	const config = manager.buildConfig({prettier: true, extends: ['xo-react']});
 
 	t.deepEqual(config.plugins, ['prettier']);
-	t.deepEqual(config.rules, {'prettier/prettier': 'error'});
+	// Sets the default values of XO `space` and `semicolon` options
+	t.deepEqual(config.rules, {'prettier/prettier': ['error', {tabWidth: 2, semi: true}]});
 	// eslint-prettier-config must always be last
 	t.deepEqual(config.baseConfig.extends.slice(-1), ['prettier']);
+});
+
+test('buildConfig: prettier: true, semicolon: false', t => {
+	const config = manager.buildConfig({prettier: true, semicolon: false});
+
+	// Sets the value of XO `semicolon` options to the `prettier/prettier` rule
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {tabWidth: 2, semi: false}]);
+});
+
+test('buildConfig: prettier: true, space: 4', t => {
+	const config = manager.buildConfig({prettier: true, space: 4});
+
+	// Sets the value of XO `space` options to the `prettier/prettier` rule
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {tabWidth: 4, semi: true}]);
 });
 
 test('buildConfig: rules', t => {
