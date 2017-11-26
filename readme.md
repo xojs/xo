@@ -59,7 +59,7 @@ $ xo --help
     --ignore          Additional paths to ignore  [Can be set multiple times]
     --space           Use space indent instead of tabs  [Default: 2]
     --no-semicolon    Prevent use of semicolons
-		--prettier        Format code with Prettier [Default: false]
+    --prettier        Format code with Prettier
     --plugin          Include third-party plugins  [Can be set multiple times]
     --extend          Extend defaults with a custom config  [Can be set multiple times]
     --open            Open files with issues in your editor
@@ -203,7 +203,7 @@ Set it to `false` to enforce no-semicolon style.
 Type: `boolean`<br>
 Default: `false`
 
-Set it to `true` to format with [Prettier](https://github.com/prettier/prettier). The [Prettier options](https://prettier.io/docs/en/options.html) will be read from the [Prettier configuration](https://prettier.io/docs/en/configuration.html)
+Format code with [Prettier](https://github.com/prettier/prettier). The [Prettier options](https://prettier.io/docs/en/options.html) will be read from the [Prettier config](https://prettier.io/docs/en/configuration.html)
 
 ### plugins
 
