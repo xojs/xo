@@ -44,27 +44,67 @@ const cli = meow(`
 	Tips
 	  Put options in package.json instead of using flags so other tools can read it.
 `, {
-	string: [
-		'_'
-	],
-	boolean: [
-		'init',
-		'fix',
+	flags: {
+		init: {
+			type: 'boolean'
+		},
+		fix: {
+			type: 'boolean'
+		},
+		reporter: {
+			type: 'string'
+		},
+		env: {
+			type: 'string'
+		},
+		global: {
+			type: 'string'
+		},
+		ignore: {
+			type: 'string'
+		},
+		space: {
+			type: 'string'
+		},
 		// TODO: We need to be able to tell whether it was specified
 		// or not as CLI arguments overrides package.json config
-		// 'semicolon',
-		'open',
-		'quiet',
-		'esnext',
-		'stdin',
-		'compact'
-	],
-	default: {
-		// -semicolon: true,
-		esnext: true
-	},
-	alias: {
-		'stdin-filename': 'filename'
+		// semicolon: {
+		// 	type: 'boolean',
+		// 	default: true
+		// },
+		plugin: {
+			type: 'string'
+		},
+		extend: {
+			type: 'string'
+		},
+		open: {
+			type: 'boolean'
+		},
+		quiet: {
+			type: 'boolean'
+		},
+		extension: {
+			type: 'string'
+		},
+		esnext: {
+			type: 'boolean',
+			default: true
+		},
+		cwd: {
+			type: 'string'
+		},
+		stdin: {
+			type: 'boolean'
+		},
+		stdinFilename: {
+			type: 'string',
+			alias: 'filename'
+		},
+		// TODO: Remove in 1.0.0
+		compact: {
+			type: 'boolean'
+		}
 	}
 });
 
