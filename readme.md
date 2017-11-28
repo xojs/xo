@@ -366,9 +366,9 @@ Show the world you're using XO → [![XO code style](https://img.shields.io/badg
 
 ## Team
 
-[![Sindre Sorhus](https://github.com/sindresorhus.png?size=130)](https://sindresorhus.com) | [![James Talmage](https://github.com/jamestalmage.png?size=130)](https://github.com/jamestalmage) | [![Mario Nebl](https://github.com/marionebl.png?size=130)](https://github.com/marionebl) | [![Michael Mayer](https://github.com/schnittstabil.png?size=130)](https://github.com/schnittstabil)
----|---|---|---
-[Sindre Sorhus](https://sindresorhus.com) | [James Talmage](https://github.com/jamestalmage) | [Mario Nebl](https://github.com/marionebl) | [Michael Mayer](https://github.com/schnittstabil)
+[![Sindre Sorhus](https://github.com/sindresorhus.png?size=130)](https://sindresorhus.com) | [![James Talmage](https://github.com/jamestalmage.png?size=130)](https://github.com/jamestalmage) | [![Mario Nebl](https://github.com/marionebl.png?size=130)](https://github.com/marionebl) | [![Michael Mayer](https://github.com/schnittstabil.png?size=130)](https://github.com/schnittstabil) | [![Pierre Vanduynslager](https://github.com/pvdlg.png?size=130)](https://github.com/pvdlg)
+---|---|---|---|---
+[Sindre Sorhus](https://sindresorhus.com) | [James Talmage](https://github.com/jamestalmage) | [Mario Nebl](https://github.com/marionebl) | [Michael Mayer](https://github.com/schnittstabil) | [Pierre Vanduynslager](https://github.com/pvdlg)
 
 
 ## License
