@@ -39,7 +39,7 @@ const runEslint = (paths, opts) => {
 	return processReport(report, opts);
 };
 
-exports.lintText = (str, opts) => {
+module.exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
 	if (opts.overrides && opts.overrides.length > 0) {
@@ -84,7 +84,7 @@ exports.lintText = (str, opts) => {
 	return processReport(report, opts);
 };
 
-exports.lintFiles = (patterns, opts) => {
+module.exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
 
 	const isEmptyPatterns = patterns.length === 0;
@@ -118,6 +118,6 @@ exports.lintFiles = (patterns, opts) => {
 	});
 };
 
-exports.getFormatter = eslint.CLIEngine.getFormatter;
-exports.getErrorResults = eslint.CLIEngine.getErrorResults;
-exports.outputFixes = eslint.CLIEngine.outputFixes;
+module.exports.getFormatter = eslint.CLIEngine.getFormatter;
+module.exports.getErrorResults = eslint.CLIEngine.getErrorResults;
+module.exports.outputFixes = eslint.CLIEngine.outputFixes;

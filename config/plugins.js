@@ -15,7 +15,8 @@ module.exports = {
 		'ava',
 		'unicorn',
 		'promise',
-		'import'
+		'import',
+		'node'
 	],
 	extends: [
 		'plugin:ava/recommended',
@@ -53,7 +54,7 @@ module.exports = {
 		// 'import/unambiguous': 'error',
 		// enable this sometime in the future when Node.js has ES2015 module support
 		// 'import/no-commonjs': 'error',
-		// looks useful, but too unstable at the moment
+		// Looks useful, but too unstable at the moment
 		// 'import/no-deprecated': 'error',
 		'import/no-extraneous-dependencies': 'error',
 		'import/no-mutable-exports': 'error',
@@ -64,6 +65,22 @@ module.exports = {
 		'import/prefer-default-export': 'error',
 		'import/no-unassigned-import': ['error', {
 			allow: ['babel-polyfill', '@babel/polyfill', 'babel-register', '@babel/register']
-		}]
+		}],
+		// Redundant with import/no-extraneous-dependencies
+		// 'node/no-extraneous-import': 'error',
+		// 'node/no-extraneous-require': 'error',
+		// Redundant with import/no-unresolved
+		// 'node/no-missing-import': 'error',
+		// 'node/no-missing-require': 'error',
+		'node/no-unpublished-bin': 'error',
+		'node/no-unpublished-import': ['error', {allowModules: ['electron', 'atom']}],
+		'node/no-unpublished-require': ['error', {allowModules: ['electron', 'atom']}],
+		// Disabled as the rule doesn't allow to exclude compiled sources
+		// 'node/no-unsupported-features': 'error',
+		'node/process-exit-as-throw': 'error',
+		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin". See https://github.com/mysticatea/eslint-plugin-node/issues/96
+		// 'node/shebang': 'error',
+		'node/no-deprecated-api': 'error',
+		'node/exports-style': ['error', 'module.exports']
 	}
 };
