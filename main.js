@@ -73,6 +73,9 @@ const cli = meow(`
 		// 	type: 'boolean',
 		// 	default: true
 		// },
+		prettier: {
+			type: 'boolean'
+		},
 		plugin: {
 			type: 'string'
 		},
