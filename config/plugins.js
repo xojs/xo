@@ -81,6 +81,6 @@ module.exports = {
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin" (i.e main.js)
 		// 'node/shebang': 'error',
 		'node/no-deprecated-api': 'error',
-		'node/exports-style': ['error', 'module.exports', {allowBatchAssign: true}]
+		'node/exports-style': ['error', 'module.exports']
 	}
 };
