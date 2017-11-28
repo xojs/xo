@@ -322,6 +322,7 @@ Not yet, but we have a [shareable config for TSLint](https://github.com/sindreso
 - [TextMate 2](https://github.com/claylo/XO.tmbundle)
 - [VSCode](https://github.com/SamVerschueren/vscode-linter-xo)
 - [Emacs](https://github.com/j-em/xo-emacs)
+- [WebStorm](https://github.com/jamestalmage/xo-with-webstorm)
 
 
 ## Build-system plugins
