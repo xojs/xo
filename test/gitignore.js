@@ -11,7 +11,7 @@ const manager = proxyquire('../lib/options-manager', {
 test('gitignore', t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore/test');
 	const filter = manager.getGitIgnoreFilter({cwd});
-	const actual = ['foo.js', 'bar.js'].filter(filter);
+	const actual = ['foo.js', 'bar.js'].filter(v => filter(v));
 	const expected = ['bar.js'];
 	t.deepEqual(actual, expected);
 });
@@ -23,7 +23,7 @@ test('ignore ignored .gitignore', t => {
 	};
 
 	const filter = manager.getGitIgnoreFilter(opts);
-	const actual = ['foo.js'].filter(filter);
+	const actual = ['foo.js'].filter(v => filter(v));
 	const expected = ['foo.js'];
 	t.deepEqual(actual, expected);
 });
@@ -34,7 +34,7 @@ test.serial('patterns should be translated according to process.cwd()', t => {
 	process.chdir(cwd);
 	try {
 		const filter = manager.getGitIgnoreFilter({});
-		const actual = ['bar.js', 'test/foo.js', 'test/bar.js'].filter(filter);
+		const actual = ['bar.js', 'test/foo.js', 'test/bar.js'].filter(v => filter(v));
 		const expected = ['bar.js', 'test/bar.js'];
 		t.deepEqual(actual, expected);
 	} finally {
