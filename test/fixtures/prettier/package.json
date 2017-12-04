@@ -1,0 +1,11 @@
+{
+	"prettier": {
+		"useTabs": false,
+		"semi": false,
+		"tabWidth": 4,
+		"bracketSpacing": false,
+		"jsxBracketSameLine": false,
+		"singleQuote": false,
+		"trailingComma": "all"
+	}
+}
