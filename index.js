@@ -103,7 +103,7 @@ module.exports.lintFiles = (patterns, opts) => {
 			});
 		}
 
-		paths = paths.filter(ignoreFilter);
+		paths = paths.filter(v => ignoreFilter(v));
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
