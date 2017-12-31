@@ -20,6 +20,7 @@ const cli = meow(`
 	  --ignore          Additional paths to ignore  [Can be set multiple times]
 	  --space           Use space indent instead of tabs  [Default: 2]
 	  --no-semicolon    Prevent use of semicolons
+	  --prettier        Conform to Prettier code style
 	  --plugin          Include third-party plugins  [Can be set multiple times]
 	  --extend          Extend defaults with a custom config  [Can be set multiple times]
 	  --open            Open files with issues in your editor
@@ -72,6 +73,9 @@ const cli = meow(`
 		// 	type: 'boolean',
 		// 	default: true
 		// },
+		prettier: {
+			type: 'boolean'
+		},
 		plugin: {
 			type: 'string'
 		},

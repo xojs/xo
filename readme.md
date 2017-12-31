@@ -32,6 +32,7 @@ Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be
 - Fix many issues automagically with `$ xo --fix`.
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
 - Specify [indent](#indent) and [semicolon](#semicolon) preferences easily without messing with the rule config.
+- Optionally use the [Prettier](https://github.com/prettier/prettier) code style.
 - Great [editor plugins](#editor-plugins).
 
 
@@ -59,6 +60,7 @@ $ xo --help
     --ignore          Additional paths to ignore  [Can be set multiple times]
     --space           Use space indent instead of tabs  [Default: 2]
     --no-semicolon    Prevent use of semicolons
+    --prettier        Conform to Prettier code style
     --plugin          Include third-party plugins  [Can be set multiple times]
     --extend          Extend defaults with a custom config  [Can be set multiple times]
     --open            Open files with issues in your editor
@@ -196,6 +198,13 @@ Type: `boolean`<br>
 Default: `true` *(semicolons required)*
 
 Set it to `false` to enforce no-semicolon style.
+
+### prettier
+
+Type: `boolean`<br>
+Default: `false`
+
+Format code with [Prettier](https://github.com/prettier/prettier). The [Prettier options](https://prettier.io/docs/en/options.html) will be read from the [Prettier config](https://prettier.io/docs/en/configuration.html)
 
 ### plugins
 

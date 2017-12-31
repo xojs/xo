@@ -3,6 +3,7 @@ import test from 'ava';
 import proxyquire from 'proxyquire';
 import parentConfig from './fixtures/nested/package';
 import childConfig from './fixtures/nested/child/package';
+import prettierConfig from './fixtures/prettier/package';
 
 process.chdir(__dirname);
 
@@ -70,6 +71,85 @@ test('buildConfig: semicolon', t => {
 			after: true
 		}]
 	});
+});
+
+test('buildConfig: prettier: true', t => {
+	const config = manager.buildConfig({prettier: true, extends: ['xo-react']});
+
+	t.deepEqual(config.plugins, ['prettier']);
+	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
+	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
+	t.deepEqual(config.rules, {
+		'prettier/prettier': ['error', {
+			useTabs: true,
+			bracketSpacing: false,
+			jsxBracketSameLine: false,
+			semi: true,
+			singleQuote: true,
+			tabWidth: 2,
+			trailingComma: 'es5'
+		}]});
+	// eslint-prettier-config must always be last
+	t.deepEqual(config.baseConfig.extends.slice(-1), ['prettier']);
+});
+
+test('buildConfig: prettier: true, semicolon: false', t => {
+	const config = manager.buildConfig({prettier: true, semicolon: false});
+
+	// Sets the `semi` options in `prettier/prettier` based on the XO `semicolon` option
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+		useTabs: true,
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		semi: false,
+		singleQuote: true,
+		tabWidth: 2,
+		trailingComma: 'es5'
+	}]);
+});
+
+test('buildConfig: prettier: true, space: 4', t => {
+	const config = manager.buildConfig({prettier: true, space: 4});
+
+	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+		useTabs: false,
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		semi: true,
+		singleQuote: true,
+		tabWidth: 4,
+		trailingComma: 'es5'
+	}]);
+});
+
+test('buildConfig: prettier: true, esnext: false', t => {
+	const config = manager.buildConfig({prettier: true, esnext: false});
+
+	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+		useTabs: true,
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		semi: true,
+		singleQuote: true,
+		tabWidth: 2,
+		trailingComma: 'none'
+	}]);
+});
+
+test('mergeWithPrettierConf: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
+	const cwd = path.resolve('fixtures', 'prettier');
+	const result = manager.mergeWithPrettierConf({cwd});
+	const expected = Object.assign({}, prettierConfig.prettier, {tabWidth: 2, useTabs: true, semi: true});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from xo config', t => {
+	const cwd = path.resolve('fixtures', 'prettier');
+	const result = manager.mergeWithPrettierConf({cwd, space: 4, semicolon: false});
+	const expected = Object.assign({}, prettierConfig.prettier, {tabWidth: 4, useTabs: false, semi: false});
+	t.deepEqual(result, expected);
 });
 
 test('buildConfig: rules', t => {
