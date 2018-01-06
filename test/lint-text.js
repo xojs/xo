@@ -196,3 +196,11 @@ test('lint negatively gitignored files', async t => {
 
 	t.true(results[0].errorCount > 0);
 });
+
+test('respect stdinFilename path for option discovery', async t => {
+	const cwd = path.join(__dirname, 'fixtures/overrides');
+	const filename = path.join(cwd, 'index.js');
+	const text = await readFile(filename, 'utf-8');
+	const {results} = fn.lintText(text, {stdinFilename: filename});
+	t.is(results[0].errorCount, 0);
+});

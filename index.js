@@ -35,11 +35,15 @@ const runEslint = (paths, opts) => {
 	const config = optionsManager.buildConfig(opts);
 	const engine = new eslint.CLIEngine(config);
 	const report = engine.executeOnFiles(paths, config);
-
 	return processReport(report, opts);
 };
 
-module.exports.lintText = (str, opts) => {
+module.exports.lintText = (str, opts = {}) => {
+	if (opts.stdinFilename && !opts.cwd) {
+		opts.cwd = path.dirname(opts.stdinFilename);
+		opts.filename = opts.stdinFilename;
+	}
+
 	opts = optionsManager.preprocess(opts);
 
 	if (opts.overrides && opts.overrides.length > 0) {
@@ -84,10 +88,17 @@ module.exports.lintText = (str, opts) => {
 	return processReport(report, opts);
 };
 
-module.exports.lintFiles = (patterns, opts) => {
+module.exports.lintFiles = (patterns, opts = {}) => {
+	const isEmptyPatterns = patterns.length === 0;
+
+	if (!isEmptyPatterns && !opts.cwd) {
+		// Use file path rather process.cwd for analysing files
+		const cwd = path.dirname(arrify(patterns)[0]);
+		opts.cwd = cwd;
+	}
+
 	opts = optionsManager.preprocess(opts);
 
-	const isEmptyPatterns = patterns.length === 0;
 	const defaultPattern = `**/*.{${opts.extensions.join(',')}}`;
 	const ignoreFilter = optionsManager.getGitIgnoreFilter(opts);
 

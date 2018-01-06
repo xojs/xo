@@ -94,3 +94,9 @@ test('multiple negative patterns should act as positive patterns', async t => {
 
 	t.deepEqual(paths, ['!!unicorn.js', '!unicorn.js']);
 });
+
+test('respect file path for option discovery rather than process.cwd', async t => {
+	const filename = path.join(__dirname, 'fixtures', 'overrides', 'index.js');
+	const {results} = await fn.lintFiles(filename, {});
+	t.is(results[0].errorCount, 0);
+});
