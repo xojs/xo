@@ -4,6 +4,7 @@ import proxyquire from 'proxyquire';
 import parentConfig from './fixtures/nested/package';
 import childConfig from './fixtures/nested/child/package';
 import prettierConfig from './fixtures/prettier/package';
+import enginesConfig from './fixtures/engines/package';
 
 process.chdir(__dirname);
 
@@ -138,6 +139,88 @@ test('buildConfig: prettier: true, esnext: false', t => {
 	}]);
 });
 
+test('buildConfig: engines: undefined', t => {
+	const config = manager.buildConfig({});
+
+	// Do not include any node version specific rules
+	t.is(config.rules['prefer-spread'], undefined);
+	t.is(config.rules['prefer-rest-params'], undefined);
+	t.is(config.rules['prefer-destructuring'], undefined);
+	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+});
+
+test('buildConfig: engines: false', t => {
+	const config = manager.buildConfig({engines: false});
+
+	// Do not include any node version specific rules
+	t.is(config.rules['prefer-spread'], undefined);
+	t.is(config.rules['prefer-rest-params'], undefined);
+	t.is(config.rules['prefer-destructuring'], undefined);
+	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+});
+
+test('buildConfig: engines: invalid range', t => {
+	const config = manager.buildConfig({engines: {node: '4'}});
+
+	// Do not include any node version specific rules
+	t.is(config.rules['prefer-spread'], undefined);
+	t.is(config.rules['prefer-rest-params'], undefined);
+	t.is(config.rules['prefer-destructuring'], undefined);
+	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+});
+
+test('buildConfig: engines: >=4', t => {
+	const config = manager.buildConfig({engines: {node: '>=4'}});
+
+	// Do not include rules for Node 5 and above
+	t.is(config.rules['prefer-spread'], undefined);
+	// Do not include rules for Node 6 and above
+	t.is(config.rules['prefer-rest-params'], undefined);
+	t.is(config.rules['prefer-destructuring'], undefined);
+	// Do not include rules for Node 8 and above
+	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+});
+
+test('buildConfig: engines: >=4.1', t => {
+	const config = manager.buildConfig({engines: {node: '>=5.1'}});
+
+	// Do not include rules for Node 5 and above
+	t.is(config.rules['prefer-spread'], 'error');
+	// Do not include rules for Node 6 and above
+	t.is(config.rules['prefer-rest-params'], undefined);
+	t.is(config.rules['prefer-destructuring'], undefined);
+	// Do not include rules for Node 8 and above
+	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+});
+
+test('buildConfig: engines: >=6', t => {
+	const config = manager.buildConfig({engines: {node: '>=6'}});
+
+	// Include rules for Node 5 and above
+	t.is(config.rules['prefer-spread'], 'error');
+	// Include rules for Node 6 and above
+	t.is(config.rules['prefer-rest-params'], 'error');
+	t.deepEqual(config.rules['prefer-destructuring'], [
+		'error', {array: true, object: true}, {enforceForRenamedProperties: true}
+	]);
+	// Do not include rules for Node 8 and above
+	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+});
+
+test('buildConfig: engines: >=8', t => {
+	const config = manager.buildConfig({engines: {node: '>=8'}});
+
+	// Include rules for Node 5 and above
+	t.is(config.rules['prefer-spread'], 'error');
+	// Include rules for Node 6 and above
+	t.is(config.rules['prefer-rest-params'], 'error');
+	t.deepEqual(config.rules['prefer-destructuring'], [
+		'error', {array: true, object: true}, {enforceForRenamedProperties: true}
+	]);
+	// Include rules for Node 8 and above
+	t.is(config.rules['promise/prefer-await-to-then'], 'error');
+});
+
 test('mergeWithPrettierConf: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
 	const cwd = path.resolve('fixtures', 'prettier');
 	const result = manager.mergeWithPrettierConf({cwd});
@@ -255,26 +338,47 @@ test('groupConfigs', t => {
 test('mergeWithPkgConf: use child if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
 	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, childConfig.xo, {cwd});
+	const expected = Object.assign({}, childConfig.xo, {cwd}, {engines: {}});
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: use parent if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested');
 	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, parentConfig.xo, {cwd});
+	const expected = Object.assign({}, parentConfig.xo, {cwd}, {engines: {}});
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: use parent if child is ignored', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-ignore');
 	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, parentConfig.xo, {cwd});
+	const expected = Object.assign({}, parentConfig.xo, {cwd}, {engines: {}});
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: use child if child is empty', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
 	const result = manager.mergeWithPkgConf({cwd});
-	t.deepEqual(result, {cwd});
+	t.deepEqual(result, {cwd, engines: {}});
+});
+
+test('mergeWithPkgConf: read engines from package.json', t => {
+	const cwd = path.resolve('fixtures', 'engines');
+	const result = manager.mergeWithPkgConf({cwd});
+	const expected = Object.assign({}, {engines: enginesConfig.engines}, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: XO engine options supersede package.json\'s', t => {
+	const cwd = path.resolve('fixtures', 'engines');
+	const result = manager.mergeWithPkgConf({cwd, engines: {node: '>=8'}});
+	const expected = Object.assign({}, {engines: {node: '>=8'}}, {cwd});
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPkgConf: XO engine options false supersede package.json\'s', t => {
+	const cwd = path.resolve('fixtures', 'engines');
+	const result = manager.mergeWithPkgConf({cwd, engines: false});
+	const expected = Object.assign({}, {engines: false}, {cwd});
+	t.deepEqual(result, expected);
 });
