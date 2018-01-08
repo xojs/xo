@@ -61,10 +61,9 @@ module.exports.lintText = (str, opts) => {
 
 	if (opts.filename) {
 		const filename = path.relative(opts.cwd, opts.filename);
-		const isIgnored = f => multimatch(f, opts.ignores).length > 0;
-		const isGitIgnored = globby.gitignore.sync({cwd: opts.cwd, ignore: opts.ignores});
 
-		if (isIgnored(filename) || isGitIgnored(opts.filename)) {
+		if (multimatch(filename, opts.ignores).length > 0 ||
+			globby.gitignore.sync({cwd: opts.cwd, ignore: opts.ignores})(opts.filename)) {
 			return {
 				errorCount: 0,
 				warningCount: 0,
@@ -87,18 +86,13 @@ module.exports.lintText = (str, opts) => {
 module.exports.lintFiles = (patterns, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-	const globbyOptions = {
-		cwd: opts.cwd,
-		gitignore: true,
-		ignore: opts.ignores
-	};
-
 	const isEmptyPatterns = patterns.length === 0;
 	const defaultPattern = `**/*.{${opts.extensions.join(',')}}`;
 
-	patterns = isEmptyPatterns ? [defaultPattern] : arrify(patterns);
-
-	return globby(patterns, globbyOptions).then(paths => {
+	return globby(
+		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
+		{ignore: opts.ignores, gitignore: true, cwd: opts.cwd}
+	).then(paths => {
 		// Filter out unwanted file extensions
 		// For silly users that don't specify an extension in the glob pattern
 		if (!isEmptyPatterns) {
