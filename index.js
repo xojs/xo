@@ -61,10 +61,9 @@ module.exports.lintText = (str, opts) => {
 
 	if (opts.filename) {
 		const filename = path.relative(opts.cwd, opts.filename);
-		const isIgnored = multimatch(filename, opts.ignores).length > 0;
-		const isGitIgnored = !optionsManager.getGitIgnoreFilter(opts)(opts.filename);
 
-		if (isIgnored || isGitIgnored) {
+		if (multimatch(filename, opts.ignores).length > 0 ||
+			globby.gitignore.sync({cwd: opts.cwd, ignore: opts.ignores})(opts.filename)) {
 			return {
 				errorCount: 0,
 				warningCount: 0,
@@ -89,11 +88,11 @@ module.exports.lintFiles = (patterns, opts) => {
 
 	const isEmptyPatterns = patterns.length === 0;
 	const defaultPattern = `**/*.{${opts.extensions.join(',')}}`;
-	const ignoreFilter = optionsManager.getGitIgnoreFilter(opts);
 
-	patterns = isEmptyPatterns ? [defaultPattern] : arrify(patterns);
-
-	return globby(patterns, {ignore: opts.ignores, nodir: true, cwd: opts.cwd}).then(paths => {
+	return globby(
+		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
+		{ignore: opts.ignores, gitignore: true, cwd: opts.cwd}
+	).then(paths => {
 		// Filter out unwanted file extensions
 		// For silly users that don't specify an extension in the glob pattern
 		if (!isEmptyPatterns) {
@@ -102,8 +101,6 @@ module.exports.lintFiles = (patterns, opts) => {
 				return opts.extensions.indexOf(ext) !== -1;
 			});
 		}
-
-		paths = paths.filter(ignoreFilter);
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
