@@ -142,7 +142,7 @@ test('buildConfig: prettier: true, esnext: false', t => {
 test('buildConfig: engines: undefined', t => {
 	const config = manager.buildConfig({});
 
-	// Do not include any node version specific rules
+	// Do not include any Node.js version specific rules
 	t.is(config.rules['prefer-spread'], undefined);
 	t.is(config.rules['prefer-rest-params'], undefined);
 	t.is(config.rules['prefer-destructuring'], undefined);
@@ -152,7 +152,7 @@ test('buildConfig: engines: undefined', t => {
 test('buildConfig: engines: false', t => {
 	const config = manager.buildConfig({engines: false});
 
-	// Do not include any node version specific rules
+	// Do not include any Node.js version specific rules
 	t.is(config.rules['prefer-spread'], undefined);
 	t.is(config.rules['prefer-rest-params'], undefined);
 	t.is(config.rules['prefer-destructuring'], undefined);
@@ -162,7 +162,7 @@ test('buildConfig: engines: false', t => {
 test('buildConfig: engines: invalid range', t => {
 	const config = manager.buildConfig({engines: {node: '4'}});
 
-	// Do not include any node version specific rules
+	// Do not include any Node.js version specific rules
 	t.is(config.rules['prefer-spread'], undefined);
 	t.is(config.rules['prefer-rest-params'], undefined);
 	t.is(config.rules['prefer-destructuring'], undefined);
@@ -172,52 +172,52 @@ test('buildConfig: engines: invalid range', t => {
 test('buildConfig: engines: >=4', t => {
 	const config = manager.buildConfig({engines: {node: '>=4'}});
 
-	// Do not include rules for Node 5 and above
+	// Do not include rules for Node.js 5 and above
 	t.is(config.rules['prefer-spread'], undefined);
-	// Do not include rules for Node 6 and above
+	// Do not include rules for Node.js 6 and above
 	t.is(config.rules['prefer-rest-params'], undefined);
 	t.is(config.rules['prefer-destructuring'], undefined);
-	// Do not include rules for Node 8 and above
+	// Do not include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
 test('buildConfig: engines: >=4.1', t => {
 	const config = manager.buildConfig({engines: {node: '>=5.1'}});
 
-	// Do not include rules for Node 5 and above
+	// Do not include rules for Node.js 5 and above
 	t.is(config.rules['prefer-spread'], 'error');
-	// Do not include rules for Node 6 and above
+	// Do not include rules for Node.js 6 and above
 	t.is(config.rules['prefer-rest-params'], undefined);
 	t.is(config.rules['prefer-destructuring'], undefined);
-	// Do not include rules for Node 8 and above
+	// Do not include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
 test('buildConfig: engines: >=6', t => {
 	const config = manager.buildConfig({engines: {node: '>=6'}});
 
-	// Include rules for Node 5 and above
+	// Include rules for Node.js 5 and above
 	t.is(config.rules['prefer-spread'], 'error');
-	// Include rules for Node 6 and above
+	// Include rules for Node.js 6 and above
 	t.is(config.rules['prefer-rest-params'], 'error');
 	t.deepEqual(config.rules['prefer-destructuring'], [
 		'error', {array: true, object: true}, {enforceForRenamedProperties: true}
 	]);
-	// Do not include rules for Node 8 and above
+	// Do not include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
 test('buildConfig: engines: >=8', t => {
 	const config = manager.buildConfig({engines: {node: '>=8'}});
 
-	// Include rules for Node 5 and above
+	// Include rules for Node.js 5 and above
 	t.is(config.rules['prefer-spread'], 'error');
-	// Include rules for Node 6 and above
+	// Include rules for Node.js 6 and above
 	t.is(config.rules['prefer-rest-params'], 'error');
 	t.deepEqual(config.rules['prefer-destructuring'], [
 		'error', {array: true, object: true}, {enforceForRenamedProperties: true}
 	]);
-	// Include rules for Node 8 and above
+	// Include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], 'error');
 });
 
@@ -383,21 +383,21 @@ test('mergeWithPkgConf: XO engine options false supersede package.json\'s', t =>
 	t.deepEqual(result, expected);
 });
 
-test('getDefaultOverrides: add AVA override if node engine <=8', t => {
+test('getDefaultOverrides: add AVA override if Node.js engine <=8', t => {
 	const cwd = path.resolve('fixtures', 'engines');
 	const config = manager.getDefaultOverrides({cwd, engines: {node: '>=4'}});
 
 	t.deepEqual(config.overrides, [{engines: {nodes: '>=8'}, files: manager.AVA_DEFAULT_FILES}]);
 });
 
-test('getDefaultOverrides: add AVA override is node engine undefined', t => {
+test('getDefaultOverrides: add AVA override is Node.js engine undefined', t => {
 	const cwd = path.resolve('fixtures', 'engines');
 	const config = manager.getDefaultOverrides({cwd});
 
 	t.deepEqual(config.overrides, [{engines: {nodes: '>=8'}, files: manager.AVA_DEFAULT_FILES}]);
 });
 
-test('getDefaultOverrides: Ado not add AVA override if node engine >=8', t => {
+test('getDefaultOverrides: Ado not add AVA override if Node.js engine >=8', t => {
 	const cwd = path.resolve('fixtures', 'engines');
 	const config = manager.getDefaultOverrides({cwd, engines: {node: '>=8'}});
 
