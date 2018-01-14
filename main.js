@@ -22,7 +22,7 @@ const cli = meow(`
 	  --space           Use space indent instead of tabs  [Default: 2]
 	  --no-semicolon    Prevent use of semicolons
 	  --prettier        Conform to Prettier code style
-	  --node-version    Range of Node version to support
+	  --node-version    Range of Node.js version to support
 	  --plugin          Include third-party plugins  [Can be set multiple times]
 	  --extend          Extend defaults with a custom config  [Can be set multiple times]
 	  --open            Open files with issues in your editor
