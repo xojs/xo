@@ -62,7 +62,7 @@ $ xo --help
     --space           Use space indent instead of tabs  [Default: 2]
     --no-semicolon    Prevent use of semicolons
     --prettier        Conform to Prettier code style
-    --node-version    Range of Node version to support
+    --node-version    Range of Node.js version to support
     --plugin          Include third-party plugins  [Can be set multiple times]
     --extend          Extend defaults with a custom config  [Can be set multiple times]
     --open            Open files with issues in your editor
@@ -211,10 +211,10 @@ Format code with [Prettier](https://github.com/prettier/prettier). The [Prettier
 ### nodeVersion
 
 Type: `string`, `boolean`<br>
-Default: value of `engines.node` key in the project `package.json`
+Default: Value of the `engines.node` key in the project `package.json`
 
-Enable rules specific to the Node versions within the range configured.
-If set to `false` no rules specific to a Node version will be enable.
+Enable rules specific to the Node.js versions within the configured range.
+If set to `false`, no rules specific to a Node.js version will be enabled.
 
 ### plugins
 
