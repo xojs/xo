@@ -315,9 +315,9 @@ Put a `package.json` with your config at the root and add `"xo": false` to the `
 
 ### Transpilation
 
-If some files in your project are transpiled in order to support an older Node version you can use the [Config Overrides](#config-overrides) option to set a specific [nodeVersion](#nodeversion) target to these files.
+If some files in your project are transpiled in order to support an older Node.js version, you can use the [config overrides](#config-overrides) option to set a specific [`nodeVersion`](#nodeversion) target for these files.
 
-For example, if your project targets Node 4 (your `package.json` is configured with `engines.node` to `>=4`) and you are using [AVA](https://github.com/avajs/ava), then your test files are automatically transpiled. You can override `nodeVersion` for the tests files:
+For example, if your project targets Node.js 4 (your `package.json` is configured with `engines.node` set to `>=4`) and you are using [AVA](https://github.com/avajs/ava), then your test files are automatically transpiled. You can override `nodeVersion` for the tests files:
 
 ```json
 {
