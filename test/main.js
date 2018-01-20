@@ -57,7 +57,7 @@ test('ignore files in .gitignore', async t => {
 	const reports = JSON.parse(err.stdout);
 	const files = reports
 		.map(report => path.relative(cwd, report.filePath))
-		.map(slash);
+		.map(report => slash(report));
 	t.deepEqual(files, ['index.js', 'test/bar.js']);
 });
 
