@@ -16,7 +16,8 @@ module.exports = {
 		'unicorn',
 		'promise',
 		'import',
-		'node'
+		'node',
+		'jsdoc'
 	],
 	extends: [
 		'plugin:ava/recommended',
@@ -80,6 +81,9 @@ module.exports = {
 		// 'node/shebang': 'error',
 		'node/no-deprecated-api': 'error',
 		'node/exports-style': ['error', 'module.exports'],
+		'jsdoc/newline-after-description': 'warn',
+		'jsdoc/require-description-complete-sentence': 'warn',
+		'jsdoc/require-hyphen-before-param-description': 'warn',
 		// Disabled by default (overrides `plugin:unicorn/recommended`), will be enabled if supported by the Node.js version
 		'unicorn/prefer-spread': 'off',
 		'unicorn/no-new-buffer': 'off'
