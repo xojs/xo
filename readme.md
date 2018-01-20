@@ -313,6 +313,25 @@ If you have a directory structure with nested `package.json` files and you want 
 
 Put a `package.json` with your config at the root and add `"xo": false` to the `package.json` in your bundled packages.
 
+### Transpilation
+
+If some files in your project are transpiled in order to support an older Node version you can use the [Config Overrides](#config-overrides) option to set a specific [nodeVersion](#nodeversion) target to these files.
+
+For example, if your project targets Node 4 (your `package.json` is configured with `engines.node` to `>=4`) and you are using [AVA](https://github.com/avajs/ava), then your test files are automatically transpiled. You can override `nodeVersion` for the tests files:
+
+```json
+{
+	"xo": {
+		"overrides": [
+			{
+				"files": "{test,tests,spec,__tests__}/**/*.js",
+				"nodeVersion": ">=9"
+			}
+		]
+	}
+}
+```
+
 
 ## FAQ
 

@@ -382,24 +382,3 @@ test('mergeWithPkgConf: XO engine options false supersede package.json\'s', t =>
 	const expected = Object.assign({}, {engines: false}, {cwd});
 	t.deepEqual(result, expected);
 });
-
-test('getDefaultOverrides: add AVA override if Node.js engine <=8', t => {
-	const cwd = path.resolve('fixtures', 'engines');
-	const config = manager.getDefaultOverrides({cwd, engines: {node: '>=4'}});
-
-	t.deepEqual(config.overrides, [{engines: {nodes: '>=8'}, files: manager.AVA_DEFAULT_FILES}]);
-});
-
-test('getDefaultOverrides: add AVA override is Node.js engine undefined', t => {
-	const cwd = path.resolve('fixtures', 'engines');
-	const config = manager.getDefaultOverrides({cwd});
-
-	t.deepEqual(config.overrides, [{engines: {nodes: '>=8'}, files: manager.AVA_DEFAULT_FILES}]);
-});
-
-test('getDefaultOverrides: Ado not add AVA override if Node.js engine >=8', t => {
-	const cwd = path.resolve('fixtures', 'engines');
-	const config = manager.getDefaultOverrides({cwd, engines: {node: '>=8'}});
-
-	t.is(config.overrides, undefined);
-});

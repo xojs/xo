@@ -42,7 +42,7 @@ const runEslint = (paths, opts) => {
 module.exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-	if (opts.overrides && opts.overrides.length > 0 && opts.filename) {
+	if (opts.overrides && opts.overrides.length > 0) {
 		const overrides = opts.overrides;
 		delete opts.overrides;
 
