@@ -31,8 +31,6 @@ module.exports = {
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
 		'promise/param-names': 'error',
-		// Enable this sometime in the future when Node.js has async/await support
-		// 'promise/prefer-await-to-then': 'error',
 		'promise/no-return-wrap': ['error', {allowReject: true}],
 		'promise/no-return-in-finally': 'error',
 		'import/default': 'error',
