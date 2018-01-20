@@ -16,7 +16,8 @@ module.exports = {
 		'unicorn',
 		'promise',
 		'import',
-		'node'
+		'node',
+		'security'
 	],
 	extends: [
 		'plugin:ava/recommended',
@@ -81,6 +82,7 @@ module.exports = {
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin". See https://github.com/mysticatea/eslint-plugin-node/issues/96
 		// 'node/shebang': 'error',
 		'node/no-deprecated-api': 'error',
-		'node/exports-style': ['error', 'module.exports']
+		'node/exports-style': ['error', 'module.exports'],
+		'security/detect-unsafe-regex': 'error'
 	}
 };
