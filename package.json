@@ -9,23 +9,6 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "sindresorhus.com"
 	},
-	"maintainers": [
-		{
-			"name": "James Talmage",
-			"email": "james@talmage.io",
-			"url": "github.com/jamestalmage"
-		},
-		{
-			"name": "Mario Nebl",
-			"email": "hello@mario-nebl.de",
-			"url": "github.com/marionebl"
-		},
-		{
-			"name": "Michael Mayer",
-			"email": "michael@schnittstabil.de",
-			"url": "github.com/schnittstabil"
-		}
-	],
 	"bin": "cli.js",
 	"engines": {
 		"node": ">=4"
@@ -45,8 +28,6 @@
 		"cli",
 		"xo",
 		"xoxo",
-		"hugs",
-		"kisses",
 		"happy",
 		"happiness",
 		"code",
@@ -86,8 +67,7 @@
 		"eslint-plugin-unicorn": "^3.0.1",
 		"get-stdin": "^5.0.0",
 		"globby": "^7.1.1",
-		"has-flag": "^2.0.0",
-		"ignore": "^3.2.6",
+		"has-flag": "^3.0.0",
 		"lodash.isequal": "^4.4.0",
 		"lodash.mergewith": "^4.6.0",
 		"meow": "^4.0.0",
@@ -106,9 +86,9 @@
 	"devDependencies": {
 		"ava": "*",
 		"coveralls": "^3.0.0",
-		"eslint-config-xo-react": "^0.13.0",
+		"eslint-config-xo-react": "^0.15.0",
 		"eslint-plugin-react": "^7.1.0",
-		"execa": "^0.8.0",
+		"execa": "^0.9.0",
 		"nyc": "^11.0.3",
 		"pify": "^3.0.0",
 		"proxyquire": "^1.7.3",
