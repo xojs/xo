@@ -94,3 +94,9 @@ test('init option', async t => {
 	const packageJson = fs.readFileSync(filepath, 'utf8');
 	t.deepEqual(JSON.parse(packageJson).scripts, {test: 'xo'});
 });
+
+test('invalid node-engine option', async t => {
+	const filepath = await tempWrite('console.log()\n', 'x.js');
+	const err = await t.throws(main(['--node-version', 'v', filepath]));
+	t.is(err.code, 1);
+});

@@ -27,6 +27,7 @@ Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be
 - No need to specify file paths to lint as it lints all JS files except for [commonly ignored paths](#ignores).
 - [Config overrides per files/globs.](#config-overrides)
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`node`](https://github.com/mysticatea/eslint-plugin-node) and more.
+- Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
 - Super simple to add XO to a project with `$ xo --init`.
 - Fix many issues automagically with `$ xo --fix`.
@@ -61,6 +62,7 @@ $ xo --help
     --space           Use space indent instead of tabs  [Default: 2]
     --no-semicolon    Prevent use of semicolons
     --prettier        Conform to Prettier code style
+    --node-version    Range of Node.js version to support
     --plugin          Include third-party plugins  [Can be set multiple times]
     --extend          Extend defaults with a custom config  [Can be set multiple times]
     --open            Open files with issues in your editor
@@ -206,6 +208,14 @@ Default: `false`
 
 Format code with [Prettier](https://github.com/prettier/prettier). The [Prettier options](https://prettier.io/docs/en/options.html) will be read from the [Prettier config](https://prettier.io/docs/en/configuration.html)
 
+### nodeVersion
+
+Type: `string`, `boolean`<br>
+Default: Value of the `engines.node` key in the project `package.json`
+
+Enable rules specific to the Node.js versions within the configured range.
+If set to `false`, no rules specific to a Node.js version will be enabled.
+
 ### plugins
 
 Type: `Array`
@@ -302,6 +312,25 @@ If you have a directory structure with nested `package.json` files and you want 
 ### Monorepo
 
 Put a `package.json` with your config at the root and add `"xo": false` to the `package.json` in your bundled packages.
+
+### Transpilation
+
+If some files in your project are transpiled in order to support an older Node.js version, you can use the [config overrides](#config-overrides) option to set a specific [`nodeVersion`](#nodeversion) target for these files.
+
+For example, if your project targets Node.js 4 (your `package.json` is configured with `engines.node` set to `>=4`) and you are using [AVA](https://github.com/avajs/ava), then your test files are automatically transpiled. You can override `nodeVersion` for the tests files:
+
+```json
+{
+	"xo": {
+		"overrides": [
+			{
+				"files": "{test,tests,spec,__tests__}/**/*.js",
+				"nodeVersion": ">=9"
+			}
+		]
+	}
+}
+```
 
 
 ## FAQ
