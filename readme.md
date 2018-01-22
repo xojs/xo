@@ -391,6 +391,7 @@ Not yet, but we have a [shareable config for TSLint](https://github.com/sindreso
 ## Related
 
 - [eslint-plugin-unicorn](https://github.com/sindresorhus/eslint-plugin-unicorn) - Various awesome ESLint rules *(Bundled in XO)*
+- [xo-summary](https://github.com/LitoMore/xo-summary) - Display output from `xo` as a list of style errors, ordered by count
 
 
 ## Badge
