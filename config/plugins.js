@@ -71,8 +71,10 @@ module.exports = {
 		// 'node/no-missing-import': 'error',
 		// 'node/no-missing-require': 'error',
 		'node/no-unpublished-bin': 'error',
-		'node/no-unpublished-import': ['error', {allowModules: ['electron', 'atom']}],
-		'node/no-unpublished-require': ['error', {allowModules: ['electron', 'atom']}],
+		// Disabled because they're too annoying, see:
+		// https://github.com/mysticatea/eslint-plugin-node/issues/105
+		// 'node/no-unpublished-import': ['error', {allowModules: ['electron', 'atom']}],
+		// 'node/no-unpublished-require': ['error', {allowModules: ['electron', 'atom']}],
 		// Disabled as the rule doesn't allow to exclude compiled sources
 		// 'node/no-unsupported-features': 'error',
 		'node/process-exit-as-throw': 'error',
