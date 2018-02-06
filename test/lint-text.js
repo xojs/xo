@@ -16,10 +16,18 @@ test('.lintText()', t => {
 
 test('default `ignores`', t => {
 	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
-		filename: 'node_modules/ignored/index.js'
+		filename: 'test/fixtures/index.js'
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
+});
+
+test('overrride default `ignores`', t => {
+	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+		filename: 'test/fixtures/index.js',
+		ignores: '!{test/,}fixture{s,}/**'
+	});
+	t.true(result.errorCount > 0);
 });
 
 test('`ignores` option', t => {

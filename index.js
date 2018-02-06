@@ -2,7 +2,6 @@
 const path = require('path');
 const eslint = require('eslint');
 const globby = require('globby');
-const isEqual = require('lodash.isequal');
 const multimatch = require('multimatch');
 const arrify = require('arrify');
 const optionsManager = require('./lib/options-manager');
@@ -53,16 +52,14 @@ module.exports.lintText = (str, opts) => {
 	}
 
 	opts = optionsManager.buildConfig(opts);
-	const defaultIgnores = optionsManager.getIgnores({}).ignores;
 
-	if (opts.ignores && !isEqual(defaultIgnores, opts.ignores) && typeof opts.filename !== 'string') {
+	if (opts.ignores && typeof opts.filename !== 'string') {
 		throw new Error('The `ignores` option requires the `filename` option to be defined.');
 	}
 
 	if (opts.filename) {
 		const filename = path.relative(opts.cwd, opts.filename);
-
-		if (multimatch(filename, opts.ignores).length > 0 ||
+		if (multimatch(filename, optionsManager.DEFAULT_IGNORE.concat(opts.ignores || [])).length > 0 ||
 			globby.gitignore.sync({cwd: opts.cwd, ignore: opts.ignores})(opts.filename)) {
 			return {
 				errorCount: 0,
@@ -88,10 +85,11 @@ module.exports.lintFiles = (patterns, opts) => {
 
 	const isEmptyPatterns = patterns.length === 0;
 	const defaultPattern = `**/*.{${opts.extensions.join(',')}}`;
+	const ignorePatterns = optionsManager.DEFAULT_IGNORE.concat(opts.ignores || []).map(pattern => pattern[0] === '!' ? pattern.substring(1) : `!${pattern}`);
 
 	return globby(
-		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
-		{ignore: opts.ignores, gitignore: true, cwd: opts.cwd}
+		(isEmptyPatterns ? [defaultPattern] : arrify(patterns)).concat(ignorePatterns),
+		{gitignore: true, cwd: opts.cwd}
 	).then(paths => {
 		// Filter out unwanted file extensions
 		// For silly users that don't specify an extension in the glob pattern
