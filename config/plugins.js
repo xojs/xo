@@ -81,7 +81,8 @@ module.exports = {
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin". See https://github.com/mysticatea/eslint-plugin-node/issues/96
 		// 'node/shebang': 'error',
 		'node/no-deprecated-api': 'error',
-		'node/exports-style': ['error', 'module.exports'],
+		// Disabled because it causes too much churn and will be moot when we switch to ES2015 modules
+		// 'node/exports-style': ['error', 'module.exports'],
 		// Disabled by default (overrides `plugin:unicorn/recommended`), will be enabled if supported by the Node.js version
 		'unicorn/prefer-spread': 'off',
 		'unicorn/no-new-buffer': 'off'
