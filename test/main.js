@@ -7,7 +7,8 @@ import tempWrite from 'temp-write';
 
 process.chdir(__dirname);
 
-const main = (args, opts) => execa(path.join(__dirname, '../main.js'), args, opts);
+const main = (args, opts) =>
+	execa(path.join(__dirname, '../main.js'), args, opts);
 
 test('fix option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
@@ -28,16 +29,6 @@ test('stdin-filename option with stdin', async t => {
 		reject: false
 	});
 	t.regex(stdout, /unicorn-file:/);
-});
-
-test('reporter option', async t => {
-	const filepath = await tempWrite('console.log()\n', 'x.js');
-
-	try {
-		await main(['--reporter=compact', filepath]);
-	} catch (err) {
-		t.true(err.stdout.indexOf('Error - ') !== -1);
-	}
 });
 
 test('overrides fixture', async t => {
