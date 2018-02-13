@@ -3,7 +3,7 @@
 	"version": "0.18.2",
 	"description": "JavaScript happiness style linter ❤️",
 	"license": "MIT",
-	"repository": "sindresorhus/xo",
+	"repository": "xojs/xo",
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",
