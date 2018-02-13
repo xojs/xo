@@ -1,6 +1,6 @@
 <h1 align="center">
 	<br>
-	<img width="400" src="https://cdn.rawgit.com/sindresorhus/xo/5d23bf1e280f574579825dc1a29ed22c69790acf/media/logo.svg" alt="XO">
+	<img width="400" src="https://cdn.rawgit.com/xojs/xo/5d23bf1e280f574579825dc1a29ed22c69790acf/media/logo.svg" alt="XO">
 	<br>
 	<br>
 	<br>
@@ -8,13 +8,13 @@
 
 > JavaScript happiness style linter
 
-[![Build Status: Linux](https://travis-ci.org/sindresorhus/xo.svg?branch=master)](https://travis-ci.org/sindresorhus/xo) [![Build status: Windows](https://ci.appveyor.com/api/projects/status/mydb56kve054n2h5/branch/master?svg=true)](https://ci.appveyor.com/project/sindresorhus/xo/branch/master) [![Coverage Status](https://coveralls.io/repos/github/sindresorhus/xo/badge.svg?branch=master)](https://coveralls.io/github/sindresorhus/xo?branch=master) [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo) [![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/xojs/Lobby)
+[![Build Status: Linux](https://travis-ci.org/xojs/xo.svg?branch=master)](https://travis-ci.org/xojs/xo) [![Build status: Windows](https://ci.appveyor.com/api/projects/status/mydb56kve054n2h5/branch/master?svg=true)](https://ci.appveyor.com/project/sindresorhus/xo/branch/master) [![Coverage Status](https://coveralls.io/repos/github/xojs/xo/badge.svg?branch=master)](https://coveralls.io/github/xojs/xo?branch=master) [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo) [![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/xojs/Lobby)
 
 Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` or `.jshintrc` to manage. It just works!
 
 Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
-*JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react#use-with-xo) for React specific linting.*
+*JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting.*
 
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/master/screenshot.png)
 
@@ -102,7 +102,7 @@ $ xo --help
 - Space after keyword `if (condition) {}`
 - Always `===` instead of `==`
 
-Check out an [example](index.js) and the [ESLint rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js).
+Check out an [example](index.js) and the [ESLint rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js).
 
 
 ## Workflow
@@ -175,7 +175,7 @@ Additional global variables your code accesses during execution.
 
 Type: `Array`
 
-Some [paths](https://github.com/sindresorhus/xo/blob/master/lib/options-manager.js) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
+Some [paths](lib/options-manager.js) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
 
 ### space
 
@@ -190,7 +190,7 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 
 Type: `Object`
 
-Override any of the [default rules](https://github.com/sindresorhus/eslint-config-xo/blob/master/index.js). See the [ESLint docs](http://eslint.org/docs/rules/) for more info on each rule.
+Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js). See the [ESLint docs](http://eslint.org/docs/rules/) for more info on each rule.
 
 Please take a moment to consider if you really need to use this option.
 
@@ -345,18 +345,18 @@ The [Standard style](http://standardjs.com) is a really cool idea. I too wish we
 
 #### Why not ESLint?
 
-XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/sindresorhus/eslint-config-xo).
+XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/xojs/eslint-config-xo).
 
 #### Does it support TypeScript?
 
-Not yet, but we have a [shareable config for TSLint](https://github.com/sindresorhus/tslint-xo).
+Not yet, but we have a [shareable config for TSLint](https://github.com/xojs/tslint-xo).
 
 
 ## Editor plugins
 
-- [Sublime Text](https://github.com/sindresorhus/SublimeLinter-contrib-xo)
-- [Atom](https://github.com/sindresorhus/atom-linter-xo)
-- [Vim](https://github.com/sindresorhus/vim-xo)
+- [Sublime Text](https://github.com/xojs/SublimeLinter-contrib-xo)
+- [Atom](https://github.com/xojs/atom-linter-xo)
+- [Vim](https://github.com/xojs/vim-xo)
 - [TextMate 2](https://github.com/claylo/XO.tmbundle)
 - [VSCode](https://github.com/SamVerschueren/vscode-linter-xo)
 - [Emacs](https://github.com/j-em/xo-emacs)
@@ -365,8 +365,8 @@ Not yet, but we have a [shareable config for TSLint](https://github.com/sindreso
 
 ## Build-system plugins
 
-- [Gulp](https://github.com/sindresorhus/gulp-xo)
-- [Grunt](https://github.com/sindresorhus/grunt-xo)
+- [Gulp](https://github.com/xojs/gulp-xo)
+- [Grunt](https://github.com/xojs/grunt-xo)
 - [webpack](https://github.com/Semigradsky/xo-loader)
 - [Metalsmith](https://github.com/blainsmith/metalsmith-xo)
 - [Fly](https://github.com/lukeed/fly-xo)
@@ -374,12 +374,12 @@ Not yet, but we have a [shareable config for TSLint](https://github.com/sindreso
 
 ## Configs
 
-- [eslint-config-xo](https://github.com/sindresorhus/eslint-config-xo) - ESLint shareable config for XO with tab indent
-- [eslint-config-xo-space](https://github.com/sindresorhus/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
-- [eslint-config-xo-react](https://github.com/sindresorhus/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
-- [stylelint-config-xo](https://github.com/sindresorhus/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
-- [stylelint-config-xo-space](https://github.com/sindresorhus/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
-- [tslint-xo](https://github.com/sindresorhus/tslint-xo) - TSLint shareable config for XO
+- [eslint-config-xo](https://github.com/xojs/eslint-config-xo) - ESLint shareable config for XO with tab indent
+- [eslint-config-xo-space](https://github.com/xojs/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
+- [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
+- [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
+- [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
+- [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
 
 
 ## Support
@@ -396,18 +396,23 @@ Not yet, but we have a [shareable config for TSLint](https://github.com/sindreso
 
 ## Badge
 
-Show the world you're using XO → [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
+Show the world you're using XO → [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 
 ```md
-[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
+[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 ```
 
 
 ## Team
 
-[![Sindre Sorhus](https://github.com/sindresorhus.png?size=130)](https://sindresorhus.com) | [![James Talmage](https://github.com/jamestalmage.png?size=130)](https://github.com/jamestalmage) | [![Mario Nebl](https://github.com/marionebl.png?size=130)](https://github.com/marionebl) | [![Michael Mayer](https://github.com/schnittstabil.png?size=130)](https://github.com/schnittstabil) | [![Pierre Vanduynslager](https://github.com/pvdlg.png?size=130)](https://github.com/pvdlg)
----|---|---|---|---
-[Sindre Sorhus](https://sindresorhus.com) | [James Talmage](https://github.com/jamestalmage) | [Mario Nebl](https://github.com/marionebl) | [Michael Mayer](https://github.com/schnittstabil) | [Pierre Vanduynslager](https://github.com/pvdlg)
+[![Sindre Sorhus](https://github.com/sindresorhus.png?size=130)](https://sindresorhus.com) | [![Mario Nebl](https://github.com/marionebl.png?size=130)](https://github.com/marionebl) | [![Pierre Vanduynslager](https://github.com/pvdlg.png?size=130)](https://github.com/pvdlg)
+---|---|---
+[Sindre Sorhus](https://sindresorhus.com) | [Mario Nebl](https://github.com/marionebl) | [Pierre Vanduynslager](https://github.com/pvdlg)
+
+###### Former
+
+- [James Talmage](https://github.com/jamestalmage)
+- [Michael Mayer](https://github.com/schnittstabil)
 
 
 ## License

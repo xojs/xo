@@ -45,7 +45,7 @@ test('overrides fixture', async t => {
 	await t.notThrows(main([], {cwd}));
 });
 
-// https://github.com/sindresorhus/xo/issues/65
+// #65
 test.failing('ignores fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
 	await t.throws(main([], {cwd}));

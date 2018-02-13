@@ -2,7 +2,7 @@
 module.exports = {
 	// Repeated here from eslint-config-xo in case some plugins set something different
 	parserOptions: {
-		ecmaVersion: 2017,
+		ecmaVersion: 2018,
 		sourceType: 'module',
 		ecmaFeatures: {
 			jsx: true,
@@ -71,15 +71,18 @@ module.exports = {
 		// 'node/no-missing-import': 'error',
 		// 'node/no-missing-require': 'error',
 		'node/no-unpublished-bin': 'error',
-		'node/no-unpublished-import': ['error', {allowModules: ['electron', 'atom']}],
-		'node/no-unpublished-require': ['error', {allowModules: ['electron', 'atom']}],
+		// Disabled because they're too annoying, see:
+		// https://github.com/mysticatea/eslint-plugin-node/issues/105
+		// 'node/no-unpublished-import': ['error', {allowModules: ['electron', 'atom']}],
+		// 'node/no-unpublished-require': ['error', {allowModules: ['electron', 'atom']}],
 		// Disabled as the rule doesn't allow to exclude compiled sources
 		// 'node/no-unsupported-features': 'error',
 		'node/process-exit-as-throw': 'error',
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin". See https://github.com/mysticatea/eslint-plugin-node/issues/96
 		// 'node/shebang': 'error',
 		'node/no-deprecated-api': 'error',
-		'node/exports-style': ['error', 'module.exports'],
+		// Disabled because it causes too much churn and will be moot when we switch to ES2015 modules
+		// 'node/exports-style': ['error', 'module.exports'],
 		// Disabled by default (overrides `plugin:unicorn/recommended`), will be enabled if supported by the Node.js version
 		'unicorn/prefer-spread': 'off',
 		'unicorn/no-new-buffer': 'off'
