@@ -109,10 +109,6 @@ const cli = meow(`
 		stdinFilename: {
 			type: 'string',
 			alias: 'filename'
-		},
-		// TODO: Remove in 1.0.0
-		compact: {
-			type: 'boolean'
 		}
 	}
 });
@@ -123,12 +119,6 @@ const input = cli.input;
 const opts = cli.flags;
 
 const log = report => {
-	// Legacy
-	// TODO: Remove in 1.0.0
-	if (opts.compact) {
-		opts.reporter = 'compact';
-	}
-
 	const reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
 
 	process.stdout.write(reporter(report.results));
