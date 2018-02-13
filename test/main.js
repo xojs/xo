@@ -30,6 +30,16 @@ test('stdin-filename option with stdin', async t => {
 	t.regex(stdout, /unicorn-file:/);
 });
 
+test('reporter option', async t => {
+	const filepath = await tempWrite('console.log()\n', 'x.js');
+
+	try {
+		await main(['--reporter=compact', filepath]);
+	} catch (err) {
+		t.true(err.stdout.indexOf('Error - ') !== -1);
+	}
+});
+
 test('overrides fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/overrides');
 	await t.notThrows(main([], {cwd}));
