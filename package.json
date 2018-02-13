@@ -63,7 +63,7 @@
 		"eslint-plugin-node": "^6.0.0",
 		"eslint-plugin-prettier": "^2.3.1",
 		"eslint-plugin-promise": "^3.6.0",
-		"eslint-plugin-unicorn": "^3.0.1",
+		"eslint-plugin-unicorn": "^4.0.1",
 		"get-stdin": "^5.0.0",
 		"globby": "^8.0.0",
 		"has-flag": "^3.0.0",
