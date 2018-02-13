@@ -65,7 +65,7 @@
 		"eslint-plugin-promise": "^3.6.0",
 		"eslint-plugin-unicorn": "^3.0.1",
 		"get-stdin": "^5.0.0",
-		"globby": "^7.1.1",
+		"globby": "^8.0.0",
 		"has-flag": "^3.0.0",
 		"lodash.isequal": "^4.4.0",
 		"lodash.mergewith": "^4.6.0",
