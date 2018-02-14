@@ -122,6 +122,8 @@ test('buildConfig: prettier: true, space: 4', t => {
 		tabWidth: 4,
 		trailingComma: 'es5'
 	}]);
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
 });
 
 test('buildConfig: prettier: true, esnext: false', t => {
@@ -137,6 +139,23 @@ test('buildConfig: prettier: true, esnext: false', t => {
 		tabWidth: 2,
 		trailingComma: 'none'
 	}]);
+});
+
+test('buildConfig: prettier: true, space: true', t => {
+	const config = manager.buildConfig({prettier: true, space: true});
+
+	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+		useTabs: false,
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		semi: true,
+		singleQuote: true,
+		tabWidth: 2,
+		trailingComma: 'es5'
+	}]);
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
 });
 
 test('buildConfig: engines: undefined', t => {
