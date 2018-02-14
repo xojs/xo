@@ -75,9 +75,9 @@ const cli = meow(`
 		// 	type: 'boolean',
 		// 	default: true
 		// },
-		prettier: {
-			type: 'boolean'
-		},
+		// prettier: {
+		// 	type: 'boolean'
+		// },
 		nodeVersion: {
 			type: 'string'
 		},
