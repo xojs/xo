@@ -200,9 +200,7 @@ test('buildConfig: engines: >=6', t => {
 	t.is(config.rules['unicorn/prefer-spread'], 'error');
 	// Include rules for Node.js 6 and above
 	t.is(config.rules['prefer-rest-params'], 'error');
-	t.deepEqual(config.rules['prefer-destructuring'], [
-		'error', {array: true, object: true}, {enforceForRenamedProperties: true}
-	]);
+	t.deepEqual(config.rules['prefer-destructuring'], ['error', {array: true, object: true}]);
 	// Do not include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
@@ -214,9 +212,7 @@ test('buildConfig: engines: >=8', t => {
 	t.is(config.rules['unicorn/prefer-spread'], 'error');
 	// Include rules for Node.js 6 and above
 	t.is(config.rules['prefer-rest-params'], 'error');
-	t.deepEqual(config.rules['prefer-destructuring'], [
-		'error', {array: true, object: true}, {enforceForRenamedProperties: true}
-	]);
+	t.deepEqual(config.rules['prefer-destructuring'], ['error', {array: true, object: true}]);
 	// Include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], 'error');
 });
