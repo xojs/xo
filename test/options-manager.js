@@ -92,6 +92,12 @@ test('buildConfig: prettier: true', t => {
 		}]});
 	// eslint-prettier-config must always be last
 	t.deepEqual(config.baseConfig.extends.slice(-1), ['prettier']);
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, semicolon: false', t => {
@@ -107,6 +113,12 @@ test('buildConfig: prettier: true, semicolon: false', t => {
 		tabWidth: 2,
 		trailingComma: 'es5'
 	}]);
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, space: 4', t => {
@@ -124,6 +136,10 @@ test('buildConfig: prettier: true, space: 4', t => {
 	}]);
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, esnext: false', t => {
@@ -139,6 +155,12 @@ test('buildConfig: prettier: true, esnext: false', t => {
 		tabWidth: 2,
 		trailingComma: 'none'
 	}]);
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, space: true', t => {
@@ -156,6 +178,24 @@ test('buildConfig: prettier: true, space: true', t => {
 	}]);
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
+});
+
+test('buildConfig: merge with prettier config', t => {
+	const cwd = path.resolve('fixtures', 'prettier');
+	const config = manager.buildConfig({cwd, prettier: true});
+
+	// Sets the `semi` options in `prettier/prettier` based on the XO `semicolon` option
+	t.deepEqual(config.rules['prettier/prettier'], ['error', prettierConfig.prettier]);
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: engines: undefined', t => {
@@ -237,17 +277,67 @@ test('buildConfig: engines: >=8', t => {
 });
 
 test('mergeWithPrettierConf: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
-	const cwd = path.resolve('fixtures', 'prettier');
-	const result = manager.mergeWithPrettierConf({cwd});
-	const expected = Object.assign({}, prettierConfig.prettier, {tabWidth: 2, useTabs: true, semi: true});
+	const prettierOpts = {singleQuote: false, trailingComma: 'all', bracketSpacing: false, jsxBracketSameLine: false};
+	const result = manager.mergeWithPrettierConf({}, prettierOpts);
+	const expected = Object.assign({}, prettierOpts, {tabWidth: 2, useTabs: true, semi: true});
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from xo config', t => {
-	const cwd = path.resolve('fixtures', 'prettier');
-	const result = manager.mergeWithPrettierConf({cwd, space: 4, semicolon: false});
-	const expected = Object.assign({}, prettierConfig.prettier, {tabWidth: 4, useTabs: false, semi: false});
+	const prettierOpts = {tabWidth: 4, useTabs: false, semi: false};
+	const result = manager.mergeWithPrettierConf({space: 4, semicolon: false}, {});
+	const expected = Object.assign(
+		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'es5'},
+		prettierOpts
+	);
 	t.deepEqual(result, expected);
+});
+
+test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from prettier config', t => {
+	const prettierOpts = {useTabs: false, semi: false, tabWidth: 4};
+	const result = manager.mergeWithPrettierConf({}, prettierOpts);
+	const expected = Object.assign(
+		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'es5'},
+		prettierOpts
+	);
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPrettierConf: throw error is `semi`/`semicolon` conflicts', t => {
+	t.throws(() => manager.mergeWithPrettierConf(
+		{semicolon: true},
+		{semi: false}
+	));
+	t.throws(() => manager.mergeWithPrettierConf(
+		{semicolon: false},
+		{semi: true}
+	));
+
+	t.notThrows(() => manager.mergeWithPrettierConf(
+		{semicolon: true},
+		{semi: true}
+	));
+	t.notThrows(() => manager.mergeWithPrettierConf({semicolon: false}, {semi: false}));
+});
+
+test('mergeWithPrettierConf: throw error is `space`/`useTabs` conflicts', t => {
+	t.throws(() => manager.mergeWithPrettierConf({space: true}, {useTabs: false}));
+	t.throws(() => manager.mergeWithPrettierConf({space: 4}, {useTabs: false}));
+	t.throws(() => manager.mergeWithPrettierConf({space: 0}, {useTabs: false}));
+	t.throws(() => manager.mergeWithPrettierConf({space: false}, {useTabs: true}));
+
+	t.notThrows(() => manager.mergeWithPrettierConf({space: false}, {useTabs: false}));
+	t.notThrows(() => manager.mergeWithPrettierConf({space: true}, {useTabs: true}));
+});
+
+test('mergeWithPrettierConf: throw error is `space`/`tabWidth` conflicts', t => {
+	t.throws(() => manager.mergeWithPrettierConf({space: 4}, {tabWidth: 2}));
+	t.throws(() => manager.mergeWithPrettierConf({space: 0}, {tabWidth: 2}));
+	t.throws(() => manager.mergeWithPrettierConf({space: 2}, {tabWidth: 0}));
+
+	t.notThrows(() => manager.mergeWithPrettierConf({space: 4}, {tabWidth: 4}));
+	t.notThrows(() => manager.mergeWithPrettierConf({space: false}, {tabWidth: 4}));
+	t.notThrows(() => manager.mergeWithPrettierConf({space: true}, {tabWidth: 4}));
 });
 
 test('buildConfig: rules', t => {

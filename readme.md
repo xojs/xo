@@ -206,7 +206,18 @@ Set it to `false` to enforce no-semicolon style.
 Type: `boolean`<br>
 Default: `false`
 
-Format code with [Prettier](https://github.com/prettier/prettier). The [Prettier options](https://prettier.io/docs/en/options.html) will be read from the [Prettier config](https://prettier.io/docs/en/configuration.html)
+Format code with [Prettier](https://github.com/prettier/prettier).
+
+The [Prettier options](https://prettier.io/docs/en/options.html) will be read from the [Prettier config](https://prettier.io/docs/en/configuration.html) and if **not set** will be determined as follow:
+- [semi](https://prettier.io/docs/en/options.html#semicolons): based on [semicolon](#semicolon) option
+- [useTabs](https://prettier.io/docs/en/options.html#tabs): based on [space](#space) option
+- [tabWidth](https://prettier.io/docs/en/options.html#tab-width): based on [space](#space) option
+- [trailingComma](https://prettier.io/docs/en/options.html#trailing-commas): based on [esnext](#esnext)
+- [singleQuote](https://prettier.io/docs/en/options.html#quotes): `true`
+- [bracketSpacing](https://prettier.io/docs/en/options.html#bracket-spacing): `false`
+- [jsxBracketSameLine](https://prettier.io/docs/en/options.html#jsx-brackets): `false`
+
+If contradicting options are set for both Prettier and XO and error will be thrown.
 
 ### nodeVersion
 
