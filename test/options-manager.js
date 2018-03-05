@@ -88,7 +88,7 @@ test('buildConfig: prettier: true', t => {
 			semi: true,
 			singleQuote: true,
 			tabWidth: 2,
-			trailingComma: 'es5'
+			trailingComma: 'none'
 		}]});
 	// eslint-prettier-config must always be last
 	t.deepEqual(config.baseConfig.extends.slice(-1), ['prettier']);
@@ -111,7 +111,7 @@ test('buildConfig: prettier: true, semicolon: false', t => {
 		semi: false,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'es5'
+		trailingComma: 'none'
 	}]);
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
@@ -132,7 +132,7 @@ test('buildConfig: prettier: true, space: 4', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 4,
-		trailingComma: 'es5'
+		trailingComma: 'none'
 	}]);
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
@@ -174,7 +174,7 @@ test('buildConfig: prettier: true, space: true', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'es5'
+		trailingComma: 'none'
 	}]);
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
@@ -287,7 +287,7 @@ test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from xo con
 	const prettierOpts = {tabWidth: 4, useTabs: false, semi: false};
 	const result = manager.mergeWithPrettierConf({space: 4, semicolon: false}, {});
 	const expected = Object.assign(
-		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'es5'},
+		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'none'},
 		prettierOpts
 	);
 	t.deepEqual(result, expected);
@@ -297,7 +297,7 @@ test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from pretti
 	const prettierOpts = {useTabs: false, semi: false, tabWidth: 4};
 	const result = manager.mergeWithPrettierConf({}, prettierOpts);
 	const expected = Object.assign(
-		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'es5'},
+		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'none'},
 		prettierOpts
 	);
 	t.deepEqual(result, expected);
