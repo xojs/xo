@@ -74,7 +74,7 @@
 		"open-editor": "^1.2.0",
 		"path-exists": "^3.0.0",
 		"pkg-conf": "^2.1.0",
-		"prettier": "~1.10.2",
+		"prettier": "~1.11.1",
 		"resolve-cwd": "^2.0.0",
 		"resolve-from": "^4.0.0",
 		"semver": "^5.5.0",
