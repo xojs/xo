@@ -80,16 +80,15 @@ test('buildConfig: prettier: true', t => {
 	t.deepEqual(config.plugins, ['prettier']);
 	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
 	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
-	t.deepEqual(config.rules, {
-		'prettier/prettier': ['error', {
-			useTabs: true,
-			bracketSpacing: false,
-			jsxBracketSameLine: false,
-			semi: true,
-			singleQuote: true,
-			tabWidth: 2,
-			trailingComma: 'none'
-		}]});
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+		useTabs: true,
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		semi: true,
+		singleQuote: true,
+		tabWidth: 2,
+		trailingComma: 'none'
+	}]);
 	// eslint-prettier-config must always be last
 	t.deepEqual(config.baseConfig.extends.slice(-1), ['prettier']);
 	// Indent rule is not enabled
