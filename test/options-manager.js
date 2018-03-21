@@ -487,3 +487,45 @@ test('mergeWithPkgConf: XO engine options false supersede package.json\'s', t =>
 	const expected = Object.assign({}, {engines: false}, {cwd});
 	t.deepEqual(result, expected);
 });
+
+test('processOverridesForFile: NOOP if no applicable override', t => {
+	const opts = {esnext: true};
+	const result = manager.processOverridesForFile('/user/dir/foo.js', opts);
+  t.is(result, opts);
+});
+
+test('processOverridesForFile: merge applicable overides', t => {
+	const opts = {
+		esnext: false,
+		cwd: '/user/dir',
+		overrides: [
+			{
+				files: '**/bar/*',
+				global: 'foo'
+			},
+			{
+				files: '**/foo.js',
+				esnext: true
+			},
+			{
+				files: '**/foo/howdy.js',
+				space: 3,
+				env: 'mocha'
+			}
+		]
+	};
+
+	const original = {
+		esnext: false,
+		cwd: '/user/dir'
+	};
+
+	const override = [{
+		esnext: true,
+		files: '**/foo.js'
+	}];
+
+	const expected = manager.mergeApplicableOverrides(original, override);
+	const result = manager.processOverridesForFile('/user/dir/foo.js', opts);
+  t.deepEqual(result, expected);
+});

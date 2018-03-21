@@ -32,6 +32,7 @@ const cli = meow(`
 	  --cwd=<dir>       Working directory for files
 	  --stdin           Validate/fix code from stdin
 	  --stdin-filename  Specify a filename for the --stdin option
+	  --print-config    Print the configuration for the given file
 
 	Examples
 	  $ xo
@@ -43,6 +44,7 @@ const cli = meow(`
 	  $ xo --plugin=react
 	  $ xo --plugin=html --extension=html
 	  $ echo 'const x=true' | xo --stdin --fix
+	  $ xo --print-config index.js
 
 	Tips
 	  Put options in package.json instead of using flags so other tools can read it.
@@ -103,6 +105,10 @@ const cli = meow(`
 		cwd: {
 			type: 'string'
 		},
+		printConfig: {
+			type: 'boolean',
+			default: false
+		},
 		stdin: {
 			type: 'boolean'
 		},
@@ -156,8 +162,20 @@ if (opts.init) {
 			process.exit(1);
 		}
 
+		if (opts.printConfig) {
+			console.error('The `print-config` option is not supported on stdin');
+			process.exit(1);
+		}
+
 		log(xo.lintText(str, opts));
 	});
+} else if (opts.printConfig) {
+	if (input.length !== 1) {
+		console.error('The `print-config` option must be used with exactly one file name');
+		process.exit(1);
+	}
+	const config = xo.getConfigForFile(input[0], opts);
+	console.log(JSON.stringify(config, null, '	'));
 } else {
 	xo.lintFiles(input, opts).then(report => {
 		if (opts.fix) {

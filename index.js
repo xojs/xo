@@ -42,14 +42,10 @@ const runEslint = (paths, opts) => {
 module.exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-	if (opts.overrides && opts.overrides.length > 0) {
-		const overrides = opts.overrides;
-		delete opts.overrides;
-
-		const filename = path.relative(opts.cwd, opts.filename);
-
-		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
-		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
+	// TODO: Should we warn the user if opts.filename is not defined
+	// and there are overrides?
+	if (opts.filename) {
+		opts = optionsManager.processOverridesForFile(opts.filename, opts);
 	}
 
 	opts = optionsManager.buildConfig(opts);
@@ -81,6 +77,18 @@ module.exports.lintText = (str, opts) => {
 	const report = engine.executeOnText(str, opts.filename);
 
 	return processReport(report, opts);
+};
+
+module.exports.getConfigForFile = (file, opts) => {
+	const {
+		preprocess,
+		processOverridesForFile,
+		buildConfig
+	} = optionsManager;
+
+	const options = buildConfig(processOverridesForFile(file, preprocess(opts)));
+	const engine = new eslint.CLIEngine(options);
+	return engine.getConfigForFile(file);
 };
 
 module.exports.lintFiles = (patterns, opts) => {

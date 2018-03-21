@@ -100,3 +100,21 @@ test('invalid node-engine option', async t => {
 	const err = await t.throws(main(['--node-version', 'v', filepath]));
 	t.is(err.code, 1);
 });
+
+test('invalid print-config option with stdin', async t => {
+	const msg = 'The `print-config` option is not supported on stdin';
+	try {
+		await main(['--print-config', '--stdin'], {input: 'console.log()\n'});
+	} catch (err) {
+		t.is(err.stderr.trim(), msg);
+	}
+});
+
+test('print-config option requires a single filename', async t => {
+	const msg = 'The `print-config` option must be used with exactly one file name';
+	try {
+		await main(['--print-config']);
+	} catch (err) {
+		t.is(err.stderr.trim(), msg);
+	}
+});
