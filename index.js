@@ -42,7 +42,6 @@ const runEslint = (paths, opts) => {
 module.exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
-<<<<<<< HEAD
 	// TODO: Should we warn the user if opts.filename is not defined
 	// and there are overrides?
 	if (opts.filename) {

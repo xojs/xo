@@ -133,4 +133,3 @@ test('print-config option requires a single filename', async t => {
 		t.is(err.stderr.trim(), msg);
 	}
 });
-
