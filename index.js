@@ -80,14 +80,11 @@ module.exports.lintText = (str, opts) => {
 };
 
 module.exports.getConfigForFile = (file, opts) => {
-	const {
-		preprocess,
-		processOverridesForFile,
-		buildConfig
-	} = optionsManager;
+	opts = optionsManager.preprocess(opts);
+	opts = optionsManager.processOverridesForFile(file, opts);
+	opts = optionsManager.buildConfig(opts);
 
-	const options = buildConfig(processOverridesForFile(file, preprocess(opts)));
-	const engine = new eslint.CLIEngine(options);
+	const engine = new eslint.CLIEngine(opts);
 	return engine.getConfigForFile(file);
 };
 
