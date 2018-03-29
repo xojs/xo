@@ -60,7 +60,6 @@ module.exports = {
 		'import/no-named-as-default': 'error',
 		'import/no-unresolved': ['error', {commonjs: true}],
 		'import/order': 'error',
-		'import/prefer-default-export': 'error',
 		'import/no-unassigned-import': ['error', {
 			allow: ['babel-polyfill', '@babel/polyfill', 'babel-register', '@babel/register']
 		}],
