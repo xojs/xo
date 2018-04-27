@@ -31,7 +31,9 @@ module.exports = {
 		'no-use-extend-native/no-use-extend-native': 'error',
 		'promise/param-names': 'error',
 		'promise/no-return-wrap': ['error', {allowReject: true}],
+		'promise/no-new-statics': 'error',
 		'promise/no-return-in-finally': 'error',
+		'promise/valid-params': 'error',
 		'import/default': 'error',
 		'import/export': 'error',
 		'import/extensions': ['error', {
@@ -44,6 +46,8 @@ module.exports = {
 		'import/namespace': ['error', {allowComputed: true}],
 		'import/no-absolute-path': 'error',
 		'import/no-webpack-loader-syntax': 'error',
+		'import/no-self-import': 'error',
+		'import/no-useless-path-segments': 'error',
 		'import/newline-after-import': 'error',
 		'import/no-amd': 'error',
 		'import/no-duplicates': 'error',
@@ -78,7 +82,7 @@ module.exports = {
 		'node/process-exit-as-throw': 'error',
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin". See https://github.com/mysticatea/eslint-plugin-node/issues/96
 		// 'node/shebang': 'error',
-		'node/no-deprecated-api': 'error',
+		'node/no-deprecated-api': 'error'
 		// Disabled because it causes too much churn and will be moot when we switch to ES2015 modules
 		// 'node/exports-style': ['error', 'module.exports']
 	}
