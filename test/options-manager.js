@@ -227,50 +227,9 @@ test('buildConfig: engines: invalid range', t => {
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
-test('buildConfig: engines: >=4', t => {
-	const config = manager.buildConfig({engines: {node: '>=4'}});
-
-	// Do not include rules for Node.js 5 and above
-	t.is(config.rules['unicorn/prefer-spread'], undefined);
-	// Do not include rules for Node.js 6 and above
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
-	// Do not include rules for Node.js 8 and above
-	t.is(config.rules['promise/prefer-await-to-then'], undefined);
-});
-
-test('buildConfig: engines: >=4.1', t => {
-	const config = manager.buildConfig({engines: {node: '>=5.1'}});
-
-	// Do not include rules for Node.js 5 and above
-	t.is(config.rules['unicorn/prefer-spread'], 'error');
-	// Do not include rules for Node.js 6 and above
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
-	// Do not include rules for Node.js 8 and above
-	t.is(config.rules['promise/prefer-await-to-then'], undefined);
-});
-
-test('buildConfig: engines: >=6', t => {
-	const config = manager.buildConfig({engines: {node: '>=6'}});
-
-	// Include rules for Node.js 5 and above
-	t.is(config.rules['unicorn/prefer-spread'], 'error');
-	// Include rules for Node.js 6 and above
-	t.is(config.rules['prefer-rest-params'], 'error');
-	t.deepEqual(config.rules['prefer-destructuring'], ['error', {array: true, object: true}]);
-	// Do not include rules for Node.js 8 and above
-	t.is(config.rules['promise/prefer-await-to-then'], undefined);
-});
-
 test('buildConfig: engines: >=8', t => {
 	const config = manager.buildConfig({engines: {node: '>=8'}});
 
-	// Include rules for Node.js 5 and above
-	t.is(config.rules['unicorn/prefer-spread'], 'error');
-	// Include rules for Node.js 6 and above
-	t.is(config.rules['prefer-rest-params'], 'error');
-	t.deepEqual(config.rules['prefer-destructuring'], ['error', {array: true, object: true}]);
 	// Include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], 'error');
 });

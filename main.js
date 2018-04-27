@@ -121,8 +121,7 @@ const cli = meow(`
 
 updateNotifier({pkg: cli.pkg}).notify();
 
-const input = cli.input;
-const opts = cli.flags;
+const {input, flags: opts} = cli;
 
 const log = report => {
 	const reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
@@ -143,7 +142,7 @@ if (opts.nodeVersion) {
 	} else if (semver.validRange(opts.nodeVersion)) {
 		opts.engines = {node: opts.nodeVersion};
 	} else {
-		console.error('The `node-engine` option must be a valid semver range (for example `>=4`)');
+		console.error('The `node-engine` option must be a valid semver range (for example `>=6`)');
 		process.exit(1);
 	}
 }

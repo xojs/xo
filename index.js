@@ -42,6 +42,7 @@ const runEslint = (paths, opts) => {
 module.exports.lintText = (str, opts) => {
 	opts = optionsManager.preprocess(opts);
 
+<<<<<<< HEAD
 	// TODO: Should we warn the user if opts.filename is not defined
 	// and there are overrides?
 	if (opts.filename) {
@@ -103,7 +104,7 @@ module.exports.lintFiles = (patterns, opts) => {
 		if (!isEmptyPatterns) {
 			paths = paths.filter(filePath => {
 				const ext = path.extname(filePath).replace('.', '');
-				return opts.extensions.indexOf(ext) !== -1;
+				return opts.extensions.includes(ext);
 			});
 		}
 
@@ -111,7 +112,7 @@ module.exports.lintFiles = (patterns, opts) => {
 			return runEslint(paths, opts);
 		}
 
-		const overrides = opts.overrides;
+		const {overrides} = opts;
 		delete opts.overrides;
 
 		const grouped = optionsManager.groupConfigs(paths, opts, overrides);
