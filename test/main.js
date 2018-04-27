@@ -36,7 +36,7 @@ test('reporter option', async t => {
 	try {
 		await main(['--reporter=compact', filepath]);
 	} catch (err) {
-		t.true(err.stdout.indexOf('Error - ') !== -1);
+		t.true(err.stdout.includes('Error - '));
 	}
 });
 

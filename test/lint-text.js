@@ -10,7 +10,7 @@ const readFile = pify(fs.readFile);
 const hasRule = (results, ruleId) => results[0].messages.some(x => x.ruleId === ruleId);
 
 test('.lintText()', t => {
-	const results = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`).results;
+	const {results} = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`);
 	t.true(hasRule(results, 'semi'));
 });
 
@@ -78,34 +78,34 @@ test('`ignores` option without filename', t => {
 });
 
 test('JSX support', t => {
-	const results = fn.lintText('const app = <div className="appClass">Hello, React!</div>;\n').results;
+	const {results} = fn.lintText('const app = <div className="appClass">Hello, React!</div>;\n');
 	t.true(hasRule(results, 'no-unused-vars'));
 });
 
 test('plugin support', t => {
-	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
+	const {results} = fn.lintText('var React;\nReact.render(<App/>);\n', {
 		plugins: ['react'],
 		rules: {'react/jsx-no-undef': 'error'}
-	}).results;
+	});
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
 test('prevent use of extended native objects', t => {
-	const results = fn.lintText('[].unicorn();\n').results;
+	const {results} = fn.lintText('[].unicorn();\n');
 	t.true(hasRule(results, 'no-use-extend-native/no-use-extend-native'));
 });
 
 test('extends support', t => {
-	const results = fn.lintText('var React;\nReact.render(<App/>);\n', {
+	const {results} = fn.lintText('var React;\nReact.render(<App/>);\n', {
 		extends: 'xo-react'
-	}).results;
+	});
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
 test('extends support with `esnext` option', t => {
-	const results = fn.lintText('import path from \'path\';\nlet React;\nReact.render(<App/>);\n', {
+	const {results} = fn.lintText('import path from \'path\';\nlet React;\nReact.render(<App/>);\n', {
 		extends: 'xo-react'
-	}).results;
+	});
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
@@ -124,7 +124,7 @@ test('disable style rules when `prettier` option is enabled', t => {
 });
 
 test('extends `react` support with `prettier` option', t => {
-	const results = fn.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true}).results;
+	const {results} = fn.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true});
 	// `react/jsx-curly-spacing` is disabled by `eslint-config-prettier`
 	t.false(hasRule(results, 'react/jsx-curly-spacing'));
 	// `prettier/prettier` is enabled
@@ -132,14 +132,14 @@ test('extends `react` support with `prettier` option', t => {
 });
 
 test('always use the latest ECMAScript parser so esnext syntax won\'t throw in normal mode', t => {
-	const results = fn.lintText('async function foo() {}\n\nfoo();\n').results;
+	const {results} = fn.lintText('async function foo() {}\n\nfoo();\n');
 	t.is(results[0].errorCount, 0);
 });
 
 test('regression test for #71', t => {
-	const results = fn.lintText(`const foo = { key: 'value' };\nconsole.log(foo);\n`, {
+	const {results} = fn.lintText(`const foo = { key: 'value' };\nconsole.log(foo);\n`, {
 		extends: path.join(__dirname, 'fixtures/extends.js')
-	}).results;
+	});
 	t.is(results[0].errorCount, 0, results[0]);
 });
 

@@ -5,8 +5,7 @@ module.exports = {
 		ecmaVersion: 2018,
 		sourceType: 'module',
 		ecmaFeatures: {
-			jsx: true,
-			experimentalObjectRestSpread: true
+			jsx: true
 		}
 	},
 	// -- end repeat
@@ -81,9 +80,6 @@ module.exports = {
 		// 'node/shebang': 'error',
 		'node/no-deprecated-api': 'error',
 		// Disabled because it causes too much churn and will be moot when we switch to ES2015 modules
-		// 'node/exports-style': ['error', 'module.exports'],
-		// Disabled by default (overrides `plugin:unicorn/recommended`), will be enabled if supported by the Node.js version
-		'unicorn/prefer-spread': 'off',
-		'unicorn/no-new-buffer': 'off'
+		// 'node/exports-style': ['error', 'module.exports']
 	}
 };
