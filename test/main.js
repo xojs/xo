@@ -101,7 +101,7 @@ test('invalid node-engine option', async t => {
 	t.is(err.code, 1);
 });
 
-test('cli option take precedence over config', async t => {
+test('cli option takes precedence over config', async t => {
 	const cwd = path.join(__dirname, 'fixtures/default-options');
 	const input = 'console.log()\n';
 
