@@ -100,3 +100,18 @@ test('invalid node-engine option', async t => {
 	const err = await t.throws(main(['--node-version', 'v', filepath]));
 	t.is(err.code, 1);
 });
+
+test('cli option take precedence over config', async t => {
+	const cwd = path.join(__dirname, 'fixtures/default-options');
+	const input = 'console.log()\n';
+
+	// Use config from package.json
+	await t.notThrows(main(['--stdin'], {cwd, input}));
+
+	// Override package.json config with cli flag
+	await t.throws(main(['--semicolon=true', '--stdin'], {cwd, input}));
+
+	// Use XO default (`true`) even if option is not set in package.json nor cli arg
+	// i.e make sure absent cli flags are not parsed as `false`
+	await t.throws(main(['--stdin'], {input}));
+});
