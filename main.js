@@ -49,6 +49,7 @@ const cli = meow(`
 	Tips
 	  Put options in package.json instead of using flags so other tools can read it.
 `, {
+	booleanDefault: undefined,
 	flags: {
 		init: {
 			type: 'boolean'
@@ -71,15 +72,12 @@ const cli = meow(`
 		space: {
 			type: 'string'
 		},
-		// TODO: We need to be able to tell whether it was specified
-		// or not as CLI arguments overrides package.json config
-		// semicolon: {
-		// 	type: 'boolean',
-		// 	default: true
-		// },
-		// prettier: {
-		// 	type: 'boolean'
-		// },
+		semicolon: {
+			type: 'boolean'
+		},
+		prettier: {
+			type: 'boolean'
+		},
 		nodeVersion: {
 			type: 'string'
 		},
@@ -99,8 +97,7 @@ const cli = meow(`
 			type: 'string'
 		},
 		esnext: {
-			type: 'boolean',
-			default: true
+			type: 'boolean'
 		},
 		cwd: {
 			type: 'string'
