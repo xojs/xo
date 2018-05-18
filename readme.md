@@ -282,11 +282,13 @@ npm i -D babel-eslint
 }
 ```
 
-To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`. No config change necessary.
+To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`:
 
 ```
-npm i -D typescript typescript-eslint-parser`
+npm i -D typescript typescript-eslint-parser
 ```
+
+No config change necessary.
 
 *See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** TSLint rules, which must be set up separately.*
 
