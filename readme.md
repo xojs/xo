@@ -266,25 +266,29 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 
 *ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
 
-### flow
+## Flow and TypeScript
 
-Type: `boolean`<br>
-Default: `false`
+To enable parsing of Flow-typed files, install `babel-eslint` and add it to the config:
 
-Set to true to enable ESLint parsing of Flow-typed files. `flow-bin` and `babel-eslint` must be installed and they are ***required*** to be listed in your `devDependencies`: `npm i -D flow-bin babel-eslint`.
+```
+npm i -D babel-eslint
+```
 
-*This option should **not** be set to `true` if `typescript` is enabled.*
+```json
+{
+	"xo": {
+		"parser": "babel-eslint"
+	}
+}
+```
 
-### typescript
+To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`. No config change necessary.
 
-Type: `boolean`<br>
-Default: `false`
-
-Set to true to enable parsing of TypeScript files. You must install `typescript` and `typescript-eslint-parser`, and they are ***required*** to be listed as `devDependencies`: `npm i -D typescript typescript-eslint-parser`.
+```
+npm i -D typescript typescript-eslint-parser`
+```
 
 *See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** TSLint rules, which must be set up separately.*
-
-*This option should **not** be set to `true` if `flow` is enabled.*
 
 ## Config Overrides
 
