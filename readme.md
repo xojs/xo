@@ -268,6 +268,8 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 
 ## Flow and TypeScript
 
+### Flow
+
 To enable parsing of Flow-typed files, install `babel-eslint` and add it to the config:
 
 ```
@@ -281,6 +283,8 @@ npm i -D babel-eslint
 	}
 }
 ```
+
+### TypeScript
 
 To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`:
 
