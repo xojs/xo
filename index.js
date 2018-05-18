@@ -102,7 +102,9 @@ module.exports.lintFiles = (patterns, opts) => {
 			});
 		}
 
-		if (paths.filter(path => path.includes('.ts')).length > 0) {
+		const isTSFile = ext => ext === '.ts' || ext === '.tsx';
+
+		if (paths.filter(filePath => isTSFile(path.extname(filePath))).length > 0) {
 			opts.parser = 'typescript-eslint-parser';
 		}
 
