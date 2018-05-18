@@ -102,6 +102,10 @@ module.exports.lintFiles = (patterns, opts) => {
 			});
 		}
 
+		if (paths.filter(path => path.includes('.ts')).length > 0) {
+			opts.parser = 'typescript-eslint-parser';
+		}
+
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
 		}
