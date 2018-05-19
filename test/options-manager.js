@@ -279,13 +279,12 @@ test('mergeWithPrettierConf: throw error is `semi`/`semicolon` conflicts', t => 
 });
 
 test('mergeWithPrettierConf: throw error is `space`/`useTabs` conflicts', t => {
-	t.throws(() => manager.mergeWithPrettierConf({space: true}, {useTabs: false}));
-	t.throws(() => manager.mergeWithPrettierConf({space: 4}, {useTabs: false}));
-	t.throws(() => manager.mergeWithPrettierConf({space: 0}, {useTabs: false}));
-	t.throws(() => manager.mergeWithPrettierConf({space: false}, {useTabs: true}));
+	t.throws(() => manager.mergeWithPrettierConf({space: false}, {useTabs: false}));
+	t.throws(() => manager.mergeWithPrettierConf({space: true}, {useTabs: true}));
 
-	t.notThrows(() => manager.mergeWithPrettierConf({space: false}, {useTabs: false}));
-	t.notThrows(() => manager.mergeWithPrettierConf({space: true}, {useTabs: true}));
+	t.notThrows(() => manager.mergeWithPrettierConf({space: 4}, {useTabs: false}));
+	t.notThrows(() => manager.mergeWithPrettierConf({space: true}, {useTabs: false}));
+	t.notThrows(() => manager.mergeWithPrettierConf({space: false}, {useTabs: true}));
 });
 
 test('mergeWithPrettierConf: throw error is `space`/`tabWidth` conflicts', t => {
