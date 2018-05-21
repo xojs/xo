@@ -35,6 +35,9 @@ module.exports = {
 					'.tsx'
 				]
 			}
+		},
+		'import/parsers': {
+			'typescript-eslint-parser': ['.ts', '.tsx']
 		}
 	},
 	rules: {
