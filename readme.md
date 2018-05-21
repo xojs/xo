@@ -273,7 +273,7 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 To enable parsing of Flow-typed files, install `babel-eslint` and add it to the config:
 
 ```
-npm i -D babel-eslint
+$ npm install --save-dev babel-eslint
 ```
 
 ```json
@@ -289,12 +289,12 @@ npm i -D babel-eslint
 To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`:
 
 ```
-npm i -D typescript typescript-eslint-parser
+npm install --save-dev typescript typescript-eslint-parser
 ```
 
 No config change necessary.
 
-*See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** TSLint rules, which must be set up separately.*
+*See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** [TSLint rules](https://github.com/xojs/tslint-xo), which must be set up separately.*
 
 ## Config Overrides
 
