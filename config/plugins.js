@@ -25,7 +25,7 @@ module.exports = {
 		'import/core-modules': [
 			'electron',
 			'atom'
-		],
+		]
 	},
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
