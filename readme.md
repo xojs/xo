@@ -266,7 +266,19 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 
 *ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
 
-## Flow and TypeScript
+## TypeScript and Flow
+
+### TypeScript
+
+To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`:
+
+```
+$ npm install --save-dev typescript typescript-eslint-parser
+```
+
+No config change necessary.
+
+*See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** [TSLint rules](https://github.com/xojs/tslint-xo), which must be set up separately.*
 
 ### Flow
 
@@ -283,18 +295,6 @@ $ npm install --save-dev babel-eslint
 	}
 }
 ```
-
-### TypeScript
-
-To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`:
-
-```
-npm install --save-dev typescript typescript-eslint-parser
-```
-
-No config change necessary.
-
-*See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** [TSLint rules](https://github.com/xojs/tslint-xo), which must be set up separately.*
 
 ## Config Overrides
 
