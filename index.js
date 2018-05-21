@@ -102,12 +102,6 @@ module.exports.lintFiles = (patterns, opts) => {
 			});
 		}
 
-		const isTSFile = ext => ext === '.ts' || ext === '.tsx';
-
-		if (paths.filter(filePath => isTSFile(path.extname(filePath))).length > 0) {
-			opts.parser = 'typescript-eslint-parser';
-		}
-
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
 		}
