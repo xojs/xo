@@ -110,7 +110,8 @@ module.exports.lintFiles = (patterns, opts) => {
 			const extensions =
 				opts.settings &&
 				opts.settings['import/resolver'] &&
-				opts.settings['import/resolver'].node
+				opts.settings['import/resolver'].node &&
+				opts.settings['import/resolver'].node.extensions
 					? opts.settings['import/resolver'].node.extensions
 					: [];
 
