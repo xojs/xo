@@ -104,11 +104,19 @@ module.exports.lintFiles = (patterns, opts) => {
 
 		const isTSFile = ext => ext === '.ts' || ext === '.tsx';
 
-		if (paths.filter(filePath => isTSFile(path.extname(filePath))).length > 0) {
+		if (paths.find(filePath => isTSFile(path.extname(filePath)))) {
 			opts.parser = 'typescript-eslint-parser';
-			opts['settings'] = {
+
+			const {extensions} = opts.settings['import/resolver'].node;
+
+			opts.settings = {
+				...opts.settings,
 				'import/resolver': {
-					node: {extensions: ['.js', '.jsx', '.ts', 'tsx']}
+					node: {
+						extensions: [
+							...new Set(['.js', '.jsx', '.ts', '.tsx', ...extensions])
+						]
+					}
 				},
 				'import/parsers': {
 					'typescript-eslint-parser': ['.ts', '.tsx']
