@@ -26,19 +26,6 @@ module.exports = {
 			'electron',
 			'atom'
 		],
-		'import/resolver': {
-			'node': {
-				'extensions': [
-					'.js',
-					'.jsx',
-					'.ts',
-					'.tsx'
-				]
-			}
-		},
-		'import/parsers': {
-			'typescript-eslint-parser': ['.ts', '.tsx']
-		}
 	},
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
