@@ -63,7 +63,6 @@
 		"eslint-plugin-node": "^6.0.0",
 		"eslint-plugin-prettier": "^2.6.0",
 		"eslint-plugin-promise": "^3.7.0",
-		"eslint-plugin-typescript": "^0.12.0",
 		"eslint-plugin-unicorn": "^4.0.3",
 		"get-stdin": "^6.0.0",
 		"globby": "^8.0.0",
