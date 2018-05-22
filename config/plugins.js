@@ -10,13 +10,12 @@ module.exports = {
 	},
 	// -- end repeat
 	plugins: [
-		'ava',
-		'import',
 		'no-use-extend-native',
-		'node',
-		'promise',
-		'typescript',
+		'ava',
 		'unicorn',
+		'promise',
+		'import',
+		'node'
 	],
 	extends: [
 		'plugin:ava/recommended',
