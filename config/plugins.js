@@ -82,21 +82,8 @@ module.exports = {
 		'node/process-exit-as-throw': 'error',
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin". See https://github.com/mysticatea/eslint-plugin-node/issues/96
 		// 'node/shebang': 'error',
-		'node/no-deprecated-api': 'error',
+		'node/no-deprecated-api': 'error'
 		// Disabled because it causes too much churn and will be moot when we switch to ES2015 modules
 		// 'node/exports-style': ['error', 'module.exports']
-		'typescript/adjacent-overload-signatures': 'error',
-		'typescript/class-name-casing': 'error',
-		'typescript/member-delimiter-style': 'error',
-		'typescript/no-array-constructor': 'error',
-		'typescript/no-empty-interface': 'error',
-		'typescript/no-non-null-assertion': 'error',
-		'typescript/no-triple-slash-reference': 'error',
-		'typescript/no-type-alias': 'error',
-		'typescript/no-unused-vars': 'error',
-		'typescript/no-use-before-define': 'error',
-		'typescript/no-var-requires': 'error',
-		'typescript/prefer-namespace-keyword': 'error',
-		'typescript/type-annotation-spacing': 'error'
 	}
 };
