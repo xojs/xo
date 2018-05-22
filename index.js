@@ -6,6 +6,7 @@ const isEqual = require('lodash.isequal');
 const multimatch = require('multimatch');
 const arrify = require('arrify');
 const optionsManager = require('./lib/options-manager');
+const mergeWith = require('lodash.mergewith');
 
 const mergeReports = reports => {
 	// Merge multiple reports into a single report
@@ -107,28 +108,28 @@ module.exports.lintFiles = (patterns, opts) => {
 		if (paths.find(filePath => isTSFile(path.extname(filePath)))) {
 			opts.parser = 'typescript-eslint-parser';
 
-			const extensions =
-				opts.settings &&
-				opts.settings['import/resolver'] &&
-				opts.settings['import/resolver'].node &&
-				opts.settings['import/resolver'].node.extensions
-					? opts.settings['import/resolver'].node.extensions
-					: [];
-
-			opts.settings = {
-				...opts.settings,
+			const defaults = {
 				'import/resolver': {
 					node: {
-						extensions: [
-							...new Set(['.js', '.jsx', '.ts', '.tsx', ...extensions])
-						]
+						extensions: ['.js', '.jsx', '.ts', '.tsx']
 					}
 				},
 				'import/parsers': {
 					'typescript-eslint-parser': ['.ts', '.tsx']
 				}
 			};
+
+			opts.settings = mergeWith(
+				defaults,
+				opts.settings,
+				(obj, src) => {
+					if (Array.isArray(obj)) {
+						return [...new Set(obj.concat(src))]
+					}
+				}
+			);
 		}
+
 
 		if (!(opts.overrides && opts.overrides.length > 0)) {
 			return runEslint(paths, opts);
