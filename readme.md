@@ -278,6 +278,8 @@ $ npm install --save-dev typescript typescript-eslint-parser
 
 No config change necessary.
 
+To enable additional TypeScript-specific rules, install [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript).
+
 *See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** [TSLint rules](https://github.com/xojs/tslint-xo), which must be set up separately.*
 
 ### Flow
@@ -295,6 +297,8 @@ $ npm install --save-dev babel-eslint
 	}
 }
 ```
+
+To enable additional Flow-specific rules, install [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow).
 
 ## Config Overrides
 
@@ -416,7 +420,8 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
 - [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
-
+- [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript to be used with eslint-config-xo
+- [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow) - ESLint shareable config for Flow to be used with eslint-config-xo
 
 ## Support
 
