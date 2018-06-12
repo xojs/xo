@@ -270,35 +270,11 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 
 ### TypeScript
 
-To enable parsing of TypeScript files (which must end in `.ts` or `.tsx`), install `typescript` and `typescript-eslint-parser`:
-
-```
-$ npm install --save-dev typescript typescript-eslint-parser
-```
-
-No config change necessary.
-
-To enable additional TypeScript-specific rules, install [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript).
-
-*See [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) for known issues. Note that this only enables ESLint rules and **not** [TSLint rules](https://github.com/xojs/tslint-xo), which must be set up separately.*
+See [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo)
 
 ### Flow
 
-To enable parsing of Flow-typed files, install `babel-eslint` and add it to the config:
-
-```
-$ npm install --save-dev babel-eslint
-```
-
-```json
-{
-	"xo": {
-		"parser": "babel-eslint"
-	}
-}
-```
-
-To enable additional Flow-specific rules, install [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow).
+See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo-flow#use-with-xo)
 
 ## Config Overrides
 
