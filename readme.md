@@ -267,6 +267,17 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 *ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
 
 
+## TypeScript and Flow
+
+### TypeScript
+
+See [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo)
+
+### Flow
+
+See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo-flow#use-with-xo)
+
+
 ## Config Overrides
 
 XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
@@ -358,10 +369,6 @@ The [Standard style](http://standardjs.com) is a really cool idea. I too wish we
 
 XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/xojs/eslint-config-xo).
 
-#### Does it support TypeScript?
-
-Not yet, but we have a [shareable config for TSLint](https://github.com/xojs/tslint-xo).
-
 
 ## Editor plugins
 
@@ -391,6 +398,8 @@ Not yet, but we have a [shareable config for TSLint](https://github.com/xojs/tsl
 - [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
 - [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
+- [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript
+- [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow) - ESLint shareable config for Flow
 
 
 ## Support
