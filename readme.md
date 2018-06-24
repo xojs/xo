@@ -266,6 +266,7 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 
 *ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
 
+
 ## TypeScript and Flow
 
 ### TypeScript
@@ -275,6 +276,7 @@ See [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-con
 ### Flow
 
 See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo-flow#use-with-xo)
+
 
 ## Config Overrides
 
@@ -396,8 +398,9 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
 - [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
-- [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript to be used with eslint-config-xo
-- [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow) - ESLint shareable config for Flow to be used with eslint-config-xo
+- [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript
+- [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow) - ESLint shareable config for Flow
+
 
 ## Support
 
