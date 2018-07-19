@@ -114,6 +114,20 @@ updateNotifier({pkg: cli.pkg}).notify();
 
 const {input, flags: opts} = cli;
 
+// Make data types for `opts.space` match those of the API
+if (typeof opts.space === 'string') {
+	if (/^\d+$/.test(opts.space)) {
+		opts.space = parseInt(opts.space, 10);
+	} else if (opts.space) {
+		// Assume `opts.space` was set to a filename when run as `xo --space file.js`
+		input.push(opts.space);
+	}
+
+	if (typeof opts.space !== 'number') {
+		opts.space = true;
+	}
+}
+
 const log = report => {
 	const reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
 

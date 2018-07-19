@@ -115,3 +115,30 @@ test('cli option takes precedence over config', async t => {
 	// i.e make sure absent cli flags are not parsed as `false`
 	await t.throws(main(['--stdin'], {input}));
 });
+
+test('space option with number value', async t => {
+	const cwd = path.join(__dirname, 'fixtures/space');
+	const {stdout} = await t.throws(main(['--space=4', 'one-space.js'], {cwd}));
+	t.true(stdout.includes('Expected indentation of 4 spaces'));
+});
+
+test('space option as boolean', async t => {
+	const cwd = path.join(__dirname, 'fixtures/space');
+	const {stdout} = await t.throws(main(['--space'], {cwd}));
+	t.true(stdout.includes('Expected indentation of 2 spaces'));
+});
+
+test('space option as boolean with filename', async t => {
+	const cwd = path.join(__dirname, 'fixtures/space');
+	const {stdout} = await main(['--reporter=json', '--space', 'two-spaces.js'], {
+		cwd,
+		reject: false
+	});
+	const reports = JSON.parse(stdout);
+
+	// Only the specified file was checked (filename was not the value of `space`)
+	t.is(reports.length, 1);
+
+	// The default space value of 2 was expected
+	t.is(reports[0].errorCount, 0);
+});
