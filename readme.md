@@ -32,7 +32,7 @@ Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be
 - Super simple to add XO to a project with `$ xo --init`.
 - Fix many issues automagically with `$ xo --fix`.
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
-- Specify [indent](#indent) and [semicolon](#semicolon) preferences easily without messing with the rule config.
+- Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
 - Optionally use the [Prettier](https://github.com/prettier/prettier) code style.
 - Great [editor plugins](#editor-plugins).
 
