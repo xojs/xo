@@ -67,13 +67,8 @@ test('buildConfig: space: 4', t => {
 
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false, nodeVersion: '12'});
-	t.deepEqual(config.rules, {
-		semi: ['error', 'never'],
-		'semi-spacing': ['error', {
-			before: false,
-			after: true
-		}]
-	});
+	t.deepEqual(config.rules.semi, ['error', 'never']);
+	t.deepEqual(config.rules['semi-spacing'], ['error', {before: false, after: true}]);
 });
 
 test('buildConfig: prettier: true', t => {
@@ -211,23 +206,13 @@ test('buildConfig: engines: undefined', t => {
 	t.is(config.rules['unicorn/prefer-flat-map'], 'off');
 	t.is(config.rules['node/prefer-promises/dns'], 'off');
 	t.is(config.rules['node/prefer-promises/fs'], 'off');
+	t.is(config.rules['node/no-unsupported-features/es-builtins'], undefined);
+	t.is(config.rules['node/no-unsupported-features/es-syntax'], undefined);
+	t.is(config.rules['node/no-unsupported-features/node-builtins'], undefined);
 });
 
 test('buildConfig: nodeVersion: false', t => {
 	const config = manager.buildConfig({nodeVersion: false});
-
-	// Override all the rules specific to Node.js version
-	t.is(config.rules['prefer-object-spread'], 'off');
-	t.is(config.rules['prefer-rest-params'], 'off');
-	t.is(config.rules['prefer-destructuring'], 'off');
-	t.is(config.rules['promise/prefer-await-to-then'], 'off');
-	t.is(config.rules['unicorn/prefer-flat-map'], 'off');
-	t.is(config.rules['node/prefer-promises/dns'], 'off');
-	t.is(config.rules['node/prefer-promises/fs'], 'off');
-});
-
-test('buildConfig: nodeVersion: invalid range', t => {
-	const config = manager.buildConfig({nodeVersion: '4'});
 
 	// Override all the rules specific to Node.js version
 	t.is(config.rules['prefer-object-spread'], 'off');
@@ -244,6 +229,13 @@ test('buildConfig: nodeVersion: >=6', t => {
 
 	// Turn off rule if we support Node.js below 7.6.0
 	t.is(config.rules['promise/prefer-await-to-then'], 'off');
+	// Set node/no-unsupported-features rules with the nodeVersion
+	t.deepEqual(config.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
+	t.deepEqual(
+		config.rules['node/no-unsupported-features/es-syntax'],
+		['error', {version: '>=6', ignores: ['modules']}]
+	);
+	t.deepEqual(config.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
 });
 
 test('buildConfig: nodeVersion: >=8', t => {
@@ -251,6 +243,13 @@ test('buildConfig: nodeVersion: >=8', t => {
 
 	// Do not turn off rule if we support only Node.js above 7.6.0
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	// Set node/no-unsupported-features rules with the nodeVersion
+	t.deepEqual(config.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
+	t.deepEqual(
+		config.rules['node/no-unsupported-features/es-syntax'],
+		['error', {version: '>=8', ignores: ['modules']}]
+	);
+	t.deepEqual(config.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
 });
 
 test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
@@ -344,7 +343,7 @@ test('mergeWithPrettierConfig: throw error is `space`/`tabWidth` conflicts', t =
 test('buildConfig: rules', t => {
 	const rules = {'object-curly-spacing': ['error', 'always']};
 	const config = manager.buildConfig({rules, nodeVersion: '12'});
-	t.deepEqual(config.rules, rules);
+	t.deepEqual(config.rules['object-curly-spacing'], rules['object-curly-spacing']);
 });
 
 test('buildConfig: parser', t => {
