@@ -132,7 +132,7 @@ test('extends `react` support with `prettier` option', t => {
 });
 
 test('always use the latest ECMAScript parser so esnext syntax won\'t throw in normal mode', t => {
-	const {results} = fn.lintText('async function foo() {}\n\nfoo();\n');
+	const {results} = fn.lintText('async function foo() {}\n\nfoo();\n', {engines: false});
 	t.is(results[0].errorCount, 0);
 });
 

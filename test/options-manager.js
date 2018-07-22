@@ -201,37 +201,47 @@ test('buildConfig: engines: undefined', t => {
 	const config = manager.buildConfig({});
 
 	// Do not include any Node.js version specific rules
-	t.is(config.rules['prefer-spread'], undefined);
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
+	t.is(config.rules['prefer-object-spread'], undefined);
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	t.is(config.rules['node/no-unsupported-features/es-builtins'], undefined);
+	t.is(config.rules['node/no-unsupported-features/es-syntax'], undefined);
+	t.is(config.rules['node/no-unsupported-features/node-builtins'], undefined);
 });
 
 test('buildConfig: engines: false', t => {
 	const config = manager.buildConfig({engines: false});
 
 	// Do not include any Node.js version specific rules
-	t.is(config.rules['prefer-spread'], undefined);
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
+	t.is(config.rules['prefer-object-spread'], undefined);
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	t.is(config.rules['node/no-unsupported-features/es-builtins'], undefined);
+	t.is(config.rules['node/no-unsupported-features/es-syntax'], undefined);
+	t.is(config.rules['node/no-unsupported-features/node-builtins'], undefined);
 });
 
 test('buildConfig: engines: invalid range', t => {
-	const config = manager.buildConfig({engines: {node: '4'}});
+	const config = manager.buildConfig({engines: {node: 'foo'}});
 
 	// Do not include any Node.js version specific rules
-	t.is(config.rules['prefer-spread'], undefined);
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
+	t.is(config.rules['prefer-object-spread'], undefined);
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	t.is(config.rules['node/no-unsupported-features/es-builtins'], undefined);
+	t.is(config.rules['node/no-unsupported-features/es-syntax'], undefined);
+	t.is(config.rules['node/no-unsupported-features/node-builtins'], undefined);
 });
 
-test('buildConfig: engines: >=8', t => {
-	const config = manager.buildConfig({engines: {node: '>=8'}});
+test('buildConfig: engines: >=7.9', t => {
+	const config = manager.buildConfig({engines: {node: '>=7.9'}});
 
 	// Include rules for Node.js 8 and above
+	t.is(config.rules['prefer-object-spread'], undefined);
 	t.is(config.rules['promise/prefer-await-to-then'], 'error');
+	t.deepEqual(config.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=7.9.0'}]);
+	t.deepEqual(
+		config.rules['node/no-unsupported-features/es-syntax'],
+		['error', {version: '>=7.9.0', ignores: ['modules']}]
+	);
+	t.deepEqual(config.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=7.9.0'}]);
 });
 
 test('mergeWithPrettierConf: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
