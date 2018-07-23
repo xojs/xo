@@ -12,7 +12,7 @@
 
 Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` or `.jshintrc` to manage. It just works!
 
-Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
+Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
 *JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting.*
 
@@ -32,7 +32,7 @@ Uses [ESLint](http://eslint.org) underneath, so issues regarding rules should be
 - Super simple to add XO to a project with `$ xo --init`.
 - Fix many issues automagically with `$ xo --fix`.
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
-- Specify [indent](#indent) and [semicolon](#semicolon) preferences easily without messing with the rule config.
+- Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
 - Optionally use the [Prettier](https://github.com/prettier/prettier) code style.
 - Great [editor plugins](#editor-plugins).
 
@@ -156,14 +156,14 @@ You can configure some options in XO by putting it in package.json:
 }
 ```
 
-[Globals](http://eslint.org/docs/user-guide/configuring#specifying-globals) and [rules](http://eslint.org/docs/user-guide/configuring#configuring-rules) can be configured inline in files.
+[Globals](https://eslint.org/docs/user-guide/configuring#specifying-globals) and [rules](https://eslint.org/docs/user-guide/configuring#configuring-rules) can be configured inline in files.
 
 ### envs
 
 Type: `Array`<br>
 Default: `['node']`
 
-Which [environments](http://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
+Which [environments](https://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
 
 ### globals
 
@@ -190,7 +190,7 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 
 Type: `Object`
 
-Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js). See the [ESLint docs](http://eslint.org/docs/rules/) for more info on each rule.
+Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
 
 Please take a moment to consider if you really need to use this option.
 
@@ -231,13 +231,13 @@ If set to `false`, no rules specific to a Node.js version will be enabled.
 
 Type: `Array`
 
-Include third-party [plugins](http://eslint.org/docs/user-guide/configuring.html#configuring-plugins).
+Include third-party [plugins](https://eslint.org/docs/user-guide/configuring.html#configuring-plugins).
 
 ### extends
 
 Type: `Array`, `string`
 
-Use one or more [shareable configs](http://eslint.org/docs/developer-guide/shareable-configs.html) or [plugin configs](http://eslint.org/docs/user-guide/configuring#using-the-configuration-from-a-plugin) to override any of the default rules (like `rules` above).
+Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shareable-configs.html) or [plugin configs](https://eslint.org/docs/user-guide/configuring#using-the-configuration-from-a-plugin) to override any of the default rules (like `rules` above).
 
 ### extensions
 
@@ -249,7 +249,7 @@ Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're s
 
 Type: `Object`
 
-[Shared ESLint settings](http://eslint.org/docs/user-guide/configuring#adding-shared-settings) exposed to rules. For example, to configure the [`import`](https://github.com/benmosher/eslint-plugin-import#settings) plugin to use your webpack configuration for determining search paths, you can put `{"import/resolver": "webpack"}` here.
+[Shared ESLint settings](https://eslint.org/docs/user-guide/configuring#adding-shared-settings) exposed to rules. For example, to configure the [`import`](https://github.com/benmosher/eslint-plugin-import#settings) plugin to use your webpack configuration for determining search paths, you can put `{"import/resolver": "webpack"}` here.
 
 ### parser
 
@@ -363,7 +363,7 @@ It means [hugs and kisses](https://en.wiktionary.org/wiki/xoxo).
 
 #### Why not Standard?
 
-The [Standard style](http://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it simple to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
+The [Standard style](https://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it simple to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
 
 #### Why not ESLint?
 
