@@ -129,10 +129,8 @@ if (input[0] === '-') {
 
 if (opts.nodeVersion) {
 	if (opts.nodeVersion === 'false') {
-		opts.engines = false;
-	} else if (semver.validRange(opts.nodeVersion)) {
-		opts.engines = {node: opts.nodeVersion};
-	} else {
+		opts.nodeVersion = false;
+	} else if (!semver.validRange(opts.nodeVersion)) {
 		console.error('The `node-engine` option must be a valid semver range (for example `>=6`)');
 		process.exit(1);
 	}

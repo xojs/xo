@@ -196,3 +196,43 @@ test('lint negatively gitignored files', async t => {
 
 	t.true(results[0].errorCount > 0);
 });
+
+test('enable rules based on nodeVersion', async t => {
+	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
+	const filename = path.join(cwd, 'promise-then.js');
+	const text = await readFile(filename, 'utf-8');
+
+	let {results} = fn.lintText(text, {nodeVersion: '>=8.0.0'});
+	t.true(hasRule(results, 'promise/prefer-await-to-then'));
+
+	({results} = fn.lintText(text, {nodeVersion: '>=6.0.0'}));
+	t.false(hasRule(results, 'promise/prefer-await-to-then'));
+});
+
+test('enable rules based on nodeVersion in override', async t => {
+	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
+	const filename = path.join(cwd, 'promise-then.js');
+	const text = await readFile(filename, 'utf-8');
+
+	let {results} = fn.lintText(text, {
+		nodeVersion: '>=8.0.0',
+		filename: 'promise-then.js',
+		overrides: [
+			{
+				files: 'promise-*.js',
+				nodeVersion: '>=6.0.0'
+			}
+		]});
+	t.false(hasRule(results, 'promise/prefer-await-to-then'));
+
+	({results} = fn.lintText(text, {
+		nodeVersion: '>=6.0.0',
+		filename: 'promise-then.js',
+		overrides: [
+			{
+				files: 'promise-*.js',
+				nodeVersion: '>=8.0.0'
+			}
+		]}));
+	t.true(hasRule(results, 'promise/prefer-await-to-then'));
+});

@@ -1,0 +1,15 @@
+{
+	"name": "application-name",
+	"version": "0.0.1",
+	"engines": {
+		"node": ">=6.0.0"
+	},
+	"xo": {
+		"overrides": [
+			{
+				"files": "*-transpile.js",
+				"nodeVersion": ">=8.0.0"
+			}
+		]
+	}
+}
