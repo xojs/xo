@@ -110,13 +110,13 @@ test('extends support with `esnext` option', t => {
 });
 
 test('disable style rules when `prettier` option is enabled', t => {
-	const withoutPrettier = fn.lintText('(a) => {}\n', {}).results;
+	const withoutPrettier = fn.lintText('(a) => {}\n', {filename: 'test.js'}).results;
 	// `arrow-parens` is enabled
 	t.true(hasRule(withoutPrettier, 'arrow-parens'));
 	// `prettier/prettier` is disabled
 	t.false(hasRule(withoutPrettier, 'prettier/prettier'));
 
-	const withPrettier = fn.lintText('(a) => {}\n', {prettier: true}).results;
+	const withPrettier = fn.lintText('(a) => {}\n', {prettier: true, filename: 'test.js'}).results;
 	// `arrow-parens` is disabled by `eslint-config-prettier`
 	t.false(hasRule(withPrettier, 'arrow-parens'));
 	// `prettier/prettier` is enabled
@@ -124,7 +124,7 @@ test('disable style rules when `prettier` option is enabled', t => {
 });
 
 test('extends `react` support with `prettier` option', t => {
-	const {results} = fn.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true});
+	const {results} = fn.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true, filename: 'test.jsx'});
 	// `react/jsx-curly-spacing` is disabled by `eslint-config-prettier`
 	t.false(hasRule(results, 'react/jsx-curly-spacing'));
 	// `prettier/prettier` is enabled
