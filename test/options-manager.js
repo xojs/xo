@@ -207,8 +207,8 @@ test('buildConfig: engines: undefined', t => {
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
-test('buildConfig: engines: false', t => {
-	const config = manager.buildConfig({engines: false});
+test('buildConfig: nodeVersion: false', t => {
+	const config = manager.buildConfig({nodeVersion: false});
 
 	// Do not include any Node.js version specific rules
 	t.is(config.rules['prefer-spread'], undefined);
@@ -217,8 +217,8 @@ test('buildConfig: engines: false', t => {
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
-test('buildConfig: engines: invalid range', t => {
-	const config = manager.buildConfig({engines: {node: '4'}});
+test('buildConfig: nodeVersion: invalid range', t => {
+	const config = manager.buildConfig({nodeVersion: '4'});
 
 	// Do not include any Node.js version specific rules
 	t.is(config.rules['prefer-spread'], undefined);
@@ -227,8 +227,8 @@ test('buildConfig: engines: invalid range', t => {
 	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
-test('buildConfig: engines: >=8', t => {
-	const config = manager.buildConfig({engines: {node: '>=8'}});
+test('buildConfig: nodeVersion: >=8', t => {
+	const config = manager.buildConfig({nodeVersion: '>=8'});
 
 	// Include rules for Node.js 8 and above
 	t.is(config.rules['promise/prefer-await-to-then'], 'error');
@@ -400,47 +400,47 @@ test('groupConfigs', t => {
 test('mergeWithPkgConf: use child if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
 	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, childConfig.xo, {cwd}, {engines: {}});
+	const expected = Object.assign({}, childConfig.xo, {cwd, nodeVersion: undefined});
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: use parent if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested');
 	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, parentConfig.xo, {cwd}, {engines: {}});
+	const expected = Object.assign({}, parentConfig.xo, {cwd, nodeVersion: undefined});
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: use parent if child is ignored', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-ignore');
 	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, parentConfig.xo, {cwd}, {engines: {}});
+	const expected = Object.assign({}, parentConfig.xo, {cwd, nodeVersion: undefined});
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: use child if child is empty', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
 	const result = manager.mergeWithPkgConf({cwd});
-	t.deepEqual(result, {cwd, engines: {}});
+	t.deepEqual(result, {nodeVersion: undefined, cwd});
 });
 
 test('mergeWithPkgConf: read engines from package.json', t => {
 	const cwd = path.resolve('fixtures', 'engines');
 	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, {engines: enginesConfig.engines}, {cwd});
+	const expected = {nodeVersion: enginesConfig.engines.node, cwd};
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: XO engine options supersede package.json\'s', t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPkgConf({cwd, engines: {node: '>=8'}});
-	const expected = Object.assign({}, {engines: {node: '>=8'}}, {cwd});
+	const result = manager.mergeWithPkgConf({cwd, nodeVersion: '>=8'});
+	const expected = {nodeVersion: '>=8', cwd};
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPkgConf: XO engine options false supersede package.json\'s', t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPkgConf({cwd, engines: false});
-	const expected = Object.assign({}, {engines: false}, {cwd});
+	const result = manager.mergeWithPkgConf({cwd, nodeVersion: false});
+	const expected = {nodeVersion: false, cwd};
 	t.deepEqual(result, expected);
 });

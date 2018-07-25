@@ -4,6 +4,11 @@ import fn from '..';
 
 process.chdir(__dirname);
 
+const hasRule = (results, filePath, ruleId) => {
+	const result = results.find(x => x.filePath === filePath);
+	return result ? result.messages.some(x => x.ruleId === ruleId) : false;
+};
+
 test('only accepts whitelisted extensions', async t => {
 	// Markdown files will always produce linter errors and will not be going away
 	const mdGlob = path.join(__dirname, '..', '*.md');
@@ -93,4 +98,25 @@ test('multiple negative patterns should act as positive patterns', async t => {
 	paths.sort();
 
 	t.deepEqual(paths, ['!!unicorn.js', '!unicorn.js']);
+});
+
+test('enable rules based on nodeVersion', async t => {
+	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
+
+	// The transpiled file (as specified in `overrides`) should use `await`
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/engines-overrides/promise-then-transpile.js'),
+			'promise/prefer-await-to-then'
+		)
+	);
+	// The non transpiled files can use `.then`
+	t.false(
+		hasRule(
+			results,
+			path.resolve('fixtures/engines-overrides/promise-then.js'),
+			'promise/prefer-await-to-then'
+		)
+	);
 });
