@@ -142,3 +142,11 @@ test('space option as boolean with filename', async t => {
 	// The default space value of 2 was expected
 	t.is(reports[0].errorCount, 0);
 });
+
+test('space option with boolean strings', async t => {
+	const cwd = path.join(__dirname, 'fixtures/space');
+	const trueResult = await t.throws(main(['--space=true'], {cwd}));
+	const falseResult = await t.throws(main(['--space=false'], {cwd}));
+	t.true(trueResult.stdout.includes('Expected indentation of 2 spaces'));
+	t.true(falseResult.stdout.includes('Expected indentation of 1 tab'));
+});

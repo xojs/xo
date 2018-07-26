@@ -115,15 +115,19 @@ updateNotifier({pkg: cli.pkg}).notify();
 const {input, flags: opts} = cli;
 
 // Make data types for `opts.space` match those of the API
+// Check for string type because `xo --no-space` sets `opts.space` to `false`
 if (typeof opts.space === 'string') {
 	if (/^\d+$/.test(opts.space)) {
 		opts.space = parseInt(opts.space, 10);
-	} else if (opts.space) {
-		// Assume `opts.space` was set to a filename when run as `xo --space file.js`
-		input.push(opts.space);
-	}
-
-	if (typeof opts.space !== 'number') {
+	} else if (opts.space === 'true') {
+		opts.space = true;
+	} else if (opts.space === 'false') {
+		opts.space = false;
+	} else {
+		if (opts.space !== '') {
+			// Assume `opts.space` was set to a filename when run as `xo --space file.js`
+			input.push(opts.space);
+		}
 		opts.space = true;
 	}
 }
