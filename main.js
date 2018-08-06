@@ -117,7 +117,7 @@ const {input, flags: opts} = cli;
 // Make data types for `opts.space` match those of the API
 // Check for string type because `xo --no-space` sets `opts.space` to `false`
 if (typeof opts.space === 'string') {
-	if (/^\d+$/.test(opts.space)) {
+	if (/^\d+$/u.test(opts.space)) {
 		opts.space = parseInt(opts.space, 10);
 	} else if (opts.space === 'true') {
 		opts.space = true;

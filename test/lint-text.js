@@ -74,7 +74,7 @@ test('`ignores` option without filename', t => {
 		fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
 			ignores: ['ignored/**/*.js']
 		});
-	}, /The `ignores` option requires the `filename` option to be defined./);
+	}, /The `ignores` option requires the `filename` option to be defined./u);
 });
 
 test('JSX support', t => {

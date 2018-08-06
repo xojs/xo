@@ -27,7 +27,7 @@ test('stdin-filename option with stdin', async t => {
 		input: 'console.log()\n',
 		reject: false
 	});
-	t.regex(stdout, /unicorn-file:/);
+	t.regex(stdout, /unicorn-file:/u);
 });
 
 test('reporter option', async t => {

@@ -42,7 +42,7 @@ test('normalizeOpts: falsie values stay falsie', t => {
 
 test('buildConfig: defaults', t => {
 	const config = manager.buildConfig({});
-	t.true(/[\\/]\.xo-cache[\\/]?$/.test(config.cacheLocation));
+	t.true(/[\\/]\.xo-cache[\\/]?$/u.test(config.cacheLocation));
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
 	t.is(config.baseConfig.extends[0], 'xo/esnext');
