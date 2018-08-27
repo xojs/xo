@@ -217,7 +217,7 @@ The [Prettier options](https://prettier.io/docs/en/options.html) will be read fr
 - [bracketSpacing](https://prettier.io/docs/en/options.html#bracket-spacing): `false`
 - [jsxBracketSameLine](https://prettier.io/docs/en/options.html#jsx-brackets): `false`
 
-If contradicting options are set for both Prettier and XO and error will be thrown.
+If contradicting options are set for both Prettier and XO an error will be thrown.
 
 ### nodeVersion
 
