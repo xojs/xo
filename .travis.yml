@@ -5,4 +5,5 @@ node_js:
   - '6'
 before_install:
   - npm install --global npm
-after_success: npm run coveralls
+after_success:
+  - './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
