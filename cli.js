@@ -12,5 +12,5 @@ if (!hasFlag('no-local') && localCLI && localCLI !== __filename) {
 	debug('Using local install of XO');
 	require(localCLI);
 } else {
-	require('./main');
+	require('./cli-main');
 }

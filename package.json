@@ -14,7 +14,7 @@
 		"node": ">=6"
 	},
 	"scripts": {
-		"test": "node main.js && eslint . && nyc ava"
+		"test": "node cli-main.js && eslint . && nyc ava"
 	},
 	"files": [
 		"config",

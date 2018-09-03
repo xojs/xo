@@ -10,12 +10,12 @@ const readFile = pify(fs.readFile);
 const hasRule = (results, ruleId) => results[0].messages.some(x => x.ruleId === ruleId);
 
 test('.lintText()', t => {
-	const {results} = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`);
+	const {results} = fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n');
 	t.true(hasRule(results, 'semi'));
 });
 
 test('default `ignores`', t => {
-	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+	const result = fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 		filename: 'node_modules/ignored/index.js'
 	});
 	t.is(result.errorCount, 0);
@@ -23,7 +23,7 @@ test('default `ignores`', t => {
 });
 
 test('`ignores` option', t => {
-	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+	const result = fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 		filename: 'ignored/index.js',
 		ignores: ['ignored/**/*.js']
 	});
@@ -32,7 +32,7 @@ test('`ignores` option', t => {
 });
 
 test('`ignores` option without cwd', t => {
-	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+	const result = fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 		filename: 'ignored/index.js',
 		ignores: ['ignored/**/*.js']
 	});
@@ -41,7 +41,7 @@ test('`ignores` option without cwd', t => {
 });
 
 test('respect overrides', t => {
-	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+	const result = fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 		filename: 'ignored/index.js',
 		ignores: ['ignored/**/*.js'],
 		overrides: [
@@ -56,7 +56,7 @@ test('respect overrides', t => {
 });
 
 test('overriden ignore', t => {
-	const result = fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+	const result = fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 		filename: 'unignored.js',
 		overrides: [
 			{
@@ -71,7 +71,7 @@ test('overriden ignore', t => {
 
 test('`ignores` option without filename', t => {
 	t.throws(() => {
-		fn.lintText(`'use strict'\nconsole.log('unicorn');\n`, {
+		fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 			ignores: ['ignored/**/*.js']
 		});
 	}, /The `ignores` option requires the `filename` option to be defined./u);
@@ -137,7 +137,7 @@ test('always use the latest ECMAScript parser so esnext syntax won\'t throw in n
 });
 
 test('regression test for #71', t => {
-	const {results} = fn.lintText(`const foo = { key: 'value' };\nconsole.log(foo);\n`, {
+	const {results} = fn.lintText('const foo = { key: \'value\' };\nconsole.log(foo);\n', {
 		extends: path.join(__dirname, 'fixtures/extends.js')
 	});
 	t.is(results[0].errorCount, 0, results[0]);
