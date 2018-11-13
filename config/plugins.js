@@ -98,9 +98,7 @@ module.exports = {
 			'error',
 			{
 				allow: [
-					'babel-polyfill',
 					'@babel/polyfill',
-					'babel-register',
 					'@babel/register'
 				]
 			}
