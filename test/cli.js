@@ -4,7 +4,7 @@ import execa from 'execa';
 
 const cwd = path.dirname(__dirname);
 const packageJson = require(path.join(cwd, 'package.json'));
-const cli = (args, opts) => execa(path.join(cwd, 'cli.js'), args, opts);
+const cli = (args, options) => execa(path.join(cwd, 'cli.js'), args, options);
 
 test('runs no-local install of XO', async t => {
 	const {stdout} = await cli(['--no-local', '--version'], {cwd});

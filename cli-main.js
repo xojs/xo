@@ -112,71 +112,70 @@ const cli = meow(`
 
 updateNotifier({pkg: cli.pkg}).notify();
 
-const {input, flags: opts} = cli;
+const {input, flags: options} = cli;
 
-// Make data types for `opts.space` match those of the API
-// Check for string type because `xo --no-space` sets `opts.space` to `false`
-if (typeof opts.space === 'string') {
-	if (/^\d+$/u.test(opts.space)) {
-		opts.space = parseInt(opts.space, 10);
-	} else if (opts.space === 'true') {
-		opts.space = true;
-	} else if (opts.space === 'false') {
-		opts.space = false;
+// Make data types for `options.space` match those of the API
+// Check for string type because `xo --no-space` sets `options.space` to `false`
+if (typeof options.space === 'string') {
+	if (/^\d+$/u.test(options.space)) {
+		options.space = parseInt(options.space, 10);
+	} else if (options.space === 'true') {
+		options.space = true;
+	} else if (options.space === 'false') {
+		options.space = false;
 	} else {
-		if (opts.space !== '') {
-			// Assume `opts.space` was set to a filename when run as `xo --space file.js`
-			input.push(opts.space);
+		if (options.space !== '') {
+			// Assume `options.space` was set to a filename when run as `xo --space file.js`
+			input.push(options.space);
 		}
-		opts.space = true;
+		options.space = true;
 	}
 }
 
 const log = report => {
-	const reporter = opts.reporter ? xo.getFormatter(opts.reporter) : formatterPretty;
-
+	const reporter = options.reporter ? xo.getFormatter(options.reporter) : formatterPretty;
 	process.stdout.write(reporter(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
 };
 
 // `xo -` => `xo --stdin`
 if (input[0] === '-') {
-	opts.stdin = true;
+	options.stdin = true;
 	input.shift();
 }
 
-if (opts.nodeVersion) {
-	if (opts.nodeVersion === 'false') {
-		opts.nodeVersion = false;
-	} else if (!semver.validRange(opts.nodeVersion)) {
+if (options.nodeVersion) {
+	if (options.nodeVersion === 'false') {
+		options.nodeVersion = false;
+	} else if (!semver.validRange(options.nodeVersion)) {
 		console.error('The `node-engine` option must be a valid semver range (for example `>=6`)');
 		process.exit(1);
 	}
 }
 
-if (opts.init) {
+if (options.init) {
 	require('xo-init')();
-} else if (opts.stdin) {
-	getStdin().then(str => {
-		if (opts.fix) {
-			console.log(xo.lintText(str, opts).results[0].output);
+} else if (options.stdin) {
+	getStdin().then(stdin => {
+		if (options.fix) {
+			console.log(xo.lintText(stdin, options).results[0].output);
 			return;
 		}
 
-		if (opts.open) {
+		if (options.open) {
 			console.error('The `open` option is not supported on stdin');
 			process.exit(1);
 		}
 
-		log(xo.lintText(str, opts));
+		log(xo.lintText(stdin, options));
 	});
 } else {
-	xo.lintFiles(input, opts).then(report => {
-		if (opts.fix) {
+	xo.lintFiles(input, options).then(report => {
+		if (options.fix) {
 			xo.outputFixes(report);
 		}
 
-		if (opts.open) {
+		if (options.open) {
 			openReport(report);
 		}
 

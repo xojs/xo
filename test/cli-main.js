@@ -7,7 +7,7 @@ import tempWrite from 'temp-write';
 
 process.chdir(__dirname);
 
-const main = (args, opts) => execa(path.join(__dirname, '../cli-main.js'), args, opts);
+const main = (args, options) => execa(path.join(__dirname, '../cli-main.js'), args, options);
 
 test('fix option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');

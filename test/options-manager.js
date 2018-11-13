@@ -12,8 +12,8 @@ const manager = proxyquire('../lib/options-manager', {
 	'resolve-from': (cwd, path) => `cwd/${path}`
 });
 
-test('normalizeOpts: makes all the opts plural and arrays', t => {
-	const opts = manager.normalizeOpts({
+test('normalizeOptions: makes all the options plural and arrays', t => {
+	const options = manager.normalizeOptions({
 		env: 'node',
 		global: 'foo',
 		ignore: 'test.js',
@@ -24,7 +24,7 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 		extension: 'html'
 	});
 
-	t.deepEqual(opts, {
+	t.deepEqual(options, {
 		envs: ['node'],
 		globals: ['foo'],
 		ignores: ['test.js'],
@@ -36,8 +36,8 @@ test('normalizeOpts: makes all the opts plural and arrays', t => {
 	});
 });
 
-test('normalizeOpts: falsie values stay falsie', t => {
-	t.deepEqual(manager.normalizeOpts({}), {});
+test('normalizeOptions: falsie values stay falsie', t => {
+	t.deepEqual(manager.normalizeOptions({}), {});
 });
 
 test('buildConfig: defaults', t => {
@@ -235,28 +235,59 @@ test('buildConfig: nodeVersion: >=8', t => {
 });
 
 test('mergeWithPrettierConf: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
-	const prettierOpts = {singleQuote: false, trailingComma: 'all', bracketSpacing: false, jsxBracketSameLine: false};
-	const result = manager.mergeWithPrettierConf({}, prettierOpts);
-	const expected = Object.assign({}, prettierOpts, {tabWidth: 2, useTabs: true, semi: true});
+	const prettierOptions = {
+		singleQuote: false,
+		trailingComma: 'all',
+		bracketSpacing: false,
+		jsxBracketSameLine: false
+	};
+	const result = manager.mergeWithPrettierConf({}, prettierOptions);
+	const expected = Object.assign(
+		{},
+		prettierOptions,
+		{
+			tabWidth: 2,
+			useTabs: true,
+			semi: true
+		}
+	);
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from xo config', t => {
-	const prettierOpts = {tabWidth: 4, useTabs: false, semi: false};
+	const prettierOptions = {
+		tabWidth: 4,
+		useTabs: false,
+		semi: false
+	};
 	const result = manager.mergeWithPrettierConf({space: 4, semicolon: false}, {});
 	const expected = Object.assign(
-		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'none'},
-		prettierOpts
+		{
+			bracketSpacing: false,
+			jsxBracketSameLine: false,
+			singleQuote: true,
+			trailingComma: 'none'
+		},
+		prettierOptions
 	);
 	t.deepEqual(result, expected);
 });
 
 test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from prettier config', t => {
-	const prettierOpts = {useTabs: false, semi: false, tabWidth: 4};
-	const result = manager.mergeWithPrettierConf({}, prettierOpts);
+	const prettierOptions = {
+		useTabs: false,
+		semi: false,
+		tabWidth: 4
+	};
+	const result = manager.mergeWithPrettierConf({}, prettierOptions);
 	const expected = Object.assign(
-		{bracketSpacing: false, jsxBracketSameLine: false, singleQuote: true, trailingComma: 'none'},
-		prettierOpts
+		{
+			bracketSpacing: false,
+			jsxBracketSameLine: false,
+			singleQuote: true,
+			trailingComma: 'none'
+		},
+		prettierOptions
 	);
 	t.deepEqual(result, expected);
 });
@@ -352,7 +383,7 @@ test('groupConfigs', t => {
 		'/user/bar/hello.js'
 	];
 
-	const opts = {
+	const options = {
 		esnext: false
 	};
 
@@ -368,17 +399,17 @@ test('groupConfigs', t => {
 		}
 	];
 
-	const result = manager.groupConfigs(paths, opts, overrides);
+	const result = manager.groupConfigs(paths, options, overrides);
 
 	t.deepEqual(result, [
 		{
-			opts: {
+			options: {
 				esnext: true
 			},
 			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
 		},
 		{
-			opts: {
+			options: {
 				esnext: true,
 				space: 3,
 				envs: ['mocha']
@@ -386,13 +417,13 @@ test('groupConfigs', t => {
 			paths: ['/user/foo/howdy.js']
 		},
 		{
-			opts: {
+			options: {
 				esnext: false
 			},
 			paths: ['/user/bar/hello.js']
 		}
 	].map(obj => {
-		obj.opts = Object.assign(manager.emptyOptions(), obj.opts);
+		obj.options = Object.assign(manager.emptyOptions(), obj.options);
 		return obj;
 	}));
 });

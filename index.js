@@ -26,44 +26,45 @@ const mergeReports = reports => {
 	};
 };
 
-const processReport = (report, opts) => {
-	report.results = opts.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
+const processReport = (report, options) => {
+	report.results = options.quiet ? eslint.CLIEngine.getErrorResults(report.results) : report.results;
 	return report;
 };
 
-const runEslint = (paths, opts) => {
-	const config = optionsManager.buildConfig(opts);
+const runEslint = (paths, options) => {
+	const config = optionsManager.buildConfig(options);
 	const engine = new eslint.CLIEngine(config);
 	const report = engine.executeOnFiles(paths, config);
-
-	return processReport(report, opts);
+	return processReport(report, options);
 };
 
-module.exports.lintText = (str, opts) => {
-	opts = optionsManager.preprocess(opts);
+module.exports.lintText = (str, options) => {
+	options = optionsManager.preprocess(options);
 
-	if (opts.overrides && opts.overrides.length > 0) {
-		const {overrides} = opts;
-		delete opts.overrides;
+	if (options.overrides && options.overrides.length > 0) {
+		const {overrides} = options;
+		delete options.overrides;
 
-		const filename = path.relative(opts.cwd, opts.filename);
+		const filename = path.relative(options.cwd, options.filename);
 
 		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
-		opts = optionsManager.mergeApplicableOverrides(opts, foundOverrides.applicable);
+		options = optionsManager.mergeApplicableOverrides(options, foundOverrides.applicable);
 	}
 
-	opts = optionsManager.buildConfig(opts);
+	options = optionsManager.buildConfig(options);
 	const defaultIgnores = optionsManager.getIgnores({}).ignores;
 
-	if (opts.ignores && !isEqual(defaultIgnores, opts.ignores) && typeof opts.filename !== 'string') {
+	if (options.ignores && !isEqual(defaultIgnores, options.ignores) && typeof options.filename !== 'string') {
 		throw new Error('The `ignores` option requires the `filename` option to be defined.');
 	}
 
-	if (opts.filename) {
-		const filename = path.relative(opts.cwd, opts.filename);
+	if (options.filename) {
+		const filename = path.relative(options.cwd, options.filename);
 
-		if (multimatch(filename, opts.ignores).length > 0 ||
-			globby.gitignore.sync({cwd: opts.cwd, ignore: opts.ignores})(opts.filename)) {
+		if (
+			multimatch(filename, options.ignores).length > 0 ||
+			globby.gitignore.sync({cwd: options.cwd, ignore: options.ignores})(options.filename)
+		) {
 			return {
 				errorCount: 0,
 				warningCount: 0,
@@ -77,41 +78,45 @@ module.exports.lintText = (str, opts) => {
 		}
 	}
 
-	const engine = new eslint.CLIEngine(opts);
-	const report = engine.executeOnText(str, opts.filename);
+	const engine = new eslint.CLIEngine(options);
+	const report = engine.executeOnText(str, options.filename);
 
-	return processReport(report, opts);
+	return processReport(report, options);
 };
 
-module.exports.lintFiles = (patterns, opts) => {
-	opts = optionsManager.preprocess(opts);
+module.exports.lintFiles = (patterns, options) => {
+	options = optionsManager.preprocess(options);
 
 	const isEmptyPatterns = patterns.length === 0;
-	const defaultPattern = `**/*.{${opts.extensions.join(',')}}`;
+	const defaultPattern = `**/*.{${options.extensions.join(',')}}`;
 
 	return globby(
 		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
-		{ignore: opts.ignores, gitignore: true, cwd: opts.cwd}
+		{
+			ignore: options.ignores,
+			gitignore: true,
+			cwd: options.cwd
+		}
 	).then(paths => {
 		// Filter out unwanted file extensions
 		// For silly users that don't specify an extension in the glob pattern
 		if (!isEmptyPatterns) {
 			paths = paths.filter(filePath => {
 				const ext = path.extname(filePath).replace('.', '');
-				return opts.extensions.includes(ext);
+				return options.extensions.includes(ext);
 			});
 		}
 
-		if (!(opts.overrides && opts.overrides.length > 0)) {
-			return runEslint(paths, opts);
+		if (!(options.overrides && options.overrides.length > 0)) {
+			return runEslint(paths, options);
 		}
 
-		const {overrides} = opts;
-		delete opts.overrides;
+		const {overrides} = options;
+		delete options.overrides;
 
-		const grouped = optionsManager.groupConfigs(paths, opts, overrides);
+		const grouped = optionsManager.groupConfigs(paths, options, overrides);
 
-		return mergeReports(grouped.map(data => runEslint(data.paths, data.opts)));
+		return mergeReports(grouped.map(data => runEslint(data.paths, data.options)));
 	});
 };
 
