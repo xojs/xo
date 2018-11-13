@@ -95,12 +95,42 @@ module.exports = {
 
 		'node/process-exit-as-throw': 'error',
 
-		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in "bin". See https://github.com/mysticatea/eslint-plugin-node/issues/96
+		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in 'bin'. See https://github.com/mysticatea/eslint-plugin-node/issues/96
 		// 'node/shebang': 'error',
 
-		'node/no-deprecated-api': 'error'
+		'node/no-deprecated-api': 'error',
 
 		// Disabled because it causes too much churn and will be moot when we switch to ES2015 modules
 		// 'node/exports-style': ['error', 'module.exports']
+
+		'node/prefer-global/buffer': [
+			'error',
+			'always'
+		],
+		'node/prefer-global/console': [
+			'error',
+			'always'
+		],
+		'node/prefer-global/process': [
+			'error',
+			'always'
+		]
+		// TODO: Enable these when XO targets Node.js 8
+		// 'node/prefer-global/text-decoder': [
+		// 	'error',
+		// 	'always'
+		// ],
+		// 'node/prefer-global/text-encoder': [
+		// 	'error',
+		// 	'always'
+		// ],
+		// 'node/prefer-global/url-search-params': [
+		// 	'error',
+		// 	'always'
+		// ],
+		// 'node/prefer-global/url': [
+		// 	'error',
+		// 	'always'
+		// ]
 	}
 };
