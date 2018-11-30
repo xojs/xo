@@ -57,7 +57,7 @@
 		"eslint-formatter-pretty": "^2.0.0",
 		"eslint-plugin-ava": "^5.1.0",
 		"eslint-plugin-import": "^2.14.0",
-		"cosmiconfig": "^5.0.5",
+		"cosmiconfig": "^5.0.7",
 		"eslint-plugin-no-use-extend-native": "^0.3.12",
 		"eslint-plugin-node": "^8.0.0",
 		"eslint-plugin-prettier": "^3.0.0",
