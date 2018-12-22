@@ -16,7 +16,8 @@ module.exports = {
 		'unicorn',
 		'promise',
 		'import',
-		'node'
+		'node',
+		'eslint-comments'
 	],
 	extends: [
 		'plugin:ava/recommended',
@@ -162,7 +163,7 @@ module.exports = {
 		'node/prefer-global/process': [
 			'error',
 			'always'
-		]
+		],
 		// TODO: Enable these when XO targets Node.js 8
 		// 'node/prefer-global/text-decoder': [
 		// 	'error',
@@ -180,5 +181,20 @@ module.exports = {
 		// 	'error',
 		// 	'always'
 		// ]
+
+		'eslint-comments/disable-enable-pair': [
+			'error',
+			{
+				allowWholeFile: true
+			}
+		],
+		'eslint-comments/no-aggregating-enable': 'error',
+		'eslint-comments/no-duplicate-disable': 'error',
+
+		// Disabled as it's already covered by the `unicorn/no-abusive-eslint-disable` rule
+		// 'eslint-comments/no-unlimited-disable': 'error',
+
+		'eslint-comments/no-unused-disable': 'error',
+		'eslint-comments/no-unused-enable': 'error'
 	}
 };
