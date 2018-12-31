@@ -1,6 +1,7 @@
 import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
+import slash from 'slash';
 import parentConfig from './fixtures/nested/package';
 import childConfig from './fixtures/nested/child/package';
 import prettierConfig from './fixtures/prettier/package';
@@ -42,7 +43,7 @@ test('normalizeOptions: falsie values stay falsie', t => {
 
 test('buildConfig: defaults', t => {
 	const config = manager.buildConfig({});
-	t.true(/[\\/]\.cache\/xo[\\/]?$/u.test(config.cacheLocation));
+	t.true(/[\\/]\.cache\/xo[\\/]?$/u.test(slash(config.cacheLocation)));
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
 	t.is(config.baseConfig.extends[0], 'xo/esnext');
