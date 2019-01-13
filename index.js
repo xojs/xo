@@ -122,7 +122,7 @@ module.exports.lintFiles = (patterns, options) => {
 
 module.exports.debugInformation = options => {
 	const extensionOptions = optionsManager.getExtensions(options);
-	const extensions = extensionOptions.extensions.concat(extensionOptions.extension);
+	const extensions = extensionOptions.extensions.concat(extensionOptions.extension || []);
 	console.log('EXTENSIONS: ' + extensions.join(' | '));
 
 	const ignores = optionsManager.getIgnores(options).ignore; // Display only files ignored by the user
@@ -133,6 +133,20 @@ module.exports.debugInformation = options => {
 			});
 		});
 	}
+
+	if (options.extend !== undefined) {
+		options.extends = [options.extend];
+	} else if (Array.isArray(options.extend)) {
+		options.extends = [...options.extend];
+	} else {
+		options.extends = [];
+	}
+
+	options.cwd = options.cwd || process.cwd();
+	const eslintExtends = optionsManager.buildConfig(options).baseConfig.extends;
+	eslintExtends.forEach(extend => {
+		console.log('ESLINT EXTENDS: ' + extend);
+	});
 };
 
 module.exports.getFormatter = eslint.CLIEngine.getFormatter;
