@@ -121,7 +121,8 @@ module.exports.lintFiles = (patterns, options) => {
 };
 
 module.exports.debugInformation = options => {
-	const extensions = [...optionsManager.getExtensions(options).extensions];
+	const extensionOptions = optionsManager.getExtensions(options);
+	const extensions = extensionOptions.extensions.concat(extensionOptions.extension);
 	console.log('EXTENSIONS: ' + extensions.join(' | '));
 
 	const ignores = optionsManager.getIgnores(options).ignore; // Display only files ignored by the user
