@@ -120,6 +120,20 @@ module.exports.lintFiles = (patterns, options) => {
 	});
 };
 
+module.exports.debugInformation = options => {
+	const extensions = [...optionsManager.getExtensions(options).extensions];
+	console.log('EXTENSIONS: ' + extensions.join(' | '));
+
+	const ignores = optionsManager.getIgnores(options).ignore; // Display only files ignored by the user
+	if (ignores !== undefined) {
+		globby(ignores).then(files => {
+			files.forEach(file => {
+				console.log('IGNORED FILE: ' + file);
+			});
+		});
+	}
+};
+
 module.exports.getFormatter = eslint.CLIEngine.getFormatter;
 module.exports.getErrorResults = eslint.CLIEngine.getErrorResults;
 module.exports.outputFixes = eslint.CLIEngine.outputFixes;
