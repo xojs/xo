@@ -128,6 +128,7 @@ if (typeof options.space === 'string') {
 			// Assume `options.space` was set to a filename when run as `xo --space file.js`
 			input.push(options.space);
 		}
+
 		options.space = true;
 	}
 }
