@@ -98,6 +98,8 @@ module.exports.lintFiles = (patterns, options) => {
 			cwd: options.cwd
 		}
 	).then(paths => {
+		paths = paths.map(x => path.relative(options.cwd, x));
+
 		// Filter out unwanted file extensions
 		// For silly users that don't specify an extension in the glob pattern
 		if (!isEmptyPatterns) {
