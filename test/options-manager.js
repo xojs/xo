@@ -2,10 +2,10 @@ import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
 import slash from 'slash';
-import parentConfig from './fixtures/nested/package';
-import childConfig from './fixtures/nested/child/package';
-import prettierConfig from './fixtures/prettier/package';
-import enginesConfig from './fixtures/engines/package';
+import parentConfig from './fixtures/nested/package.json';
+import childConfig from './fixtures/nested/child/package.json';
+import prettierConfig from './fixtures/prettier/package.json';
+import enginesConfig from './fixtures/engines/package.json';
 
 process.chdir(__dirname);
 
