@@ -128,6 +128,7 @@ if (typeof options.space === 'string') {
 			// Assume `options.space` was set to a filename when run as `xo --space file.js`
 			input.push(options.space);
 		}
+
 		options.space = true;
 	}
 }
@@ -136,6 +137,22 @@ const log = report => {
 	const reporter = options.reporter ? xo.getFormatter(options.reporter) : formatterPretty;
 	process.stdout.write(reporter(report.results));
 	process.exit(report.errorCount === 0 ? 0 : 1);
+};
+
+const throwIfFileIsIgnored = file => {
+	if (input.includes(file)) {
+		throw new Error('You cannot run xo on an ignored file');
+	}
+};
+
+const checkIfInputFileIsIgnored = () => {
+	if (Array.isArray(options.ignore)) {
+		options.ignore.forEach(ignoredFile => {
+			throwIfFileIsIgnored(ignoredFile);
+		});
+	} else {
+		throwIfFileIsIgnored(options.ignore);
+	}
 };
 
 // `xo -` => `xo --stdin`
@@ -170,6 +187,10 @@ if (options.init) {
 		log(xo.lintText(stdin, options));
 	});
 } else {
+	if (options.ignore) {
+		checkIfInputFileIsIgnored();
+	}
+
 	xo.lintFiles(input, options).then(report => {
 		if (options.fix) {
 			xo.outputFixes(report);
