@@ -197,6 +197,21 @@ test('lint negatively gitignored files', async t => {
 	t.true(results[0].errorCount > 0);
 });
 
+test('do not lint eslintignored files if filename is given', async t => {
+	const cwd = path.join(__dirname, 'fixtures/eslintignore');
+	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
+	const ignored = await readFile(ignoredPath, 'utf-8');
+	const {results} = fn.lintText(ignored, {filename: ignoredPath, cwd});
+	t.is(results[0].errorCount, 0);
+});
+
+test('lint eslintignored files if filename is not given', async t => {
+	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
+	const ignored = await readFile(ignoredPath, 'utf-8');
+	const {results} = fn.lintText(ignored);
+	t.true(results[0].errorCount > 0);
+});
+
 test('enable rules based on nodeVersion', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filename = path.join(cwd, 'promise-then.js');

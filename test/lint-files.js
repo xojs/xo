@@ -120,3 +120,14 @@ test('enable rules based on nodeVersion', async t => {
 		)
 	);
 });
+
+test('do not lint eslintignored files', async t => {
+	const cwd = path.join(__dirname, 'fixtures/eslintignore/');
+	const glob = path.posix.join(cwd, '*');
+	const positive = path.resolve('fixtures/eslintignore/foo.js');
+	const negative = path.resolve('fixtures/eslintignore/bar.js');
+	const {results} = await fn.lintFiles(glob, {cwd});
+
+	t.is(results.some(r => r.filePath === positive), true);
+	t.is(results.some(r => r.filePath === negative), false);
+});
