@@ -1,10 +1,15 @@
 #!/usr/bin/env node
 'use strict';
+const path = require('path');
 const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
 const semver = require('semver');
+const globby = require('globby');
+const multimatch = require('multimatch');
+const pkgConf = require('pkg-conf');
+const optionsManager = require('./lib/options-manager');
 const openReport = require('./lib/open-report');
 const xo = require('.');
 
@@ -139,19 +144,38 @@ const log = report => {
 	process.exit(report.errorCount === 0 ? 0 : 1);
 };
 
-const throwIfFileIsIgnored = file => {
-	if (input.includes(file)) {
-		throw new Error('You cannot run xo on an ignored file');
-	}
-};
-
 const checkIfInputFileIsIgnored = () => {
-	if (Array.isArray(options.ignore)) {
-		options.ignore.forEach(ignoredFile => {
-			throwIfFileIsIgnored(ignoredFile);
-		});
-	} else {
-		throwIfFileIsIgnored(options.ignore);
+	let packageJsonIgnores = [];
+	let cliIgnores = [];
+
+	const packageOpts = pkgConf.sync('xo', {skipOnFalse: true});
+	if (packageOpts.ignores !== undefined && Array.isArray(packageOpts.ignores)) {
+		packageJsonIgnores = packageOpts.ignores;
+	}
+
+	if (options.ignore && Array.isArray(options.ignore)) {
+		cliIgnores = options.ignore;
+	} else if (options.ignore) {
+		cliIgnores.push(options.ignore);
+	}
+
+	const allIgnoredDirectories = optionsManager.DEFAULT_IGNORE.concat(
+		packageJsonIgnores,
+		cliIgnores
+	);
+
+	for (const file of input) {
+		const filename = path.relative(process.cwd(), file);
+		const inIgnoredDirectory =
+			multimatch(filename, allIgnoredDirectories).length > 0;
+		const isGitIgnored = globby.gitignore.sync({
+			cwd: process.cwd(),
+			ignore: optionsManager.DEFAULT_IGNORE
+		})(filename);
+		if (inIgnoredDirectory || isGitIgnored) {
+			console.error(`You cannot run xo on an ignored file ${filename}`);
+			process.exit(1);
+		}
 	}
 };
 
@@ -187,10 +211,7 @@ if (options.init) {
 		log(xo.lintText(stdin, options));
 	});
 } else {
-	if (options.ignore) {
-		checkIfInputFileIsIgnored();
-	}
-
+	checkIfInputFileIsIgnored();
 	xo.lintFiles(input, options).then(report => {
 		if (options.fix) {
 			xo.outputFixes(report);
