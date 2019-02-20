@@ -51,8 +51,8 @@ module.exports = {
 			'error',
 			{
 				js: 'never',
-				json: 'never',
-				jsx: 'never'
+				jsx: 'never',
+				json: 'always'
 			}
 		],
 		'import/first': 'error',

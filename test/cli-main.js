@@ -42,18 +42,18 @@ test('reporter option', async t => {
 
 test('overrides fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/overrides');
-	await t.notThrows(main([], {cwd}));
+	await t.notThrowsAsync(main([], {cwd}));
 });
 
 // #65
 test.failing('ignores fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
-	await t.throws(main([], {cwd}));
+	await t.throwsAsync(main([], {cwd}));
 });
 
 test('ignore files in .gitignore', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
-	const err = await t.throws(main(['--reporter=json'], {cwd}));
+	const err = await t.throwsAsync(main(['--reporter=json'], {cwd}));
 	const reports = JSON.parse(err.stdout);
 	const files = reports
 		.map(report => path.relative(cwd, report.filePath))
@@ -69,7 +69,7 @@ test('fail explicit files when in .gitgnore', async t => {
 
 test('negative gitignores', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
-	const err = await t.throws(main(['--reporter=json'], {cwd}));
+	const err = await t.throwsAsync(main(['--reporter=json'], {cwd}));
 	const reports = JSON.parse(err.stdout);
 	const files = reports.map(report => path.relative(cwd, report.filePath));
 	t.deepEqual(files, ['foo.js']);
@@ -77,12 +77,12 @@ test('negative gitignores', async t => {
 
 test('supports being extended with a shareable config', async t => {
 	const cwd = path.join(__dirname, 'fixtures/project');
-	await t.notThrows(main([], {cwd}));
+	await t.notThrowsAsync(main([], {cwd}));
 });
 
 test('quiet option', async t => {
 	const filepath = await tempWrite('// TODO: quiet\nconsole.log()\n', 'x.js');
-	const err = await t.throws(main(['--quiet', '--reporter=json', filepath]));
+	const err = await t.throwsAsync(main(['--quiet', '--reporter=json', filepath]));
 	const [report] = JSON.parse(err.stdout);
 	t.is(report.warningCount, 0);
 });
@@ -98,7 +98,7 @@ test('init option', async t => {
 
 test('invalid node-engine option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
-	const err = await t.throws(main(['--node-version', 'v', filepath]));
+	const err = await t.throwsAsync(main(['--node-version', 'v', filepath]));
 	t.is(err.code, 1);
 });
 
@@ -107,25 +107,25 @@ test('cli option takes precedence over config', async t => {
 	const input = 'console.log()\n';
 
 	// Use config from package.json
-	await t.notThrows(main(['--stdin'], {cwd, input}));
+	await t.notThrowsAsync(main(['--stdin'], {cwd, input}));
 
 	// Override package.json config with cli flag
-	await t.throws(main(['--semicolon=true', '--stdin'], {cwd, input}));
+	await t.throwsAsync(main(['--semicolon=true', '--stdin'], {cwd, input}));
 
 	// Use XO default (`true`) even if option is not set in package.json nor cli arg
 	// i.e make sure absent cli flags are not parsed as `false`
-	await t.throws(main(['--stdin'], {input}));
+	await t.throwsAsync(main(['--stdin'], {input}));
 });
 
 test('space option with number value', async t => {
 	const cwd = path.join(__dirname, 'fixtures/space');
-	const {stdout} = await t.throws(main(['--space=4', 'one-space.js'], {cwd}));
+	const {stdout} = await t.throwsAsync(main(['--space=4', 'one-space.js'], {cwd}));
 	t.true(stdout.includes('Expected indentation of 4 spaces'));
 });
 
 test('space option as boolean', async t => {
 	const cwd = path.join(__dirname, 'fixtures/space');
-	const {stdout} = await t.throws(main(['--space'], {cwd}));
+	const {stdout} = await t.throwsAsync(main(['--space'], {cwd}));
 	t.true(stdout.includes('Expected indentation of 2 spaces'));
 });
 
@@ -146,8 +146,8 @@ test('space option as boolean with filename', async t => {
 
 test('space option with boolean strings', async t => {
 	const cwd = path.join(__dirname, 'fixtures/space');
-	const trueResult = await t.throws(main(['--space=true'], {cwd}));
-	const falseResult = await t.throws(main(['--space=false'], {cwd}));
+	const trueResult = await t.throwsAsync(main(['--space=true'], {cwd}));
+	const falseResult = await t.throwsAsync(main(['--space=false'], {cwd}));
 	t.true(trueResult.stdout.includes('Expected indentation of 2 spaces'));
 	t.true(falseResult.stdout.includes('Expected indentation of 1 tab'));
 });
