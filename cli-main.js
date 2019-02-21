@@ -159,7 +159,13 @@ if (options.nodeVersion) {
 }
 
 if (options.verbose) {
-	xo.debugInformation(options);
+	if (options.ignore && Array.isArray(options.ignore)) {
+		for (const ignored of options.ignore) {
+			console.log('IGNORED: ' + ignored);
+		}
+	} else if (options.ignore) {
+		console.log('IGNORED: ' + options.ignore);
+	}
 }
 
 if (options.init) {

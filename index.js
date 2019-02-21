@@ -34,6 +34,15 @@ const processReport = (report, options) => {
 const runEslint = (paths, options) => {
 	const config = optionsManager.buildConfig(options);
 	const engine = new eslint.CLIEngine(config);
+	if (options.verbose) {
+		const eslintExtends = optionsManager.buildConfig(options).baseConfig.extends;
+		for (const extend of eslintExtends) {
+			console.log('ESLINT EXTENDS: ' + extend);
+		}
+
+		console.log('ESLINT CONFIG FILE: ' + engine.options.configFile);
+	}
+
 	const report = engine.executeOnFiles(paths, config);
 	return processReport(report, options);
 };
@@ -89,6 +98,12 @@ module.exports.lintFiles = (patterns, options) => {
 
 	const isEmptyPatterns = patterns.length === 0;
 	const defaultPattern = `**/*.{${options.extensions.join(',')}}`;
+	if (options.verbose) {
+		console.log('EXTENSIONS: ' + options.extensions.join(' | '));
+		for (const ignore of options.ignores) {
+			console.log('IGNORED: ' + ignore);
+		}
+	}
 
 	return globby(
 		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
@@ -117,35 +132,6 @@ module.exports.lintFiles = (patterns, options) => {
 		const grouped = optionsManager.groupConfigs(paths, options, overrides);
 
 		return mergeReports(grouped.map(data => runEslint(data.paths, data.options)));
-	});
-};
-
-module.exports.debugInformation = options => {
-	const extensionOptions = optionsManager.getExtensions(options);
-	const extensions = extensionOptions.extensions.concat(extensionOptions.extension || []);
-	console.log('EXTENSIONS: ' + extensions.join(' | '));
-
-	const ignores = optionsManager.getIgnores(options).ignore; // Display only files ignored by the user
-	if (ignores !== undefined) {
-		globby(ignores).then(files => {
-			files.forEach(file => {
-				console.log('IGNORED FILE: ' + file);
-			});
-		});
-	}
-
-	if (options.extend !== undefined) {
-		options.extends = [options.extend];
-	} else if (Array.isArray(options.extend)) {
-		options.extends = [...options.extend];
-	} else {
-		options.extends = [];
-	}
-
-	options.cwd = options.cwd || process.cwd();
-	const eslintExtends = optionsManager.buildConfig(options).baseConfig.extends;
-	eslintExtends.forEach(extend => {
-		console.log('ESLINT EXTENDS: ' + extend);
 	});
 };
 

@@ -150,3 +150,12 @@ test('space option with boolean strings', async t => {
 	t.true(trueResult.stdout.includes('Expected indentation of 2 spaces'));
 	t.true(falseResult.stdout.includes('Expected indentation of 1 tab'));
 });
+
+test('verbose cli flag outputs debug info', async t => {
+	const cwd = path.join(__dirname, 'fixtures/verbose');
+	const {stdout} = await main(['--ignore=foo.js', '--reporter=json', '--extension=ts', '--verbose'], {cwd});
+	t.true(stdout.includes('IGNORED: foo.js'));
+	t.true(stdout.includes('EXTENSIONS: js | jsx | ts'));
+	t.true(stdout.includes('IGNORED: **/node_modules/**'));
+	t.true(stdout.includes('ESLINT EXTENDS: xo/esnext'));
+});
