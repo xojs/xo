@@ -159,7 +159,9 @@ if (options.init) {
 } else if (options.stdin) {
 	getStdin().then(stdin => {
 		if (options.fix) {
-			console.log(xo.lintText(stdin, options).results[0].output);
+			const result = xo.lintText(stdin, options).results[0];
+			// If there is no output, pass the stdin back out
+			console.log(result.output || stdin);
 			return;
 		}
 
