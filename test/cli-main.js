@@ -45,6 +45,24 @@ test('overrides fixture', async t => {
 	await t.notThrowsAsync(main([], {cwd}));
 });
 
+test('overrides work with relative path', async t => {
+	const cwd = path.join(__dirname, 'fixtures/overrides');
+	const file = path.join('test', 'bar.js');
+	await t.notThrowsAsync(main([file], {cwd}));
+});
+
+test('overrides work with relative path starting with `./`', async t => {
+	const cwd = path.join(__dirname, 'fixtures/overrides');
+	const file = '.' + path.sep + path.join('test', 'bar.js');
+	await t.notThrowsAsync(main([file], {cwd}));
+});
+
+test('overrides work with absolute path', async t => {
+	const cwd = path.join(__dirname, 'fixtures/overrides');
+	const file = path.join(cwd, 'test', 'bar.js');
+	await t.notThrowsAsync(main([file], {cwd}));
+});
+
 // #65
 test.failing('ignores fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
