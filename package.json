@@ -1,7 +1,7 @@
 {
 	"name": "xo",
 	"version": "0.24.0",
-	"description": "JavaScript happiness style linter ❤️",
+	"description": "JavaScript linter with great defaults",
 	"license": "MIT",
 	"repository": "xojs/xo",
 	"author": {
@@ -33,7 +33,6 @@
 		"style",
 		"lint",
 		"linter",
-		"jscs",
 		"jshint",
 		"jslint",
 		"eslint",
