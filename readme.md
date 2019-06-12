@@ -385,7 +385,8 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 - [Gulp](https://github.com/xojs/gulp-xo)
 - [Grunt](https://github.com/xojs/grunt-xo)
-- [webpack](https://github.com/Semigradsky/xo-loader)
+- [webpack loader](https://github.com/Semigradsky/xo-loader)
+- [webpack plugin](https://github.com/nstanard/xo-webpack-plugin)
 - [Metalsmith](https://github.com/blainsmith/metalsmith-xo)
 - [Fly](https://github.com/lukeed/fly-xo)
 
