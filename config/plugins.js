@@ -55,7 +55,11 @@ module.exports = {
 				json: 'always'
 			}
 		],
-		'import/first': 'error',
+
+		// Disabled as it causes problems with TypeScript when you use mixed ESM and CommonJS
+		// TODO: Enable again when I target only ESM
+		// 'import/first': 'error',
+
 		'import/named': 'error',
 		'import/namespace': [
 			'error',
@@ -71,7 +75,10 @@ module.exports = {
 		// 'import/no-cycle': 'error'
 
 		'import/no-useless-path-segments': 'error',
-		'import/newline-after-import': 'error',
+
+		// Disabled as it doesn't work with TypeScript
+		// 'import/newline-after-import': 'error',
+
 		'import/no-amd': 'error',
 		'import/no-duplicates': 'error',
 
@@ -88,12 +95,15 @@ module.exports = {
 		'import/no-mutable-exports': 'error',
 		'import/no-named-as-default-member': 'error',
 		'import/no-named-as-default': 'error',
-		'import/no-unresolved': [
-			'error',
-			{
-				commonjs: true
-			}
-		],
+
+		// Disabled because it's buggy and it also doesn't work with TypeScript
+		// 'import/no-unresolved': [
+		// 	'error',
+		// 	{
+		// 		commonjs: true
+		// 	}
+		// ],
+
 		'import/order': 'error',
 		'import/no-unassigned-import': [
 			'error',
