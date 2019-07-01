@@ -16,7 +16,7 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 
 *JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting.*
 
-*Vue components aren't supported by default, you'll need [eslint-onfig-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app*
+*Vue components are not supported by default. You'll need [eslint-onfig-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
 
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/master/screenshot.png)
 
