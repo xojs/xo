@@ -16,6 +16,8 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 
 *JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting.*
 
+*Vue components are not supported by default. You'll need [eslint-onfig-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
+
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/master/screenshot.png)
 
 
@@ -395,6 +397,7 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [eslint-config-xo](https://github.com/xojs/eslint-config-xo) - ESLint shareable config for XO with tab indent
 - [eslint-config-xo-space](https://github.com/xojs/eslint-config-xo-space) - ESLint shareable config for XO with 2-space indent
 - [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react) - ESLint shareable config for React to be used with the above
+- [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue) - ESLint shareable config for Vue to be used with the above
 - [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
 - [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
