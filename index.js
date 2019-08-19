@@ -84,42 +84,41 @@ module.exports.lintText = (string, options) => {
 	return processReport(report, options);
 };
 
-module.exports.lintFiles = (patterns, options) => {
+module.exports.lintFiles = async (patterns, options) => {
 	options = optionsManager.preprocess(options);
 
 	const isEmptyPatterns = patterns.length === 0;
 	const defaultPattern = `**/*.{${options.extensions.join(',')}}`;
 
-	return globby(
+	let paths = await globby(
 		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
 		{
 			ignore: options.ignores,
 			gitignore: true,
 			cwd: options.cwd
 		}
-	).then(paths => {
-		paths = paths.map(x => path.relative(options.cwd, path.resolve(options.cwd, x)));
+	);
+	paths = paths.map(x => path.relative(options.cwd, path.resolve(options.cwd, x)));
 
-		// Filter out unwanted file extensions
-		// For silly users that don't specify an extension in the glob pattern
-		if (!isEmptyPatterns) {
-			paths = paths.filter(filePath => {
-				const extension = path.extname(filePath).replace('.', '');
-				return options.extensions.includes(extension);
-			});
-		}
+	// Filter out unwanted file extensions
+	// For silly users that don't specify an extension in the glob pattern
+	if (!isEmptyPatterns) {
+		paths = paths.filter(filePath => {
+			const extension = path.extname(filePath).replace('.', '');
+			return options.extensions.includes(extension);
+		});
+	}
 
-		if (!(options.overrides && options.overrides.length > 0)) {
-			return runEslint(paths, options);
-		}
+	if (!(options.overrides && options.overrides.length > 0)) {
+		return runEslint(paths, options);
+	}
 
-		const {overrides} = options;
-		delete options.overrides;
+	const {overrides} = options;
+	delete options.overrides;
 
-		const grouped = optionsManager.groupConfigs(paths, options, overrides);
+	const grouped = optionsManager.groupConfigs(paths, options, overrides);
 
-		return mergeReports(grouped.map(data => runEslint(data.paths, data.options)));
-	});
+	return mergeReports(grouped.map(data => runEslint(data.paths, data.options)));
 };
 
 module.exports.getFormatter = eslint.CLIEngine.getFormatter;

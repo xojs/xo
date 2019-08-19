@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable import/no-unassigned-import */
 'use strict';
 const resolveCwd = require('resolve-cwd');
 const hasFlag = require('has-flag');

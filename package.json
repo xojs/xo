@@ -11,10 +11,10 @@
 	},
 	"bin": "cli.js",
 	"engines": {
-		"node": ">=6"
+		"node": ">=8"
 	},
 	"scripts": {
-		"test": "node cli-main.js && eslint --quiet . && nyc ava"
+		"test": "eslint --quiet . && nyc ava"
 	},
 	"files": [
 		"config",
@@ -97,7 +97,6 @@
 		"extends": "eslint-config-xo"
 	},
 	"eslintIgnore": [
-		"cli.js",
 		"test/fixtures"
 	]
 }

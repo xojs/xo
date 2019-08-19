@@ -154,10 +154,12 @@ if (options.nodeVersion) {
 	}
 }
 
-if (options.init) {
-	require('xo-init')();
-} else if (options.stdin) {
-	getStdin().then(stdin => {
+(async () => {
+	if (options.init) {
+		require('xo-init')();
+	} else if (options.stdin) {
+		const stdin = await getStdin();
+
 		if (options.fix) {
 			const result = xo.lintText(stdin, options).results[0];
 			// If there is no output, pass the stdin back out
@@ -171,9 +173,9 @@ if (options.init) {
 		}
 
 		log(xo.lintText(stdin, options));
-	});
-} else {
-	xo.lintFiles(input, options).then(report => {
+	} else {
+		const report = await xo.lintFiles(input, options);
+
 		if (options.fix) {
 			xo.outputFixes(report);
 		}
@@ -183,5 +185,5 @@ if (options.init) {
 		}
 
 		log(report);
-	});
-}
+	}
+})();

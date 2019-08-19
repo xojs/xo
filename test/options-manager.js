@@ -235,98 +235,92 @@ test('buildConfig: nodeVersion: >=8', t => {
 	t.is(config.rules['promise/prefer-await-to-then'], 'error');
 });
 
-test('mergeWithPrettierConf: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
+test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
 	const prettierOptions = {
 		singleQuote: false,
 		trailingComma: 'all',
 		bracketSpacing: false,
 		jsxBracketSameLine: false
 	};
-	const result = manager.mergeWithPrettierConf({}, prettierOptions);
-	const expected = Object.assign(
-		{},
-		prettierOptions,
-		{
-			tabWidth: 2,
-			useTabs: true,
-			semi: true
-		}
-	);
+	const result = manager.mergeWithPrettierConfig({}, prettierOptions);
+	const expected = {
+
+		...prettierOptions,
+		tabWidth: 2,
+		useTabs: true,
+		semi: true
+	};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from xo config', t => {
+test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from xo config', t => {
 	const prettierOptions = {
 		tabWidth: 4,
 		useTabs: false,
 		semi: false
 	};
-	const result = manager.mergeWithPrettierConf({space: 4, semicolon: false}, {});
-	const expected = Object.assign(
-		{
-			bracketSpacing: false,
-			jsxBracketSameLine: false,
-			singleQuote: true,
-			trailingComma: 'none'
-		},
-		prettierOptions
-	);
+	const result = manager.mergeWithPrettierConfig({space: 4, semicolon: false}, {});
+	const expected = {
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		singleQuote: true,
+		trailingComma: 'none',
+		...prettierOptions
+	};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPrettierConf: determine `tabWidth`, `useTabs`, `semi` from prettier config', t => {
+test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from prettier config', t => {
 	const prettierOptions = {
 		useTabs: false,
 		semi: false,
 		tabWidth: 4
 	};
-	const result = manager.mergeWithPrettierConf({}, prettierOptions);
-	const expected = Object.assign(
-		{
-			bracketSpacing: false,
-			jsxBracketSameLine: false,
-			singleQuote: true,
-			trailingComma: 'none'
-		},
-		prettierOptions
-	);
+	const result = manager.mergeWithPrettierConfig({}, prettierOptions);
+	const expected = {
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		singleQuote: true,
+		trailingComma: 'none',
+		...prettierOptions
+	};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPrettierConf: throw error is `semi`/`semicolon` conflicts', t => {
-	t.throws(() => manager.mergeWithPrettierConf(
+test('mergeWithPrettierConfig: throw error is `semi`/`semicolon` conflicts', t => {
+	t.throws(() => manager.mergeWithPrettierConfig(
 		{semicolon: true},
 		{semi: false}
 	));
-	t.throws(() => manager.mergeWithPrettierConf(
+	t.throws(() => manager.mergeWithPrettierConfig(
 		{semicolon: false},
 		{semi: true}
 	));
 
-	t.notThrows(() => manager.mergeWithPrettierConf(
+	t.notThrows(() => manager.mergeWithPrettierConfig(
 		{semicolon: true},
 		{semi: true}
 	));
-	t.notThrows(() => manager.mergeWithPrettierConf({semicolon: false}, {semi: false}));
+	t.notThrows(() => manager.mergeWithPrettierConfig({semicolon: false}, {semi: false}));
 });
 
-test('mergeWithPrettierConf: throw error is `space`/`useTabs` conflicts', t => {
-	t.throws(() => manager.mergeWithPrettierConf({space: false}, {useTabs: false}));
-	t.throws(() => manager.mergeWithPrettierConf({space: true}, {useTabs: true}));
+test('mergeWithPrettierConfig: throw error is `space`/`useTabs` conflicts', t => {
+	t.throws(() => manager.mergeWithPrettierConfig({space: false}, {useTabs: false}));
+	t.throws(() => manager.mergeWithPrettierConfig({space: true}, {useTabs: true}));
 
-	t.notThrows(() => manager.mergeWithPrettierConf({space: 4}, {useTabs: false}));
-	t.notThrows(() => manager.mergeWithPrettierConf({space: true}, {useTabs: false}));
-	t.notThrows(() => manager.mergeWithPrettierConf({space: false}, {useTabs: true}));
+	t.notThrows(() => manager.mergeWithPrettierConfig({space: 4}, {useTabs: false}));
+	t.notThrows(() => manager.mergeWithPrettierConfig({space: true}, {useTabs: false}));
+	t.notThrows(() => manager.mergeWithPrettierConfig({space: false}, {useTabs: true}));
 });
 
-test('mergeWithPrettierConf: throw error is `space`/`tabWidth` conflicts', t => {
-	t.throws(() => manager.mergeWithPrettierConf({space: 4}, {tabWidth: 2}));
-	t.throws(() => manager.mergeWithPrettierConf({space: 0}, {tabWidth: 2}));
-	t.throws(() => manager.mergeWithPrettierConf({space: 2}, {tabWidth: 0}));
+test('mergeWithPrettierConfig: throw error is `space`/`tabWidth` conflicts', t => {
+	t.throws(() => manager.mergeWithPrettierConfig({space: 4}, {tabWidth: 2}));
+	t.throws(() => manager.mergeWithPrettierConfig({space: 0}, {tabWidth: 2}));
+	t.throws(() => manager.mergeWithPrettierConfig({space: 2}, {tabWidth: 0}));
 
-	t.notThrows(() => manager.mergeWithPrettierConf({space: 4}, {tabWidth: 4}));
-	t.notThrows(() => manager.mergeWithPrettierConf({space: false}, {tabWidth: 4}));
-	t.notThrows(() => manager.mergeWithPrettierConf({space: true}, {tabWidth: 4}));
+	t.notThrows(() => manager.mergeWithPrettierConfig({space: 4}, {tabWidth: 4}));
+	t.notThrows(() => manager.mergeWithPrettierConfig({space: false}, {tabWidth: 4}));
+	t.notThrows(() => manager.mergeWithPrettierConfig({space: true}, {tabWidth: 4}));
 });
 
 test('buildConfig: rules', t => {
@@ -429,50 +423,50 @@ test('groupConfigs', t => {
 	}));
 });
 
-test('mergeWithPkgConf: use child if closest', t => {
+test('mergeWithPackageConfig: use child if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
-	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, childConfig.xo, {cwd, nodeVersion: undefined});
+	const result = manager.mergeWithPackageConfig({cwd});
+	const expected = {...childConfig.xo, cwd, nodeVersion: undefined};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPkgConf: use parent if closest', t => {
+test('mergeWithPackageConfig: use parent if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested');
-	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, parentConfig.xo, {cwd, nodeVersion: undefined});
+	const result = manager.mergeWithPackageConfig({cwd});
+	const expected = {...parentConfig.xo, cwd, nodeVersion: undefined};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPkgConf: use parent if child is ignored', t => {
+test('mergeWithPackageConfig: use parent if child is ignored', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-ignore');
-	const result = manager.mergeWithPkgConf({cwd});
-	const expected = Object.assign({}, parentConfig.xo, {cwd, nodeVersion: undefined});
+	const result = manager.mergeWithPackageConfig({cwd});
+	const expected = {...parentConfig.xo, cwd, nodeVersion: undefined};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPkgConf: use child if child is empty', t => {
+test('mergeWithPackageConfig: use child if child is empty', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
-	const result = manager.mergeWithPkgConf({cwd});
+	const result = manager.mergeWithPackageConfig({cwd});
 	t.deepEqual(result, {nodeVersion: undefined, cwd});
 });
 
-test('mergeWithPkgConf: read engines from package.json', t => {
+test('mergeWithPackageConfig: read engines from package.json', t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPkgConf({cwd});
+	const result = manager.mergeWithPackageConfig({cwd});
 	const expected = {nodeVersion: enginesConfig.engines.node, cwd};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPkgConf: XO engine options supersede package.json\'s', t => {
+test('mergeWithPackageConfig: XO engine options supersede package.json\'s', t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPkgConf({cwd, nodeVersion: '>=8'});
+	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: '>=8'});
 	const expected = {nodeVersion: '>=8', cwd};
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPkgConf: XO engine options false supersede package.json\'s', t => {
+test('mergeWithPackageConfig: XO engine options false supersede package.json\'s', t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPkgConf({cwd, nodeVersion: false});
+	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: false});
 	const expected = {nodeVersion: false, cwd};
 	t.deepEqual(result, expected);
 });
