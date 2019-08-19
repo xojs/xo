@@ -74,7 +74,12 @@ module.exports = {
 		// Enable this sometime in the future when Node.js has ES2015 module support
 		// 'import/no-cycle': 'error'
 
-		'import/no-useless-path-segments': 'error',
+		'import/no-useless-path-segments': [
+			'error',
+			{
+				noUselessIndex: true
+			}
+		],
 
 		// Disabled as it doesn't work with TypeScript
 		// 'import/newline-after-import': 'error',
