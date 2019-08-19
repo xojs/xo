@@ -174,7 +174,7 @@ module.exports = {
 			'error',
 			'always'
 		],
-		// TODO: Enable these when XO targets Node.js 8
+		// TODO: Enable these when XO targets Node.js 10
 		// 'node/prefer-global/text-decoder': [
 		// 	'error',
 		// 	'always'
@@ -191,6 +191,7 @@ module.exports = {
 		// 	'error',
 		// 	'always'
 		// ]
+		// 'node/prefer-promises/dns': 'error',
 
 		'eslint-comments/disable-enable-pair': [
 			'error',
