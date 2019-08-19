@@ -61,7 +61,7 @@
 		"eslint-plugin-node": "^9.1.0",
 		"eslint-plugin-prettier": "^3.0.0",
 		"eslint-plugin-promise": "^4.0.0",
-		"eslint-plugin-unicorn": "^7.0.0",
+		"eslint-plugin-unicorn": "^10.0.0",
 		"find-cache-dir": "^3.0.0",
 		"get-stdin": "^7.0.0",
 		"globby": "^9.0.0",
