@@ -1,6 +1,6 @@
 import test from 'ava'
 import fn from '..'
 
-test(t => {
+test('main', t => {
    t.is(fn('foo'), fn('foobar'))
 })
