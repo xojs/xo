@@ -423,9 +423,9 @@ test('groupConfigs', t => {
 			},
 			paths: ['/user/bar/hello.js']
 		}
-	].map(obj => {
-		obj.options = Object.assign(manager.emptyOptions(), obj.options);
-		return obj;
+	].map(object => {
+		object.options = Object.assign(manager.emptyOptions(), object.options);
+		return object;
 	}));
 });
 

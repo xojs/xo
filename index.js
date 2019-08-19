@@ -38,7 +38,7 @@ const runEslint = (paths, options) => {
 	return processReport(report, options);
 };
 
-module.exports.lintText = (str, options) => {
+module.exports.lintText = (string, options) => {
 	options = optionsManager.preprocess(options);
 
 	if (options.overrides && options.overrides.length > 0) {
@@ -79,7 +79,7 @@ module.exports.lintText = (str, options) => {
 	}
 
 	const engine = new eslint.CLIEngine(options);
-	const report = engine.executeOnText(str, options.filename);
+	const report = engine.executeOnText(string, options.filename);
 
 	return processReport(report, options);
 };
@@ -104,8 +104,8 @@ module.exports.lintFiles = (patterns, options) => {
 		// For silly users that don't specify an extension in the glob pattern
 		if (!isEmptyPatterns) {
 			paths = paths.filter(filePath => {
-				const ext = path.extname(filePath).replace('.', '');
-				return options.extensions.includes(ext);
+				const extension = path.extname(filePath).replace('.', '');
+				return options.extensions.includes(extension);
 			});
 		}
 

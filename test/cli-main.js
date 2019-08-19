@@ -7,7 +7,7 @@ import tempWrite from 'temp-write';
 
 process.chdir(__dirname);
 
-const main = (args, options) => execa(path.join(__dirname, '../cli-main.js'), args, options);
+const main = (arguments_, options) => execa(path.join(__dirname, '../cli-main.js'), arguments_, options);
 
 test('fix option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
@@ -71,8 +71,8 @@ test.failing('ignores fixture', async t => {
 
 test('ignore files in .gitignore', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
-	const err = await t.throwsAsync(main(['--reporter=json'], {cwd}));
-	const reports = JSON.parse(err.stdout);
+	const error = await t.throwsAsync(main(['--reporter=json'], {cwd}));
+	const reports = JSON.parse(error.stdout);
 	const files = reports
 		.map(report => path.relative(cwd, report.filePath))
 		.map(report => slash(report));
@@ -86,8 +86,8 @@ test('ignore explicit files when in .gitgnore', async t => {
 
 test('negative gitignores', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
-	const err = await t.throwsAsync(main(['--reporter=json'], {cwd}));
-	const reports = JSON.parse(err.stdout);
+	const error = await t.throwsAsync(main(['--reporter=json'], {cwd}));
+	const reports = JSON.parse(error.stdout);
 	const files = reports.map(report => path.relative(cwd, report.filePath));
 	t.deepEqual(files, ['foo.js']);
 });
@@ -99,8 +99,8 @@ test('supports being extended with a shareable config', async t => {
 
 test('quiet option', async t => {
 	const filepath = await tempWrite('// TODO: quiet\nconsole.log()\n', 'x.js');
-	const err = await t.throwsAsync(main(['--quiet', '--reporter=json', filepath]));
-	const [report] = JSON.parse(err.stdout);
+	const error = await t.throwsAsync(main(['--quiet', '--reporter=json', filepath]));
+	const [report] = JSON.parse(error.stdout);
 	t.is(report.warningCount, 0);
 });
 
@@ -115,8 +115,8 @@ test('init option', async t => {
 
 test('invalid node-engine option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
-	const err = await t.throwsAsync(main(['--node-version', 'v', filepath]));
-	t.is(err.code, 1);
+	const error = await t.throwsAsync(main(['--node-version', 'v', filepath]));
+	t.is(error.code, 1);
 });
 
 test('cli option takes precedence over config', async t => {

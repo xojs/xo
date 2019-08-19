@@ -1,2 +1,2 @@
-const obj = { a: 1 };
-console.log(obj.a);
+const object = { a: 1 };
+console.log(object.a);
