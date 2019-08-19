@@ -192,6 +192,7 @@ module.exports = {
 		// 	'always'
 		// ]
 		// 'node/prefer-promises/dns': 'error',
+		// 'node/prefer-promises/fs': 'error',
 
 		'eslint-comments/disable-enable-pair': [
 			'error',
