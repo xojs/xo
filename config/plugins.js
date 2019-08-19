@@ -31,6 +31,17 @@ module.exports = {
 	},
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
+
+		// TODO: Remove this override at some point.
+		// It's just here to ease users into readable variable names.
+		'unicorn/prevent-abbreviations': [
+			'error',
+			{
+				checkProperties: false,
+				checkFilenames: false
+			}
+		],
+
 		'promise/param-names': 'error',
 		'promise/no-return-wrap': [
 			'error',
