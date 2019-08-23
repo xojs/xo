@@ -162,26 +162,26 @@ You can configure some options in XO by putting it in package.json:
 
 ### envs
 
-Type: `Array`<br>
+Type: `string[]`<br>
 Default: `['node']`
 
 Which [environments](https://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
 
 ### globals
 
-Type: `Array`
+Type: `string[]`
 
 Additional global variables your code accesses during execution.
 
 ### ignores
 
-Type: `Array`
+Type: `string[]`
 
 Some [paths](lib/options-manager.js) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
 
 ### space
 
-Type: `boolean`, `number`<br>
+Type: `boolean | number`<br>
 Default: `false` *(tab indentation)*
 
 Set it to `true` to get 2-space indentation or specify the number of spaces.
@@ -190,7 +190,7 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 
 ### rules
 
-Type: `Object`
+Type: `object`
 
 Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
 
@@ -199,7 +199,7 @@ Please take a moment to consider if you really need to use this option.
 ### semicolon
 
 Type: `boolean`<br>
-Default: `true` *(semicolons required)*
+Default: `true` *(Semicolons required)*
 
 Set it to `false` to enforce no-semicolon style.
 
@@ -223,33 +223,34 @@ If contradicting options are set for both Prettier and XO an error will be throw
 
 ### nodeVersion
 
-Type: `string`, `boolean`<br>
+Type: `string | boolean`<br>
 Default: Value of the `engines.node` key in the project `package.json`
 
 Enable rules specific to the Node.js versions within the configured range.
+
 If set to `false`, no rules specific to a Node.js version will be enabled.
 
 ### plugins
 
-Type: `Array`
+Type: `string[]`
 
 Include third-party [plugins](https://eslint.org/docs/user-guide/configuring.html#configuring-plugins).
 
 ### extends
 
-Type: `Array`, `string`
+Type: `string | string[]`
 
 Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shareable-configs.html) or [plugin configs](https://eslint.org/docs/user-guide/configuring#using-the-configuration-from-a-plugin) to override any of the default rules (like `rules` above).
 
 ### extensions
 
-Type: `Array`
+Type: `string[]`
 
 Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're supported by ESLint or an ESLint plugin.
 
 ### settings
 
-Type: `Object`
+Type: `object`
 
 [Shared ESLint settings](https://eslint.org/docs/user-guide/configuring#adding-shared-settings) exposed to rules. For example, to configure the [`import`](https://github.com/benmosher/eslint-plugin-import#settings) plugin to use your webpack configuration for determining search paths, you can put `{"import/resolver": "webpack"}` here.
 
@@ -407,7 +408,6 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 ## Support
 
-- [Gitter chat](https://gitter.im/xojs/Lobby)
 - [Twitter](https://twitter.com/sindresorhus)
 
 
@@ -438,8 +438,3 @@ You can also find some nice dynamic XO badges on [badgen.net](https://badgen.net
 
 - [James Talmage](https://github.com/jamestalmage)
 - [Michael Mayer](https://github.com/schnittstabil)
-
-
-## License
-
-MIT
