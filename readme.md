@@ -442,4 +442,4 @@ You can also find some nice dynamic XO badges on [badgen.net](https://badgen.net
 
 ## License
 
-MIT
+[MIT](license)
