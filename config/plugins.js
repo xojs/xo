@@ -71,7 +71,10 @@ module.exports = {
 		// TODO: Enable again when I target only ESM
 		// 'import/first': 'error',
 
-		'import/named': 'error',
+		// Disabled as it doesn't work with TypeScript
+		// This issue and some others: https://github.com/benmosher/eslint-plugin-import/issues/1341
+		// 'import/named': 'error',
+
 		'import/namespace': [
 			'error',
 			{
