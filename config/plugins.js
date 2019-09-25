@@ -45,6 +45,13 @@ module.exports = {
 		// 		}
 		// 	}
 		// ],
+		'unicorn/prevent-abbreviations': 'off',
+
+		// TODO: Remove this override when the rule is more stable.
+		'unicorn/consistent-function-scoping': 'off',
+
+		// TODO: Temporarily disabled as the rule is buggy.
+		'function-call-argument-newline': 'off',
 
 		'promise/param-names': 'error',
 		'promise/no-return-wrap': [
