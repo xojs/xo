@@ -34,7 +34,10 @@ const processReport = (report, options) => {
 const runEslint = (paths, options) => {
 	const config = optionsManager.buildConfig(options);
 	const engine = new eslint.CLIEngine(config);
-	const report = engine.executeOnFiles(paths, config);
+	const report = engine.executeOnFiles(
+		paths.filter(path => !engine.isPathIgnored(path)),
+		config,
+	);
 	return processReport(report, options);
 };
 
@@ -58,12 +61,15 @@ module.exports.lintText = (string, options) => {
 		throw new Error('The `ignores` option requires the `filename` option to be defined.');
 	}
 
+	const engine = new eslint.CLIEngine(options);
+
 	if (options.filename) {
 		const filename = path.relative(options.cwd, options.filename);
 
 		if (
 			multimatch(filename, options.ignores).length > 0 ||
-			globby.gitignore.sync({cwd: options.cwd, ignore: options.ignores})(options.filename)
+			globby.gitignore.sync({cwd: options.cwd, ignore: options.ignores})(options.filename) ||
+			engine.isPathIgnored(options.filename)
 		) {
 			return {
 				errorCount: 0,
@@ -78,7 +84,6 @@ module.exports.lintText = (string, options) => {
 		}
 	}
 
-	const engine = new eslint.CLIEngine(options);
 	const report = engine.executeOnText(string, options.filename);
 
 	return processReport(report, options);

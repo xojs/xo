@@ -161,14 +161,14 @@ test('lintText() - overrides support', async t => {
 test('do not lint gitignored files if filename is given', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
-	const ignored = await readFile(ignoredPath, 'utf-8');
+	const ignored = await readFile(ignoredPath, 'utf8');
 	const {results} = fn.lintText(ignored, {filename: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
 
 test('lint gitignored files if filename is not given', async t => {
 	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
-	const ignored = await readFile(ignoredPath, 'utf-8');
+	const ignored = await readFile(ignoredPath, 'utf8');
 	const {results} = fn.lintText(ignored);
 	t.true(results[0].errorCount > 0);
 });
@@ -176,7 +176,7 @@ test('lint gitignored files if filename is not given', async t => {
 test('do not lint gitignored files in file with negative gitignores', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
 	const ignoredPath = path.resolve('fixtures/negative-gitignore/bar.js');
-	const ignored = await readFile(ignoredPath, 'utf-8');
+	const ignored = await readFile(ignoredPath, 'utf8');
 	const {results} = fn.lintText(ignored, {filename: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
@@ -184,7 +184,7 @@ test('do not lint gitignored files in file with negative gitignores', async t =>
 test('multiple negative patterns should act as positive patterns', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'gitignore-multiple-negation');
 	const filename = path.join(cwd, '!!!unicorn.js');
-	const text = await readFile(filename, 'utf-8');
+	const text = await readFile(filename, 'utf8');
 	const {results} = fn.lintText(text, {filename, cwd});
 	t.is(results[0].errorCount, 0);
 });
@@ -197,10 +197,25 @@ test('lint negatively gitignored files', async t => {
 	t.true(results[0].errorCount > 0);
 });
 
+test('do not lint eslintignored files if filename is given', async t => {
+	const cwd = path.join(__dirname, 'fixtures/eslintignore');
+	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
+	const ignored = await readFile(ignoredPath, 'utf8');
+	const {results} = fn.lintText(ignored, {filename: ignoredPath, cwd});
+	t.is(results[0].errorCount, 0);
+});
+
+test('lint eslintignored files if filename is not given', async t => {
+	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
+	const ignored = await readFile(ignoredPath, 'utf8');
+	const {results} = fn.lintText(ignored);
+	t.true(results[0].errorCount > 0);
+});
+
 test('enable rules based on nodeVersion', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filename = path.join(cwd, 'promise-then.js');
-	const text = await readFile(filename, 'utf-8');
+	const text = await readFile(filename, 'utf8');
 
 	let {results} = fn.lintText(text, {nodeVersion: '>=8.0.0'});
 	t.true(hasRule(results, 'promise/prefer-await-to-then'));
@@ -212,7 +227,7 @@ test('enable rules based on nodeVersion', async t => {
 test('enable rules based on nodeVersion in override', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filename = path.join(cwd, 'promise-then.js');
-	const text = await readFile(filename, 'utf-8');
+	const text = await readFile(filename, 'utf8');
 
 	let {results} = fn.lintText(text, {
 		nodeVersion: '>=8.0.0',

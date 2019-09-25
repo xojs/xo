@@ -177,7 +177,7 @@ Additional global variables your code accesses during execution.
 
 Type: `string[]`
 
-Some [paths](lib/options-manager.js) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
+Some [paths](lib/options-manager.js) are ignored by default, including paths in `.gitignore` and [.eslintignore](https://eslint.org/docs/user-guide/configuring#eslintignore). Additional ignores can be added here.
 
 ### space
 
