@@ -50,6 +50,14 @@ module.exports = {
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
 
+		// TODO: Change the rule default for this.
+		'unicorn/expiring-todo-comments': [
+			'error',
+			{
+				allowWarningComments: true
+			}
+		],
+
 		// TODO: Temporarily disabled as the rule is buggy.
 		'function-call-argument-newline': 'off',
 

@@ -21,8 +21,7 @@ test('opens nothing when there are no errors nor warnings', async t => {
 	t.pass();
 });
 
-// TODO: Fix the logic causing this to fail.
-test.failing('only opens errors if there are errors and warnings', async t => {
+test('only opens errors if there are errors and warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/**');
 	const results = await fn.lintFiles(glob);
 
