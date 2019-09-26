@@ -245,6 +245,9 @@ module.exports = {
 		// 'eslint-comments/no-unlimited-disable': 'error',
 
 		'eslint-comments/no-unused-disable': 'error',
-		'eslint-comments/no-unused-enable': 'error'
+		'eslint-comments/no-unused-enable': 'error',
+
+		// Disabled by default, enabled only in Node.js >= 11 in option-manager.js
+		'unicorn/prefer-flat-map': 'off'
 	}
 };
