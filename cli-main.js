@@ -13,7 +13,6 @@ const cli = meow(`
 	  $ xo [<file|glob> ...]
 
 	Options
-	  --init            Add XO to your project
 	  --fix             Automagically fix issues
 	  --reporter        Reporter to use
 	  --env             Environment preset  [Can be set multiple times]
@@ -39,19 +38,16 @@ const cli = meow(`
 	  $ xo *.js !foo.js
 	  $ xo --space
 	  $ xo --env=node --env=mocha
-	  $ xo --init --space
 	  $ xo --plugin=react
 	  $ xo --plugin=html --extension=html
 	  $ echo 'const x=true' | xo --stdin --fix
 
 	Tips
-	  Put options in package.json instead of using flags so other tools can read it.
+	  - Add XO to your project with \`npm init xo\`.
+	  - Put options in package.json instead of using flags so other tools can read it.
 `, {
 	booleanDefault: undefined,
 	flags: {
-		init: {
-			type: 'boolean'
-		},
 		fix: {
 			type: 'boolean'
 		},
@@ -155,9 +151,7 @@ if (options.nodeVersion) {
 }
 
 (async () => {
-	if (options.init) {
-		require('xo-init')();
-	} else if (options.stdin) {
+	if (options.stdin) {
 		const stdin = await getStdin();
 
 		if (options.fix) {

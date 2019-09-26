@@ -31,7 +31,7 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`node`](https://github.com/mysticatea/eslint-plugin-node) and more.
 - Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
-- Super simple to add XO to a project with `$ xo --init`.
+- Super simple to add XO to a project with [`$ npm init xo`](https://github.com/xojs/create-xo).
 - Fix many issues automagically with `$ xo --fix`.
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
 - Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
@@ -55,7 +55,6 @@ $ xo --help
     $ xo [<file|glob> ...]
 
   Options
-    --init            Add XO to your project
     --fix             Automagically fix issues
     --reporter        Reporter to use
     --env             Environment preset  [Can be set multiple times]
@@ -81,13 +80,13 @@ $ xo --help
     $ xo *.js !foo.js
     $ xo --space
     $ xo --env=node --env=mocha
-    $ xo --init --space
     $ xo --plugin=react
     $ xo --plugin=html --extension=html
     $ echo 'const x=true' | xo --stdin --fix
 
   Tips
-    Put options in package.json instead of using flags so other tools can read it.
+    - Add XO to your project with `npm init xo`.
+    - Put options in package.json instead of using flags so other tools can read it.
 ```
 
 *Note that the CLI will use your local install of XO when available, even when run globally.*
@@ -111,35 +110,23 @@ Check out an [example](index.js) and the [ESLint rules](https://github.com/xojs/
 
 The recommended workflow is to add XO locally to your project and run it with the tests.
 
-Simply run `$ xo --init` (with any options) to add XO to your package.json or create one.
+Simply run `$ npm init xo` (with any options) to add XO to your package.json or create one.
 
-### Before
+### Before/after
 
-```json
-{
-	"name": "awesome-package",
-	"scripts": {
-		"test": "ava"
-	},
-	"devDependencies": {
-		"ava": "^0.20.0"
-	}
-}
-```
-
-### After
-
-```json
-{
-	"name": "awesome-package",
-	"scripts": {
-		"test": "xo && ava"
-	},
-	"devDependencies": {
-		"ava": "^0.20.0",
-		"xo": "^0.18.0"
-	}
-}
+```diff
+ {
+ 	"name": "awesome-package",
+ 	"scripts": {
+-		"test": "ava",
++		"test": "xo && ava"
+ 	},
+ 	"devDependencies": {
+-		"ava": "^2.0.0"
++		"ava": "^2.0.0",
++		"xo": "^0.25.0"
+ 	}
+ }
 ```
 
 Then just run `$ npm test` and XO will be run before your tests.

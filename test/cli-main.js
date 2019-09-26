@@ -104,15 +104,6 @@ test('quiet option', async t => {
 	t.is(report.warningCount, 0);
 });
 
-test('init option', async t => {
-	const filepath = await tempWrite('{}', 'package.json');
-	await main(['--init'], {
-		cwd: path.dirname(filepath)
-	});
-	const packageJson = fs.readFileSync(filepath, 'utf8');
-	t.deepEqual(JSON.parse(packageJson).scripts, {test: 'xo'});
-});
-
 test('invalid node-engine option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
 	const error = await t.throwsAsync(main(['--node-version', 'v', filepath]));

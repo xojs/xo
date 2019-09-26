@@ -78,8 +78,7 @@
 		"resolve-from": "^5.0.0",
 		"semver": "^6.3.0",
 		"slash": "^3.0.0",
-		"update-notifier": "^3.0.1",
-		"xo-init": "^0.7.0"
+		"update-notifier": "^3.0.1"
 	},
 	"devDependencies": {
 		"ava": "^1.1.0",
