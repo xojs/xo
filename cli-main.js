@@ -132,7 +132,7 @@ if (typeof options.space === 'string') {
 const log = report => {
 	const reporter = options.reporter ? xo.getFormatter(options.reporter) : formatterPretty;
 	process.stdout.write(reporter(report.results));
-	process.exit(report.errorCount === 0 ? 0 : 1);
+	process.exitCode = report.errorCount === 0 ? 0 : 1;
 };
 
 // `xo -` => `xo --stdin`
