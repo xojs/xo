@@ -54,6 +54,12 @@ test('eslint-disable-next-line one line input CRLF endings', async t => {
 	});
 	t.is(stdout, '');
 });
+test('eslint-disable-next-line one line input CRLF endings - no line ending disable', async t => {
+	const {stdout} = await main(['--stdin'], {
+		input: '/* eslint capitalized-comments: ["error"] */\r\n// eslint-disable-next-line capitalized-comments\r\n/* spell-checker: disable */\r\n'
+	});
+	t.is(stdout, '');
+});
 test('stdin-filename option with stdin', async t => {
 	const {stdout} = await main(['--stdin', '--stdin-filename=unicorn-file'], {
 		input: 'console.log()\n',
