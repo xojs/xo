@@ -21,7 +21,39 @@ test('fix option with stdin', async t => {
 	});
 	t.is(stdout.trim(), 'console.log();');
 });
+test('eslint-disable-next-line exact input LF endings', async t => {
+	const {stdout} = await main(['--stdin'], {
+		input: `/* eslint capitalized-comments: ["error"] */
+// eslint-disable-next-line capitalized-comments
+/* spell-checker: disable */
 
+`
+	});
+	t.is(stdout, '');
+});
+test('eslint-disable-next-line exact input CRLF endings', async t => {
+	const {stdout} = await main(['--stdin'], {
+		input: `/* eslint-disable linebreak-style */\r
+/* eslint capitalized-comments: ["error"] */\r
+// eslint-disable-next-line capitalized-comments\r
+/* spell-checker: disable */\r
+
+`
+	});
+	t.is(stdout, '');
+});
+test('eslint-disable-next-line one line input LF endings', async t => {
+	const {stdout} = await main(['--stdin'], {
+		input: '/* eslint capitalized-comments: ["error"] */\n// eslint-disable-next-line capitalized-comments\n/* spell-checker: disable */\n'
+	});
+	t.is(stdout, '');
+});
+test('eslint-disable-next-line one line input CRLF endings', async t => {
+	const {stdout} = await main(['--stdin'], {
+		input: '/* eslint-disable linebreak-style */\r\n/* eslint capitalized-comments: ["error"] */\r\n// eslint-disable-next-line capitalized-comments\r\n/* spell-checker: disable */\r\n'
+	});
+	t.is(stdout, '');
+});
 test('stdin-filename option with stdin', async t => {
 	const {stdout} = await main(['--stdin', '--stdin-filename=unicorn-file'], {
 		input: 'console.log()\n',
