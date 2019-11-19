@@ -36,7 +36,7 @@ const runEslint = (paths, options) => {
 	const engine = new eslint.CLIEngine(config);
 	const report = engine.executeOnFiles(
 		paths.filter(path => !engine.isPathIgnored(path)),
-		config,
+		config
 	);
 	return processReport(report, options);
 };
