@@ -2,7 +2,7 @@
 const path = require('path');
 const eslint = require('eslint');
 const globby = require('globby');
-const isEqual = require('lodash/isEqual');
+const {isEqual} = require('lodash');
 const multimatch = require('multimatch');
 const arrify = require('arrify');
 const optionsManager = require('./lib/options-manager');
@@ -45,7 +45,7 @@ module.exports.lintText = (string, options) => {
 	options = optionsManager.preprocess(options);
 
 	if (options.overrides && options.overrides.length > 0) {
-		const { overrides } = options;
+		const {overrides} = options;
 		delete options.overrides;
 
 		const filename = path.relative(options.cwd, options.filename);
@@ -68,7 +68,7 @@ module.exports.lintText = (string, options) => {
 
 		if (
 			multimatch(filename, options.ignores).length > 0 ||
-			globby.gitignore.sync({ cwd: options.cwd, ignore: options.ignores })(options.filename) ||
+			globby.gitignore.sync({cwd: options.cwd, ignore: options.ignores})(options.filename) ||
 			engine.isPathIgnored(options.filename)
 		) {
 			return {
@@ -118,7 +118,7 @@ module.exports.lintFiles = async (patterns, options) => {
 		return runEslint(paths, options);
 	}
 
-	const { overrides } = options;
+	const {overrides} = options;
 	delete options.overrides;
 
 	const grouped = optionsManager.groupConfigs(paths, options, overrides);
