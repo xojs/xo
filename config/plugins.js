@@ -41,7 +41,13 @@ module.exports = {
 		// 		checkProperties: false,
 		// 		checkFilenames: false,
 		// 		replacements: {
-		// 			args: false
+		// 			args: false,
+		// 			application: {
+		// 				app: true
+		// 			},
+		// 			applications: {
+		// 				apps: true
+		// 			}
 		// 		}
 		// 	}
 		// ],
