@@ -470,3 +470,10 @@ test('mergeWithPackageConfig: XO engine options false supersede package.json\'s'
 	const expected = {nodeVersion: false, cwd};
 	t.deepEqual(result, expected);
 });
+
+test('mergeWithPackageConfig: read config from file `.xorc`', t => {
+	const cwd = path.resolve('fixtures', 'config_file');
+	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: false});
+	const expected = {esnext: true, space: true, nodeVersion: false, cwd};
+	t.deepEqual(result, expected);
+});

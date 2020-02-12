@@ -49,6 +49,7 @@
 	],
 	"dependencies": {
 		"arrify": "^2.0.1",
+		"cosmiconfig": "^6.0.0",
 		"debug": "^4.1.0",
 		"eslint": "^6.4.0",
 		"eslint-config-prettier": "^6.3.0",
