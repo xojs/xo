@@ -144,7 +144,7 @@ You can configure some options in XO by putting it in package.json:
 ### envs
 
 Type: `string[]`\
-Default: `['node']`
+Default: `['es2020', 'node']`
 
 Which [environments](https://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
 
