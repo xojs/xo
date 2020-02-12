@@ -107,7 +107,7 @@ test('quiet option', async t => {
 test('invalid node-engine option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
 	const error = await t.throwsAsync(main(['--node-version', 'v', filepath]));
-	t.is(error.code, 1);
+	t.is(error.exitCode, 1);
 });
 
 test('cli option takes precedence over config', async t => {

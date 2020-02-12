@@ -32,13 +32,14 @@ module.exports = {
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
 
-		// TODO: Enable this again in the minor XO release.
+		// TODO: Enable this again in the next XO release.
+		// Start with just a manual list of some non-contreversial abbreviations.
+		//
 		// TODO: Remove this override at some point.
 		// It's just here to ease users into readable variable names.
 		// 'unicorn/prevent-abbreviations': [
 		// 	'error',
 		// 	{
-		// 		checkProperties: false,
 		// 		checkFilenames: false,
 		// 		replacements: {
 		// 			args: false,
@@ -53,16 +54,14 @@ module.exports = {
 		// ],
 		'unicorn/prevent-abbreviations': 'off',
 
+		// TODO: Enable this when targeting Node.js 12.
+		'unicorn/prefer-flat-map': 'off',
+
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
 
-		// TODO: Change the rule default for this.
-		'unicorn/expiring-todo-comments': [
-			'error',
-			{
-				allowWarningComments: true
-			}
-		],
+		// TODO: Enable it again when the bugs are fixed.
+		'unicorn/regex-shorthand': 'off',
 
 		// TODO: Temporarily disabled as the rule is buggy.
 		'function-call-argument-newline': 'off',
@@ -77,10 +76,7 @@ module.exports = {
 		'promise/no-new-statics': 'error',
 		'promise/no-return-in-finally': 'error',
 		'promise/valid-params': 'error',
-
-		// TODO: Enable this when XO targets Node.js 8
-		// 'promise/prefer-await-to-then': 'error',
-
+		'promise/prefer-await-to-then': 'error',
 		'import/default': 'error',
 		'import/export': 'error',
 		'import/extensions': [
@@ -220,7 +216,8 @@ module.exports = {
 			'error',
 			'always'
 		],
-		// TODO: Enable these when XO targets Node.js 10
+
+		// Enable these when targeting Node.js 12.
 		// 'node/prefer-global/text-decoder': [
 		// 	'error',
 		// 	'always'
@@ -229,14 +226,17 @@ module.exports = {
 		// 	'error',
 		// 	'always'
 		// ],
-		// 'node/prefer-global/url-search-params': [
-		// 	'error',
-		// 	'always'
-		// ],
-		// 'node/prefer-global/url': [
-		// 	'error',
-		// 	'always'
-		// ]
+
+		'node/prefer-global/url-search-params': [
+			'error',
+			'always'
+		],
+		'node/prefer-global/url': [
+			'error',
+			'always'
+		],
+
+		// Enable these when targeting Node.js 12.
 		// 'node/prefer-promises/dns': 'error',
 		// 'node/prefer-promises/fs': 'error',
 
@@ -253,9 +253,6 @@ module.exports = {
 		// 'eslint-comments/no-unlimited-disable': 'error',
 
 		'eslint-comments/no-unused-disable': 'error',
-		'eslint-comments/no-unused-enable': 'error',
-
-		// Disabled by default, enabled only in Node.js >= 11 in option-manager.js
-		'unicorn/prefer-flat-map': 'off'
+		'eslint-comments/no-unused-enable': 'error'
 	}
 };

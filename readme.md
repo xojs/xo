@@ -20,7 +20,6 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/master/screenshot.png)
 
-
 ## Highlights
 
 - Beautiful output.
@@ -38,13 +37,11 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 - Optionally use the [Prettier](https://github.com/prettier/prettier) code style.
 - Great [editor plugins](#editor-plugins).
 
-
 ## Install
 
 ```
 $ npm install --global xo
 ```
-
 
 ## Usage
 
@@ -91,7 +88,6 @@ $ xo --help
 
 *Note that the CLI will use your local install of XO when available, even when run globally.*
 
-
 ## Default code style
 
 *Any of these can be [overridden](#rules) if necessary.*
@@ -104,7 +100,6 @@ $ xo --help
 - Always `===` instead of `==`
 
 Check out an [example](index.js) and the [ESLint rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js).
-
 
 ## Workflow
 
@@ -131,7 +126,6 @@ Simply run `$ npm init xo` (with any options) to add XO to your package.json or 
 
 Then just run `$ npm test` and XO will be run before your tests.
 
-
 ## Config
 
 You can configure some options in XO by putting it in package.json:
@@ -149,7 +143,7 @@ You can configure some options in XO by putting it in package.json:
 
 ### envs
 
-Type: `string[]`<br>
+Type: `string[]`\
 Default: `['node']`
 
 Which [environments](https://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
@@ -168,7 +162,7 @@ Some [paths](lib/options-manager.js) are ignored by default, including paths in 
 
 ### space
 
-Type: `boolean | number`<br>
+Type: `boolean | number`\
 Default: `false` *(tab indentation)*
 
 Set it to `true` to get 2-space indentation or specify the number of spaces.
@@ -185,14 +179,14 @@ Please take a moment to consider if you really need to use this option.
 
 ### semicolon
 
-Type: `boolean`<br>
+Type: `boolean`\
 Default: `true` *(Semicolons required)*
 
 Set it to `false` to enforce no-semicolon style.
 
 ### prettier
 
-Type: `boolean`<br>
+Type: `boolean`\
 Default: `false`
 
 Format code with [Prettier](https://github.com/prettier/prettier).
@@ -210,7 +204,7 @@ If contradicting options are set for both Prettier and XO an error will be throw
 
 ### nodeVersion
 
-Type: `string | boolean`<br>
+Type: `string | boolean`\
 Default: Value of the `engines.node` key in the project `package.json`
 
 Enable rules specific to the Node.js versions within the configured range.
@@ -249,13 +243,12 @@ ESLint parser. For example, [`babel-eslint`](https://github.com/babel/babel-esli
 
 ### esnext
 
-Type: `boolean`<br>
+Type: `boolean`\
 Default: `true`
 
 Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax and conventions.
 
 *ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
-
 
 ## TypeScript and Flow
 
@@ -266,7 +259,6 @@ See [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-con
 ### Flow
 
 See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo-flow#use-with-xo)
-
 
 ## Config Overrides
 
@@ -314,7 +306,6 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 }
 ```
 
-
 ## Tips
 
 ### Using a parent's config
@@ -344,7 +335,6 @@ For example, if your project targets Node.js 4 (your `package.json` is configure
 }
 ```
 
-
 ## FAQ
 
 #### What does XO mean?
@@ -359,7 +349,6 @@ The [Standard style](https://standardjs.com) is a really cool idea. I too wish w
 
 XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/xojs/eslint-config-xo).
 
-
 ## Editor plugins
 
 - [Sublime Text](https://github.com/xojs/SublimeLinter-contrib-xo)
@@ -370,7 +359,6 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [Emacs](https://github.com/j-em/xo-emacs)
 - [WebStorm](https://github.com/jamestalmage/xo-with-webstorm)
 
-
 ## Build-system plugins
 
 - [Gulp](https://github.com/xojs/gulp-xo)
@@ -379,7 +367,6 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [webpack plugin](https://github.com/nstanard/xo-webpack-plugin)
 - [Metalsmith](https://github.com/blainsmith/metalsmith-xo)
 - [Fly](https://github.com/lukeed/fly-xo)
-
 
 ## Configs
 
@@ -393,17 +380,14 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript
 - [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow) - ESLint shareable config for Flow
 
-
 ## Support
 
 - [Twitter](https://twitter.com/sindresorhus)
-
 
 ## Related
 
 - [eslint-plugin-unicorn](https://github.com/sindresorhus/eslint-plugin-unicorn) - Various awesome ESLint rules *(Bundled in XO)*
 - [xo-summary](https://github.com/LitoMore/xo-summary) - Display output from `xo` as a list of style errors, ordered by count
-
 
 ## Badge
 
@@ -414,7 +398,6 @@ Show the world you're using XO → [![XO code style](https://img.shields.io/badg
 ```
 
 You can also find some nice dynamic XO badges on [badgen.net](https://badgen.net/#xo).
-
 
 ## Team
 
