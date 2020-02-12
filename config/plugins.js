@@ -148,7 +148,9 @@ module.exports = {
 		// 	}
 		// ],
 
-		'import/order': 'error',
+		// Disabled because of https://github.com/benmosher/eslint-plugin-import/pull/1651 and other issues.
+		// 'import/order': 'error',
+
 		'import/no-unassigned-import': [
 			'error',
 			{
