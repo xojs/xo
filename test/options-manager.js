@@ -471,9 +471,37 @@ test('mergeWithPackageConfig: XO engine options false supersede package.json\'s'
 	t.deepEqual(result, expected);
 });
 
-test('mergeWithPackageConfig: read config from file `.xorc`', t => {
-	const cwd = path.resolve('fixtures', 'config_file');
+test('mergeWithPackageConfig: read config from json-file `.xorc`', t => {
+	const cwd = path.resolve('fixtures', 'config_file', 'no_extension');
 	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: false});
 	const expected = {esnext: true, space: true, nodeVersion: false, cwd};
 	t.deepEqual(result, expected);
+});
+
+test('mergeWithPackageConfig: read config from json-file `.xorc.json`', t => {
+	const cwd = path.resolve('fixtures', 'config_file', 'json_extension');
+	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: false});
+	const expected = {esnext: false, space: true, nodeVersion: false, cwd};
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPackageConfig: read config from js-module `.xorc.js`', t => {
+	const cwd = path.resolve('fixtures', 'config_file', 'js_extension');
+	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: false});
+	const expected = {eslint: true, space: false, nodeVersion: false, cwd};
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPackageConfig: read config from js-module `xo.config.js`', t => {
+	const cwd = path.resolve('fixtures', 'config_file', 'js_config_extension');
+	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: false});
+	const expected = {eslint: true, space: true, nodeVersion: false, cwd};
+	t.deepEqual(result, expected);
+});
+
+test('mergeWithPackageConfig: should fail when `.xorc` is yaml-file', t => {
+	const cwd = path.resolve('fixtures', 'config_file', 'yaml');
+	t.throws(() => {
+		manager.mergeWithPackageConfig({cwd, nodeVersion: false});
+	}, {name: 'JSONError'});
 });
