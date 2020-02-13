@@ -54,8 +54,6 @@ module.exports = {
 		// ],
 		'unicorn/prevent-abbreviations': 'off',
 
-		'unicorn/prefer-flat-map': 'error',
-
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
 
