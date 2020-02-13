@@ -134,8 +134,9 @@ Then just run `$ npm test` and XO will be run before your tests.
 
 ## Config
 
-You can configure some options in XO by putting it in package.json:
+You can configure some options in XO by putting it
 
+1. either in package.json:
 ```json
 {
 	"name": "awesome-package",
@@ -144,6 +145,22 @@ You can configure some options in XO by putting it in package.json:
 	}
 }
 ```
+
+2. putting valid json data in one of the files `.xorc` or `.xorc.json`:
+```json
+{
+	"space": true
+}
+```
+3. or creating a loadable js-module in one of the files `.xorc.js` or `xo.config.js`:
+```js
+use strict;
+
+module.exports = {
+	space: true
+};
+```
+All configuration files should be created in the same folder as the package.json file and should contain pure json data or a loadable js-module. YAML configuration files are not supported.
 
 [Globals](https://eslint.org/docs/user-guide/configuring#specifying-globals) and [rules](https://eslint.org/docs/user-guide/configuring#configuring-rules) can be configured inline in files.
 
