@@ -54,9 +54,6 @@ module.exports = {
 		// ],
 		'unicorn/prevent-abbreviations': 'off',
 
-		// TODO: Enable this when targeting Node.js 12.
-		'unicorn/prefer-flat-map': 'off',
-
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
 
@@ -216,16 +213,14 @@ module.exports = {
 			'error',
 			'always'
 		],
-
-		// Enable these when targeting Node.js 12.
-		// 'node/prefer-global/text-decoder': [
-		// 	'error',
-		// 	'always'
-		// ],
-		// 'node/prefer-global/text-encoder': [
-		// 	'error',
-		// 	'always'
-		// ],
+		'node/prefer-global/text-decoder': [
+			'error',
+			'always'
+		],
+		'node/prefer-global/text-encoder': [
+			'error',
+			'always'
+		],
 
 		'node/prefer-global/url-search-params': [
 			'error',
@@ -235,11 +230,8 @@ module.exports = {
 			'error',
 			'always'
 		],
-
-		// Enable these when targeting Node.js 12.
-		// 'node/prefer-promises/dns': 'error',
-		// 'node/prefer-promises/fs': 'error',
-
+		'node/prefer-promises/dns': 'error',
+		'node/prefer-promises/fs': 'error',
 		'eslint-comments/disable-enable-pair': [
 			'error',
 			{

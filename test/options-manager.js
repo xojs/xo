@@ -65,7 +65,7 @@ test('buildConfig: space: 4', t => {
 });
 
 test('buildConfig: semicolon', t => {
-	const config = manager.buildConfig({semicolon: false});
+	const config = manager.buildConfig({semicolon: false, nodeVersion: '12'});
 	t.deepEqual(config.rules, {
 		semi: ['error', 'never'],
 		'semi-spacing': ['error', {
@@ -203,38 +203,53 @@ test('buildConfig: engines: undefined', t => {
 	const config = manager.buildConfig({});
 
 	// Do not include any Node.js version specific rules
-	t.is(config.rules['prefer-spread'], undefined);
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
-	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	t.is(config.rules['prefer-object-spread'], 'off');
+	t.is(config.rules['prefer-rest-params'], 'off');
+	t.is(config.rules['prefer-destructuring'], 'off');
+	t.is(config.rules['promise/prefer-await-to-then'], 'off');
+	t.is(config.rules['unicorn/prefer-flat-map'], 'off');
+	t.is(config.rules['node/prefer-promises/dns'], 'off');
+	t.is(config.rules['node/prefer-promises/fs'], 'off');
 });
 
 test('buildConfig: nodeVersion: false', t => {
 	const config = manager.buildConfig({nodeVersion: false});
 
-	// Do not include any Node.js version specific rules
-	t.is(config.rules['prefer-spread'], undefined);
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
-	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	// Override all the rules specific to Node.js version
+	t.is(config.rules['prefer-object-spread'], 'off');
+	t.is(config.rules['prefer-rest-params'], 'off');
+	t.is(config.rules['prefer-destructuring'], 'off');
+	t.is(config.rules['promise/prefer-await-to-then'], 'off');
+	t.is(config.rules['unicorn/prefer-flat-map'], 'off');
+	t.is(config.rules['node/prefer-promises/dns'], 'off');
+	t.is(config.rules['node/prefer-promises/fs'], 'off');
 });
 
 test('buildConfig: nodeVersion: invalid range', t => {
 	const config = manager.buildConfig({nodeVersion: '4'});
 
-	// Do not include any Node.js version specific rules
-	t.is(config.rules['prefer-spread'], undefined);
-	t.is(config.rules['prefer-rest-params'], undefined);
-	t.is(config.rules['prefer-destructuring'], undefined);
-	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	// Override all the rules specific to Node.js version
+	t.is(config.rules['prefer-object-spread'], 'off');
+	t.is(config.rules['prefer-rest-params'], 'off');
+	t.is(config.rules['prefer-destructuring'], 'off');
+	t.is(config.rules['promise/prefer-await-to-then'], 'off');
+	t.is(config.rules['unicorn/prefer-flat-map'], 'off');
+	t.is(config.rules['node/prefer-promises/dns'], 'off');
+	t.is(config.rules['node/prefer-promises/fs'], 'off');
 });
 
-// TODO: We need a new fixture. Help welcome.
-test.failing('buildConfig: nodeVersion: >=8', t => {
+test('buildConfig: nodeVersion: >=6', t => {
+	const config = manager.buildConfig({nodeVersion: '>=6'});
+
+	// Turn off rule if we support Node.js below 7.6.0
+	t.is(config.rules['promise/prefer-await-to-then'], 'off');
+});
+
+test('buildConfig: nodeVersion: >=8', t => {
 	const config = manager.buildConfig({nodeVersion: '>=8'});
 
-	// Include rules for Node.js 8 and above
-	t.is(config.rules['promise/prefer-await-to-then'], 'error');
+	// Do not turn off rule if we support only Node.js above 7.6.0
+	t.is(config.rules['promise/prefer-await-to-then'], undefined);
 });
 
 test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
@@ -327,7 +342,7 @@ test('mergeWithPrettierConfig: throw error is `space`/`tabWidth` conflicts', t =
 
 test('buildConfig: rules', t => {
 	const rules = {'object-curly-spacing': ['error', 'always']};
-	const config = manager.buildConfig({rules});
+	const config = manager.buildConfig({rules, nodeVersion: '12'});
 	t.deepEqual(config.rules, rules);
 });
 
