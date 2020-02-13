@@ -215,7 +215,6 @@ module.exports = {
 			'error',
 			'always'
 		],
-
 		'node/prefer-global/text-decoder': [
 			'error',
 			'always'
@@ -233,10 +232,8 @@ module.exports = {
 			'error',
 			'always'
 		],
-
 		'node/prefer-promises/dns': 'error',
 		'node/prefer-promises/fs': 'error',
-
 		'eslint-comments/disable-enable-pair': [
 			'error',
 			{
