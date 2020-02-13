@@ -212,8 +212,7 @@ test('lint eslintignored files if filename is not given', async t => {
 	t.true(results[0].errorCount > 0);
 });
 
-// TODO: We need a new fixture. Help welcome.
-test.failing('enable rules based on nodeVersion', async t => {
+test('enable rules based on nodeVersion', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filename = path.join(cwd, 'promise-then.js');
 	const text = await readFile(filename, 'utf8');
@@ -225,8 +224,7 @@ test.failing('enable rules based on nodeVersion', async t => {
 	t.false(hasRule(results, 'promise/prefer-await-to-then'));
 });
 
-// TODO: We need a new fixture. Help welcome.
-test.failing('enable rules based on nodeVersion in override', async t => {
+test('enable rules based on nodeVersion in override', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filename = path.join(cwd, 'promise-then.js');
 	const text = await readFile(filename, 'utf8');
