@@ -97,6 +97,35 @@ test('buildConfig: prettier: true', t => {
 	t.is(config.rules['semi-spacing'], undefined);
 });
 
+test('buildConfig: prettier: true, typescript file', t => {
+	const config = manager.buildConfig({prettier: true, ts: true}, {});
+
+	t.deepEqual(config.plugins, ['prettier']);
+	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
+	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+		useTabs: true,
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		semi: true,
+		singleQuote: true,
+		tabWidth: 2,
+		trailingComma: 'none'
+	}]);
+
+	// eslint-prettier-config must always be last
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/@typescript-eslint');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'xo-typescript');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'prettier/unicorn');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 4], 'prettier');
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
+});
+
 test('buildConfig: prettier: true, semicolon: false', t => {
 	const config = manager.buildConfig({prettier: true, semicolon: false}, {});
 
@@ -372,6 +401,18 @@ test('buildConfig: extends', t => {
 	]);
 });
 
+test('buildConfig: typescript', t => {
+	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
+
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'xo-typescript');
+	t.is(config.baseConfig.parser, '@typescript-eslint/parser');
+	t.deepEqual(config.baseConfig.parserOptions, {
+		warnOnUnsupportedTypeScriptVersion: false,
+		ecmaFeatures: {jsx: true},
+		project: './tsconfig.json'
+	});
+});
+
 test('findApplicableOverrides', t => {
 	const result = manager.findApplicableOverrides('/user/dir/foo.js', [
 		{files: '**/f*.js'},
@@ -433,6 +474,40 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', t
 	const cwd = path.resolve('fixtures', 'engines');
 	const {options} = manager.mergeWithFileConfig({cwd, nodeVersion: false});
 	const expected = {nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: typescript files', t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'child');
+	const filename = path.resolve(cwd, 'file.ts');
+	const {options} = manager.mergeWithFileConfig({cwd, filename});
+	const expected = {
+		filename,
+		extensions: DEFAULT_EXTENSION,
+		ignores: DEFAULT_IGNORES,
+		cwd,
+		nodeVersion: undefined,
+		semicolon: false,
+		ts: true,
+		tsConfigPath: path.resolve(cwd, 'tsconfig.json')
+	};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: tsx files', t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'child');
+	const filename = path.resolve(cwd, 'file.tsx');
+	const {options} = manager.mergeWithFileConfig({cwd, filename});
+	const expected = {
+		filename,
+		extensions: DEFAULT_EXTENSION,
+		ignores: DEFAULT_IGNORES,
+		cwd,
+		nodeVersion: undefined,
+		semicolon: false,
+		ts: true,
+		tsConfigPath: path.resolve(cwd, 'tsconfig.json')
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -516,6 +591,41 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				ignores: DEFAULT_IGNORES
 			},
 			prettierOptions: {semi: false}
+		}
+	]);
+});
+
+test('mergeWithFileConfigs: typescript files', async t => {
+	const cwd = path.resolve('fixtures', 'typescript');
+	const paths = ['two-spaces.tsx', 'child/extra-semicolon.ts'];
+	const result = await manager.mergeWithFileConfigs(paths, {cwd});
+
+	t.deepEqual(result, [
+		{
+			files: [path.resolve(cwd, 'two-spaces.tsx')],
+			options: {
+				space: 4,
+				nodeVersion: undefined,
+				cwd,
+				extensions: DEFAULT_EXTENSION,
+				ignores: DEFAULT_IGNORES,
+				tsConfigPath: path.resolve(cwd, 'tsconfig.json'),
+				ts: true
+			},
+			prettierOptions: {}
+		},
+		{
+			files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
+			options: {
+				semicolon: false,
+				nodeVersion: undefined,
+				cwd: path.resolve(cwd, 'child'),
+				extensions: DEFAULT_EXTENSION,
+				ignores: DEFAULT_IGNORES,
+				tsConfigPath: path.resolve(cwd, 'child/tsconfig.json'),
+				ts: true
+			},
+			prettierOptions: {}
 		}
 	]);
 });

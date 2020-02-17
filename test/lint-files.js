@@ -167,3 +167,23 @@ test('find configurations close to linted file', async t => {
 		)
 	);
 });
+
+test('typescript files', async t => {
+	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/typescript'});
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/typescript/two-spaces.tsx'),
+			'@typescript-eslint/indent'
+		)
+	);
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/typescript/child/extra-semicolon.ts'),
+			'@typescript-eslint/no-extra-semi'
+		)
+	);
+});

@@ -267,3 +267,13 @@ test('find configurations close to linted file', t => {
 ]);\n`, {filename: 'fixtures/nested-configs/child-override/two-spaces.js'}));
 	t.true(hasRule(results, 'indent'));
 });
+
+test('typescript files', t => {
+	let {results} = fn.lintText('console.log(\'extra-semicolon\');;\n', {filename: 'fixtures/typescript/child/extra-semicolon.ts'});
+	t.true(hasRule(results, '@typescript-eslint/no-extra-semi'));
+
+	({results} = fn.lintText(`console.log([
+  2
+]);`, {filename: 'fixtures/typescript/two-spaces.tsx'}));
+	t.true(hasRule(results, '@typescript-eslint/indent'));
+});
