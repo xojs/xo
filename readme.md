@@ -346,6 +346,20 @@ For example, if your project targets Node.js 4 (your `package.json` is configure
 }
 ```
 
+### Including files ignored by default
+
+You include files that XO ignores [files by default](https://github.com/xojs/xo/blob/master/lib/constants.js#L1) by adding aa negative glob in the `ignores` options:
+```json
+{
+	"xo": {
+		"ignores": [
+			"!vendor/**"
+		]
+	}
+}
+```
+
+
 ## FAQ
 
 #### What does XO mean?
