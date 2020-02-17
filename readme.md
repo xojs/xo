@@ -128,8 +128,8 @@ Then just run `$ npm test` and XO will be run before your tests.
 
 ## Config
 
-You can configure some options in XO by putting it in package.json:
-
+You can configure XO options with one of the following files:
+1. as JSON in the `xo` property in `package.json`:
 ```json
 {
 	"name": "awesome-package",
@@ -137,6 +137,17 @@ You can configure some options in XO by putting it in package.json:
 		"space": true
 	}
 }
+```
+2. as JSON in `.xorc` or `.xorc.json`
+```json
+{
+	"space": true
+}
+3. as a JavaScript module in `.xorc.js` or `xo.config.js`
+```js
+module.exports = {
+	space: true
+};
 ```
 
 [Globals](https://eslint.org/docs/user-guide/configuring#specifying-globals) and [rules](https://eslint.org/docs/user-guide/configuring#configuring-rules) can be configured inline in files.
@@ -262,7 +273,7 @@ See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo
 
 ## Config Overrides
 
-XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
+XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings, relative to the config file. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
 
 ```json
 {
@@ -310,11 +321,11 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 
 ### Using a parent's config
 
-If you have a directory structure with nested `package.json` files and you want one of the child manifests to be skipped, you can do so by setting `"xo": false`. For example, when you have separate app and dev `package.json` files with `electron-builder`.
+If you have a directory structure with nested `package.json` files and you want one of the child manifests to be skipped, you can do so by ommiting the `xo` property in the child's `package.json`. For example, when you have separate app and dev `package.json` files with `electron-builder`.
 
 ### Monorepo
 
-Put a `package.json` with your config at the root and add `"xo": false` to the `package.json` in your bundled packages.
+Put a `package.json` with your config at the root and omit the `xo` property in the `package.json` of your bundled packages.
 
 ### Transpilation
 

@@ -3,9 +3,16 @@ const path = require('path');
 const eslint = require('eslint');
 const globby = require('globby');
 const isEqual = require('lodash/isEqual');
-const multimatch = require('multimatch');
+const micromatch = require('micromatch');
 const arrify = require('arrify');
-const optionsManager = require('./lib/options-manager');
+const {DEFAULT_EXTENSION} = require('./lib/constants');
+const {
+	normalizeOptions,
+	getIgnores,
+	mergeWithFileConfig,
+	mergeWithFileConfigs,
+	buildConfig
+} = require('./lib/options-manager');
 
 const mergeReports = reports => {
 	// Merge multiple reports into a single report
@@ -32,32 +39,19 @@ const processReport = (report, options) => {
 };
 
 const runEslint = (paths, options) => {
-	const config = optionsManager.buildConfig(options);
-	const engine = new eslint.CLIEngine(config);
+	const engine = new eslint.CLIEngine(options);
 	const report = engine.executeOnFiles(
 		paths.filter(path => !engine.isPathIgnored(path)),
-		config
+		options
 	);
 	return processReport(report, options);
 };
 
-module.exports.lintText = (string, options) => {
-	options = optionsManager.preprocess(options);
+const lintText = (string, options) => {
+	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(options);
+	options = buildConfig(foundOptions, prettierOptions);
 
-	if (options.overrides && options.overrides.length > 0) {
-		const {overrides} = options;
-		delete options.overrides;
-
-		const filename = path.relative(options.cwd, options.filename);
-
-		const foundOverrides = optionsManager.findApplicableOverrides(filename, overrides);
-		options = optionsManager.mergeApplicableOverrides(options, foundOverrides.applicable);
-	}
-
-	options = optionsManager.buildConfig(options);
-	const defaultIgnores = optionsManager.getIgnores({}).ignores;
-
-	if (options.ignores && !isEqual(defaultIgnores, options.ignores) && typeof options.filename !== 'string') {
+	if (options.ignores && !isEqual(getIgnores({}), options.ignores) && typeof options.filename !== 'string') {
 		throw new Error('The `ignores` option requires the `filename` option to be defined.');
 	}
 
@@ -67,7 +61,7 @@ module.exports.lintText = (string, options) => {
 		const filename = path.relative(options.cwd, options.filename);
 
 		if (
-			multimatch(filename, options.ignores).length > 0 ||
+			micromatch.isMatch(filename, options.ignores) ||
 			globby.gitignore.sync({cwd: options.cwd, ignore: options.ignores})(options.filename) ||
 			engine.isPathIgnored(options.filename)
 		) {
@@ -89,43 +83,30 @@ module.exports.lintText = (string, options) => {
 	return processReport(report, options);
 };
 
-module.exports.lintFiles = async (patterns, options) => {
-	options = optionsManager.preprocess(options);
+const lintFiles = async (patterns, options) => {
+	options = normalizeOptions(options);
 
 	const isEmptyPatterns = patterns.length === 0;
-	const defaultPattern = `**/*.{${options.extensions.join(',')}}`;
+	const defaultPattern = `**/*.{${DEFAULT_EXTENSION.concat(options.extensions || []).join(',')}}`;
 
-	let paths = await globby(
+	const paths = await globby(
 		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
 		{
-			ignore: options.ignores,
+			ignore: getIgnores(options),
 			gitignore: true,
-			cwd: options.cwd
+			cwd: options.cwd || process.cwd()
 		}
 	);
-	paths = paths.map(x => path.relative(options.cwd, path.resolve(options.cwd, x)));
 
-	// Filter out unwanted file extensions
-	// For silly users that don't specify an extension in the glob pattern
-	if (!isEmptyPatterns) {
-		paths = paths.filter(filePath => {
-			const extension = path.extname(filePath).replace('.', '');
-			return options.extensions.includes(extension);
-		});
-	}
-
-	if (!(options.overrides && options.overrides.length > 0)) {
-		return runEslint(paths, options);
-	}
-
-	const {overrides} = options;
-	delete options.overrides;
-
-	const grouped = optionsManager.groupConfigs(paths, options, overrides);
-
-	return mergeReports(grouped.map(data => runEslint(data.paths, data.options)));
+	return mergeReports((await mergeWithFileConfigs(paths, options)).map(
+		({files, options, prettierOptions}) => runEslint(files, buildConfig(options, prettierOptions)))
+	);
 };
 
-module.exports.getFormatter = eslint.CLIEngine.getFormatter;
-module.exports.getErrorResults = eslint.CLIEngine.getErrorResults;
-module.exports.outputFixes = eslint.CLIEngine.outputFixes;
+module.exports = {
+	getFormatter: eslint.CLIEngine.getFormatter,
+	getErrorResults: eslint.CLIEngine.getErrorResults,
+	outputFixes: eslint.CLIEngine.outputFixes,
+	lintText,
+	lintFiles
+};

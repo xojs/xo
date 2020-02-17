@@ -63,8 +63,7 @@ test('overrides work with absolute path', async t => {
 	await t.notThrowsAsync(main([file], {cwd}));
 });
 
-// #65
-test.failing('ignores fixture', async t => {
+test('ignores fixture', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
 	await t.throwsAsync(main([], {cwd}));
 });
@@ -76,7 +75,7 @@ test('ignore files in .gitignore', async t => {
 	const files = reports
 		.map(report => path.relative(cwd, report.filePath))
 		.map(report => slash(report));
-	t.deepEqual(files, ['index.js', 'test/bar.js']);
+	t.deepEqual(files.sort(), ['index.js', 'test/bar.js'].sort());
 });
 
 test('ignore explicit files when in .gitgnore', async t => {

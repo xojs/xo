@@ -2,6 +2,7 @@ import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
 import slash from 'slash';
+import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants';
 import parentConfig from './fixtures/nested/package.json';
 import childConfig from './fixtures/nested/child/package.json';
 import prettierConfig from './fixtures/prettier/package.json';
@@ -76,7 +77,7 @@ test('buildConfig: semicolon', t => {
 });
 
 test('buildConfig: prettier: true', t => {
-	const config = manager.buildConfig({prettier: true, extends: ['xo-react']});
+	const config = manager.buildConfig({prettier: true, extends: ['xo-react']}, {});
 
 	t.deepEqual(config.plugins, ['prettier']);
 	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
@@ -102,7 +103,7 @@ test('buildConfig: prettier: true', t => {
 });
 
 test('buildConfig: prettier: true, semicolon: false', t => {
-	const config = manager.buildConfig({prettier: true, semicolon: false});
+	const config = manager.buildConfig({prettier: true, semicolon: false}, {});
 
 	// Sets the `semi` options in `prettier/prettier` based on the XO `semicolon` option
 	t.deepEqual(config.rules['prettier/prettier'], ['error', {
@@ -123,7 +124,7 @@ test('buildConfig: prettier: true, semicolon: false', t => {
 });
 
 test('buildConfig: prettier: true, space: 4', t => {
-	const config = manager.buildConfig({prettier: true, space: 4});
+	const config = manager.buildConfig({prettier: true, space: 4}, {});
 
 	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
 	t.deepEqual(config.rules['prettier/prettier'], ['error', {
@@ -144,7 +145,7 @@ test('buildConfig: prettier: true, space: 4', t => {
 });
 
 test('buildConfig: prettier: true, esnext: false', t => {
-	const config = manager.buildConfig({prettier: true, esnext: false});
+	const config = manager.buildConfig({prettier: true, esnext: false}, {});
 
 	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
 	t.deepEqual(config.rules['prettier/prettier'], ['error', {
@@ -165,7 +166,7 @@ test('buildConfig: prettier: true, esnext: false', t => {
 });
 
 test('buildConfig: prettier: true, space: true', t => {
-	const config = manager.buildConfig({prettier: true, space: true});
+	const config = manager.buildConfig({prettier: true, space: true}, {});
 
 	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
 	t.deepEqual(config.rules['prettier/prettier'], ['error', {
@@ -187,7 +188,7 @@ test('buildConfig: prettier: true, space: true', t => {
 
 test('buildConfig: merge with prettier config', t => {
 	const cwd = path.resolve('fixtures', 'prettier');
-	const config = manager.buildConfig({cwd, prettier: true});
+	const config = manager.buildConfig({cwd, prettier: true}, prettierConfig.prettier);
 
 	// Sets the `semi` options in `prettier/prettier` based on the XO `semicolon` option
 	t.deepEqual(config.rules['prettier/prettier'], ['error', prettierConfig.prettier]);
@@ -387,103 +388,149 @@ test('findApplicableOverrides', t => {
 	]);
 });
 
-test('groupConfigs', t => {
+test('mergeWithFileConfig: use child if closest', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child');
+	const {options} = manager.mergeWithFileConfig({cwd});
+	const expected = {...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, nodeVersion: undefined};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: use parent if closest', t => {
+	const cwd = path.resolve('fixtures', 'nested');
+	const {options} = manager.mergeWithFileConfig({cwd});
+	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, nodeVersion: undefined};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: use parent if child is ignored', t => {
+	const cwd = path.resolve('fixtures', 'nested');
+	const filename = path.resolve(cwd, 'child-ignore', 'file.js');
+	const {options} = manager.mergeWithFileConfig({cwd, filename});
+	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filename, nodeVersion: undefined};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: use child if child is empty', t => {
+	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
+	const {options} = manager.mergeWithFileConfig({cwd});
+	t.deepEqual(options, {nodeVersion: undefined, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd});
+});
+
+test('mergeWithFileConfig: read engines from package.json', t => {
+	const cwd = path.resolve('fixtures', 'engines');
+	const {options} = manager.mergeWithFileConfig({cwd});
+	const expected = {nodeVersion: enginesConfig.engines.node, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: XO engine options supersede package.json\'s', t => {
+	const cwd = path.resolve('fixtures', 'engines');
+	const {options} = manager.mergeWithFileConfig({cwd, nodeVersion: '>=8'});
+	const expected = {nodeVersion: '>=8', extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: XO engine options false supersede package.json\'s', t => {
+	const cwd = path.resolve('fixtures', 'engines');
+	const {options} = manager.mergeWithFileConfig({cwd, nodeVersion: false});
+	const expected = {nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
+	t.deepEqual(options, expected);
+});
+
+function mergeWithFileConfigFileType(t, {dir}) {
+	const cwd = path.resolve('fixtures', 'config-files', dir);
+	const {options} = manager.mergeWithFileConfig({cwd});
+	const expected = {esnext: true, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, nodeVersion: undefined};
+	t.deepEqual(options, expected);
+}
+
+mergeWithFileConfigFileType.title = (_, {type}) => `mergeWithFileConfig: load from ${type}`.trim();
+
+test(mergeWithFileConfigFileType, {type: 'xo.config.js', dir: 'xoconfigjs'});
+test(mergeWithFileConfigFileType, {type: '.xorc.js', dir: 'xorcjs'});
+test(mergeWithFileConfigFileType, {type: '.xorc.json', dir: 'xorcjson'});
+test(mergeWithFileConfigFileType, {type: '.xorc', dir: 'xorc'});
+
+test('mergeWithFileConfigs: nested configs with prettier', async t => {
+	const cwd = path.resolve('fixtures', 'nested-configs');
 	const paths = [
-		'/user/foo/hello.js',
-		'/user/foo/goodbye.js',
-		'/user/foo/howdy.js',
-		'/user/bar/hello.js'
+		'single-quote.js',
+		'package.json',
+		'child/package.json',
+		'child/semicolon.js',
+		'child-override/package.json',
+		'child-override/semicolon.js'
 	];
-
-	const options = {
-		esnext: false
-	};
-
-	const overrides = [
-		{
-			files: '**/foo/*',
-			esnext: true
-		},
-		{
-			files: '**/foo/howdy.js',
-			space: 3,
-			env: 'mocha'
-		}
-	];
-
-	const result = manager.groupConfigs(paths, options, overrides);
+	const result = await manager.mergeWithFileConfigs(paths, {cwd});
 
 	t.deepEqual(result, [
 		{
+			files: [path.resolve(cwd, 'single-quote.js')],
 			options: {
-				esnext: true
+				semicolon: true,
+				prettier: true,
+				nodeVersion: undefined,
+				cwd,
+				extensions: DEFAULT_EXTENSION,
+				ignores: DEFAULT_IGNORES
 			},
-			paths: ['/user/foo/hello.js', '/user/foo/goodbye.js']
+			prettierOptions: {singleQuote: false}
 		},
 		{
+			files: [path.resolve(cwd, 'child/semicolon.js')],
+			options: {
+				semicolon: false,
+				nodeVersion: undefined,
+				cwd: path.resolve(cwd, 'child'),
+				extensions: DEFAULT_EXTENSION,
+				ignores: DEFAULT_IGNORES
+			},
+			prettierOptions: {}
+		},
+		{
+			files: [path.resolve(cwd, 'child-override/semicolon.js')],
+			options: {
+				rules: {},
+				settings: {},
+				globals: [],
+				envs: [],
+				plugins: [],
+				extends: [],
+				nodeVersion: undefined,
+				cwd: path.resolve(cwd, 'child-override'),
+				extensions: DEFAULT_EXTENSION,
+				ignores: DEFAULT_IGNORES,
+				prettier: true
+			},
+			prettierOptions: {singleQuote: false}
+		}
+	]);
+});
+
+async function mergeWithFileConfigsFileType(t, {dir}) {
+	const cwd = path.resolve('fixtures', 'config-files', dir);
+	const paths = ['a.js', 'b.js'];
+
+	const result = await manager.mergeWithFileConfigs(paths, {cwd});
+
+	t.deepEqual(result, [
+		{
+			files: paths.reverse().map(p => path.resolve(cwd, p)),
 			options: {
 				esnext: true,
-				space: 3,
-				envs: ['mocha']
+				nodeVersion: undefined,
+				cwd,
+				extensions: DEFAULT_EXTENSION,
+				ignores: DEFAULT_IGNORES
 			},
-			paths: ['/user/foo/howdy.js']
-		},
-		{
-			options: {
-				esnext: false
-			},
-			paths: ['/user/bar/hello.js']
+			prettierOptions: {}
 		}
-	].map(object => {
-		object.options = Object.assign(manager.emptyOptions(), object.options);
-		return object;
-	}));
-});
+	]);
+}
 
-test('mergeWithPackageConfig: use child if closest', t => {
-	const cwd = path.resolve('fixtures', 'nested', 'child');
-	const result = manager.mergeWithPackageConfig({cwd});
-	const expected = {...childConfig.xo, cwd, nodeVersion: undefined};
-	t.deepEqual(result, expected);
-});
+mergeWithFileConfigsFileType.title = (_, {type}) => `mergeWithFileConfigs: load from ${type}`.trim();
 
-test('mergeWithPackageConfig: use parent if closest', t => {
-	const cwd = path.resolve('fixtures', 'nested');
-	const result = manager.mergeWithPackageConfig({cwd});
-	const expected = {...parentConfig.xo, cwd, nodeVersion: undefined};
-	t.deepEqual(result, expected);
-});
-
-test('mergeWithPackageConfig: use parent if child is ignored', t => {
-	const cwd = path.resolve('fixtures', 'nested', 'child-ignore');
-	const result = manager.mergeWithPackageConfig({cwd});
-	const expected = {...parentConfig.xo, cwd, nodeVersion: undefined};
-	t.deepEqual(result, expected);
-});
-
-test('mergeWithPackageConfig: use child if child is empty', t => {
-	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
-	const result = manager.mergeWithPackageConfig({cwd});
-	t.deepEqual(result, {nodeVersion: undefined, cwd});
-});
-
-test('mergeWithPackageConfig: read engines from package.json', t => {
-	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPackageConfig({cwd});
-	const expected = {nodeVersion: enginesConfig.engines.node, cwd};
-	t.deepEqual(result, expected);
-});
-
-test('mergeWithPackageConfig: XO engine options supersede package.json\'s', t => {
-	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: '>=8'});
-	const expected = {nodeVersion: '>=8', cwd};
-	t.deepEqual(result, expected);
-});
-
-test('mergeWithPackageConfig: XO engine options false supersede package.json\'s', t => {
-	const cwd = path.resolve('fixtures', 'engines');
-	const result = manager.mergeWithPackageConfig({cwd, nodeVersion: false});
-	const expected = {nodeVersion: false, cwd};
-	t.deepEqual(result, expected);
-});
+test(mergeWithFileConfigsFileType, {type: 'xo.config.js', dir: 'xoconfigjs'});
+test(mergeWithFileConfigsFileType, {type: '.xorc.js', dir: 'xorcjs'});
+test(mergeWithFileConfigsFileType, {type: '.xorc.json', dir: 'xorcjson'});
+test(mergeWithFileConfigsFileType, {type: '.xorc', dir: 'xorc'});
