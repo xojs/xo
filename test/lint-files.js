@@ -132,7 +132,7 @@ test('do not lint eslintignored files', async t => {
 	t.is(results.some(r => r.filePath === negative), false);
 });
 
-test.only('find configurations close to linted file', async t => {
+test('find configurations close to linted file', async t => {
 	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/nested-configs'});
 
 	t.true(
@@ -146,7 +146,7 @@ test.only('find configurations close to linted file', async t => {
 	t.true(
 		hasRule(
 			results,
-			path.resolve('fixtures/nested-configs/child-override/semicolon.js'),
+			path.resolve('fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'),
 			'prettier/prettier'
 		)
 	);
@@ -154,8 +154,16 @@ test.only('find configurations close to linted file', async t => {
 	t.true(
 		hasRule(
 			results,
-			path.resolve('fixtures/nested-configs/single-quote.js'),
-			'prettier/prettier'
+			path.resolve('fixtures/nested-configs/no-semicolon.js'),
+			'semi'
+		)
+	);
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/nested-configs/child-override/two-spaces.js'),
+			'indent'
 		)
 	);
 });

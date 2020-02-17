@@ -48,7 +48,7 @@ const runEslint = (paths, options) => {
 };
 
 const lintText = (string, options) => {
-	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(options);
+	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
 	options = buildConfig(foundOptions, prettierOptions);
 
 	if (options.ignores && !isEqual(getIgnores({}), options.ignores) && typeof options.filename !== 'string') {

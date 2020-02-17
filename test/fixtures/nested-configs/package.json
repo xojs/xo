@@ -1,9 +1,5 @@
 {
     "xo": {
-        "semicolon": true,
-        "prettier": true
-    },
-    "prettier": {
-        "singleQuote": false
+        "semicolon": true
     }
 }

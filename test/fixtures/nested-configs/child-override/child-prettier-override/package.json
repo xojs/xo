@@ -2,8 +2,8 @@
     "xo": {
         "overrides": [
             {
-                "files": "two-spaces.js",
-                "space": 4
+                "files": "semicolon.js",
+                "prettier": true
             }
         ]
     }

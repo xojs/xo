@@ -253,14 +253,17 @@ test('enable rules based on nodeVersion in override', async t => {
 });
 
 test('find configurations close to linted file', t => {
-	const {results: childResults} = fn.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child/file.js'});
-	t.true(hasRule(childResults, 'semi'));
+	let {results} = fn.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child/semicolon.js'});
+	t.true(hasRule(results, 'semi'));
 
-	const {results} = fn.lintText('console.log(\'single-quote\');\n', {filename: 'fixtures/nested-configs/file.js'});
+	({results} = fn.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'}));
 	t.true(hasRule(results, 'prettier/prettier'));
-});
 
-test('find configurations close to linted file and use overrides', t => {
-	const {results} = fn.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child-override/semicolon.js'});
-	t.true(hasRule(results, 'prettier/prettier'));
+	({results} = fn.lintText('console.log(\'no-semicolon\')\n', {filename: 'fixtures/nested-configs/no-semicolon.js'}));
+	t.true(hasRule(results, 'semi'));
+
+	({results} = fn.lintText(`console.log([
+  2
+]);\n`, {filename: 'fixtures/nested-configs/child-override/two-spaces.js'}));
+	t.true(hasRule(results, 'indent'));
 });

@@ -454,27 +454,24 @@ test(mergeWithFileConfigFileType, {type: '.xo-config', dir: 'xo-config'});
 test('mergeWithFileConfigs: nested configs with prettier', async t => {
 	const cwd = path.resolve('fixtures', 'nested-configs');
 	const paths = [
-		'single-quote.js',
-		'package.json',
-		'child/package.json',
+		'no-semicolon.js',
 		'child/semicolon.js',
-		'child-override/package.json',
-		'child-override/semicolon.js'
+		'child-override/two-spaces.js',
+		'child-override/child-prettier-override/semicolon.js'
 	];
 	const result = await manager.mergeWithFileConfigs(paths, {cwd});
 
 	t.deepEqual(result, [
 		{
-			files: [path.resolve(cwd, 'single-quote.js')],
+			files: [path.resolve(cwd, 'no-semicolon.js')],
 			options: {
 				semicolon: true,
-				prettier: true,
 				nodeVersion: undefined,
 				cwd,
 				extensions: DEFAULT_EXTENSION,
 				ignores: DEFAULT_IGNORES
 			},
-			prettierOptions: {singleQuote: false}
+			prettierOptions: {}
 		},
 		{
 			files: [path.resolve(cwd, 'child/semicolon.js')],
@@ -488,8 +485,9 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 			prettierOptions: {}
 		},
 		{
-			files: [path.resolve(cwd, 'child-override/semicolon.js')],
+			files: [path.resolve(cwd, 'child-override/two-spaces.js')],
 			options: {
+				space: 4,
 				rules: {},
 				settings: {},
 				globals: [],
@@ -499,10 +497,26 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				nodeVersion: undefined,
 				cwd: path.resolve(cwd, 'child-override'),
 				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES,
-				prettier: true
+				ignores: DEFAULT_IGNORES
 			},
-			prettierOptions: {singleQuote: false}
+			prettierOptions: {}
+		},
+		{
+			files: [path.resolve(cwd, 'child-override/child-prettier-override/semicolon.js')],
+			options: {
+				prettier: true,
+				rules: {},
+				settings: {},
+				globals: [],
+				envs: [],
+				plugins: [],
+				extends: [],
+				nodeVersion: undefined,
+				cwd: path.resolve(cwd, 'child-override', 'child-prettier-override'),
+				extensions: DEFAULT_EXTENSION,
+				ignores: DEFAULT_IGNORES
+			},
+			prettierOptions: {semi: false}
 		}
 	]);
 });
