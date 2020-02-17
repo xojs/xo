@@ -129,7 +129,9 @@ Then just run `$ npm test` and XO will be run before your tests.
 ## Config
 
 You can configure XO options with one of the following files:
-1. as JSON in the `xo` property in `package.json`:
+
+1. As JSON in the `xo` property in `package.json`:
+
 ```json
 {
 	"name": "awesome-package",
@@ -138,12 +140,17 @@ You can configure XO options with one of the following files:
 	}
 }
 ```
-2. as JSON in `.xorc` or `.xorc.json`
+
+2. As JSON in `.xorc` or `.xorc.json`:
+
 ```json
 {
 	"space": true
 }
-3. as a JavaScript module in `.xorc.js` or `xo.config.js`
+```
+
+3. As a JavaScript module in `.xorc.js` or `xo.config.js`:
+
 ```js
 module.exports = {
 	space: true
