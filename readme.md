@@ -141,7 +141,7 @@ You can configure XO options with one of the following files:
 }
 ```
 
-2. As JSON in `.xorc` or `.xorc.json`:
+2. As JSON in `.xo-config` or `.xo-config.json`:
 
 ```json
 {
@@ -149,7 +149,7 @@ You can configure XO options with one of the following files:
 }
 ```
 
-3. As a JavaScript module in `.xorc.js` or `xo.config.js`:
+3. As a JavaScript module in `.xo-config.js` or `xo.config.js`:
 
 ```js
 module.exports = {

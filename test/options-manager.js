@@ -446,10 +446,10 @@ function mergeWithFileConfigFileType(t, {dir}) {
 
 mergeWithFileConfigFileType.title = (_, {type}) => `mergeWithFileConfig: load from ${type}`.trim();
 
-test(mergeWithFileConfigFileType, {type: 'xo.config.js', dir: 'xoconfigjs'});
-test(mergeWithFileConfigFileType, {type: '.xorc.js', dir: 'xorcjs'});
-test(mergeWithFileConfigFileType, {type: '.xorc.json', dir: 'xorcjson'});
-test(mergeWithFileConfigFileType, {type: '.xorc', dir: 'xorc'});
+test(mergeWithFileConfigFileType, {type: 'xo.config.js', dir: 'xo-config_js'});
+test(mergeWithFileConfigFileType, {type: '.xo-config.js', dir: 'xo-config_js'});
+test(mergeWithFileConfigFileType, {type: '.xo-config.json', dir: 'xo-config_json'});
+test(mergeWithFileConfigFileType, {type: '.xo-config', dir: 'xo-config'});
 
 test('mergeWithFileConfigs: nested configs with prettier', async t => {
 	const cwd = path.resolve('fixtures', 'nested-configs');
@@ -530,7 +530,7 @@ async function mergeWithFileConfigsFileType(t, {dir}) {
 
 mergeWithFileConfigsFileType.title = (_, {type}) => `mergeWithFileConfigs: load from ${type}`.trim();
 
-test(mergeWithFileConfigsFileType, {type: 'xo.config.js', dir: 'xoconfigjs'});
-test(mergeWithFileConfigsFileType, {type: '.xorc.js', dir: 'xorcjs'});
-test(mergeWithFileConfigsFileType, {type: '.xorc.json', dir: 'xorcjson'});
-test(mergeWithFileConfigsFileType, {type: '.xorc', dir: 'xorc'});
+test(mergeWithFileConfigsFileType, {type: 'xo.config.js', dir: 'xo-config_js'});
+test(mergeWithFileConfigsFileType, {type: '.xo-config.js', dir: 'xo-config_js'});
+test(mergeWithFileConfigsFileType, {type: '.xo-config.json', dir: 'xo-config_json'});
+test(mergeWithFileConfigsFileType, {type: '.xo-config', dir: 'xo-config'});
