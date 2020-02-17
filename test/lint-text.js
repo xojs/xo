@@ -251,3 +251,19 @@ test('enable rules based on nodeVersion in override', async t => {
 		]}));
 	t.true(hasRule(results, 'promise/prefer-await-to-then'));
 });
+
+test('find configurations close to linted file', t => {
+	let {results} = fn.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child/semicolon.js'});
+	t.true(hasRule(results, 'semi'));
+
+	({results} = fn.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'}));
+	t.true(hasRule(results, 'prettier/prettier'));
+
+	({results} = fn.lintText('console.log(\'no-semicolon\')\n', {filename: 'fixtures/nested-configs/no-semicolon.js'}));
+	t.true(hasRule(results, 'semi'));
+
+	({results} = fn.lintText(`console.log([
+  2
+]);\n`, {filename: 'fixtures/nested-configs/child-override/two-spaces.js'}));
+	t.true(hasRule(results, 'indent'));
+});
