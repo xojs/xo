@@ -336,22 +336,36 @@ Put a `package.json` with your config at the root and omit the `xo` property in 
 
 ### Transpilation
 
-If some files in your project are transpiled in order to support an older Node.js version, you can use the [config overrides](#config-overrides) option to set a specific [`nodeVersion`](#nodeversion) target for these files.
+If some files in your project are transpiled in order to support an older Node.js version, you can use the [config overrides](#config-overrides) option to set a specific [`nodeVersion`](#nodeversion) to target your sources files.
 
-For example, if your project targets Node.js 4 (your `package.json` is configured with `engines.node` set to `>=4`) and you are using [AVA](https://github.com/avajs/ava), then your test files are automatically transpiled. You can override `nodeVersion` for the tests files:
+For example, if your project targets Node.js 8 but you want to use the latest JavaScript syntax as supported in Node.js 12:
+1. Set the `engines.node` property of your `package.json` to `>=8`
+2. Configure [Babel](https://babeljs.io) to transpile your source files (in `src` directory in this example)
+3. Make sure to include the transpiled files in your published package with the [`files`](https://docs.npmjs.com/files/package.json#files) and [`main`](https://docs.npmjs.com/files/package.json#main) properties of your `package.json`
+4. Configure the XO `overrides` option to set `nodeVersion` to `>=12` for your source files directory
 
 ```json
 {
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"build": "babel src --out-dir dist"
+	},
+	"main": "dist/index.js",
+	"files": ["dist/**/*.js"],
 	"xo": {
 		"overrides": [
 			{
-				"files": "{test,tests,spec,__tests__}/**/*.js",
-				"nodeVersion": ">=9"
+				"files": "{src}/**/*.js",
+				"nodeVersion": ">=12"
 			}
 		]
 	}
 }
 ```
+
+This way your `package.json` will contain the actual minimum Node.js version supported by your published code, but XO will lint your source code as if it targets Node.js 12. 
 
 ### Including files ignored by default
 
@@ -366,7 +380,6 @@ To include files that XO [ignores by default](https://github.com/xojs/xo/blob/ma
 	}
 }
 ```
-
 
 ## FAQ
 
