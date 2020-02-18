@@ -1,7 +1,7 @@
 {
 	"name": "xo",
 	"version": "0.26.1",
-	"description": "JavaScript/TypeSCript linter with great defaults",
+	"description": "JavaScript/TypeScript linter with great defaults",
 	"license": "MIT",
 	"repository": "xojs/xo",
 	"funding": "https://github.com/sponsors/sindresorhus",
