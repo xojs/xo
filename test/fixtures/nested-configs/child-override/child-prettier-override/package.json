@@ -1,10 +1,10 @@
 {
-    "xo": {
-        "overrides": [
-            {
-                "files": "semicolon.js",
-                "prettier": true
-            }
-        ]
-    }
+	"xo": {
+		"overrides": [
+			{
+				"files": "semicolon.js",
+				"prettier": true
+			}
+		]
+	}
 }

@@ -51,8 +51,8 @@
 		"typescript"
 	],
 	"dependencies": {
-		"@typescript-eslint/eslint-plugin": "^2.19.2",
-		"@typescript-eslint/parser": "^2.19.2",
+		"@typescript-eslint/eslint-plugin": "^2.21.0",
+		"@typescript-eslint/parser": "^2.21.0",
 		"arrify": "^2.0.1",
 		"cosmiconfig": "^6.0.0",
 		"debug": "^4.1.0",
@@ -93,7 +93,7 @@
 	"devDependencies": {
 		"ava": "^1.1.0",
 		"coveralls": "^3.0.6",
-		"eslint-config-xo-react": "^0.22.0",
+		"eslint-config-xo-react": "^0.23.0",
 		"eslint-plugin-react": "^7.14.3",
 		"eslint-plugin-react-hooks": "^2.0.1",
 		"execa": "^4.0.0",

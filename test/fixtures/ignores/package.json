@@ -1,9 +1,9 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
-  "xo": {
-    "ignore": [
-      "!{test/,}fixture{s,}/**"
-    ]
-  }
+	"name": "application-name",
+	"version": "0.0.1",
+	"xo": {
+		"ignore": [
+			"!{test/,}fixture{s,}/**"
+		]
+	}
 }

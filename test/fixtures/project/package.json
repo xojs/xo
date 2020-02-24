@@ -1,5 +1,5 @@
 {
-  "xo": {
-    "extends": ["custom"]
-  }
+	"xo": {
+		"extends": ["custom"]
+	}
 }
