@@ -1,5 +1,7 @@
 import path from 'path';
 import test from 'ava';
+import omit from 'lodash/omit';
+import {readJson} from 'fs-extra';
 import proxyquire from 'proxyquire';
 import slash from 'slash';
 import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants';
@@ -477,7 +479,7 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', t
 	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: typescript files', t => {
+test('mergeWithFileConfig: typescript files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filename = path.resolve(cwd, 'file.ts');
 	const {options} = manager.mergeWithFileConfig({cwd, filename});
@@ -488,13 +490,17 @@ test('mergeWithFileConfig: typescript files', t => {
 		cwd,
 		nodeVersion: undefined,
 		semicolon: false,
-		ts: true,
-		tsConfigPath: path.resolve(cwd, 'tsconfig.json')
+		ts: true
 	};
-	t.deepEqual(options, expected);
+	t.deepEqual(omit(options, 'tsConfigPath'), expected);
+	t.deepEqual(await readJson(options.tsConfigPath), {
+		extends: path.resolve(cwd, 'tsconfig.json'),
+		files: [path.resolve(cwd, 'file.ts')],
+		include: [path.resolve(cwd, '**/*.ts'), path.resolve(cwd, '**/*.tsx')]
+	});
 });
 
-test('mergeWithFileConfig: tsx files', t => {
+test('mergeWithFileConfig: tsx files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filename = path.resolve(cwd, 'file.tsx');
 	const {options} = manager.mergeWithFileConfig({cwd, filename});
@@ -505,10 +511,14 @@ test('mergeWithFileConfig: tsx files', t => {
 		cwd,
 		nodeVersion: undefined,
 		semicolon: false,
-		ts: true,
-		tsConfigPath: path.resolve(cwd, 'tsconfig.json')
+		ts: true
 	};
-	t.deepEqual(options, expected);
+	t.deepEqual(omit(options, 'tsConfigPath'), expected);
+	t.deepEqual(await readJson(options.tsConfigPath), {
+		extends: path.resolve(cwd, 'tsconfig.json'),
+		files: [path.resolve(cwd, 'file.tsx')],
+		include: [path.resolve(cwd, '**/*.ts'), path.resolve(cwd, '**/*.tsx')]
+	});
 });
 
 function mergeWithFileConfigFileType(t, {dir}) {
@@ -600,34 +610,40 @@ test('mergeWithFileConfigs: typescript files', async t => {
 	const paths = ['two-spaces.tsx', 'child/extra-semicolon.ts'];
 	const result = await manager.mergeWithFileConfigs(paths, {cwd});
 
-	t.deepEqual(result, [
-		{
-			files: [path.resolve(cwd, 'two-spaces.tsx')],
-			options: {
-				space: 4,
-				nodeVersion: undefined,
-				cwd,
-				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES,
-				tsConfigPath: path.resolve(cwd, 'tsconfig.json'),
-				ts: true
-			},
-			prettierOptions: {}
+	t.deepEqual(omit(result[0], 'options.tsConfigPath'), {
+		files: [path.resolve(cwd, 'two-spaces.tsx')],
+		options: {
+			space: 4,
+			nodeVersion: undefined,
+			cwd,
+			extensions: DEFAULT_EXTENSION,
+			ignores: DEFAULT_IGNORES,
+			ts: true
 		},
-		{
-			files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
-			options: {
-				semicolon: false,
-				nodeVersion: undefined,
-				cwd: path.resolve(cwd, 'child'),
-				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES,
-				tsConfigPath: path.resolve(cwd, 'child/tsconfig.json'),
-				ts: true
-			},
-			prettierOptions: {}
-		}
-	]);
+		prettierOptions: {}
+	});
+	t.deepEqual(await readJson(result[0].options.tsConfigPath), {files: [path.resolve(cwd, 'two-spaces.tsx')]});
+
+	t.deepEqual(omit(result[1], 'options.tsConfigPath'), {
+		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
+		options: {
+			semicolon: false,
+			nodeVersion: undefined,
+			cwd: path.resolve(cwd, 'child'),
+			extensions: DEFAULT_EXTENSION,
+			ignores: DEFAULT_IGNORES,
+			ts: true
+		},
+		prettierOptions: {}
+	});
+	t.deepEqual(await readJson(result[1].options.tsConfigPath), {
+		extends: path.resolve(cwd, 'child/tsconfig.json'),
+		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
+		include: [
+			path.resolve(cwd, 'child/**/*.ts'),
+			path.resolve(cwd, 'child/**/*.tsx')
+		]
+	});
 });
 
 async function mergeWithFileConfigsFileType(t, {dir}) {

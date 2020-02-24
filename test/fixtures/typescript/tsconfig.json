@@ -1,7 +1,0 @@
-{
-    // comment
-    "include": [
-        "**/*.ts",
-        "**/*.tsx"
-    ]
-}
