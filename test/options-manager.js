@@ -1,5 +1,7 @@
 import path from 'path';
 import test from 'ava';
+import omit from 'lodash/omit';
+import {readJson} from 'fs-extra';
 import proxyquire from 'proxyquire';
 import slash from 'slash';
 import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants';
@@ -89,6 +91,35 @@ test('buildConfig: prettier: true', t => {
 	// eslint-prettier-config must always be last
 	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/unicorn');
 	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'prettier');
+	// Indent rule is not enabled
+	t.is(config.rules.indent, undefined);
+	// Semi rule is not enabled
+	t.is(config.rules.semi, undefined);
+	// Semi-spacing is not enabled
+	t.is(config.rules['semi-spacing'], undefined);
+});
+
+test('buildConfig: prettier: true, typescript file', t => {
+	const config = manager.buildConfig({prettier: true, ts: true}, {});
+
+	t.deepEqual(config.plugins, ['prettier']);
+	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
+	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
+	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+		useTabs: true,
+		bracketSpacing: false,
+		jsxBracketSameLine: false,
+		semi: true,
+		singleQuote: true,
+		tabWidth: 2,
+		trailingComma: 'none'
+	}]);
+
+	// eslint-prettier-config must always be last
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/@typescript-eslint');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'xo-typescript');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'prettier/unicorn');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 4], 'prettier');
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
 	// Semi rule is not enabled
@@ -372,6 +403,18 @@ test('buildConfig: extends', t => {
 	]);
 });
 
+test('buildConfig: typescript', t => {
+	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
+
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'xo-typescript');
+	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
+	t.deepEqual(config.baseConfig.parserOptions, {
+		warnOnUnsupportedTypeScriptVersion: false,
+		ecmaFeatures: {jsx: true},
+		project: './tsconfig.json'
+	});
+});
+
 test('findApplicableOverrides', t => {
 	const result = manager.findApplicableOverrides('/user/dir/foo.js', [
 		{files: '**/f*.js'},
@@ -434,6 +477,48 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', t
 	const {options} = manager.mergeWithFileConfig({cwd, nodeVersion: false});
 	const expected = {nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: typescript files', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'child');
+	const filename = path.resolve(cwd, 'file.ts');
+	const {options} = manager.mergeWithFileConfig({cwd, filename});
+	const expected = {
+		filename,
+		extensions: DEFAULT_EXTENSION,
+		ignores: DEFAULT_IGNORES,
+		cwd,
+		nodeVersion: undefined,
+		semicolon: false,
+		ts: true
+	};
+	t.deepEqual(omit(options, 'tsConfigPath'), expected);
+	t.deepEqual(await readJson(options.tsConfigPath), {
+		extends: path.resolve(cwd, 'tsconfig.json'),
+		files: [path.resolve(cwd, 'file.ts')],
+		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))]
+	});
+});
+
+test('mergeWithFileConfig: tsx files', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'child');
+	const filename = path.resolve(cwd, 'file.tsx');
+	const {options} = manager.mergeWithFileConfig({cwd, filename});
+	const expected = {
+		filename,
+		extensions: DEFAULT_EXTENSION,
+		ignores: DEFAULT_IGNORES,
+		cwd,
+		nodeVersion: undefined,
+		semicolon: false,
+		ts: true
+	};
+	t.deepEqual(omit(options, 'tsConfigPath'), expected);
+	t.deepEqual(await readJson(options.tsConfigPath), {
+		extends: path.resolve(cwd, 'tsconfig.json'),
+		files: [path.resolve(cwd, 'file.tsx')],
+		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))]
+	});
 });
 
 function mergeWithFileConfigFileType(t, {dir}) {
@@ -518,6 +603,58 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 			prettierOptions: {semi: false}
 		}
 	]);
+});
+
+test('mergeWithFileConfigs: typescript files', async t => {
+	const cwd = path.resolve('fixtures', 'typescript');
+	const paths = ['two-spaces.tsx', 'child/extra-semicolon.ts'];
+	const result = await manager.mergeWithFileConfigs(paths, {cwd});
+
+	t.deepEqual(omit(result[0], 'options.tsConfigPath'), {
+		files: [path.resolve(cwd, 'two-spaces.tsx')],
+		options: {
+			space: 4,
+			nodeVersion: undefined,
+			cwd,
+			extensions: DEFAULT_EXTENSION,
+			ignores: DEFAULT_IGNORES,
+			ts: true
+		},
+		prettierOptions: {}
+	});
+	t.deepEqual(await readJson(result[0].options.tsConfigPath), {
+		files: [path.resolve(cwd, 'two-spaces.tsx')],
+		compilerOptions: {
+			newLine: 'lf',
+			noFallthroughCasesInSwitch: true,
+			noImplicitReturns: true,
+			noUnusedLocals: true,
+			noUnusedParameters: true,
+			strict: true,
+			target: 'es2018'
+		}
+	});
+
+	t.deepEqual(omit(result[1], 'options.tsConfigPath'), {
+		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
+		options: {
+			semicolon: false,
+			nodeVersion: undefined,
+			cwd: path.resolve(cwd, 'child'),
+			extensions: DEFAULT_EXTENSION,
+			ignores: DEFAULT_IGNORES,
+			ts: true
+		},
+		prettierOptions: {}
+	});
+	t.deepEqual(await readJson(result[1].options.tsConfigPath), {
+		extends: path.resolve(cwd, 'child/tsconfig.json'),
+		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
+		include: [
+			slash(path.resolve(cwd, 'child/**/*.ts')),
+			slash(path.resolve(cwd, 'child/**/*.tsx'))
+		]
+	});
 });
 
 async function mergeWithFileConfigsFileType(t, {dir}) {

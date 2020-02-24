@@ -6,7 +6,7 @@
 	<br>
 </h1>
 
-> JavaScript linter with great defaults
+> JavaScript/TypeScript linter with great defaults
 
 [![Build Status](https://travis-ci.org/xojs/xo.svg?branch=master)](https://travis-ci.org/xojs/xo) [![Coverage Status](https://coveralls.io/repos/github/xojs/xo/badge.svg?branch=master)](https://coveralls.io/github/xojs/xo?branch=master) [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo) [![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/xojs/Lobby)
 
@@ -25,8 +25,9 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 - Beautiful output.
 - Zero-config, but [configurable when needed](#config).
 - Enforces readable code, because you read more code than you write.
-- No need to specify file paths to lint as it lints all JS files except for [commonly ignored paths](#ignores).
+- No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
 - [Config overrides per files/globs.](#config-overrides)
+- [TypeScript supported by default](#typescript)
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`node`](https://github.com/mysticatea/eslint-plugin-node) and more.
 - Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
@@ -272,7 +273,9 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 
 ### TypeScript
 
-See [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo)
+XO will automatically lint TypeScript files (`.ts`, `.d.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
+
+XO will handle the [@typescript-eslint/parser `project` option](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser#parseroptionsproject) automatically even if you don't have a `tsconfig.json` in your project.
 
 ### Flow
 
