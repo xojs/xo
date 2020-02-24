@@ -547,3 +547,38 @@ test(mergeWithFileConfigsFileType, {type: 'xo.config.js', dir: 'xo-config_js'});
 test(mergeWithFileConfigsFileType, {type: '.xo-config.js', dir: 'xo-config_js'});
 test(mergeWithFileConfigsFileType, {type: '.xo-config.json', dir: 'xo-config_json'});
 test(mergeWithFileConfigsFileType, {type: '.xo-config', dir: 'xo-config'});
+
+test('applyOverrides', t => {
+	t.deepEqual(
+		manager.applyOverrides(
+			'file.js',
+			{
+				overrides: [
+					{
+						files: 'file.js',
+						rules: {'rule-2': 'c'},
+						extends: ['overrride-extend'],
+						globals: ['override'],
+						plugins: ['override-plugin']
+					}
+				],
+				rules: {'rule-1': 'a', 'rule-2': 'b'},
+				extends: ['base-extend'],
+				globals: ['base'],
+				plugins: ['base-plugin'],
+				cwd: '.'
+			}),
+		{
+			options: {
+				rules: {'rule-1': 'a', 'rule-2': 'c'},
+				extends: ['base-extend', 'overrride-extend'],
+				globals: ['base', 'override'],
+				plugins: ['base-plugin', 'override-plugin'],
+				envs: [],
+				settings: {},
+				cwd: '.'
+			},
+			hash: 1
+		}
+	);
+});
