@@ -622,7 +622,18 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		},
 		prettierOptions: {}
 	});
-	t.deepEqual(await readJson(result[0].options.tsConfigPath), {files: [path.resolve(cwd, 'two-spaces.tsx')]});
+	t.deepEqual(await readJson(result[0].options.tsConfigPath), {
+		files: [path.resolve(cwd, 'two-spaces.tsx')],
+		compilerOptions: {
+			newLine: 'lf',
+			noFallthroughCasesInSwitch: true,
+			noImplicitReturns: true,
+			noUnusedLocals: true,
+			noUnusedParameters: true,
+			strict: true,
+			target: 'es2018'
+		}
+	});
 
 	t.deepEqual(omit(result[1], 'options.tsConfigPath'), {
 		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
