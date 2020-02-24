@@ -149,7 +149,8 @@ module.exports = {
 			{
 				allow: [
 					'@babel/polyfill',
-					'@babel/register'
+					'**/register',
+					'**/register/**'
 				]
 			}
 		],
