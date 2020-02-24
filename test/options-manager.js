@@ -496,7 +496,7 @@ test('mergeWithFileConfig: typescript files', async t => {
 	t.deepEqual(await readJson(options.tsConfigPath), {
 		extends: path.resolve(cwd, 'tsconfig.json'),
 		files: [path.resolve(cwd, 'file.ts')],
-		include: [path.resolve(cwd, '**/*.ts'), path.resolve(cwd, '**/*.tsx')]
+		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))]
 	});
 });
 
@@ -517,7 +517,7 @@ test('mergeWithFileConfig: tsx files', async t => {
 	t.deepEqual(await readJson(options.tsConfigPath), {
 		extends: path.resolve(cwd, 'tsconfig.json'),
 		files: [path.resolve(cwd, 'file.tsx')],
-		include: [path.resolve(cwd, '**/*.ts'), path.resolve(cwd, '**/*.tsx')]
+		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))]
 	});
 });
 
@@ -640,8 +640,8 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		extends: path.resolve(cwd, 'child/tsconfig.json'),
 		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
 		include: [
-			path.resolve(cwd, 'child/**/*.ts'),
-			path.resolve(cwd, 'child/**/*.tsx')
+			slash(path.resolve(cwd, 'child/**/*.ts')),
+			slash(path.resolve(cwd, 'child/**/*.tsx'))
 		]
 	});
 });
