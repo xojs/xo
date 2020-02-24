@@ -27,7 +27,7 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 - Enforces readable code, because you read more code than you write.
 - No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
 - [Config overrides per files/globs.](#config-overrides)
-- TypeScript supported by default
+- [TypeScript supported by default](#typescript)
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`node`](https://github.com/mysticatea/eslint-plugin-node) and more.
 - Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
