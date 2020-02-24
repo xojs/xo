@@ -273,7 +273,9 @@ Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax 
 
 ### TypeScript
 
-XO will automatically lint TypeScript files (`.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
+XO will automatically lint TypeScript files (`.ts`, `.d.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
+
+XO will handle the [@typescript-eslint/parser `project` option](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser#parseroptionsproject) automatically even if you don't have a `tsconfig.json` in your project.
 
 ### Flow
 
