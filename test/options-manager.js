@@ -407,7 +407,7 @@ test('buildConfig: typescript', t => {
 	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
 
 	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'xo-typescript');
-	t.is(config.baseConfig.parser, '@typescript-eslint/parser');
+	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
 		ecmaFeatures: {jsx: true},
