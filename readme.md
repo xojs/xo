@@ -244,9 +244,12 @@ Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shar
 
 ### extensions
 
-Type: `string[]`
+Type: `string[]`\
+Default: `['js', 'jsx', 'ts', 'tsx']`
 
-Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're supported by ESLint or an ESLint plugin.
+Allow more file extensions to be linted. Make sure they're supported by ESLint or an ESLint plugin.
+
+*Note that this option can only be set via CLI argument as XO will first look for the files to lint, then look for configuration files relative to the  files being linted.*
 
 ### settings
 
