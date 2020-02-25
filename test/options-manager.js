@@ -46,7 +46,7 @@ test('normalizeOptions: falsie values stay falsie', t => {
 
 test('buildConfig: defaults', t => {
 	const config = manager.buildConfig({});
-	t.regex(slash(config.cacheLocation), /[\\/]\.cache\/xo[\\/]?$/u);
+	t.regex(slash(config.cacheLocation), /[\\/]\.cache\/xo\/xo-cache.json[\\/]?$/u);
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
 	t.is(config.baseConfig.extends[0], 'xo/esnext');
@@ -607,7 +607,7 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 
 test('mergeWithFileConfigs: typescript files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript');
-	const paths = ['two-spaces.tsx', 'child/extra-semicolon.ts'];
+	const paths = ['two-spaces.tsx', 'child/extra-semicolon.ts', 'child/sub-child/four-spaces.ts'];
 	const result = await manager.mergeWithFileConfigs(paths, {cwd});
 
 	t.deepEqual(omit(result[0], 'options.tsConfigPath'), {
@@ -647,14 +647,36 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		},
 		prettierOptions: {}
 	});
+
+	t.deepEqual(omit(result[2], 'options.tsConfigPath'), {
+		files: [path.resolve(cwd, 'child/sub-child/four-spaces.ts')],
+		options: {
+			space: 2,
+			nodeVersion: undefined,
+			cwd: path.resolve(cwd, 'child/sub-child'),
+			extensions: DEFAULT_EXTENSION,
+			ignores: DEFAULT_IGNORES,
+			ts: true
+		},
+		prettierOptions: {}
+	});
+
+	// Verify that we use the same temporary tsconfig.json for both files group sharing the same original tsconfig.json even if they have different xo config
+	t.is(result[1].options.tsConfigPath, result[2].options.tsConfigPath);
 	t.deepEqual(await readJson(result[1].options.tsConfigPath), {
 		extends: path.resolve(cwd, 'child/tsconfig.json'),
-		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
+		files: [path.resolve(cwd, 'child/extra-semicolon.ts'), path.resolve(cwd, 'child/sub-child/four-spaces.ts')],
 		include: [
 			slash(path.resolve(cwd, 'child/**/*.ts')),
 			slash(path.resolve(cwd, 'child/**/*.tsx'))
 		]
 	});
+
+	const secondResult = await manager.mergeWithFileConfigs(paths, {cwd});
+
+	// Verify that on each run the options.tsConfigPath is consistent to preserve ESLint cache
+	t.is(result[0].options.tsConfigPath, secondResult[0].options.tsConfigPath);
+	t.is(result[1].options.tsConfigPath, secondResult[1].options.tsConfigPath);
 });
 
 async function mergeWithFileConfigsFileType(t, {dir}) {

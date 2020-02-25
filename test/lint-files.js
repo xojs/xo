@@ -186,4 +186,12 @@ test('typescript files', async t => {
 			'@typescript-eslint/no-extra-semi'
 		)
 	);
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/typescript/child/sub-child/four-spaces.ts'),
+			'@typescript-eslint/indent'
+		)
+	);
 });
