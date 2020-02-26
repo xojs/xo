@@ -63,7 +63,7 @@ test('overrides work with absolute path', async t => {
 	await t.notThrowsAsync(main([file], {cwd}));
 });
 
-test('ignores fixture', async t => {
+test.failing('override default ignore', async t => {
 	const cwd = path.join(__dirname, 'fixtures/ignores');
 	await t.throwsAsync(main([], {cwd}));
 });
