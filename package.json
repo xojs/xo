@@ -75,6 +75,7 @@
 		"globby": "^9.0.0",
 		"has-flag": "^4.0.0",
 		"imurmurhash": "^0.1.4",
+		"is-path-inside": "^3.0.2",
 		"json-stable-stringify-without-jsonify": "^1.0.1",
 		"json5": "^2.1.1",
 		"lodash": "^4.17.15",

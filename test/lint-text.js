@@ -282,3 +282,15 @@ test('typescript files', t => {
 ]);`, {filename: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
 	t.true(hasRule(results, '@typescript-eslint/indent'));
 });
+
+function configType(t, {dir}) {
+	const {results} = fn.lintText('var obj = { a: 1 };\n', {cwd: path.resolve('fixtures', 'config-files', dir), filename: 'file.js'});
+	t.true(hasRule(results, 'no-var'));
+}
+
+configType.title = (_, {type}) => `load config from ${type}`.trim();
+
+test(configType, {type: 'xo.config.js', dir: 'xo-config_js'});
+test(configType, {type: '.xo-config.js', dir: 'xo-config_js'});
+test(configType, {type: '.xo-config.json', dir: 'xo-config_json'});
+test(configType, {type: '.xo-config', dir: 'xo-config'});
