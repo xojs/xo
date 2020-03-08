@@ -195,3 +195,22 @@ test('typescript files', async t => {
 		)
 	);
 });
+
+async function configType(t, {dir}) {
+	const {results} = await fn.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures', 'config-files', dir, 'file.js'),
+			'no-var'
+		)
+	);
+}
+
+configType.title = (_, {type}) => `load config from ${type}`.trim();
+
+test(configType, {type: 'xo.config.js', dir: 'xo-config_js'});
+test(configType, {type: '.xo-config.js', dir: 'xo-config_js'});
+test(configType, {type: '.xo-config.json', dir: 'xo-config_json'});
+test(configType, {type: '.xo-config', dir: 'xo-config'});

@@ -3,15 +3,19 @@ const path = require('path');
 const eslint = require('eslint');
 const globby = require('globby');
 const isEqual = require('lodash/isEqual');
+const uniq = require('lodash/uniq');
 const micromatch = require('micromatch');
 const arrify = require('arrify');
-const {DEFAULT_EXTENSION} = require('./lib/constants');
+const pReduce = require('p-reduce');
+const {cosmiconfig, defaultLoaders} = require('cosmiconfig');
+const {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES} = require('./lib/constants');
 const {
 	normalizeOptions,
 	getIgnores,
 	mergeWithFileConfig,
 	mergeWithFileConfigs,
-	buildConfig
+	buildConfig,
+	mergeOptions
 } = require('./lib/options-manager');
 
 const mergeReports = reports => {
@@ -46,6 +50,12 @@ const runEslint = (paths, options) => {
 	);
 	return processReport(report, options);
 };
+
+const globFiles = async (patterns, {ignores, extensions, cwd}) => (
+	await globby(
+		patterns.length === 0 ? [`**/*.{${extensions.join(',')}}`] : arrify(patterns),
+		{ignore: ignores, gitignore: true, cwd}
+	)).filter(file => extensions.includes(path.extname(file).slice(1))).map(file => path.resolve(cwd, file));
 
 const lintText = (string, options) => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
@@ -83,22 +93,26 @@ const lintText = (string, options) => {
 	return processReport(report, options);
 };
 
-const lintFiles = async (patterns, options) => {
-	options = normalizeOptions(options);
+const lintFiles = async (patterns, options = {}) => {
+	options.cwd = path.resolve(options.cwd || process.cwd());
+	const configExplorer = cosmiconfig(MODULE_NAME, {searchPlaces: CONFIG_FILES, loaders: {noExt: defaultLoaders['.json']}, stopDir: options.cwd});
 
-	const isEmptyPatterns = patterns.length === 0;
-	const defaultPattern = `**/*.{${DEFAULT_EXTENSION.concat(options.extensions || []).join(',')}}`;
+	const configFiles = (await Promise.all(
+		(await globby(
+			CONFIG_FILES.map(configFile => `**/${configFile}`),
+			{ignore: DEFAULT_IGNORES, gitignore: true, cwd: options.cwd}
+		)).map(async configFile => configExplorer.load(path.resolve(options.cwd, configFile)))
+	)).filter(Boolean);
 
-	const paths = await globby(
-		isEmptyPatterns ? [defaultPattern] : arrify(patterns),
-		{
-			ignore: getIgnores(options),
-			gitignore: true,
-			cwd: options.cwd || process.cwd()
-		}
-	);
+	const paths = configFiles.length > 0 ?
+		await pReduce(
+			configFiles,
+			async (paths, {filepath, config}) =>
+				[...paths, ...(await globFiles(patterns, {...mergeOptions(options, config), cwd: path.dirname(filepath)}))],
+			[]) :
+		await globFiles(patterns, mergeOptions(options));
 
-	return mergeReports((await mergeWithFileConfigs(paths, options)).map(
+	return mergeReports((await mergeWithFileConfigs(uniq(paths), options, configFiles)).map(
 		({files, options, prettierOptions}) => runEslint(files, buildConfig(options, prettierOptions)))
 	);
 };

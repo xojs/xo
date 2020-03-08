@@ -521,20 +521,6 @@ test('mergeWithFileConfig: tsx files', async t => {
 	});
 });
 
-function mergeWithFileConfigFileType(t, {dir}) {
-	const cwd = path.resolve('fixtures', 'config-files', dir);
-	const {options} = manager.mergeWithFileConfig({cwd});
-	const expected = {esnext: true, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, nodeVersion: undefined};
-	t.deepEqual(options, expected);
-}
-
-mergeWithFileConfigFileType.title = (_, {type}) => `mergeWithFileConfig: load from ${type}`.trim();
-
-test(mergeWithFileConfigFileType, {type: 'xo.config.js', dir: 'xo-config_js'});
-test(mergeWithFileConfigFileType, {type: '.xo-config.js', dir: 'xo-config_js'});
-test(mergeWithFileConfigFileType, {type: '.xo-config.json', dir: 'xo-config_json'});
-test(mergeWithFileConfigFileType, {type: '.xo-config', dir: 'xo-config'});
-
 test('mergeWithFileConfigs: nested configs with prettier', async t => {
 	const cwd = path.resolve('fixtures', 'nested-configs');
 	const paths = [
@@ -542,8 +528,19 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 		'child/semicolon.js',
 		'child-override/two-spaces.js',
 		'child-override/child-prettier-override/semicolon.js'
-	];
-	const result = await manager.mergeWithFileConfigs(paths, {cwd});
+	].map(file => path.resolve(cwd, file));
+	const result = await manager.mergeWithFileConfigs(paths, {cwd}, [
+		{
+			filepath: path.resolve(cwd, 'child-override', 'child-prettier-override', 'package.json'),
+			config: {overrides: [{files: 'semicolon.js', prettier: true}]}
+		},
+		{filepath: path.resolve(cwd, 'package.json'), config: {semicolon: true}},
+		{
+			filepath: path.resolve(cwd, 'child-override', 'package.json'),
+			config: {overrides: [{files: 'two-spaces.js', space: 4}]}
+		},
+		{filepath: path.resolve(cwd, 'child', 'package.json'), config: {semicolon: false}}
+	]);
 
 	t.deepEqual(result, [
 		{
@@ -607,8 +604,13 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 
 test('mergeWithFileConfigs: typescript files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript');
-	const paths = ['two-spaces.tsx', 'child/extra-semicolon.ts', 'child/sub-child/four-spaces.ts'];
-	const result = await manager.mergeWithFileConfigs(paths, {cwd});
+	const paths = ['two-spaces.tsx', 'child/extra-semicolon.ts', 'child/sub-child/four-spaces.ts'].map(file => path.resolve(cwd, file));
+	const configFiles = [
+		{filepath: path.resolve(cwd, 'child/sub-child/package.json'), config: {space: 2}},
+		{filepath: path.resolve(cwd, 'package.json'), config: {space: 4}},
+		{filepath: path.resolve(cwd, 'child/package.json'), config: {semicolon: false}}
+	];
+	const result = await manager.mergeWithFileConfigs(paths, {cwd}, configFiles);
 
 	t.deepEqual(omit(result[0], 'options.tsConfigPath'), {
 		files: [path.resolve(cwd, 'two-spaces.tsx')],
@@ -672,40 +674,12 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		]
 	});
 
-	const secondResult = await manager.mergeWithFileConfigs(paths, {cwd});
+	const secondResult = await manager.mergeWithFileConfigs(paths, {cwd}, configFiles);
 
 	// Verify that on each run the options.tsConfigPath is consistent to preserve ESLint cache
 	t.is(result[0].options.tsConfigPath, secondResult[0].options.tsConfigPath);
 	t.is(result[1].options.tsConfigPath, secondResult[1].options.tsConfigPath);
 });
-
-async function mergeWithFileConfigsFileType(t, {dir}) {
-	const cwd = path.resolve('fixtures', 'config-files', dir);
-	const paths = ['a.js', 'b.js'];
-
-	const result = await manager.mergeWithFileConfigs(paths, {cwd});
-
-	t.deepEqual(result, [
-		{
-			files: paths.reverse().map(p => path.resolve(cwd, p)),
-			options: {
-				esnext: true,
-				nodeVersion: undefined,
-				cwd,
-				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES
-			},
-			prettierOptions: {}
-		}
-	]);
-}
-
-mergeWithFileConfigsFileType.title = (_, {type}) => `mergeWithFileConfigs: load from ${type}`.trim();
-
-test(mergeWithFileConfigsFileType, {type: 'xo.config.js', dir: 'xo-config_js'});
-test(mergeWithFileConfigsFileType, {type: '.xo-config.js', dir: 'xo-config_js'});
-test(mergeWithFileConfigsFileType, {type: '.xo-config.json', dir: 'xo-config_json'});
-test(mergeWithFileConfigsFileType, {type: '.xo-config', dir: 'xo-config'});
 
 test('applyOverrides', t => {
 	t.deepEqual(
