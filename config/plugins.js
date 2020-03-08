@@ -32,33 +32,98 @@ module.exports = {
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
 
-		// TODO: Enable this again in the next XO release.
-		// Start with just a manual list of some non-contreversial abbreviations.
-		//
 		// TODO: Remove this override at some point.
 		// It's just here to ease users into readable variable names.
-		// 'unicorn/prevent-abbreviations': [
-		// 	'error',
-		// 	{
-		// 		checkFilenames: false,
-		// 		replacements: {
-		// 			args: false,
-		// 			application: {
-		// 				app: true
-		// 			},
-		// 			applications: {
-		// 				apps: true
-		// 			}
-		// 		}
-		// 	}
-		// ],
-		'unicorn/prevent-abbreviations': 'off',
+		'unicorn/prevent-abbreviations': [
+			'error',
+			{
+				checkFilenames: false,
+				checkDefaultAndNamespaceImports: false,
+				checkShorthandImports: false,
+				extendDefaultReplacements: false,
+				replacements: {
+					// Not part of `eslint-plugin-unicorn`
+					application: {
+						app: true
+					},
+					applications: {
+						apps: true
+					},
+
+					// Part of `eslint-plugin-unicorn`
+					arr: {
+						array: true
+					},
+					e: {
+						error: true,
+						event: true
+					},
+					el: {
+						element: true
+					},
+					elem: {
+						element: true
+					},
+					len: {
+						length: true
+					},
+					msg: {
+						message: true
+					},
+					num: {
+						number: true
+					},
+					obj: {
+						object: true
+					},
+					opts: {
+						options: true
+					},
+					param: {
+						parameter: true
+					},
+					params: {
+						parameters: true
+					},
+					prev: {
+						previous: true
+					},
+					req: {
+						request: true
+					},
+					res: {
+						response: true,
+						result: true
+					},
+					ret: {
+						returnValue: true
+					},
+					str: {
+						string: true
+					},
+					temp: {
+						temporary: true
+					},
+					tmp: {
+						temporary: true
+					},
+					val: {
+						value: true
+					}
+				}
+			}
+		],
+
+		// The character class sorting is a bit buggy at the moment.
+		'unicorn/better-regex': [
+			'error',
+			{
+				sortCharacterClasses: false
+			}
+		],
 
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
-
-		// TODO: Enable it again when the bugs are fixed.
-		'unicorn/regex-shorthand': 'off',
 
 		// TODO: Temporarily disabled as the rule is buggy.
 		'function-call-argument-newline': 'off',
