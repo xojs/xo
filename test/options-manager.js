@@ -384,9 +384,38 @@ test('buildConfig: parser', t => {
 });
 
 test('buildConfig: settings', t => {
-	const settings = {'import/resolver': 'webpack'};
+	const settings = {'import/resolver': {webpack: {}}};
 	const config = manager.buildConfig({settings});
 	t.deepEqual(config.baseConfig.settings, settings);
+});
+
+test('buildConfig: finds webpack config file', t => {
+	const cwd = path.resolve('fixtures', 'webpack', 'with-config');
+	const config = manager.buildConfig({cwd});
+	const expected = {webpack: {config: path.resolve(cwd, 'webpack.config.js')}};
+	t.deepEqual(config.baseConfig.settings['import/resolver'], expected);
+});
+
+test('buildConfig: webpack option sets resolver', t => {
+	const config = manager.buildConfig({webpack: true, settings: {'import/resolver': 'node'}});
+	t.deepEqual(config.baseConfig.settings['import/resolver'], {webpack: {}, node: {}});
+});
+
+test('buildConfig: webpack option handles object values', t => {
+	const config = manager.buildConfig({webpack: {foo: 1}, settings: {'import/resolver': 'node'}});
+	t.deepEqual(config.baseConfig.settings['import/resolver'], {webpack: {foo: 1}, node: {}});
+});
+
+test('buildConfig: webpack resolver is not added automatically if webpack option is set to false', t => {
+	const cwd = path.resolve('fixtures', 'webpack', 'with-config');
+	const config = manager.buildConfig({cwd, webpack: false, settings: {}});
+	t.deepEqual(config.baseConfig.settings['import/resolver'], {});
+});
+
+test('buildConfig: webpack option is merged with import/resolver', t => {
+	const settings = {'import/resolver': {webpack: {bar: 1}}};
+	const config = manager.buildConfig({settings, webpack: {foo: 1}});
+	t.deepEqual(config.baseConfig.settings['import/resolver'], {webpack: {foo: 1, bar: 1}});
 });
 
 test('buildConfig: extends', t => {

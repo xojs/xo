@@ -196,6 +196,58 @@ test('typescript files', async t => {
 	);
 });
 
+test('webpack import resolver is used if webpack.config.js is found', async t => {
+	const cwd = 'fixtures/webpack/with-config/';
+	const {results} = await fn.lintFiles(path.resolve(cwd, 'file1.js'), {
+		cwd,
+		rules: {
+			'import/no-unresolved': 2
+		}
+	});
+
+	t.is(results[0].errorCount, 1);
+
+	const errorMessage = results[0].messages[0].message;
+	t.truthy(/Unable to resolve path to module 'inexistent'/.exec(errorMessage));
+});
+
+test('webpack import resolver config can be passed through webpack option', async t => {
+	const cwd = 'fixtures/webpack/no-config/';
+
+	const {results} = await fn.lintFiles(path.resolve(cwd, 'file1.js'), {
+		cwd,
+		webpack: {
+			config: {
+				resolve: {
+					alias: {
+						file2alias: path.resolve(__dirname, cwd, './file2.js')
+					}
+				}
+			}
+		},
+		rules: {
+			'import/no-unresolved': 2
+		}
+	});
+
+	t.is(results[0].errorCount, 1);
+});
+
+test('webpack import resolver is used if {webpack: true}', async t => {
+	const cwd = 'fixtures/webpack/no-config/';
+
+	const {results} = await fn.lintFiles(path.resolve(cwd, 'file3.js'), {
+		cwd,
+		webpack: true,
+		rules: {
+			'import/no-unresolved': 2,
+			'import/no-webpack-loader-syntax': 0
+		}
+	});
+
+	t.is(results[0].errorCount, 0);
+});
+
 async function configType(t, {dir}) {
 	const {results} = await fn.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
 
