@@ -113,6 +113,14 @@ module.exports = {
 				}
 			}
 		],
+		'unicorn/string-content': [
+			'error',
+			{
+				patterns: {
+					[/\.\.\./.source]: '…'
+				}
+			}
+		],
 
 		// The character class sorting is a bit buggy at the moment.
 		'unicorn/better-regex': [
