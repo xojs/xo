@@ -252,7 +252,7 @@ Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're s
 
 Type: `object`
 
-[Shared ESLint settings](https://eslint.org/docs/user-guide/configuring#adding-shared-settings) exposed to rules. For example, to configure the [`import`](https://github.com/benmosher/eslint-plugin-import#settings) plugin to use your webpack configuration for determining search paths, you can put `{"import/resolver": "webpack"}` here.
+[Shared ESLint settings](https://eslint.org/docs/user-guide/configuring#adding-shared-settings) exposed to rules.
 
 ### parser
 
@@ -268,6 +268,17 @@ Default: `true`
 Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax and conventions.
 
 *ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
+
+### webpack
+
+Type: `boolean | object`
+Default: `false`
+
+Use [eslint-import-resolver-webpack](https://github.com/benmosher/eslint-plugin-import/tree/master/resolvers/webpack) to resolve import search paths. This is enabled automatically if a `webpack.config.js` file is found.
+
+Set this to a boolean to explicitly enable or disable the resolver.
+
+Setting this to an object enables the resolver and passes the object as configuration. See the [resolver readme](https://github.com/benmosher/eslint-plugin-import/blob/master/resolvers/webpack/README.md) along with the [webpack documentation](https://webpack.js.org/configuration/resolve/) for more information.
 
 ## TypeScript and Flow
 
@@ -368,7 +379,7 @@ For example, if your project targets Node.js 8 but you want to use the latest Ja
 }
 ```
 
-This way your `package.json` will contain the actual minimum Node.js version supported by your published code, but XO will lint your source code as if it targets Node.js 12. 
+This way your `package.json` will contain the actual minimum Node.js version supported by your published code, but XO will lint your source code as if it targets Node.js 12.
 
 ### Including files ignored by default
 
