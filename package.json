@@ -1,6 +1,6 @@
 {
 	"name": "xo",
-	"version": "0.28.0",
+	"version": "0.28.1",
 	"description": "JavaScript/TypeScript linter with great defaults",
 	"license": "MIT",
 	"repository": "xojs/xo",
