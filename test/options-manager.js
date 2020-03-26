@@ -115,11 +115,10 @@ test('buildConfig: prettier: true, typescript file', t => {
 		trailingComma: 'none'
 	}]);
 
-	// eslint-prettier-config must always be last
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/@typescript-eslint');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'xo-typescript');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'prettier/unicorn');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 4], 'prettier');
+	// Config prettier/@typescript-eslint must always be after xo-typescript
+	t.deepEqual(config.baseConfig.extends[0], 'xo-typescript');
+	t.deepEqual(config.baseConfig.extends[1], 'prettier/@typescript-eslint');
+
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
 	// Semi rule is not enabled
@@ -435,7 +434,7 @@ test('buildConfig: extends', t => {
 test('buildConfig: typescript', t => {
 	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
 
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'xo-typescript');
+	t.deepEqual(config.baseConfig.extends[0], 'xo-typescript');
 	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
