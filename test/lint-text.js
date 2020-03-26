@@ -270,17 +270,34 @@ test('find configurations close to linted file', t => {
 
 test('typescript files', t => {
 	let {results} = fn.lintText(`console.log([
-		2
-	  ]);`, {filename: 'fixtures/typescript/two-spaces.tsx'});
+  2
+]);
+`, {filename: 'fixtures/typescript/two-spaces.tsx'});
 	t.true(hasRule(results, '@typescript-eslint/indent'));
+
+	({results} = fn.lintText(`console.log([
+  2
+]);
+`, {filename: 'fixtures/typescript/two-spaces.tsx', space: 2}));
+	t.is(results[0].errorCount, 0);
 
 	({results} = fn.lintText('console.log(\'extra-semicolon\');;\n', {filename: 'fixtures/typescript/child/extra-semicolon.ts'}));
 	t.true(hasRule(results, '@typescript-eslint/no-extra-semi'));
 
+	({results} = fn.lintText('console.log(\'no-semicolon\')\n', {filename: 'fixtures/typescript/child/no-semicolon.ts', semicolon: false}));
+	t.is(results[0].errorCount, 0);
+
 	({results} = fn.lintText(`console.log([
     4
-]);`, {filename: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
+]);
+`, {filename: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
 	t.true(hasRule(results, '@typescript-eslint/indent'));
+
+	({results} = fn.lintText(`console.log([
+    4
+]);
+`, {filename: 'fixtures/typescript/child/sub-child/four-spaces.ts', space: 4}));
+	t.is(results[0].errorCount, 0);
 });
 
 function configType(t, {dir}) {
