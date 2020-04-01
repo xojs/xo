@@ -67,6 +67,12 @@ test('buildConfig: space: 4', t => {
 	t.deepEqual(config.rules.indent, ['error', 4, {SwitchCase: 1}]);
 });
 
+test('buildConfig: space: 4 (ts file)', t => {
+	const config = manager.buildConfig({space: 4, ts: true});
+	t.deepEqual(config.rules.indent, ['error', 4, {SwitchCase: 1}]);
+	t.deepEqual(config.rules['@typescript-eslint/indent'], ['error', 4, {SwitchCase: 1}]);
+});
+
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false, nodeVersion: '12'});
 	t.deepEqual(config.rules.semi, ['error', 'never']);
