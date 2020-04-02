@@ -439,7 +439,20 @@ test('buildConfig: typescript', t => {
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
 		ecmaFeatures: {jsx: true},
-		project: './tsconfig.json'
+		project: './tsconfig.json',
+		projectFolderIgnoreList: [/\/node_modules\/(?!.*\.cache\/xo-linter)/]
+	});
+});
+
+test('buildConfig: typescript with parserOption', t => {
+	const config = manager.buildConfig({ts: true, parserOptions: {projectFolderIgnoreList: []}, tsConfigPath: 'path/to/tmp-tsconfig.json'}, {});
+
+	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
+	t.deepEqual(config.baseConfig.parserOptions, {
+		warnOnUnsupportedTypeScriptVersion: false,
+		ecmaFeatures: {jsx: true},
+		projectFolderIgnoreList: [],
+		project: 'path/to/tmp-tsconfig.json'
 	});
 });
 
