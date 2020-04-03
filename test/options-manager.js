@@ -67,12 +67,6 @@ test('buildConfig: space: 4', t => {
 	t.deepEqual(config.rules.indent, ['error', 4, {SwitchCase: 1}]);
 });
 
-test('buildConfig: space: 4 (ts file)', t => {
-	const config = manager.buildConfig({space: 4, ts: true});
-	t.deepEqual(config.rules.indent, ['error', 4, {SwitchCase: 1}]);
-	t.deepEqual(config.rules['@typescript-eslint/indent'], ['error', 4, {SwitchCase: 1}]);
-});
-
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false, nodeVersion: '12'});
 	t.deepEqual(config.rules.semi, ['error', 'never']);
@@ -121,9 +115,11 @@ test('buildConfig: prettier: true, typescript file', t => {
 		trailingComma: 'none'
 	}]);
 
-	// Config prettier/@typescript-eslint must always be after xo-typescript
-	t.deepEqual(config.baseConfig.extends[0], 'xo-typescript');
-	t.deepEqual(config.baseConfig.extends[1], 'prettier/@typescript-eslint');
+	// eslint-prettier-config must always be last
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/@typescript-eslint');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'prettier/unicorn');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'prettier');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 4], 'xo-typescript');
 
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
@@ -440,7 +436,7 @@ test('buildConfig: extends', t => {
 test('buildConfig: typescript', t => {
 	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
 
-	t.deepEqual(config.baseConfig.extends[0], 'xo-typescript');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'xo-typescript');
 	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
