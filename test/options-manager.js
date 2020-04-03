@@ -46,7 +46,7 @@ test('normalizeOptions: falsie values stay falsie', t => {
 
 test('buildConfig: defaults', t => {
 	const config = manager.buildConfig({});
-	t.regex(slash(config.cacheLocation), /[\\/]\.cache\/xo\/xo-cache.json[\\/]?$/u);
+	t.regex(slash(config.cacheLocation), /[\\/]\.cache\/xo-linter\/xo-cache.json[\\/]?$/u);
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
 	t.is(config.baseConfig.extends[0], 'xo/esnext');
@@ -117,9 +117,10 @@ test('buildConfig: prettier: true, typescript file', t => {
 
 	// eslint-prettier-config must always be last
 	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/@typescript-eslint');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'xo-typescript');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'prettier/unicorn');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 4], 'prettier');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'prettier/unicorn');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'prettier');
+	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 4], 'xo-typescript');
+
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
 	// Semi rule is not enabled
@@ -440,7 +441,20 @@ test('buildConfig: typescript', t => {
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
 		ecmaFeatures: {jsx: true},
-		project: './tsconfig.json'
+		project: './tsconfig.json',
+		projectFolderIgnoreList: [/\/node_modules\/(?!.*\.cache\/xo-linter)/]
+	});
+});
+
+test('buildConfig: typescript with parserOption', t => {
+	const config = manager.buildConfig({ts: true, parserOptions: {projectFolderIgnoreList: []}, tsConfigPath: 'path/to/tmp-tsconfig.json'}, {});
+
+	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
+	t.deepEqual(config.baseConfig.parserOptions, {
+		warnOnUnsupportedTypeScriptVersion: false,
+		ecmaFeatures: {jsx: true},
+		projectFolderIgnoreList: [],
+		project: 'path/to/tmp-tsconfig.json'
 	});
 });
 
