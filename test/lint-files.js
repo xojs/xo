@@ -196,6 +196,21 @@ test('typescript files', async t => {
 	);
 });
 
+test('typescript 2 space option', async t => {
+	const {errorCount} = await fn.lintFiles('two-spaces.tsx', {cwd: 'fixtures/typescript', space: 2});
+	t.is(errorCount, 0);
+});
+
+test('typescript 4 space option', async t => {
+	const {errorCount} = await fn.lintFiles('child/sub-child/four-spaces.ts', {cwd: 'fixtures/typescript', space: 4});
+	t.is(errorCount, 0);
+});
+
+test('typescript no semicolon option', async t => {
+	const {errorCount} = await fn.lintFiles('child/no-semicolon.ts', {cwd: 'fixtures/typescript', semicolon: false});
+	t.is(errorCount, 0);
+});
+
 test('webpack import resolver is used if webpack.config.js is found', async t => {
 	const cwd = 'fixtures/webpack/with-config/';
 	const {results} = await fn.lintFiles(path.resolve(cwd, 'file1.js'), {
