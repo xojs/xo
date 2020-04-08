@@ -476,14 +476,14 @@ test('findApplicableOverrides', t => {
 test('mergeWithFileConfig: use child if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
 	const {options} = manager.mergeWithFileConfig({cwd});
-	const expected = {...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, nodeVersion: undefined};
+	const expected = {...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
 });
 
 test('mergeWithFileConfig: use parent if closest', t => {
 	const cwd = path.resolve('fixtures', 'nested');
 	const {options} = manager.mergeWithFileConfig({cwd});
-	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, nodeVersion: undefined};
+	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
 });
 
@@ -491,14 +491,14 @@ test('mergeWithFileConfig: use parent if child is ignored', t => {
 	const cwd = path.resolve('fixtures', 'nested');
 	const filename = path.resolve(cwd, 'child-ignore', 'file.js');
 	const {options} = manager.mergeWithFileConfig({cwd, filename});
-	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filename, nodeVersion: undefined};
+	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filename};
 	t.deepEqual(options, expected);
 });
 
 test('mergeWithFileConfig: use child if child is empty', t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
 	const {options} = manager.mergeWithFileConfig({cwd});
-	t.deepEqual(options, {nodeVersion: undefined, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd});
+	t.deepEqual(options, {extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd});
 });
 
 test('mergeWithFileConfig: read engines from package.json', t => {
@@ -531,7 +531,6 @@ test('mergeWithFileConfig: typescript files', async t => {
 		extensions: DEFAULT_EXTENSION,
 		ignores: DEFAULT_IGNORES,
 		cwd,
-		nodeVersion: undefined,
 		semicolon: false,
 		ts: true
 	};
@@ -552,7 +551,6 @@ test('mergeWithFileConfig: tsx files', async t => {
 		extensions: DEFAULT_EXTENSION,
 		ignores: DEFAULT_IGNORES,
 		cwd,
-		nodeVersion: undefined,
 		semicolon: false,
 		ts: true
 	};
@@ -590,7 +588,6 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 			files: [path.resolve(cwd, 'no-semicolon.js')],
 			options: {
 				semicolon: true,
-				nodeVersion: undefined,
 				cwd,
 				extensions: DEFAULT_EXTENSION,
 				ignores: DEFAULT_IGNORES
@@ -601,7 +598,6 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 			files: [path.resolve(cwd, 'child/semicolon.js')],
 			options: {
 				semicolon: false,
-				nodeVersion: undefined,
 				cwd: path.resolve(cwd, 'child'),
 				extensions: DEFAULT_EXTENSION,
 				ignores: DEFAULT_IGNORES
@@ -618,7 +614,6 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				envs: [],
 				plugins: [],
 				extends: [],
-				nodeVersion: undefined,
 				cwd: path.resolve(cwd, 'child-override'),
 				extensions: DEFAULT_EXTENSION,
 				ignores: DEFAULT_IGNORES
@@ -635,7 +630,6 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				envs: [],
 				plugins: [],
 				extends: [],
-				nodeVersion: undefined,
 				cwd: path.resolve(cwd, 'child-override', 'child-prettier-override'),
 				extensions: DEFAULT_EXTENSION,
 				ignores: DEFAULT_IGNORES
@@ -659,7 +653,6 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		files: [path.resolve(cwd, 'two-spaces.tsx')],
 		options: {
 			space: 4,
-			nodeVersion: undefined,
 			cwd,
 			extensions: DEFAULT_EXTENSION,
 			ignores: DEFAULT_IGNORES,
@@ -684,7 +677,6 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		files: [path.resolve(cwd, 'child/extra-semicolon.ts')],
 		options: {
 			semicolon: false,
-			nodeVersion: undefined,
 			cwd: path.resolve(cwd, 'child'),
 			extensions: DEFAULT_EXTENSION,
 			ignores: DEFAULT_IGNORES,
@@ -697,7 +689,6 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		files: [path.resolve(cwd, 'child/sub-child/four-spaces.ts')],
 		options: {
 			space: 2,
-			nodeVersion: undefined,
 			cwd: path.resolve(cwd, 'child/sub-child'),
 			extensions: DEFAULT_EXTENSION,
 			ignores: DEFAULT_IGNORES,
