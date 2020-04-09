@@ -157,7 +157,7 @@ if (options.nodeVersion) {
 		if (options.fix) {
 			const result = xo.lintText(stdin, options).results[0];
 			// If there is no output, pass the stdin back out
-			console.log(result.output || stdin);
+			process.stdout.write(result.output || stdin);
 			return;
 		}
 

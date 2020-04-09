@@ -17,9 +17,9 @@ test('fix option', async t => {
 
 test('fix option with stdin', async t => {
 	const {stdout} = await main(['--fix', '--stdin'], {
-		input: 'console.log()\n'
+		input: 'console.log()'
 	});
-	t.is(stdout.trim(), 'console.log();');
+	t.is(stdout, 'console.log();');
 });
 
 test('stdin-filename option with stdin', async t => {
