@@ -114,12 +114,15 @@ module.exports = {
 			}
 		],
 
-		// TODO: Restore when it becomes safer
+		// TODO: Restore when it becomes safer: https://github.com/sindresorhus/eslint-plugin-unicorn/issues/681
 		// 'unicorn/string-content': [
 		// 	'error',
 		// 	{
 		// 		patterns: {
-		// 			[/\.\.\./.source]: '…'
+		// 			'': '’',
+		// 			[/\.\.\./.source]: '…',
+		// 			'->': '→',
+		// 			[/^http:\/\//.source]: 'http://'
 		// 		}
 		// 	}
 		// ],
@@ -131,6 +134,9 @@ module.exports = {
 				sortCharacterClasses: false
 			}
 		],
+
+		// TODO: Disabled for now as I don't have time to deal with the backslash that might come from this. Try to enable this rule in 2021.
+		'unicorn/no-null': 'off',
 
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
