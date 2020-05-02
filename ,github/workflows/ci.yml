@@ -1,0 +1,40 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test
+
+    strategy:
+      matrix:
+        node: [10, 12]
+        os: [ubuntu-latest, windows-latest]
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: Checkout git repository
+        uses: actions/checkout@v2
+      - name: Setup Node.js for use with Actions
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - name: Cache npm dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+      - name: Submit coverage
+        run: ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls
