@@ -182,6 +182,7 @@ module.exports = {
 		],
 		'import/no-absolute-path': 'error',
 		'import/no-anonymous-default-export': 'error',
+		'import/no-named-default': 'error',
 		'import/no-webpack-loader-syntax': 'error',
 		'import/no-self-import': 'error',
 
