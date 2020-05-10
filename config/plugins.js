@@ -245,6 +245,15 @@ module.exports = {
 		// 'node/no-missing-require': 'error',
 
 		'node/no-unpublished-bin': 'error',
+		'node/no-mixed-requires': [
+			'error',
+			{
+				grouping: true,
+				allowCall: true
+			}
+		],
+		'node/no-new-require': 'error',
+		'node/no-path-concat': 'error',
 
 		// Disabled because they're too annoying, see:
 		// https://github.com/mysticatea/eslint-plugin-node/issues/105
