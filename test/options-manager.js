@@ -423,13 +423,17 @@ test('buildConfig: extends', t => {
 	const config = manager.buildConfig({extends: [
 		'plugin:foo/bar',
 		'eslint-config-foo-bar',
-		'foo-bar-two'
+		'foo-bar-two',
+		'@foobar',
+		'@foobar/eslint-config'
 	]});
 
-	t.deepEqual(config.baseConfig.extends.slice(-3), [
+	t.deepEqual(config.baseConfig.extends.slice(-5), [
 		'plugin:foo/bar',
 		'cwd/eslint-config-foo-bar',
-		'cwd/eslint-config-foo-bar-two'
+		'cwd/eslint-config-foo-bar-two',
+		'@foobar',
+		'@foobar/eslint-config'
 	]);
 });
 
