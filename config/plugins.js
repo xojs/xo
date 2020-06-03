@@ -165,7 +165,9 @@ module.exports = {
 			{
 				js: 'never',
 				jsx: 'never',
-				json: 'always'
+				json: 'always',
+				svg: 'always',
+				css: 'always'
 			}
 		],
 
