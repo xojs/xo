@@ -141,6 +141,9 @@ module.exports = {
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
 
+		// TODO: Temporarily disabled until it becomes more mature.
+		'unicorn/no-useless-undefined': 'off',
+
 		// TODO: Temporarily disabled as the rule is buggy.
 		'function-call-argument-newline': 'off',
 
