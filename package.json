@@ -81,7 +81,7 @@
 		"json-stable-stringify-without-jsonify": "^1.0.1",
 		"json5": "^2.1.3",
 		"lodash": "^4.17.15",
-		"meow": "^5.0.0",
+		"meow": "^7.0.1",
 		"micromatch": "^4.0.2",
 		"open-editor": "^2.0.1",
 		"p-reduce": "^2.1.0",

@@ -46,6 +46,7 @@ const cli = meow(`
 	  - Add XO to your project with \`npm init xo\`.
 	  - Put options in package.json instead of using flags so other tools can read it.
 `, {
+	autoVersion: false,
 	booleanDefault: undefined,
 	flags: {
 		fix: {
@@ -100,15 +101,14 @@ const cli = meow(`
 			type: 'boolean'
 		},
 		stdinFilename: {
-			type: 'string',
-			alias: 'filename'
+			type: 'string'
 		}
 	}
 });
 
 updateNotifier({pkg: cli.pkg}).notify();
 
-const {input, flags: options} = cli;
+const {input, flags: options, showVersion} = cli;
 
 // Make data types for `options.space` match those of the API
 // Check for string type because `xo --no-space` sets `options.space` to `false`
@@ -141,6 +141,10 @@ if (input[0] === '-') {
 	input.shift();
 }
 
+if (options.version) {
+	showVersion();
+}
+
 if (options.nodeVersion) {
 	if (options.nodeVersion === 'false') {
 		options.nodeVersion = false;
@@ -153,6 +157,10 @@ if (options.nodeVersion) {
 (async () => {
 	if (options.stdin) {
 		const stdin = await getStdin();
+
+		if (options.stdinFilename) {
+			options.filename = options.stdinFilename;
+		}
 
 		if (options.fix) {
 			const result = xo.lintText(stdin, options).results[0];
