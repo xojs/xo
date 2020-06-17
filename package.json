@@ -118,6 +118,7 @@
 	"ava": {
 		"require": [
 			"esm"
-		]
+		],
+		"timeout": "1m"
 	}
 }
