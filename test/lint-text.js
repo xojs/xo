@@ -74,7 +74,7 @@ test('`ignores` option without filename', t => {
 		fn.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 			ignores: ['ignored/**/*.js']
 		});
-	}, /The `ignores` option requires the `filename` option to be defined./u);
+	}, {message: /The `ignores` option requires the `filename` option to be defined./u});
 });
 
 test('JSX support', t => {
@@ -140,22 +140,22 @@ test('regression test for #71', t => {
 	const {results} = fn.lintText('const foo = { key: \'value\' };\nconsole.log(foo);\n', {
 		extends: path.join(__dirname, 'fixtures/extends.js')
 	});
-	t.is(results[0].errorCount, 0, results[0]);
+	t.is(results[0].errorCount, 0);
 });
 
 test('lintText() - overrides support', async t => {
 	const cwd = path.join(__dirname, 'fixtures/overrides');
 	const bar = path.join(cwd, 'test/bar.js');
 	const barResults = fn.lintText(await readFile(bar, 'utf8'), {filename: bar, cwd}).results;
-	t.is(barResults[0].errorCount, 0, barResults[0]);
+	t.is(barResults[0].errorCount, 0);
 
 	const foo = path.join(cwd, 'test/foo.js');
 	const fooResults = fn.lintText(await readFile(foo, 'utf8'), {filename: foo, cwd}).results;
-	t.is(fooResults[0].errorCount, 0, fooResults[0]);
+	t.is(fooResults[0].errorCount, 0);
 
 	const index = path.join(cwd, 'test/index.js');
 	const indexResults = fn.lintText(await readFile(bar, 'utf8'), {filename: index, cwd}).results;
-	t.is(indexResults[0].errorCount, 0, indexResults[0]);
+	t.is(indexResults[0].errorCount, 0);
 });
 
 test('do not lint gitignored files if filename is given', async t => {
