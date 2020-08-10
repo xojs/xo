@@ -638,7 +638,7 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				extensions: DEFAULT_EXTENSION,
 				ignores: DEFAULT_IGNORES
 			},
-			prettierOptions: {semi: false}
+			prettierOptions: {endOfLine: 'lf', semi: false, useTabs: true}
 		}
 	]);
 });
