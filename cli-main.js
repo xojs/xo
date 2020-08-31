@@ -56,13 +56,16 @@ const cli = meow(`
 			type: 'string'
 		},
 		env: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		global: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		ignore: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		space: {
 			type: 'string'
@@ -77,10 +80,12 @@ const cli = meow(`
 			type: 'string'
 		},
 		plugin: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		extend: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		open: {
 			type: 'boolean'
@@ -89,7 +94,8 @@ const cli = meow(`
 			type: 'boolean'
 		},
 		extension: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		esnext: {
 			type: 'boolean'
