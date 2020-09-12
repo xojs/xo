@@ -4,6 +4,7 @@ const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
+const formatterCompact = require('eslint/lib/cli-engine/formatters/compact');
 const semver = require('semver');
 const openReport = require('./lib/open-report');
 const xo = require('.');
@@ -136,7 +137,7 @@ if (typeof options.space === 'string') {
 }
 
 const log = report => {
-	const reporter = options.reporter ? xo.getFormatter(options.reporter) : formatterPretty;
+	const reporter = options.reporter ? xo.getFormatter(options.reporter) : process.env.GITHUB_ACTIONS ? formatterCompact : formatterPretty;
 	process.stdout.write(reporter(report.results));
 	process.exitCode = report.errorCount === 0 ? 0 : 1;
 };
