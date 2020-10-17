@@ -3,7 +3,7 @@
 module.exports = {
 	// Repeated here from eslint-config-xo in case some plugins set something different
 	parserOptions: {
-		ecmaVersion: 2020,
+		ecmaVersion: 2021,
 		sourceType: 'module',
 		ecmaFeatures: {
 			jsx: true
