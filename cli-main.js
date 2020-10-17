@@ -136,7 +136,7 @@ if (typeof options.space === 'string') {
 }
 
 const log = report => {
-	const reporter = options.reporter ? xo.getFormatter(options.reporter) : formatterPretty;
+	const reporter = options.reporter || process.env.GITHUB_ACTIONS ? xo.getFormatter(options.reporter || 'compact') : formatterPretty;
 	process.stdout.write(reporter(report.results));
 	process.exitCode = report.errorCount === 0 ? 0 : 1;
 };
