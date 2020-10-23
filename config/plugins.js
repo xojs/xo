@@ -238,7 +238,11 @@ module.exports = {
 				allow: [
 					'@babel/polyfill',
 					'**/register',
-					'**/register/**'
+					'**/register/**',
+					'**/*.css',
+					'**/*.scss',
+					'**/*.sass',
+					'**/*.less'
 				]
 			}
 		],
