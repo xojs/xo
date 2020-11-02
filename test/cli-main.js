@@ -158,3 +158,12 @@ test('space option with boolean strings', async t => {
 	t.true(trueResult.stdout.includes('Expected indentation of 2 spaces'));
 	t.true(falseResult.stdout.includes('Expected indentation of 1 tab'));
 });
+
+test('extension option', async t => {
+	const cwd = path.join(__dirname, 'fixtures/custom-extension');
+	const {stdout} = await t.throwsAsync(main(['--reporter=json', '--extension=mjs'], {cwd}));
+	const reports = JSON.parse(stdout);
+
+	t.is(reports.length, 1);
+	t.true(reports[0].filePath.endsWith('.mjs'));
+});
