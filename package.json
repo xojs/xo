@@ -86,7 +86,7 @@
 		"open-editor": "^2.0.1",
 		"p-reduce": "^2.1.0",
 		"path-exists": "^4.0.0",
-		"prettier": "2.0.4",
+		"prettier": "^2.1.2",
 		"resolve-cwd": "^3.0.0",
 		"resolve-from": "^5.0.0",
 		"semver": "^7.3.2",
