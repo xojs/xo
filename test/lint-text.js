@@ -252,6 +252,20 @@ test('enable rules based on nodeVersion in override', async t => {
 	t.true(hasRule(results, 'promise/prefer-await-to-then'));
 });
 
+test('allow unassigned stylesheet imports', t => {
+	let {results} = fn.lintText('import \'stylesheet.css\'');
+	t.false(hasRule(results, 'import/no-unassigned-import'));
+
+	({results} = fn.lintText('import \'stylesheet.scss\''));
+	t.false(hasRule(results, 'import/no-unassigned-import'));
+
+	({results} = fn.lintText('import \'stylesheet.sass\''));
+	t.false(hasRule(results, 'import/no-unassigned-import'));
+
+	({results} = fn.lintText('import \'stylesheet.less\''));
+	t.false(hasRule(results, 'import/no-unassigned-import'));
+});
+
 test('find configurations close to linted file', t => {
 	let {results} = fn.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child/semicolon.js'});
 	t.true(hasRule(results, 'semi'));
