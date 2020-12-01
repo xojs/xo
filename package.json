@@ -97,7 +97,6 @@
 	},
 	"devDependencies": {
 		"ava": "^3.13.0",
-		"coveralls": "^3.1.0",
 		"eslint-config-xo-react": "^0.23.0",
 		"eslint-plugin-react": "^7.21.5",
 		"eslint-plugin-react-hooks": "^4.2.0",
