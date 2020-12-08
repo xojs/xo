@@ -261,6 +261,12 @@ Type: `string`
 
 ESLint parser. For example, [`babel-eslint`](https://github.com/babel/babel-eslint) if you're using language features that ESLint doesn't yet support.
 
+### processor
+
+Type: `string`
+
+[ESLint processor.](https://eslint.org/docs/user-guide/configuring#specifying-processor)
+
 ### esnext
 
 Type: `boolean`\

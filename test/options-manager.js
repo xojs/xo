@@ -384,6 +384,12 @@ test('buildConfig: parser', t => {
 	t.deepEqual(config.baseConfig.parser, parser);
 });
 
+test('buildConfig: processor', t => {
+	const processor = 'svelte3/svelte3';
+	const config = manager.buildConfig({processor});
+	t.deepEqual(config.baseConfig.processor, processor);
+});
+
 test('buildConfig: settings', t => {
 	const settings = {'import/resolver': {webpack: {}}};
 	const config = manager.buildConfig({settings});
