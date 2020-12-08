@@ -135,7 +135,7 @@ if (typeof options.space === 'string') {
 	}
 }
 
-if (process.env.GITHUB_ACTIONS) {
+if (process.env.GITHUB_ACTIONS && !options.fix && !options.reporter) {
 	options.quiet = true;
 }
 
@@ -175,7 +175,7 @@ if (options.nodeVersion) {
 		if (options.fix) {
 			const result = xo.lintText(stdin, options).results[0];
 			// If there is no output, pass the stdin back out
-			process.stdout.write(result.output || stdin);
+			process.stdout.write((result && result.output) || stdin);
 			return;
 		}
 
