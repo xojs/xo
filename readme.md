@@ -294,7 +294,7 @@ See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo
 
 ## GitHub Actions
 
-XO uses a different formatter when running in a GitHub Actions workflow to be able to get inline annotations. XO also disables warnings here.
+XO uses a different formatter when running in a GitHub Actions workflow to be able to get [inline annotations](https://developer.github.com/changes/2019-09-06-more-check-annotations-shown-in-files-changed-tab/). XO also disables warnings here.
 
 ## Config Overrides
 
