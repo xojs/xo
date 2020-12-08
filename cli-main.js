@@ -135,6 +135,10 @@ if (typeof options.space === 'string') {
 	}
 }
 
+if (process.env.GITHUB_ACTIONS) {
+	options.quiet = true;
+}
+
 const log = report => {
 	const reporter = options.reporter || process.env.GITHUB_ACTIONS ? xo.getFormatter(options.reporter || 'compact') : formatterPretty;
 	process.stdout.write(reporter(report.results));
