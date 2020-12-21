@@ -42,6 +42,20 @@ module.exports = {
 				checkShorthandImports: false,
 				extendDefaultReplacements: false,
 				replacements: {
+					// https://thenextweb.com/dd/2020/07/13/linux-kernel-will-no-longer-use-terms-blacklist-and-slave/
+					whitelist: {
+						allowList: true
+					},
+					blacklist: {
+						denyList: true
+					},
+					master: {
+						main: true
+					},
+					slave: {
+						secondary: true
+					},
+
 					// Not part of `eslint-plugin-unicorn`
 					application: {
 						app: true

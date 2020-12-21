@@ -9,7 +9,7 @@ const hasRule = (results, filePath, ruleId) => {
 	return result ? result.messages.some(x => x.ruleId === ruleId) : false;
 };
 
-test('only accepts whitelisted extensions', async t => {
+test('only accepts allowed extensions', async t => {
 	// Markdown files will always produce linter errors and will not be going away
 	const mdGlob = path.join(__dirname, '..', '*.md');
 
