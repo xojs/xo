@@ -123,6 +123,9 @@ module.exports = {
 					},
 					val: {
 						value: true
+					},
+					err: {
+						error: true
 					}
 				}
 			}
