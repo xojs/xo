@@ -260,7 +260,7 @@ test('webpack import resolver is used if {webpack: true}', async t => {
 		}
 	});
 
-	t.is(results[0].errorCount, 0);
+	t.is(results[0].errorCount, 0, JSON.stringify(results[0]));
 });
 
 async function configType(t, {dir}) {

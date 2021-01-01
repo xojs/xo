@@ -109,7 +109,10 @@
 		"webpack": "^5.10.0"
 	},
 	"eslintConfig": {
-		"extends": "eslint-config-xo"
+		"extends": "eslint-config-xo",
+		"rules": {
+			"unicorn/import-index": "off"
+		}
 	},
 	"eslintIgnore": [
 		"test/fixtures"

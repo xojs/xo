@@ -152,6 +152,9 @@ module.exports = {
 			}
 		],
 
+		// TODO: Remove this when https://github.com/sindresorhus/eslint-plugin-unicorn/pull/977 is out.
+		'unicorn/import-index': 'off',
+
 		// TODO: Disabled for now as I don't have time to deal with the backslash that might come from this. Try to enable this rule in 2021.
 		'unicorn/no-null': 'off',
 
@@ -179,20 +182,17 @@ module.exports = {
 		'import/export': 'error',
 		'import/extensions': [
 			'error',
+			'always',
 			{
-				js: 'never',
-				jsx: 'never',
-				json: 'always',
-				svg: 'always',
-				css: 'always'
+				ignorePackages: true
 			}
 		],
 
-		// Disabled as it causes problems with TypeScript when you use mixed ESM and CommonJS
-		// TODO: Enable again when I target only ESM
+		// Disabled as it causes problems with TypeScript when you use mixed ESM and CommonJS.
+		// TODO: Enable again when I target only ESM.
 		// 'import/first': 'error',
 
-		// Disabled as it doesn't work with TypeScript
+		// Disabled as it doesn't work with TypeScript.
 		// This issue and some others: https://github.com/benmosher/eslint-plugin-import/issues/1341
 		// 'import/named': 'error',
 
@@ -211,12 +211,7 @@ module.exports = {
 		// Enable this sometime in the future when Node.js has ES2015 module support
 		// 'import/no-cycle': 'error'
 
-		'import/no-useless-path-segments': [
-			'error',
-			{
-				noUselessIndex: true
-			}
-		],
+		'import/no-useless-path-segments': 'error',
 
 		// Disabled as it doesn't work with TypeScript
 		// 'import/newline-after-import': 'error',
@@ -242,7 +237,7 @@ module.exports = {
 		// 'import/no-unresolved': [
 		// 	'error',
 		// 	{
-		// 		commonjs: true
+		// 		commonjs: false
 		// 	}
 		// ],
 
@@ -264,11 +259,11 @@ module.exports = {
 			}
 		],
 
-		// Redundant with import/no-extraneous-dependencies
+		// Redundant with `import/no-extraneous-dependencies`.
 		// 'node/no-extraneous-import': 'error',
 		// 'node/no-extraneous-require': 'error',
 
-		// Redundant with import/no-unresolved
+		// Redundant with `import/no-unresolved`.
 		// 'node/no-missing-import': 'error',
 		// 'node/no-missing-require': 'error',
 
@@ -357,7 +352,7 @@ module.exports = {
 		'eslint-comments/no-aggregating-enable': 'error',
 		'eslint-comments/no-duplicate-disable': 'error',
 
-		// Disabled as it's already covered by the `unicorn/no-abusive-eslint-disable` rule
+		// Disabled as it's already covered by the `unicorn/no-abusive-eslint-disable` rule.
 		// 'eslint-comments/no-unlimited-disable': 'error',
 
 		'eslint-comments/no-unused-disable': 'error',
