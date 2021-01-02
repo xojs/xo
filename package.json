@@ -122,5 +122,11 @@
 			"esm"
 		],
 		"timeout": "1m"
+	},
+	"nyc": {
+		"reporter": [
+			"text",
+			"lcov"
+		]
 	}
 }
