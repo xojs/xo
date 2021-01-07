@@ -303,6 +303,8 @@ See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo
 
 XO uses a different formatter when running in a GitHub Actions workflow to be able to get [inline annotations](https://developer.github.com/changes/2019-09-06-more-check-annotations-shown-in-files-changed-tab/). XO also disables warnings here.
 
+**Note**: For this to work, the [setup-node](https://github.com/actions/setup-node) action must be run before XO.
+
 ## Config Overrides
 
 XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings, relative to the config file. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
