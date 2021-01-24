@@ -8,7 +8,7 @@
 
 > JavaScript/TypeScript linter with great defaults
 
-[![Coverage Status](https://codecov.io/gh/xojs/xo/branch/master/graph/badge.svg)](https://codecov.io/gh/xojs/xo/branch/master)
+[![Coverage Status](https://codecov.io/gh/xojs/xo/branch/main/graph/badge.svg)](https://codecov.io/gh/xojs/xo/branch/main)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 
 Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` or `.jshintrc` to manage. It just works!
@@ -19,7 +19,7 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 
 *Vue components are not supported by default. You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
 
-![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/master/screenshot.png)
+![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/main/screenshot.png)
 
 ## Highlights
 
@@ -101,7 +101,7 @@ $ xo --help
 - Space after keyword `if (condition) {}`
 - Always `===` instead of `==`
 
-Check out an [example](index.js) and the [ESLint rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js).
+Check out an [example](index.js) and the [ESLint rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js).
 
 ## Workflow
 
@@ -193,7 +193,7 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 
 Type: `object`
 
-Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/master/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
+Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
 
 Please take a moment to consider if you really need to use this option.
 
@@ -396,7 +396,7 @@ This way your `package.json` will contain the actual minimum Node.js version sup
 
 ### Including files ignored by default
 
-To include files that XO [ignores by default](https://github.com/xojs/xo/blob/master/lib/constants.js#L1), add them as negative globs in the `ignores` option:
+To include files that XO [ignores by default](lib/constants.js#L1), add them as negative globs in the `ignores` option:
 
 ```json
 {
