@@ -116,6 +116,14 @@ updateNotifier({pkg: cli.pkg}).notify();
 
 const {input, flags: options, showVersion} = cli;
 
+// Revert behavior of meow >8 to pre-8 (7.1.1) for flags using `isMultiple: true``
+// Otherwise options defined in package.json can't be merged by lib/options-manager.js mergeOptions()
+for (const key in options) {
+	if (Array.isArray(options[key]) && options[key].length === 0) {
+		delete options[key];
+	}
+}
+
 // Make data types for `options.space` match those of the API
 // Check for string type because `xo --no-space` sets `options.space` to `false`
 if (typeof options.space === 'string') {
