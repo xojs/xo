@@ -152,11 +152,17 @@ module.exports = {
 			}
 		],
 
-		// TODO: Remove this when https://github.com/sindresorhus/eslint-plugin-unicorn/pull/977 is out.
-		'unicorn/import-index': 'off',
+		// TODO: Disabled for now until it becomes more stable: https://github.com/sindresorhus/eslint-plugin-unicorn/search?q=consistent-destructuring+is:issue&state=open&type=issues
+		'unicorn/consistent-destructuring': 'off',
 
 		// TODO: Disabled for now as I don't have time to deal with the backslash that might come from this. Try to enable this rule in 2021.
 		'unicorn/no-null': 'off',
+
+		// We only enforce it for single-line statements to not be too opinionated.
+		'unicorn/prefer-ternary': [
+			'error',
+			'only-single-line'
+		],
 
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
