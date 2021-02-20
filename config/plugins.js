@@ -180,18 +180,20 @@ module.exports = {
 		'promise/prefer-await-to-then': 'error',
 		'import/default': 'error',
 		'import/export': 'error',
-		'import/extensions': [
-			'error',
-			'always',
-			{
-				ignorePackages: true,
-				// TypeScript doesn't yet support using extensions and fails with error TS2691.
-				pattern: {
-					ts: 'never',
-					tsx: 'never'
-				}
-			}
-		],
+
+		// Disabled as we use `node/file-extension-in-import` instead as it has an auto-fix.
+		// 'import/extensions': [
+		// 	'error',
+		// 	'always',
+		// 	{
+		// 		ignorePackages: true,
+		// 		// TypeScript doesn't yet support using extensions and fails with error TS2691.
+		// 		pattern: {
+		// 			ts: 'never',
+		// 			tsx: 'never'
+		// 		}
+		// 	}
+		// ],
 
 		// Disabled as it causes problems with TypeScript when you use mixed ESM and CommonJS.
 		// TODO: Enable again when I target only ESM.
@@ -275,6 +277,15 @@ module.exports = {
 		// 'node/no-missing-require': 'error',
 
 		'node/no-unpublished-bin': 'error',
+		'node/file-extension-in-import': [
+			'error',
+			'always',
+			{
+				// TypeScript doesn't yet support using extensions and fails with error TS2691.
+				'.ts': 'never',
+				'.tsx': 'never'
+			}
+		],
 		'node/no-mixed-requires': [
 			'error',
 			{
