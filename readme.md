@@ -247,7 +247,7 @@ Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shar
 
 Type: `string[]`
 
-Allow more extensions to be linted besides `.js` and `.jsx`. Make sure they're supported by ESLint or an ESLint plugin.
+Allow more extensions to be linted besides `.js`, `.jsx`, `.mjs`, and `.cjs`. Make sure they're supported by ESLint or an ESLint plugin.
 
 ### settings
 
