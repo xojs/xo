@@ -422,6 +422,10 @@ The [Standard style](https://standardjs.com) is a really cool idea. I too wish w
 
 XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/xojs/eslint-config-xo).
 
+#### Why am I getting errors about `Unexpected top-level property` when customizing the `xo` config?
+
+The `--extend` argument is for use with ESLint configs. You will probably see errors if you do `--extend .xo.config.js`, for example. `xo` will automatically detect its config files.
+
 ## Editor plugins
 
 - [Sublime Text](https://github.com/xojs/SublimeLinter-contrib-xo)
