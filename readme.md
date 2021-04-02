@@ -6,7 +6,7 @@
 	<br>
 </h1>
 
-> JavaScript/TypeScript linter with great defaults
+> JavaScript/TypeScript linter (ESLint wrapper) with great defaults
 
 [![Coverage Status](https://codecov.io/gh/xojs/xo/branch/main/graph/badge.svg)](https://codecov.io/gh/xojs/xo/branch/main)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
