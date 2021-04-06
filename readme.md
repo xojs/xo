@@ -71,6 +71,7 @@ $ xo --help
     --cwd=<dir>       Working directory for files
     --stdin           Validate/fix code from stdin
     --stdin-filename  Specify a filename for the --stdin option
+    --print-config    Print the ESLint configuration for the given file
 
   Examples
     $ xo
@@ -81,6 +82,7 @@ $ xo --help
     $ xo --plugin=react
     $ xo --plugin=html --extension=html
     $ echo 'const x=true' | xo --stdin --fix
+    $ xo --print-config=index.js
 
   Tips
     - Add XO to your project with `npm init xo`.

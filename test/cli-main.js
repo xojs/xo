@@ -166,3 +166,17 @@ test('extension option', async t => {
 	t.is(reports.length, 1);
 	t.true(reports[0].filePath.endsWith('.unknown'));
 });
+
+test('invalid print-config flag with stdin', async t => {
+	const error = await t.throwsAsync(() =>
+		main(['--print-config', 'x.js', '--stdin'], {input: 'console.log()\n'})
+	);
+	t.is(error.stderr.trim(), 'The `--print-config` flag is not supported on stdin');
+});
+
+test('print-config flag requires a single filename', async t => {
+	const error = await t.throwsAsync(() =>
+		main(['--print-config', 'x.js', 'y.js'])
+	);
+	t.is(error.stderr.trim(), 'The `--print-config` flag must be used with exactly one filename');
+});

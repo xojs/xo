@@ -57,6 +57,13 @@ const globFiles = async (patterns, {ignores, extensions, cwd}) => (
 		{ignore: ignores, gitignore: true, cwd}
 	)).filter(file => extensions.includes(path.extname(file).slice(1))).map(file => path.resolve(cwd, file));
 
+const getConfig = options => {
+	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
+	options = buildConfig(foundOptions, prettierOptions);
+	const engine = new eslint.CLIEngine(options);
+	return engine.getConfigForFile(options.filename);
+};
+
 const lintText = (string, options) => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
 	options = buildConfig(foundOptions, prettierOptions);
@@ -121,6 +128,7 @@ module.exports = {
 	getFormatter: eslint.CLIEngine.getFormatter,
 	getErrorResults: eslint.CLIEngine.getErrorResults,
 	outputFixes: eslint.CLIEngine.outputFixes,
+	getConfig,
 	lintText,
 	lintFiles
 };
