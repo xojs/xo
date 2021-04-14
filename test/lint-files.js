@@ -197,8 +197,8 @@ test('typescript files', async t => {
 });
 
 test('typescript 2 space option', async t => {
-	const {errorCount} = await fn.lintFiles('two-spaces.tsx', {cwd: 'fixtures/typescript', space: 2});
-	t.is(errorCount, 0);
+	const {errorCount, results} = await fn.lintFiles('two-spaces.tsx', {cwd: 'fixtures/typescript', space: 2});
+	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test('typescript 4 space option', async t => {
@@ -270,7 +270,7 @@ async function configType(t, {dir}) {
 		hasRule(
 			results,
 			path.resolve('fixtures', 'config-files', dir, 'file.js'),
-			'no-var'
+			'indent'
 		)
 	);
 }

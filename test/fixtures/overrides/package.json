@@ -5,7 +5,6 @@
 		"overrides": [
 			{
 				"files": "test/*.js",
-				"esnext": true,
 				"space": 3
 			},
 			{

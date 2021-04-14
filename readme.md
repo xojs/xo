@@ -68,7 +68,6 @@ $ xo --help
     --open            Open files with issues in your editor
     --quiet           Show only errors and no warnings
     --extension       Additional extension to lint [Can be set multiple times]
-    --no-esnext       Don't enforce ES2015+ rules
     --cwd=<dir>       Working directory for files
     --stdin           Validate/fix code from stdin
     --stdin-filename  Specify a filename for the --stdin option
@@ -267,15 +266,6 @@ Type: `string`
 
 [ESLint processor.](https://eslint.org/docs/user-guide/configuring#specifying-processor)
 
-### esnext
-
-Type: `boolean`\
-Default: `true`
-
-Enforce ES2015+ rules. Disabling this will make it not *enforce* ES2015+ syntax and conventions.
-
-*ES2015+ is parsed even without this option. You can already use ES2017 features like [`async`/`await`](https://github.com/lukehoban/ecmascript-asyncawait).
-
 ### webpack
 
 Type: `boolean | object`
@@ -317,12 +307,11 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 		"overrides": [
 			{
 				"files": "test/*.js",
-				"esnext": false,
 				"space": 3
 			},
 			{
 				 "files": "test/foo.js",
-				 "esnext": true
+				 "semicolon": true
 			}
 		]
 	}
@@ -331,11 +320,10 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 
 - The base configuration is simply `space: 2`, `semicolon: false`. These settings are used for every file unless otherwise noted below.
 
-- For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`, and the `esnext` option is set to `false`. The resulting config is:
+- For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`. The resulting config is:
 
 ```json
 {
-	"esnext": false,
 	"semicolon": false,
 	"space": 3
 }
@@ -345,8 +333,7 @@ XO makes it easy to override configs for specific files. The `overrides` propert
 
 ```json
 {
-	"esnext": true,
-	"semicolon": false,
+	"semicolon": true,
 	"space": 3
 }
 ```

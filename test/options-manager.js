@@ -49,11 +49,6 @@ test('buildConfig: defaults', t => {
 	t.regex(slash(config.cacheLocation), /[\\/]\.cache\/xo-linter\/xo-cache.json[\\/]?$/u);
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
-	t.is(config.baseConfig.extends[0], 'xo/esnext');
-});
-
-test('buildConfig: esnext', t => {
-	const config = manager.buildConfig({esnext: false});
 	t.is(config.baseConfig.extends[0], 'xo');
 });
 
@@ -161,27 +156,6 @@ test('buildConfig: prettier: true, space: 4', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 4,
-		trailingComma: 'none'
-	}]);
-	// Indent rule is not enabled
-	t.is(config.rules.indent, undefined);
-	// Semi rule is not enabled
-	t.is(config.rules.semi, undefined);
-	// Semi-spacing is not enabled
-	t.is(config.rules['semi-spacing'], undefined);
-});
-
-test('buildConfig: prettier: true, esnext: false', t => {
-	const config = manager.buildConfig({prettier: true, esnext: false}, {});
-
-	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
-	t.deepEqual(config.rules['prettier/prettier'], ['error', {
-		useTabs: true,
-		bracketSpacing: false,
-		jsxBracketSameLine: false,
-		semi: true,
-		singleQuote: true,
-		tabWidth: 2,
 		trailingComma: 'none'
 	}]);
 	// Indent rule is not enabled

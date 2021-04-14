@@ -27,7 +27,6 @@ const cli = meow(`
 	  --open            Open files with issues in your editor
 	  --quiet           Show only errors and no warnings
 	  --extension       Additional extension to lint [Can be set multiple times]
-	  --no-esnext       Don't enforce ES2015+ rules
 	  --cwd=<dir>       Working directory for files
 	  --stdin           Validate/fix code from stdin
 	  --stdin-filename  Specify a filename for the --stdin option
@@ -96,9 +95,6 @@ const cli = meow(`
 		extension: {
 			type: 'string',
 			isMultiple: true
-		},
-		esnext: {
-			type: 'boolean'
 		},
 		cwd: {
 			type: 'string'

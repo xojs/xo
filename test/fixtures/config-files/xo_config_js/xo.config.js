@@ -1,3 +1,3 @@
 module.exports = {
-	esnext: true
-}
+	space: true
+};

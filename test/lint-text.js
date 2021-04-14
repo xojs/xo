@@ -102,13 +102,6 @@ test('extends support', t => {
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
-test('extends support with `esnext` option', t => {
-	const {results} = fn.lintText('import path from \'path\';\nlet React;\nReact.render(<App/>);\n', {
-		extends: 'xo-react'
-	});
-	t.true(hasRule(results, 'react/jsx-no-undef'));
-});
-
 test('disable style rules when `prettier` option is enabled', t => {
 	const withoutPrettier = fn.lintText('(a) => {}\n', {filename: 'test.js'}).results;
 	// `arrow-parens` is enabled
@@ -129,11 +122,6 @@ test('extends `react` support with `prettier` option', t => {
 	t.false(hasRule(results, 'react/jsx-curly-spacing'));
 	// `prettier/prettier` is enabled
 	t.true(hasRule(results, 'prettier/prettier'));
-});
-
-test('always use the latest ECMAScript parser so esnext syntax won\'t throw in normal mode', t => {
-	const {results} = fn.lintText('async function foo() {}\n\nfoo();\n');
-	t.is(results[0].errorCount, 0);
 });
 
 test('regression test for #71', t => {
