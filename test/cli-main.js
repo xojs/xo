@@ -33,11 +33,10 @@ test('stdin-filename option with stdin', async t => {
 test('reporter option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
 
-	try {
-		await main(['--reporter=compact', filepath]);
-	} catch (error) {
-		t.true(error.stdout.includes('Error - '));
-	}
+	const error = await t.throwsAsync(() =>
+		main(['--reporter=compact', filepath])
+	);
+	t.true(error.stdout.includes('Error - '));
 });
 
 test('overrides fixture', async t => {
