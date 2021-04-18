@@ -164,7 +164,7 @@ if (options.nodeVersion) {
 	if (options.nodeVersion === 'false') {
 		options.nodeVersion = false;
 	} else if (!semver.validRange(options.nodeVersion)) {
-		console.error('The `node-engine` option must be a valid semver range (for example `>=6`)');
+		console.error('The `--node-engine` flag must be a valid semver range (for example `>=6`)');
 		process.exit(1);
 	}
 }
@@ -185,7 +185,7 @@ if (options.nodeVersion) {
 		}
 
 		if (options.open) {
-			console.error('The `open` option is not supported on stdin');
+			console.error('The `--open` flag is not supported on stdin');
 			process.exit(1);
 		}
 
