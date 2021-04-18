@@ -1,13 +1,13 @@
 import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
-import fn from '..';
+import xo from '..';
 
 process.chdir(__dirname);
 
 test('opens nothing when there are no errors nor warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/successes/*');
-	const results = await fn.lintFiles(glob);
+	const results = await xo.lintFiles(glob);
 
 	const openReport = proxyquire('../lib/open-report', {
 		'open-editor': files => {
@@ -23,7 +23,7 @@ test('opens nothing when there are no errors nor warnings', async t => {
 
 test('only opens errors if there are errors and warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/**');
-	const results = await fn.lintFiles(glob);
+	const results = await xo.lintFiles(glob);
 
 	const expected = [
 		{
@@ -53,7 +53,7 @@ test('only opens errors if there are errors and warnings', async t => {
 
 test('if a file has errors and warnings, it opens the first error', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/errors/two-with-warnings.js');
-	const results = await fn.lintFiles(glob);
+	const results = await xo.lintFiles(glob);
 
 	const expected = [
 		{
@@ -71,7 +71,7 @@ test('if a file has errors and warnings, it opens the first error', async t => {
 
 test('only opens warnings if there are no errors', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/warnings/*');
-	const results = await fn.lintFiles(glob);
+	const results = await xo.lintFiles(glob);
 
 	const expected = [
 		{

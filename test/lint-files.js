@@ -1,6 +1,6 @@
 import path from 'path';
 import test from 'ava';
-import fn from '..';
+import xo from '..';
 
 process.chdir(__dirname);
 
@@ -14,18 +14,18 @@ test('only accepts allowed extensions', async t => {
 	const mdGlob = path.join(__dirname, '..', '*.md');
 
 	// No files should be linted = no errors
-	const noOptionsResults = await fn.lintFiles(mdGlob, {});
+	const noOptionsResults = await xo.lintFiles(mdGlob, {});
 	t.is(noOptionsResults.errorCount, 0);
 
 	// Markdown files linted (with no plugin for it) = errors
-	const moreExtensionsResults = await fn.lintFiles(mdGlob, {extensions: ['md']});
+	const moreExtensionsResults = await xo.lintFiles(mdGlob, {extensions: ['md']});
 	t.true(moreExtensionsResults.errorCount > 0);
 });
 
 test('ignores dirs for empty extensions', async t => {
 	{
 		const glob = path.join(__dirname, 'fixtures/nodir/*');
-		const results = await fn.lintFiles(glob, {extensions: ['', 'js']});
+		const results = await xo.lintFiles(glob, {extensions: ['', 'js']});
 		const {results: [fileResult]} = results;
 
 		// Only `fixtures/nodir/noextension` should be linted
@@ -37,7 +37,7 @@ test('ignores dirs for empty extensions', async t => {
 
 	{
 		const glob = path.join(__dirname, 'fixtures/nodir/nested/*');
-		const results = await fn.lintFiles(glob);
+		const results = await xo.lintFiles(glob);
 		const {results: [fileResult]} = results;
 
 		// Ensure `nodir/nested` **would** report if globbed
@@ -49,7 +49,7 @@ test('ignores dirs for empty extensions', async t => {
 });
 
 test.serial('cwd option', async t => {
-	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/cwd'});
+	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/cwd'});
 	const paths = results.map(r => path.relative(__dirname, r.filePath));
 	paths.sort();
 	t.deepEqual(paths, [path.join('fixtures', 'cwd', 'unicorn.js')]);
@@ -59,7 +59,7 @@ test('do not lint gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	const glob = path.posix.join(cwd, '**/*');
 	const ignored = path.resolve('fixtures/gitignore/test/foo.js');
-	const {results} = await fn.lintFiles(glob, {cwd});
+	const {results} = await xo.lintFiles(glob, {cwd});
 
 	t.is(results.some(r => r.filePath === ignored), false);
 });
@@ -68,7 +68,7 @@ test('do not lint gitignored files in file with negative gitignores', async t =>
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
 	const glob = path.posix.join(cwd, '*');
 	const ignored = path.resolve('fixtures/negative-gitignore/bar.js');
-	const {results} = await fn.lintFiles(glob, {cwd});
+	const {results} = await xo.lintFiles(glob, {cwd});
 
 	t.is(results.some(r => r.filePath === ignored), false);
 });
@@ -77,7 +77,7 @@ test('lint negatively gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
 	const glob = path.posix.join(cwd, '*');
 	const negative = path.resolve('fixtures/negative-gitignore/foo.js');
-	const {results} = await fn.lintFiles(glob, {cwd});
+	const {results} = await xo.lintFiles(glob, {cwd});
 
 	t.is(results.some(r => r.filePath === negative), true);
 });
@@ -86,14 +86,14 @@ test('do not lint inapplicable negatively gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
 	const glob = path.posix.join(cwd, 'bar.js');
 	const negative = path.resolve('fixtures/negative-gitignore/foo.js');
-	const {results} = await fn.lintFiles(glob, {cwd});
+	const {results} = await xo.lintFiles(glob, {cwd});
 
 	t.is(results.some(r => r.filePath === negative), false);
 });
 
 test('multiple negative patterns should act as positive patterns', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'gitignore-multiple-negation');
-	const {results} = await fn.lintFiles('**/*', {cwd});
+	const {results} = await xo.lintFiles('**/*', {cwd});
 	const paths = results.map(r => path.basename(r.filePath));
 	paths.sort();
 
@@ -101,7 +101,7 @@ test('multiple negative patterns should act as positive patterns', async t => {
 });
 
 test('enable rules based on nodeVersion', async t => {
-	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
+	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
 
 	// The transpiled file (as specified in `overrides`) should use `await`
 	t.true(
@@ -126,14 +126,14 @@ test('do not lint eslintignored files', async t => {
 	const glob = path.posix.join(cwd, '*');
 	const positive = path.resolve('fixtures/eslintignore/foo.js');
 	const negative = path.resolve('fixtures/eslintignore/bar.js');
-	const {results} = await fn.lintFiles(glob, {cwd});
+	const {results} = await xo.lintFiles(glob, {cwd});
 
 	t.is(results.some(r => r.filePath === positive), true);
 	t.is(results.some(r => r.filePath === negative), false);
 });
 
 test('find configurations close to linted file', async t => {
-	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/nested-configs'});
+	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/nested-configs'});
 
 	t.true(
 		hasRule(
@@ -169,7 +169,7 @@ test('find configurations close to linted file', async t => {
 });
 
 test('typescript files', async t => {
-	const {results} = await fn.lintFiles('**/*', {cwd: 'fixtures/typescript'});
+	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/typescript'});
 
 	t.true(
 		hasRule(
@@ -197,23 +197,23 @@ test('typescript files', async t => {
 });
 
 test('typescript 2 space option', async t => {
-	const {errorCount, results} = await fn.lintFiles('two-spaces.tsx', {cwd: 'fixtures/typescript', space: 2});
+	const {errorCount, results} = await xo.lintFiles('two-spaces.tsx', {cwd: 'fixtures/typescript', space: 2});
 	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test('typescript 4 space option', async t => {
-	const {errorCount} = await fn.lintFiles('child/sub-child/four-spaces.ts', {cwd: 'fixtures/typescript', space: 4});
+	const {errorCount} = await xo.lintFiles('child/sub-child/four-spaces.ts', {cwd: 'fixtures/typescript', space: 4});
 	t.is(errorCount, 0);
 });
 
 test('typescript no semicolon option', async t => {
-	const {errorCount} = await fn.lintFiles('child/no-semicolon.ts', {cwd: 'fixtures/typescript', semicolon: false});
+	const {errorCount} = await xo.lintFiles('child/no-semicolon.ts', {cwd: 'fixtures/typescript', semicolon: false});
 	t.is(errorCount, 0);
 });
 
 test('webpack import resolver is used if webpack.config.js is found', async t => {
 	const cwd = 'fixtures/webpack/with-config/';
-	const {results} = await fn.lintFiles(path.resolve(cwd, 'file1.js'), {
+	const {results} = await xo.lintFiles(path.resolve(cwd, 'file1.js'), {
 		cwd,
 		rules: {
 			'import/no-unresolved': 2
@@ -229,7 +229,7 @@ test('webpack import resolver is used if webpack.config.js is found', async t =>
 test('webpack import resolver config can be passed through webpack option', async t => {
 	const cwd = 'fixtures/webpack/no-config/';
 
-	const {results} = await fn.lintFiles(path.resolve(cwd, 'file1.js'), {
+	const {results} = await xo.lintFiles(path.resolve(cwd, 'file1.js'), {
 		cwd,
 		webpack: {
 			config: {
@@ -251,7 +251,7 @@ test('webpack import resolver config can be passed through webpack option', asyn
 test('webpack import resolver is used if {webpack: true}', async t => {
 	const cwd = 'fixtures/webpack/no-config/';
 
-	const {results} = await fn.lintFiles(path.resolve(cwd, 'file3.js'), {
+	const {results} = await xo.lintFiles(path.resolve(cwd, 'file3.js'), {
 		cwd,
 		webpack: true,
 		rules: {
@@ -264,7 +264,7 @@ test('webpack import resolver is used if {webpack: true}', async t => {
 });
 
 async function configType(t, {dir}) {
-	const {results} = await fn.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
+	const {results} = await xo.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
 
 	t.true(
 		hasRule(
