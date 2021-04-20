@@ -33,11 +33,10 @@ test('stdin-filename option with stdin', async t => {
 test('reporter option', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
 
-	try {
-		await main(['--reporter=compact', filepath]);
-	} catch (error) {
-		t.true(error.stdout.includes('Error - '));
-	}
+	const error = await t.throwsAsync(() =>
+		main(['--reporter=compact', filepath])
+	);
+	t.true(error.stdout.includes('Error - '));
 });
 
 test('overrides fixture', async t => {
@@ -166,4 +165,18 @@ test('extension option', async t => {
 
 	t.is(reports.length, 1);
 	t.true(reports[0].filePath.endsWith('.unknown'));
+});
+
+test('invalid print-config flag with stdin', async t => {
+	const error = await t.throwsAsync(() =>
+		main(['--print-config', 'x.js', '--stdin'], {input: 'console.log()\n'})
+	);
+	t.is(error.stderr.trim(), 'The `--print-config` flag is not supported on stdin');
+});
+
+test('print-config flag requires a single filename', async t => {
+	const error = await t.throwsAsync(() =>
+		main(['--print-config', 'x.js', 'y.js'])
+	);
+	t.is(error.stderr.trim(), 'The `--print-config` flag must be used with exactly one filename');
 });

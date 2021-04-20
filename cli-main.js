@@ -30,6 +30,7 @@ const cli = meow(`
 	  --cwd=<dir>       Working directory for files
 	  --stdin           Validate/fix code from stdin
 	  --stdin-filename  Specify a filename for the --stdin option
+	  --print-config    Print the effective ESLint config for the given file
 
 	Examples
 	  $ xo
@@ -40,6 +41,7 @@ const cli = meow(`
 	  $ xo --plugin=react
 	  $ xo --plugin=html --extension=html
 	  $ echo 'const x=true' | xo --stdin --fix
+	  $ xo --print-config=index.js
 
 	Tips
 	  - Add XO to your project with \`npm init xo\`.
@@ -97,6 +99,9 @@ const cli = meow(`
 			isMultiple: true
 		},
 		cwd: {
+			type: 'string'
+		},
+		printConfig: {
 			type: 'string'
 		},
 		stdin: {
@@ -164,13 +169,27 @@ if (options.nodeVersion) {
 	if (options.nodeVersion === 'false') {
 		options.nodeVersion = false;
 	} else if (!semver.validRange(options.nodeVersion)) {
-		console.error('The `node-engine` option must be a valid semver range (for example `>=6`)');
+		console.error('The `--node-engine` flag must be a valid semver range (for example `>=6`)');
 		process.exit(1);
 	}
 }
 
 (async () => {
-	if (options.stdin) {
+	if (options.printConfig) {
+		if (input.length > 0) {
+			console.error('The `--print-config` flag must be used with exactly one filename');
+			process.exit(1);
+		}
+
+		if (options.stdin) {
+			console.error('The `--print-config` flag is not supported on stdin');
+			process.exit(1);
+		}
+
+		options.filename = options.printConfig;
+		const config = xo.getConfig(options);
+		console.log(JSON.stringify(config, undefined, '\t'));
+	} else if (options.stdin) {
 		const stdin = await getStdin();
 
 		if (options.stdinFilename) {
@@ -185,7 +204,7 @@ if (options.nodeVersion) {
 		}
 
 		if (options.open) {
-			console.error('The `open` option is not supported on stdin');
+			console.error('The `--open` flag is not supported on stdin');
 			process.exit(1);
 		}
 
