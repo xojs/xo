@@ -84,8 +84,7 @@ test('buildConfig: prettier: true', t => {
 		trailingComma: 'none'
 	}]);
 	// eslint-prettier-config must always be last
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/unicorn');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'prettier');
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier');
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
 	// Semi rule is not enabled
@@ -111,10 +110,9 @@ test('buildConfig: prettier: true, typescript file', t => {
 	}]);
 
 	// eslint-prettier-config must always be last
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/@typescript-eslint');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'prettier/unicorn');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'prettier');
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 4], 'xo-typescript');
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier/@typescript-eslint');
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'prettier');
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 3], 'xo-typescript');
 
 	// Indent rule is not enabled
 	t.is(config.rules.indent, undefined);
