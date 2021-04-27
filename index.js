@@ -35,9 +35,9 @@ const mergeReports = reports => {
 	}
 
 	return {
-		results,
 		errorCount,
-		warningCount
+		warningCount,
+		results
 	};
 };
 
