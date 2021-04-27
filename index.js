@@ -29,7 +29,7 @@ const mergeReports = reports => {
 	let warningCount = 0;
 
 	for (const report of reports) {
-		results = results.concat(...report.results);
+		results = results.concat(report.results);
 		errorCount += report.errorCount;
 		warningCount += report.warningCount;
 	}
