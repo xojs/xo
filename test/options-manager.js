@@ -29,14 +29,30 @@ test('normalizeOptions: makes all the options plural and arrays', t => {
 	});
 
 	t.deepEqual(options, {
-		envs: ['node'],
-		globals: ['foo'],
-		ignores: ['test.js'],
-		plugins: ['my-plugin'],
-		rules: {'my-rule': 'foo'},
-		settings: {'my-rule': 'bar'},
-		extends: ['foo'],
-		extensions: ['html']
+		envs: [
+			'node'
+		],
+		extends: [
+			'foo'
+		],
+		extensions: [
+			'html'
+		],
+		globals: [
+			'foo'
+		],
+		ignores: [
+			'test.js'
+		],
+		plugins: [
+			'my-plugin'
+		],
+		rules: {
+			'my-rule': 'foo'
+		},
+		settings: {
+			'my-rule': 'bar'
+		}
 	});
 });
 
@@ -54,27 +70,27 @@ test('buildConfig: defaults', t => {
 
 test('buildConfig: space: true', t => {
 	const config = manager.buildConfig({space: true});
-	t.deepEqual(config.rules.indent, ['error', 2, {SwitchCase: 1}]);
+	t.deepEqual(config.baseConfig.rules.indent, ['error', 2, {SwitchCase: 1}]);
 });
 
 test('buildConfig: space: 4', t => {
 	const config = manager.buildConfig({space: 4});
-	t.deepEqual(config.rules.indent, ['error', 4, {SwitchCase: 1}]);
+	t.deepEqual(config.baseConfig.rules.indent, ['error', 4, {SwitchCase: 1}]);
 });
 
 test('buildConfig: semicolon', t => {
 	const config = manager.buildConfig({semicolon: false, nodeVersion: '12'});
-	t.deepEqual(config.rules.semi, ['error', 'never']);
-	t.deepEqual(config.rules['semi-spacing'], ['error', {before: false, after: true}]);
+	t.deepEqual(config.baseConfig.rules.semi, ['error', 'never']);
+	t.deepEqual(config.baseConfig.rules['semi-spacing'], ['error', {before: false, after: true}]);
 });
 
 test('buildConfig: prettier: true', t => {
 	const config = manager.buildConfig({prettier: true, extends: ['xo-react']}, {});
 
-	t.deepEqual(config.plugins, ['prettier']);
+	t.deepEqual(config.baseConfig.plugins, ['prettier']);
 	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
 	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
-	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: true,
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
@@ -86,20 +102,20 @@ test('buildConfig: prettier: true', t => {
 	// eslint-prettier-config must always be last
 	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier');
 	// Indent rule is not enabled
-	t.is(config.rules.indent, undefined);
+	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
-	t.is(config.rules.semi, undefined);
+	t.is(config.baseConfig.rules.semi, undefined);
 	// Semi-spacing is not enabled
-	t.is(config.rules['semi-spacing'], undefined);
+	t.is(config.baseConfig.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, typescript file', t => {
 	const config = manager.buildConfig({prettier: true, ts: true}, {});
 
-	t.deepEqual(config.plugins, ['prettier']);
+	t.deepEqual(config.baseConfig.plugins, ['prettier']);
 	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
 	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
-	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: true,
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
@@ -114,18 +130,18 @@ test('buildConfig: prettier: true, typescript file', t => {
 	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 2], 'xo-typescript');
 
 	// Indent rule is not enabled
-	t.is(config.rules.indent, undefined);
+	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
-	t.is(config.rules.semi, undefined);
+	t.is(config.baseConfig.rules.semi, undefined);
 	// Semi-spacing is not enabled
-	t.is(config.rules['semi-spacing'], undefined);
+	t.is(config.baseConfig.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, semicolon: false', t => {
 	const config = manager.buildConfig({prettier: true, semicolon: false}, {});
 
 	// Sets the `semi` options in `prettier/prettier` based on the XO `semicolon` option
-	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: true,
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
@@ -135,18 +151,18 @@ test('buildConfig: prettier: true, semicolon: false', t => {
 		trailingComma: 'none'
 	}]);
 	// Indent rule is not enabled
-	t.is(config.rules.indent, undefined);
+	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
-	t.is(config.rules.semi, undefined);
+	t.is(config.baseConfig.rules.semi, undefined);
 	// Semi-spacing is not enabled
-	t.is(config.rules['semi-spacing'], undefined);
+	t.is(config.baseConfig.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, space: 4', t => {
 	const config = manager.buildConfig({prettier: true, space: 4}, {});
 
 	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
-	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: false,
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
@@ -156,18 +172,18 @@ test('buildConfig: prettier: true, space: 4', t => {
 		trailingComma: 'none'
 	}]);
 	// Indent rule is not enabled
-	t.is(config.rules.indent, undefined);
+	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
-	t.is(config.rules.semi, undefined);
+	t.is(config.baseConfig.rules.semi, undefined);
 	// Semi-spacing is not enabled
-	t.is(config.rules['semi-spacing'], undefined);
+	t.is(config.baseConfig.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: prettier: true, space: true', t => {
 	const config = manager.buildConfig({prettier: true, space: true}, {});
 
 	// Sets `useTabs` and `tabWidth` options in `prettier/prettier` rule based on the XO `space` options
-	t.deepEqual(config.rules['prettier/prettier'], ['error', {
+	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: false,
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
@@ -177,11 +193,11 @@ test('buildConfig: prettier: true, space: true', t => {
 		trailingComma: 'none'
 	}]);
 	// Indent rule is not enabled
-	t.is(config.rules.indent, undefined);
+	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
-	t.is(config.rules.semi, undefined);
+	t.is(config.baseConfig.rules.semi, undefined);
 	// Semi-spacing is not enabled
-	t.is(config.rules['semi-spacing'], undefined);
+	t.is(config.baseConfig.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: merge with prettier config', t => {
@@ -189,70 +205,70 @@ test('buildConfig: merge with prettier config', t => {
 	const config = manager.buildConfig({cwd, prettier: true}, prettierConfig.prettier);
 
 	// Sets the `semi` options in `prettier/prettier` based on the XO `semicolon` option
-	t.deepEqual(config.rules['prettier/prettier'], ['error', prettierConfig.prettier]);
+	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', prettierConfig.prettier]);
 	// Indent rule is not enabled
-	t.is(config.rules.indent, undefined);
+	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
-	t.is(config.rules.semi, undefined);
+	t.is(config.baseConfig.rules.semi, undefined);
 	// Semi-spacing is not enabled
-	t.is(config.rules['semi-spacing'], undefined);
+	t.is(config.baseConfig.rules['semi-spacing'], undefined);
 });
 
 test('buildConfig: engines: undefined', t => {
 	const config = manager.buildConfig({});
 
 	// Do not include any Node.js version specific rules
-	t.is(config.rules['prefer-object-spread'], 'off');
-	t.is(config.rules['prefer-rest-params'], 'off');
-	t.is(config.rules['prefer-destructuring'], 'off');
-	t.is(config.rules['promise/prefer-await-to-then'], 'off');
-	t.is(config.rules['unicorn/prefer-flat-map'], 'off');
-	t.is(config.rules['node/prefer-promises/dns'], 'off');
-	t.is(config.rules['node/prefer-promises/fs'], 'off');
-	t.is(config.rules['node/no-unsupported-features/es-builtins'], undefined);
-	t.is(config.rules['node/no-unsupported-features/es-syntax'], undefined);
-	t.is(config.rules['node/no-unsupported-features/node-builtins'], undefined);
+	t.is(config.baseConfig.rules['prefer-object-spread'], 'off');
+	t.is(config.baseConfig.rules['prefer-rest-params'], 'off');
+	t.is(config.baseConfig.rules['prefer-destructuring'], 'off');
+	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
+	t.is(config.baseConfig.rules['unicorn/prefer-flat-map'], 'off');
+	t.is(config.baseConfig.rules['node/prefer-promises/dns'], 'off');
+	t.is(config.baseConfig.rules['node/prefer-promises/fs'], 'off');
+	t.is(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], undefined);
+	t.is(config.baseConfig.rules['node/no-unsupported-features/es-syntax'], undefined);
+	t.is(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], undefined);
 });
 
 test('buildConfig: nodeVersion: false', t => {
 	const config = manager.buildConfig({nodeVersion: false});
 
 	// Override all the rules specific to Node.js version
-	t.is(config.rules['prefer-object-spread'], 'off');
-	t.is(config.rules['prefer-rest-params'], 'off');
-	t.is(config.rules['prefer-destructuring'], 'off');
-	t.is(config.rules['promise/prefer-await-to-then'], 'off');
-	t.is(config.rules['unicorn/prefer-flat-map'], 'off');
-	t.is(config.rules['node/prefer-promises/dns'], 'off');
-	t.is(config.rules['node/prefer-promises/fs'], 'off');
+	t.is(config.baseConfig.rules['prefer-object-spread'], 'off');
+	t.is(config.baseConfig.rules['prefer-rest-params'], 'off');
+	t.is(config.baseConfig.rules['prefer-destructuring'], 'off');
+	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
+	t.is(config.baseConfig.rules['unicorn/prefer-flat-map'], 'off');
+	t.is(config.baseConfig.rules['node/prefer-promises/dns'], 'off');
+	t.is(config.baseConfig.rules['node/prefer-promises/fs'], 'off');
 });
 
 test('buildConfig: nodeVersion: >=6', t => {
 	const config = manager.buildConfig({nodeVersion: '>=6'});
 
 	// Turn off rule if we support Node.js below 7.6.0
-	t.is(config.rules['promise/prefer-await-to-then'], 'off');
+	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
 	// Set node/no-unsupported-features rules with the nodeVersion
-	t.deepEqual(config.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
+	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
 	t.deepEqual(
-		config.rules['node/no-unsupported-features/es-syntax'],
+		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
 		['error', {version: '>=6', ignores: ['modules']}]
 	);
-	t.deepEqual(config.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
+	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
 });
 
 test('buildConfig: nodeVersion: >=8', t => {
 	const config = manager.buildConfig({nodeVersion: '>=8'});
 
 	// Do not turn off rule if we support only Node.js above 7.6.0
-	t.is(config.rules['promise/prefer-await-to-then'], undefined);
+	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], undefined);
 	// Set node/no-unsupported-features rules with the nodeVersion
-	t.deepEqual(config.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
+	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
 	t.deepEqual(
-		config.rules['node/no-unsupported-features/es-syntax'],
+		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
 		['error', {version: '>=8', ignores: ['modules']}]
 	);
-	t.deepEqual(config.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
+	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
 });
 
 test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
@@ -346,7 +362,7 @@ test('mergeWithPrettierConfig: throw error is `space`/`tabWidth` conflicts', t =
 test('buildConfig: rules', t => {
 	const rules = {'object-curly-spacing': ['error', 'always']};
 	const config = manager.buildConfig({rules, nodeVersion: '12'});
-	t.deepEqual(config.rules['object-curly-spacing'], rules['object-curly-spacing']);
+	t.deepEqual(config.baseConfig.rules['object-curly-spacing'], rules['object-curly-spacing']);
 });
 
 test('buildConfig: parser', t => {
@@ -397,20 +413,22 @@ test('buildConfig: webpack option is merged with import/resolver', t => {
 });
 
 test('buildConfig: extends', t => {
-	const config = manager.buildConfig({extends: [
-		'plugin:foo/bar',
-		'eslint-config-foo-bar',
-		'foo-bar-two',
-		'@foobar',
-		'@foobar/eslint-config'
-	]});
+	const config = manager.buildConfig({
+		extends: [
+			'plugin:foo/bar',
+			'eslint-config-foo-bar',
+			'foo-bar-two',
+			'@foobar',
+			'@foobar/eslint-config'
+		]
+	});
 
 	t.deepEqual(config.baseConfig.extends.slice(-5), [
 		'plugin:foo/bar',
 		'cwd/eslint-config-foo-bar',
 		'cwd/eslint-config-foo-bar-two',
-		'@foobar',
-		'@foobar/eslint-config'
+		'cwd/@foobar/eslint-config',
+		'cwd/@foobar/eslint-config'
 	]);
 });
 
@@ -470,9 +488,9 @@ test('mergeWithFileConfig: use parent if closest', t => {
 
 test('mergeWithFileConfig: use parent if child is ignored', t => {
 	const cwd = path.resolve('fixtures', 'nested');
-	const filename = path.resolve(cwd, 'child-ignore', 'file.js');
-	const {options} = manager.mergeWithFileConfig({cwd, filename});
-	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filename};
+	const filePath = path.resolve(cwd, 'child-ignore', 'file.js');
+	const {options} = manager.mergeWithFileConfig({cwd, filePath});
+	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filePath};
 	t.deepEqual(options, expected);
 });
 
@@ -505,10 +523,10 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', t
 
 test('mergeWithFileConfig: typescript files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
-	const filename = path.resolve(cwd, 'file.ts');
-	const {options} = manager.mergeWithFileConfig({cwd, filename});
+	const filePath = path.resolve(cwd, 'file.ts');
+	const {options} = manager.mergeWithFileConfig({cwd, filePath});
 	const expected = {
-		filename,
+		filePath,
 		extensions: DEFAULT_EXTENSION,
 		ignores: DEFAULT_IGNORES,
 		cwd,
@@ -525,10 +543,10 @@ test('mergeWithFileConfig: typescript files', async t => {
 
 test('mergeWithFileConfig: tsx files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
-	const filename = path.resolve(cwd, 'file.tsx');
-	const {options} = manager.mergeWithFileConfig({cwd, filename});
+	const filePath = path.resolve(cwd, 'file.tsx');
+	const {options} = manager.mergeWithFileConfig({cwd, filePath});
 	const expected = {
-		filename,
+		filePath,
 		extensions: DEFAULT_EXTENSION,
 		ignores: DEFAULT_IGNORES,
 		cwd,

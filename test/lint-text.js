@@ -7,42 +7,42 @@ import xo from '..';
 process.chdir(__dirname);
 
 const readFile = pify(fs.readFile);
-const hasRule = (results, ruleId) => results[0].messages.some(x => x.ruleId === ruleId);
+const hasRule = (results, expectedRuleId) => results[0].messages.some(({ruleId}) => ruleId === expectedRuleId);
 
-test('.lintText()', t => {
-	const {results} = xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n');
+test('.lintText()', async t => {
+	const {results} = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n');
 	t.true(hasRule(results, 'semi'));
 });
 
-test('default `ignores`', t => {
-	const result = xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
-		filename: 'node_modules/ignored/index.js'
+test('default `ignores`', async t => {
+	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
+		filePath: 'node_modules/ignored/index.js'
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
 });
 
-test('`ignores` option', t => {
-	const result = xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
-		filename: 'ignored/index.js',
+test('`ignores` option', async t => {
+	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
+		filePath: 'ignored/index.js',
 		ignores: ['ignored/**/*.js']
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
 });
 
-test('`ignores` option without cwd', t => {
-	const result = xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
-		filename: 'ignored/index.js',
+test('`ignores` option without cwd', async t => {
+	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
+		filePath: 'ignored/index.js',
 		ignores: ['ignored/**/*.js']
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
 });
 
-test('respect overrides', t => {
-	const result = xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
-		filename: 'ignored/index.js',
+test('respect overrides', async t => {
+	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
+		filePath: 'ignored/index.js',
 		ignores: ['ignored/**/*.js'],
 		overrides: [
 			{
@@ -55,9 +55,9 @@ test('respect overrides', t => {
 	t.is(result.warningCount, 0);
 });
 
-test('overriden ignore', t => {
-	const result = xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
-		filename: 'unignored.js',
+test('overriden ignore', async t => {
+	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
+		filePath: 'unignored.js',
 		overrides: [
 			{
 				files: ['unignored.js'],
@@ -69,63 +69,63 @@ test('overriden ignore', t => {
 	t.is(result.warningCount, 0);
 });
 
-test('`ignores` option without filename', t => {
-	t.throws(() => {
-		xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
+test('`ignores` option without filename', async t => {
+	await t.throwsAsync(async () => {
+		await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 			ignores: ['ignored/**/*.js']
 		});
-	}, {message: /The `ignores` option requires the `filename` option to be defined./u});
+	}, {message: /The `ignores` option requires the `filePath` option to be defined./u});
 });
 
-test('JSX support', t => {
-	const {results} = xo.lintText('const app = <div className="appClass">Hello, React!</div>;\n');
+test('JSX support', async t => {
+	const {results} = await xo.lintText('const app = <div className="appClass">Hello, React!</div>;\n');
 	t.true(hasRule(results, 'no-unused-vars'));
 });
 
-test('plugin support', t => {
-	const {results} = xo.lintText('var React;\nReact.render(<App/>);\n', {
+test('plugin support', async t => {
+	const {results} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
 		plugins: ['react'],
 		rules: {'react/jsx-no-undef': 'error'}
 	});
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
-test('prevent use of extended native objects', t => {
-	const {results} = xo.lintText('[].unicorn();\n');
+test('prevent use of extended native objects', async t => {
+	const {results} = await xo.lintText('[].unicorn();\n');
 	t.true(hasRule(results, 'no-use-extend-native/no-use-extend-native'));
 });
 
-test('extends support', t => {
-	const {results} = xo.lintText('var React;\nReact.render(<App/>);\n', {
+test('extends support', async t => {
+	const {results} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
 		extends: 'xo-react'
 	});
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
 
-test('disable style rules when `prettier` option is enabled', t => {
-	const withoutPrettier = xo.lintText('(a) => {}\n', {filename: 'test.js'}).results;
+test('disable style rules when `prettier` option is enabled', async t => {
+	const {results: withoutPrettier} = await xo.lintText('(a) => {}\n', {filePath: 'test.js'});
 	// `arrow-parens` is enabled
 	t.true(hasRule(withoutPrettier, 'arrow-parens'));
 	// `prettier/prettier` is disabled
 	t.false(hasRule(withoutPrettier, 'prettier/prettier'));
 
-	const withPrettier = xo.lintText('(a) => {}\n', {prettier: true, filename: 'test.js'}).results;
+	const {results: withPrettier} = await xo.lintText('(a) => {}\n', {prettier: true, filePath: 'test.js'});
 	// `arrow-parens` is disabled by `eslint-config-prettier`
 	t.false(hasRule(withPrettier, 'arrow-parens'));
 	// `prettier/prettier` is enabled
 	t.true(hasRule(withPrettier, 'prettier/prettier'));
 });
 
-test('extends `react` support with `prettier` option', t => {
-	const {results} = xo.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true, filename: 'test.jsx'});
+test('extends `react` support with `prettier` option', async t => {
+	const {results} = await xo.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true, filePath: 'test.jsx'});
 	// `react/jsx-curly-spacing` is disabled by `eslint-config-prettier`
 	t.false(hasRule(results, 'react/jsx-curly-spacing'));
 	// `prettier/prettier` is enabled
 	t.true(hasRule(results, 'prettier/prettier'));
 });
 
-test('regression test for #71', t => {
-	const {results} = xo.lintText('const foo = { key: \'value\' };\nconsole.log(foo);\n', {
+test('regression test for #71', async t => {
+	const {results} = await xo.lintText('const foo = { key: \'value\' };\nconsole.log(foo);\n', {
 		extends: path.join(__dirname, 'fixtures/extends.js')
 	});
 	t.is(results[0].errorCount, 0);
@@ -134,15 +134,15 @@ test('regression test for #71', t => {
 test('lintText() - overrides support', async t => {
 	const cwd = path.join(__dirname, 'fixtures/overrides');
 	const bar = path.join(cwd, 'test/bar.js');
-	const barResults = xo.lintText(await readFile(bar, 'utf8'), {filename: bar, cwd}).results;
+	const {results: barResults} = await xo.lintText(await readFile(bar, 'utf8'), {filePath: bar, cwd});
 	t.is(barResults[0].errorCount, 0);
 
 	const foo = path.join(cwd, 'test/foo.js');
-	const fooResults = xo.lintText(await readFile(foo, 'utf8'), {filename: foo, cwd}).results;
+	const {results: fooResults} = await xo.lintText(await readFile(foo, 'utf8'), {filePath: foo, cwd});
 	t.is(fooResults[0].errorCount, 0);
 
 	const index = path.join(cwd, 'test/index.js');
-	const indexResults = xo.lintText(await readFile(bar, 'utf8'), {filename: index, cwd}).results;
+	const {results: indexResults} = await xo.lintText(await readFile(bar, 'utf8'), {filePath: index, cwd});
 	t.is(indexResults[0].errorCount, 0);
 });
 
@@ -150,14 +150,14 @@ test('do not lint gitignored files if filename is given', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
 	const ignored = await readFile(ignoredPath, 'utf8');
-	const {results} = xo.lintText(ignored, {filename: ignoredPath, cwd});
+	const {results} = await xo.lintText(ignored, {filePath: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
 
 test('lint gitignored files if filename is not given', async t => {
 	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
 	const ignored = await readFile(ignoredPath, 'utf8');
-	const {results} = xo.lintText(ignored);
+	const {results} = await xo.lintText(ignored);
 	t.true(results[0].errorCount > 0);
 });
 
@@ -165,15 +165,15 @@ test('do not lint gitignored files in file with negative gitignores', async t =>
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
 	const ignoredPath = path.resolve('fixtures/negative-gitignore/bar.js');
 	const ignored = await readFile(ignoredPath, 'utf8');
-	const {results} = xo.lintText(ignored, {filename: ignoredPath, cwd});
+	const {results} = await xo.lintText(ignored, {filePath: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
 
 test('multiple negative patterns should act as positive patterns', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'gitignore-multiple-negation');
-	const filename = path.join(cwd, '!!!unicorn.js');
-	const text = await readFile(filename, 'utf8');
-	const {results} = xo.lintText(text, {filename, cwd});
+	const filePath = path.join(cwd, '!!!unicorn.js');
+	const text = await readFile(filePath, 'utf8');
+	const {results} = await xo.lintText(text, {filePath, cwd});
 	t.is(results[0].errorCount, 0);
 });
 
@@ -189,121 +189,133 @@ test('do not lint eslintignored files if filename is given', async t => {
 	const cwd = path.join(__dirname, 'fixtures/eslintignore');
 	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
 	const ignored = await readFile(ignoredPath, 'utf8');
-	const {results} = xo.lintText(ignored, {filename: ignoredPath, cwd});
+	const {results} = await xo.lintText(ignored, {filePath: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
 
 test('lint eslintignored files if filename is not given', async t => {
 	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
 	const ignored = await readFile(ignoredPath, 'utf8');
-	const {results} = xo.lintText(ignored);
+	const {results} = await xo.lintText(ignored);
 	t.true(results[0].errorCount > 0);
 });
 
 test('enable rules based on nodeVersion', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
-	const filename = path.join(cwd, 'promise-then.js');
-	const text = await readFile(filename, 'utf8');
+	const filePath = path.join(cwd, 'promise-then.js');
+	const text = await readFile(filePath, 'utf8');
 
-	let {results} = xo.lintText(text, {nodeVersion: '>=8.0.0'});
+	let {results} = await xo.lintText(text, {nodeVersion: '>=8.0.0'});
 	t.true(hasRule(results, 'promise/prefer-await-to-then'));
 
-	({results} = xo.lintText(text, {nodeVersion: '>=6.0.0'}));
+	({results} = await xo.lintText(text, {nodeVersion: '>=6.0.0'}));
 	t.false(hasRule(results, 'promise/prefer-await-to-then'));
 });
 
 test('enable rules based on nodeVersion in override', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
-	const filename = path.join(cwd, 'promise-then.js');
-	const text = await readFile(filename, 'utf8');
+	const filePath = path.join(cwd, 'promise-then.js');
+	const text = await readFile(filePath, 'utf8');
 
-	let {results} = xo.lintText(text, {
+	let {results} = await xo.lintText(text, {
 		nodeVersion: '>=8.0.0',
-		filename: 'promise-then.js',
+		filePath: 'promise-then.js',
 		overrides: [
 			{
 				files: 'promise-*.js',
 				nodeVersion: '>=6.0.0'
 			}
-		]});
+		]
+	});
 	t.false(hasRule(results, 'promise/prefer-await-to-then'));
 
-	({results} = xo.lintText(text, {
+	({results} = await xo.lintText(text, {
 		nodeVersion: '>=6.0.0',
-		filename: 'promise-then.js',
+		filePath: 'promise-then.js',
 		overrides: [
 			{
 				files: 'promise-*.js',
 				nodeVersion: '>=8.0.0'
 			}
-		]}));
+		]
+	}));
 	t.true(hasRule(results, 'promise/prefer-await-to-then'));
 });
 
-test('allow unassigned stylesheet imports', t => {
-	let {results} = xo.lintText('import \'stylesheet.css\'');
+test('allow unassigned stylesheet imports', async t => {
+	let {results} = await xo.lintText('import \'stylesheet.css\'');
 	t.false(hasRule(results, 'import/no-unassigned-import'));
 
-	({results} = xo.lintText('import \'stylesheet.scss\''));
+	({results} = await xo.lintText('import \'stylesheet.scss\''));
 	t.false(hasRule(results, 'import/no-unassigned-import'));
 
-	({results} = xo.lintText('import \'stylesheet.sass\''));
+	({results} = await xo.lintText('import \'stylesheet.sass\''));
 	t.false(hasRule(results, 'import/no-unassigned-import'));
 
-	({results} = xo.lintText('import \'stylesheet.less\''));
+	({results} = await xo.lintText('import \'stylesheet.less\''));
 	t.false(hasRule(results, 'import/no-unassigned-import'));
 });
 
-test('find configurations close to linted file', t => {
-	let {results} = xo.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child/semicolon.js'});
+test('find configurations close to linted file', async t => {
+	let {results} = await xo.lintText('console.log(\'semicolon\');\n', {filePath: 'fixtures/nested-configs/child/semicolon.js'});
 	t.true(hasRule(results, 'semi'));
 
-	({results} = xo.lintText('console.log(\'semicolon\');\n', {filename: 'fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'}));
+	({results} = await xo.lintText('console.log(\'semicolon\');\n', {filePath: 'fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'}));
 	t.true(hasRule(results, 'prettier/prettier'));
 
-	({results} = xo.lintText('console.log(\'no-semicolon\')\n', {filename: 'fixtures/nested-configs/no-semicolon.js'}));
+	({results} = await xo.lintText('console.log(\'no-semicolon\')\n', {filePath: 'fixtures/nested-configs/no-semicolon.js'}));
 	t.true(hasRule(results, 'semi'));
 
-	({results} = xo.lintText(`console.log([
+	({results} = await xo.lintText(`console.log([
   2
-]);\n`, {filename: 'fixtures/nested-configs/child-override/two-spaces.js'}));
+]);\n`, {filePath: 'fixtures/nested-configs/child-override/two-spaces.js'}));
 	t.true(hasRule(results, 'indent'));
 });
 
-test('typescript files', t => {
-	let {results} = xo.lintText(`console.log([
+test('typescript files', async t => {
+	let {results} = await xo.lintText(`console.log([
   2
 ]);
-`, {filename: 'fixtures/typescript/two-spaces.tsx'});
+`, {filePath: 'fixtures/typescript/two-spaces.tsx'});
+
 	t.true(hasRule(results, '@typescript-eslint/indent'));
 
-	({results} = xo.lintText(`console.log([
+	({results} = await xo.lintText(`console.log([
   2
 ]);
-`, {filename: 'fixtures/typescript/two-spaces.tsx', space: 2}));
+`, {filePath: 'fixtures/typescript/two-spaces.tsx', space: 2}));
 	t.is(results[0].errorCount, 0);
 
-	({results} = xo.lintText('console.log(\'extra-semicolon\');;\n', {filename: 'fixtures/typescript/child/extra-semicolon.ts'}));
+	({results} = await xo.lintText('console.log(\'extra-semicolon\');;\n', {filePath: 'fixtures/typescript/child/extra-semicolon.ts'}));
 	t.true(hasRule(results, '@typescript-eslint/no-extra-semi'));
 
-	({results} = xo.lintText('console.log(\'no-semicolon\')\n', {filename: 'fixtures/typescript/child/no-semicolon.ts', semicolon: false}));
+	({results} = await xo.lintText('console.log(\'no-semicolon\')\n', {filePath: 'fixtures/typescript/child/no-semicolon.ts', semicolon: false}));
 	t.is(results[0].errorCount, 0);
 
-	({results} = xo.lintText(`console.log([
+	({results} = await xo.lintText(`console.log([
     4
 ]);
-`, {filename: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
+`, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
 	t.true(hasRule(results, '@typescript-eslint/indent'));
 
-	({results} = xo.lintText(`console.log([
+	({results} = await xo.lintText(`console.log([
     4
 ]);
-`, {filename: 'fixtures/typescript/child/sub-child/four-spaces.ts', space: 4}));
+`, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts', space: 4}));
 	t.is(results[0].errorCount, 0);
 });
 
-function configType(t, {dir}) {
-	const {results} = xo.lintText('var obj = { a: 1 };\n', {cwd: path.resolve('fixtures', 'config-files', dir), filename: 'file.js'});
+test('deprecated rules', async t => {
+	const {usedDeprecatedRules} = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n');
+
+	for (const {ruleId, replacedBy} of usedDeprecatedRules) {
+		t.is(typeof ruleId, 'string');
+		t.true(Array.isArray(replacedBy));
+	}
+});
+
+async function configType(t, {dir}) {
+	const {results} = await xo.lintText('var obj = { a: 1 };\n', {cwd: path.resolve('fixtures', 'config-files', dir), filePath: 'file.js'});
 	t.true(hasRule(results, 'no-var'));
 }
 
