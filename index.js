@@ -66,7 +66,7 @@ const getReportStatistics = results => {
 		fixableErrorCount,
 		fixableWarningCount
 	};
-}
+};
 
 const processReport = (report, {isQuiet = false} = {}) => {
 	if (isQuiet) {
