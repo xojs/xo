@@ -42,7 +42,7 @@ const mergeReports = reports => {
 	};
 };
 
-function getReportStatistics(results) {
+const getReportStatistics = results => {
 	let errorCount = 0;
 	let warningCount = 0;
 	let fixableErrorCount = 0;
