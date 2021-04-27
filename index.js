@@ -24,6 +24,7 @@ const {
 } = require('./lib/options-manager');
 
 const mergeReports = reports => {
+	// Merge multiple reports into a single report
 	let results = [];
 	let errorCount = 0;
 	let warningCount = 0;
