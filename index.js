@@ -24,24 +24,25 @@ const {
 } = require('./lib/options-manager');
 
 const mergeReports = reports => {
+	// Merge multiple reports into a single report
 	let results = [];
 	let errorCount = 0;
 	let warningCount = 0;
 
 	for (const report of reports) {
-		results = results.concat(...report.results);
+		results = results.concat(report.results);
 		errorCount += report.errorCount;
 		warningCount += report.warningCount;
 	}
 
 	return {
-		results,
 		errorCount,
-		warningCount
+		warningCount,
+		results
 	};
 };
 
-function getReportStatistics(results) {
+const getReportStatistics = results => {
 	let errorCount = 0;
 	let warningCount = 0;
 	let fixableErrorCount = 0;
@@ -65,7 +66,7 @@ function getReportStatistics(results) {
 		fixableErrorCount,
 		fixableWarningCount
 	};
-}
+};
 
 const processReport = (report, {isQuiet = false} = {}) => {
 	if (isQuiet) {
