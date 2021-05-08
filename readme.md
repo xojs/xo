@@ -260,7 +260,7 @@ Type: `object`
 
 Type: `string`
 
-ESLint parser. For example, [`babel-eslint`](https://github.com/babel/babel-eslint) if you're using language features that ESLint doesn't yet support.
+ESLint parser. For example, [`@babel/eslint-parser`](https://github.com/babel/babel/tree/main/eslint/babel-eslint-parser) if you're using language features that ESLint doesn't yet support.
 
 ### processor
 
