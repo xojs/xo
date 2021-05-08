@@ -2,19 +2,15 @@ import path from 'path';
 import test from 'ava';
 import omit from 'lodash/omit';
 import {readJson} from 'fs-extra';
-import proxyquire from 'proxyquire';
 import slash from 'slash';
 import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants';
 import parentConfig from './fixtures/nested/package.json';
 import childConfig from './fixtures/nested/child/package.json';
 import prettierConfig from './fixtures/prettier/package.json';
 import enginesConfig from './fixtures/engines/package.json';
+import manager from '../lib/options-manager';
 
 process.chdir(__dirname);
-
-const manager = proxyquire('../lib/options-manager', {
-	'resolve-from': (cwd, path) => `cwd/${path}`
-});
 
 test('normalizeOptions: makes all the options plural and arrays', t => {
 	const options = manager.normalizeOptions({
@@ -65,7 +61,7 @@ test('buildConfig: defaults', t => {
 	t.regex(slash(config.cacheLocation), /[\\/]\.cache\/xo-linter\/xo-cache.json[\\/]?$/u);
 	t.is(config.useEslintrc, false);
 	t.is(config.cache, true);
-	t.is(config.baseConfig.extends[0], 'xo');
+	t.true(config.baseConfig.extends[0].includes('eslint-config-xo'));
 });
 
 test('buildConfig: space: true', t => {
@@ -416,19 +412,13 @@ test('buildConfig: extends', t => {
 	const config = manager.buildConfig({
 		extends: [
 			'plugin:foo/bar',
-			'eslint-config-foo-bar',
-			'foo-bar-two',
-			'@foobar',
-			'@foobar/eslint-config'
+			'eslint-config-prettier'
 		]
 	});
 
-	t.deepEqual(config.baseConfig.extends.slice(-5), [
+	t.deepEqual(config.baseConfig.extends.slice(-2), [
 		'plugin:foo/bar',
-		'cwd/eslint-config-foo-bar',
-		'cwd/eslint-config-foo-bar-two',
-		'cwd/@foobar/eslint-config',
-		'cwd/@foobar/eslint-config'
+		path.resolve('../node_modules/eslint-config-prettier/index.js')
 	]);
 });
 
