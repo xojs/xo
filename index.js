@@ -23,49 +23,39 @@ const {
 	mergeOptions
 } = require('./lib/options-manager');
 
+/** Merge multiple reports into a single report */
 const mergeReports = reports => {
-	// Merge multiple reports into a single report
-	let results = [];
-	let errorCount = 0;
-	let warningCount = 0;
+	const report = {
+		results: [],
+		errorCount: 0,
+		warningCount: 0
+	};
 
-	for (const report of reports) {
-		results = results.concat(report.results);
-		errorCount += report.errorCount;
-		warningCount += report.warningCount;
+	for (const currentReport of reports) {
+		report.results = results.concat(currentReport.results);
+		report.errorCount += currentReport.errorCount;
+		report.warningCount += currentReport.warningCount;
 	}
 
-	return {
-		errorCount,
-		warningCount,
-		results
-	};
+	return report;
 };
 
 const getReportStatistics = results => {
-	let errorCount = 0;
-	let warningCount = 0;
-	let fixableErrorCount = 0;
-	let fixableWarningCount = 0;
+	const statistics = {
+		errorCount: 0,
+		warningCount: 0,
+		fixableErrorCount: 0,
+		fixableWarningCount: 0
+	};
 
-	for (const {
-		errorCount: currentErrorCount,
-		warningCount: currentWarningCount,
-		fixableErrorCount: currentFixableErrorCount,
-		fixableWarningCount: currentFixableWarningCount
-	} of results) {
-		errorCount += currentErrorCount;
-		warningCount += currentWarningCount;
-		fixableErrorCount += currentFixableErrorCount;
-		fixableWarningCount += currentFixableWarningCount;
+	for (const result of results) {
+		statistics.errorCount += result.errorCount;
+		statistics.warningCount += result.warningCount;
+		statistics.fixableErrorCount += result.fixableErrorCount;
+		statistics.fixableWarningCount += result.fixableWarningCount;
 	}
 
-	return {
-		errorCount,
-		warningCount,
-		fixableErrorCount,
-		fixableWarningCount
-	};
+	return statistics;
 };
 
 const processReport = (report, {isQuiet = false} = {}) => {
