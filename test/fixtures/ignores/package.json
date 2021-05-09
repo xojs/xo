@@ -4,6 +4,10 @@
 	"xo": {
 		"ignore": [
 			"!dist/**"
-		]
+		],
+		"rules": {
+			"unicorn/prefer-module": "off",
+			"unicorn/prefer-node-protocol": "off"
+		}
 	}
 }

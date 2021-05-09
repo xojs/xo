@@ -198,10 +198,7 @@ module.exports = {
 				}
 			}
 		],
-
-		// Disabled as it causes problems with TypeScript when you use mixed ESM and CommonJS.
-		// TODO: Enable again when I target only ESM.
-		// 'import/first': 'error',
+		'import/first': 'error',
 
 		// Disabled as it doesn't work with TypeScript.
 		// This issue and some others: https://github.com/benmosher/eslint-plugin-import/issues/1341
@@ -218,10 +215,12 @@ module.exports = {
 		'import/no-named-default': 'error',
 		'import/no-webpack-loader-syntax': 'error',
 		'import/no-self-import': 'error',
-
-		// Enable this sometime in the future when Node.js has ES2015 module support
-		// 'import/no-cycle': 'error'
-
+		'import/no-cycle': [
+			'error',
+			{
+				ignoreExternal: true
+			}
+		],
 		'import/no-useless-path-segments': 'error',
 
 		// Disabled as it doesn't work with TypeScript
@@ -230,10 +229,7 @@ module.exports = {
 		'import/no-amd': 'error',
 		'import/no-duplicates': 'error',
 
-		// Enable this sometime in the future when Node.js has ES2015 module support
-		// 'import/unambiguous': 'error',
-
-		// Enable this sometime in the future when Node.js has ES2015 module support
+		// We use `unicorn/prefer-module` instead.
 		// 'import/no-commonjs': 'error',
 
 		// Looks useful, but too unstable at the moment
@@ -252,9 +248,7 @@ module.exports = {
 		// 	}
 		// ],
 
-		// Disabled because of https://github.com/benmosher/eslint-plugin-import/pull/1651 and other issues.
-		// 'import/order': 'error',
-
+		'import/order': 'error',
 		'import/no-unassigned-import': [
 			'error',
 			{
@@ -277,7 +271,7 @@ module.exports = {
 		// 'node/no-extraneous-require': 'error',
 
 		// Redundant with `import/no-unresolved`.
-		// 'node/no-missing-import': 'error',
+		// 'node/no-missing-import': 'error', // This rule is also buggy and doesn't support `node:`.
 		// 'node/no-missing-require': 'error',
 
 		'node/no-unpublished-bin': 'error',
@@ -329,13 +323,6 @@ module.exports = {
 		// 'node/shebang': 'error',
 
 		'node/no-deprecated-api': 'error',
-
-		// Disabled because it causes too much churn and will be moot when we switch to ES2015 modules
-		// 'node/exports-style': [
-		// 	'error',
-		// 	'module.exports'
-		// ]
-
 		'node/prefer-global/buffer': [
 			'error',
 			'always'
@@ -356,7 +343,6 @@ module.exports = {
 			'error',
 			'always'
 		],
-
 		'node/prefer-global/url-search-params': [
 			'error',
 			'always'

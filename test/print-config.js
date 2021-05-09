@@ -2,7 +2,7 @@ import path from 'path';
 import test from 'ava';
 import execa from 'execa';
 import tempWrite from 'temp-write';
-import xo from '..';
+import xo from '../index.js';
 
 process.chdir(__dirname);
 

@@ -1,7 +1,7 @@
 import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
-import xo from '..';
+import xo from '../index.js';
 
 process.chdir(__dirname);
 

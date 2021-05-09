@@ -5,8 +5,8 @@ const getStdin = require('get-stdin');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
 const semver = require('semver');
-const openReport = require('./lib/open-report');
-const xo = require('.');
+const openReport = require('./lib/open-report.js');
+const xo = require('./index.js');
 
 const cli = meow(`
 	Usage
@@ -130,7 +130,7 @@ for (const key in options) {
 // Check for string type because `xo --no-space` sets `options.space` to `false`
 if (typeof options.space === 'string') {
 	if (/^\d+$/u.test(options.space)) {
-		options.space = parseInt(options.space, 10);
+		options.space = Number.parseInt(options.space, 10);
 	} else if (options.space === 'true') {
 		options.space = true;
 	} else if (options.space === 'false') {

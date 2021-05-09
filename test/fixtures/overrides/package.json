@@ -13,8 +13,10 @@
 			}
 		],
 		"rules": {
-			"import/no-extraneous-dependencies": 0,
-			"ava/no-ignored-test-files": 0
+			"import/no-extraneous-dependencies": "off",
+			"ava/no-ignored-test-files": "off",
+			"unicorn/prefer-module": "off",
+			"unicorn/prefer-node-protocol": "off"
 		}
 	}
 }

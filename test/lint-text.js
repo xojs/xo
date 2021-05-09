@@ -1,12 +1,10 @@
-import fs from 'fs';
+import {promises as fs} from 'fs';
 import path from 'path';
 import test from 'ava';
-import pify from 'pify';
-import xo from '..';
+import xo from '../index.js';
 
 process.chdir(__dirname);
 
-const readFile = pify(fs.readFile);
 const hasRule = (results, expectedRuleId) => results[0].messages.some(({ruleId}) => ruleId === expectedRuleId);
 
 test('.lintText()', async t => {
@@ -49,7 +47,11 @@ test('respect overrides', async t => {
 				files: ['ignored/**/*.js'],
 				ignores: []
 			}
-		]
+		],
+		rules: {
+			'unicorn/prefer-module': 'off',
+			'unicorn/prefer-node-protocol': 'off'
+		}
 	});
 	t.is(result.errorCount, 1);
 	t.is(result.warningCount, 0);
@@ -134,29 +136,29 @@ test('regression test for #71', async t => {
 test('lintText() - overrides support', async t => {
 	const cwd = path.join(__dirname, 'fixtures/overrides');
 	const bar = path.join(cwd, 'test/bar.js');
-	const {results: barResults} = await xo.lintText(await readFile(bar, 'utf8'), {filePath: bar, cwd});
+	const {results: barResults} = await xo.lintText(await fs.readFile(bar, 'utf8'), {filePath: bar, cwd});
 	t.is(barResults[0].errorCount, 0);
 
 	const foo = path.join(cwd, 'test/foo.js');
-	const {results: fooResults} = await xo.lintText(await readFile(foo, 'utf8'), {filePath: foo, cwd});
+	const {results: fooResults} = await xo.lintText(await fs.readFile(foo, 'utf8'), {filePath: foo, cwd});
 	t.is(fooResults[0].errorCount, 0);
 
 	const index = path.join(cwd, 'test/index.js');
-	const {results: indexResults} = await xo.lintText(await readFile(bar, 'utf8'), {filePath: index, cwd});
+	const {results: indexResults} = await xo.lintText(await fs.readFile(bar, 'utf8'), {filePath: index, cwd});
 	t.is(indexResults[0].errorCount, 0);
 });
 
 test('do not lint gitignored files if filename is given', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
 	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
-	const ignored = await readFile(ignoredPath, 'utf8');
+	const ignored = await fs.readFile(ignoredPath, 'utf8');
 	const {results} = await xo.lintText(ignored, {filePath: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
 
 test('lint gitignored files if filename is not given', async t => {
 	const ignoredPath = path.resolve('fixtures/gitignore/test/foo.js');
-	const ignored = await readFile(ignoredPath, 'utf8');
+	const ignored = await fs.readFile(ignoredPath, 'utf8');
 	const {results} = await xo.lintText(ignored);
 	t.true(results[0].errorCount > 0);
 });
@@ -164,7 +166,7 @@ test('lint gitignored files if filename is not given', async t => {
 test('do not lint gitignored files in file with negative gitignores', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
 	const ignoredPath = path.resolve('fixtures/negative-gitignore/bar.js');
-	const ignored = await readFile(ignoredPath, 'utf8');
+	const ignored = await fs.readFile(ignoredPath, 'utf8');
 	const {results} = await xo.lintText(ignored, {filePath: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
@@ -172,7 +174,7 @@ test('do not lint gitignored files in file with negative gitignores', async t =>
 test('multiple negative patterns should act as positive patterns', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'gitignore-multiple-negation');
 	const filePath = path.join(cwd, '!!!unicorn.js');
-	const text = await readFile(filePath, 'utf8');
+	const text = await fs.readFile(filePath, 'utf8');
 	const {results} = await xo.lintText(text, {filePath, cwd});
 	t.is(results[0].errorCount, 0);
 });
@@ -188,14 +190,14 @@ test('lint negatively gitignored files', async t => {
 test('do not lint eslintignored files if filename is given', async t => {
 	const cwd = path.join(__dirname, 'fixtures/eslintignore');
 	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
-	const ignored = await readFile(ignoredPath, 'utf8');
+	const ignored = await fs.readFile(ignoredPath, 'utf8');
 	const {results} = await xo.lintText(ignored, {filePath: ignoredPath, cwd});
 	t.is(results[0].errorCount, 0);
 });
 
 test('lint eslintignored files if filename is not given', async t => {
 	const ignoredPath = path.resolve('fixtures/eslintignore/bar.js');
-	const ignored = await readFile(ignoredPath, 'utf8');
+	const ignored = await fs.readFile(ignoredPath, 'utf8');
 	const {results} = await xo.lintText(ignored);
 	t.true(results[0].errorCount > 0);
 });
@@ -203,7 +205,7 @@ test('lint eslintignored files if filename is not given', async t => {
 test('enable rules based on nodeVersion', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filePath = path.join(cwd, 'promise-then.js');
-	const text = await readFile(filePath, 'utf8');
+	const text = await fs.readFile(filePath, 'utf8');
 
 	let {results} = await xo.lintText(text, {nodeVersion: '>=8.0.0'});
 	t.true(hasRule(results, 'promise/prefer-await-to-then'));
@@ -215,7 +217,7 @@ test('enable rules based on nodeVersion', async t => {
 test('enable rules based on nodeVersion in override', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filePath = path.join(cwd, 'promise-then.js');
-	const text = await readFile(filePath, 'utf8');
+	const text = await fs.readFile(filePath, 'utf8');
 
 	let {results} = await xo.lintText(text, {
 		nodeVersion: '>=8.0.0',

@@ -1,6 +1,6 @@
 import path from 'path';
 import test from 'ava';
-import xo from '..';
+import xo from '../index.js';
 
 process.chdir(__dirname);
 
@@ -220,7 +220,7 @@ test('webpack import resolver is used if webpack.config.js is found', async t =>
 		}
 	});
 
-	t.is(results[0].errorCount, 1);
+	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
 
 	const errorMessage = results[0].messages[0].message;
 	t.truthy(/Unable to resolve path to module 'inexistent'/.exec(errorMessage));
@@ -245,7 +245,7 @@ test('webpack import resolver config can be passed through webpack option', asyn
 		}
 	});
 
-	t.is(results[0].errorCount, 1);
+	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
 });
 
 test('webpack import resolver is used if {webpack: true}', async t => {

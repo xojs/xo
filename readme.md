@@ -11,13 +11,11 @@
 [![Coverage Status](https://codecov.io/gh/xojs/xo/branch/main/graph/badge.svg)](https://codecov.io/gh/xojs/xo/branch/main)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 
-Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` or `.jshintrc` to manage. It just works!
+Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` to manage. It just works!
 
-Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should be opened over [there](https://github.com/eslint/eslint/issues).
+It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
-*JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting.*
-
-*Vue components are not supported by default. You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
+**XO requires your project to be [ESM](https://blog.sindresorhus.com/hello-modules-d1010b4e777b).**
 
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/main/screenshot.png)
 
@@ -44,6 +42,8 @@ Uses [ESLint](https://eslint.org) underneath, so issues regarding rules should b
 ```
 $ npm install --global xo
 ```
+
+*JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting. Vue components are not supported by default. You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
 
 ## Usage
 
@@ -165,7 +165,7 @@ module.exports = {
 ### envs
 
 Type: `string[]`\
-Default: `['es2020', 'node']`
+Default: `['es2021', 'node']`
 
 Which [environments](https://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
 
@@ -279,17 +279,11 @@ Set this to a boolean to explicitly enable or disable the resolver.
 
 Setting this to an object enables the resolver and passes the object as configuration. See the [resolver readme](https://github.com/benmosher/eslint-plugin-import/blob/master/resolvers/webpack/README.md) along with the [webpack documentation](https://webpack.js.org/configuration/resolve/) for more information.
 
-## TypeScript and Flow
-
-### TypeScript
+## TypeScript
 
 XO will automatically lint TypeScript files (`.ts`, `.d.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
 
 XO will handle the [@typescript-eslint/parser `project` option](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser#parseroptionsproject) automatically even if you don't have a `tsconfig.json` in your project.
-
-### Flow
-
-See [eslint-config-xo-flow#use-with-xo](https://github.com/xojs/eslint-config-xo-flow#use-with-xo)
 
 ## GitHub Actions
 
@@ -363,7 +357,7 @@ For example, if your project targets Node.js 8 but you want to use the latest Ja
 ```json
 {
 	"engines": {
-		"node": ">=8"
+		"node": ">=12"
 	},
 	"scripts": {
 		"build": "babel src --out-dir dist"
@@ -374,14 +368,14 @@ For example, if your project targets Node.js 8 but you want to use the latest Ja
 		"overrides": [
 			{
 				"files": "{src}/**/*.js",
-				"nodeVersion": ">=12"
+				"nodeVersion": ">=16"
 			}
 		]
 	}
 }
 ```
 
-This way your `package.json` will contain the actual minimum Node.js version supported by your published code, but XO will lint your source code as if it targets Node.js 12.
+This way your `package.json` will contain the actual minimum Node.js version supported by your published code, but XO will lint your source code as if it targets Node.js 16.
 
 ### Including files ignored by default
 
@@ -440,7 +434,6 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
 - [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
 - [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript
-- [eslint-config-xo-flow](https://github.com/xojs/eslint-config-xo-flow) - ESLint shareable config for Flow
 
 ## Support
 
@@ -463,11 +456,11 @@ You can also find some nice dynamic XO badges on [badgen.net](https://badgen.net
 
 ## Team
 
-[![Sindre Sorhus](https://github.com/sindresorhus.png?size=130)](https://sindresorhus.com) | [![Mario Nebl](https://github.com/marionebl.png?size=130)](https://github.com/marionebl) | [![Pierre Vanduynslager](https://github.com/pvdlg.png?size=130)](https://github.com/pvdlg)
----|---|---
-[Sindre Sorhus](https://sindresorhus.com) | [Mario Nebl](https://github.com/marionebl) | [Pierre Vanduynslager](https://github.com/pvdlg)
+- [Sindre Sorhus](https://github.com/sindresorhus)
 
 ###### Former
 
 - [James Talmage](https://github.com/jamestalmage)
 - [Michael Mayer](https://github.com/schnittstabil)
+- [Mario Nebl](https://github.com/marionebl)
+- [Pierre Vanduynslager](https://github.com/pvdlg)
