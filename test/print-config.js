@@ -13,8 +13,8 @@ const hasPrintConfigGlobal = config => Object.keys(config.globals).includes('pri
 
 test('getConfig', async t => {
 	const filepath = await tempWrite('console.log()\n', 'x.js');
-	const options = {filename: filepath, globals: ['printConfig']};
-	const result = xo.getConfig(options);
+	const options = {filePath: filepath, globals: ['printConfig']};
+	const result = await xo.getConfig(options);
 	t.true(hasUnicornPlugin(result) && hasPrintConfigGlobal(result));
 });
 

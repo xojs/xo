@@ -149,8 +149,8 @@ if (process.env.GITHUB_ACTIONS && !options.fix && !options.reporter) {
 	options.quiet = true;
 }
 
-const log = report => {
-	const reporter = options.reporter || process.env.GITHUB_ACTIONS ? xo.getFormatter(options.reporter || 'compact') : formatterPretty;
+const log = async report => {
+	const reporter = options.reporter || process.env.GITHUB_ACTIONS ? await xo.getFormatter(options.reporter || 'compact') : formatterPretty;
 	process.stdout.write(reporter(report.results));
 	process.exitCode = report.errorCount === 0 ? 0 : 1;
 };
@@ -186,18 +186,18 @@ if (options.nodeVersion) {
 			process.exit(1);
 		}
 
-		options.filename = options.printConfig;
-		const config = xo.getConfig(options);
+		options.filePath = options.printConfig;
+		const config = await xo.getConfig(options);
 		console.log(JSON.stringify(config, undefined, '\t'));
 	} else if (options.stdin) {
 		const stdin = await getStdin();
 
 		if (options.stdinFilename) {
-			options.filename = options.stdinFilename;
+			options.filePath = options.stdinFilename;
 		}
 
 		if (options.fix) {
-			const result = xo.lintText(stdin, options).results[0];
+			const {results: [result]} = await xo.lintText(stdin, options);
 			// If there is no output, pass the stdin back out
 			process.stdout.write((result && result.output) || stdin);
 			return;
@@ -208,18 +208,18 @@ if (options.nodeVersion) {
 			process.exit(1);
 		}
 
-		log(xo.lintText(stdin, options));
+		await log(await xo.lintText(stdin, options));
 	} else {
 		const report = await xo.lintFiles(input, options);
 
 		if (options.fix) {
-			xo.outputFixes(report);
+			await xo.outputFixes(report);
 		}
 
 		if (options.open) {
 			openReport(report);
 		}
 
-		log(report);
+		await log(report);
 	}
 })();
