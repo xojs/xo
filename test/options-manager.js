@@ -447,6 +447,16 @@ test('buildConfig: typescript with parserOption', t => {
 	});
 });
 
+test('buildConfig: parserOptions', t => {
+	const config = manager.buildConfig({
+		parserOptions: {
+			sourceType: 'script'
+		}
+	});
+
+	t.is(config.baseConfig.parserOptions.sourceType, 'script');
+});
+
 test('findApplicableOverrides', t => {
 	const result = manager.findApplicableOverrides('/user/dir/foo.js', [
 		{files: '**/f*.js'},
