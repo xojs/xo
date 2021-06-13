@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 'use strict';
-const updateNotifier = require('update-notifier');
 const getStdin = require('get-stdin');
 const meow = require('meow');
 const formatterPretty = require('eslint-formatter-pretty');
@@ -112,8 +111,6 @@ const cli = meow(`
 		}
 	}
 });
-
-updateNotifier({pkg: cli.pkg}).notify();
 
 const {input, flags: options, showVersion} = cli;
 
