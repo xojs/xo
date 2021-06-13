@@ -118,13 +118,13 @@ const lintText = async (string, inputOptions = {}) => {
 	const {filePath, warnIgnored, ...opts} = options;
 	const engine = new ESLint(opts);
 
-	if (options.filePath) {
-		const filename = path.relative(options.cwd, options.filePath);
+	if (filePath) {
+		const filename = path.relative(options.cwd, filePath);
 
 		if (
 			micromatch.isMatch(filename, options.baseConfig.ignorePatterns) ||
-			globby.gitignore.sync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(options.filePath) ||
-			await engine.isPathIgnored(options.filePath)
+			globby.gitignore.sync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath) ||
+			await engine.isPathIgnored(filePath)
 		) {
 			return {
 				errorCount: 0,
