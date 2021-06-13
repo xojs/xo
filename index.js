@@ -3,9 +3,6 @@ const path = require('path');
 const {ESLint} = require('eslint');
 const globby = require('globby');
 const isEqual = require('lodash/isEqual');
-const uniq = require('lodash/uniq');
-const pick = require('lodash/pick');
-const omit = require('lodash/omit');
 const micromatch = require('micromatch');
 const arrify = require('arrify');
 const pReduce = require('p-reduce');
@@ -13,7 +10,7 @@ const pMap = require('p-map');
 const {cosmiconfig, defaultLoaders} = require('cosmiconfig');
 const defineLazyProperty = require('define-lazy-prop');
 const pFilter = require('p-filter');
-const {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES, LINT_METHOD_OPTIONS} = require('./lib/constants');
+const {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES} = require('./lib/constants');
 const {
 	normalizeOptions,
 	getIgnores,
@@ -105,8 +102,9 @@ const globFiles = async (patterns, {ignores, extensions, cwd}) => (
 const getConfig = async options => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
 	options = buildConfig(foundOptions, prettierOptions);
-	const engine = new ESLint(omit(options, LINT_METHOD_OPTIONS));
-	return engine.calculateConfigForFile(options.filePath);
+	const {filePath, warnIgnored, ...opts} = options;
+	const engine = new ESLint(opts);
+	return engine.calculateConfigForFile(filePath);
 };
 
 const lintText = async (string, inputOptions = {}) => {
@@ -117,7 +115,8 @@ const lintText = async (string, inputOptions = {}) => {
 		throw new Error('The `ignores` option requires the `filePath` option to be defined.');
 	}
 
-	const engine = new ESLint(omit(options, LINT_METHOD_OPTIONS));
+	const {filePath, warnIgnored, ...opts} = options;
+	const engine = new ESLint(opts);
 
 	if (options.filePath) {
 		const filename = path.relative(options.cwd, options.filePath);
@@ -140,7 +139,7 @@ const lintText = async (string, inputOptions = {}) => {
 		}
 	}
 
-	const report = await engine.lintText(string, pick(options, LINT_METHOD_OPTIONS));
+	const report = await engine.lintText(string, {filePath, warnIgnored});
 
 	return processReport(report, {isQuiet: inputOptions.quiet});
 };
@@ -164,7 +163,7 @@ const lintFiles = async (patterns, inputOptions = {}) => {
 			[]) :
 		await globFiles(patterns, mergeOptions(inputOptions));
 
-	return mergeReports(await pMap(await mergeWithFileConfigs(uniq(paths), inputOptions, configFiles), async ({files, options, prettierOptions}) => runEslint(files, buildConfig(options, prettierOptions), {isQuiet: options.quiet})));
+	return mergeReports(await pMap(await mergeWithFileConfigs([...new Set(paths)], inputOptions, configFiles), async ({files, options, prettierOptions}) => runEslint(files, buildConfig(options, prettierOptions), {isQuiet: options.quiet})));
 };
 
 const getFormatter = async name => {
