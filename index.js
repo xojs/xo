@@ -101,9 +101,8 @@ const globFiles = async (patterns, {ignores, extensions, cwd}) => (
 
 const getConfig = async options => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
-	options = buildConfig(foundOptions, prettierOptions);
-	const {filePath, warnIgnored, ...opts} = options;
-	const engine = new ESLint(opts);
+	const {filePath, warnIgnored, ...eslintOptions} = buildConfig(foundOptions, prettierOptions);
+	const engine = new ESLint(eslintOptions);
 	return engine.calculateConfigForFile(filePath);
 };
 
@@ -115,8 +114,8 @@ const lintText = async (string, inputOptions = {}) => {
 		throw new Error('The `ignores` option requires the `filePath` option to be defined.');
 	}
 
-	const {filePath, warnIgnored, ...opts} = options;
-	const engine = new ESLint(opts);
+	const {filePath, warnIgnored, ...eslintOptions} = options;
+	const engine = new ESLint(eslintOptions);
 
 	if (filePath) {
 		const filename = path.relative(options.cwd, filePath);
