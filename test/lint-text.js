@@ -324,6 +324,8 @@ async function configType(t, {dir}) {
 configType.title = (_, {type}) => `load config from ${type}`.trim();
 
 test(configType, {type: 'xo.config.js', dir: 'xo-config_js'});
+test(configType, {type: 'xo.config.cjs', dir: 'xo-config_cjs'});
 test(configType, {type: '.xo-config.js', dir: 'xo-config_js'});
+test(configType, {type: '.xo-config.cjs', dir: 'xo-config_cjs'});
 test(configType, {type: '.xo-config.json', dir: 'xo-config_json'});
 test(configType, {type: '.xo-config', dir: 'xo-config'});

@@ -160,6 +160,14 @@ module.exports = {
 };
 ```
 
+4. For [ECMAScript module (ESM)](https://nodejs.org/api/esm.html) packages with [`"type": "module"`](https://nodejs.org/api/packages.html#packages_type), as a JavaScript module in `.xo-config.cjs` or `xo.config.cjs`:
+
+```js
+module.exports = {
+	space: true
+};
+```
+
 [Globals](https://eslint.org/docs/user-guide/configuring#specifying-globals) and [rules](https://eslint.org/docs/user-guide/configuring#configuring-rules) can be configured inline in files.
 
 ### envs
