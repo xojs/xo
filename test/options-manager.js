@@ -462,6 +462,17 @@ test('buildConfig: parserOptions', t => {
 	t.is(config.baseConfig.parserOptions.sourceType, 'script');
 });
 
+test('buildConfig: prevents useEslintrc option', t => {
+	t.throws(() => {
+		manager.buildConfig({
+			useEslintrc: true
+		});
+	}, {
+		instanceOf: Error,
+		message: 'The `useEslintrc` option is not supported'
+	});
+});
+
 test('findApplicableOverrides', t => {
 	const result = manager.findApplicableOverrides('/user/dir/foo.js', [
 		{files: '**/f*.js'},
