@@ -461,7 +461,7 @@ test('buildConfig: prevents useEslintrc option', t => {
 	t.throws(() => {
 		manager.buildConfig({
 			useEslintrc: true
-		})
+		});
 	}, {
 		instanceOf: Error,
 		message: 'The `useEslintrc` option is not supported'
