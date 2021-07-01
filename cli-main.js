@@ -45,7 +45,6 @@ const cli = meow(`
 	  - Add XO to your project with \`npm init xo\`.
 	  - Put options in package.json instead of using flags so other tools can read it.
 `, {
-	importMeta: import.meta,
 	autoVersion: false,
 	booleanDefault: undefined,
 	flags: {
