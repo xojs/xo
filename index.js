@@ -1,24 +1,23 @@
-'use strict';
-const path = require('path');
-const {ESLint} = require('eslint');
-const globby = require('globby');
-const isEqual = require('lodash/isEqual');
-const micromatch = require('micromatch');
-const arrify = require('arrify');
-const pReduce = require('p-reduce');
-const pMap = require('p-map');
-const {cosmiconfig, defaultLoaders} = require('cosmiconfig');
-const defineLazyProperty = require('define-lazy-prop');
-const pFilter = require('p-filter');
-const {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES} = require('./lib/constants');
-const {
+import path from 'path';
+import {ESLint} from 'eslint';
+import globby from 'globby';
+import {isEqual} from 'lodash-es';
+import micromatch from 'micromatch';
+import arrify from 'arrify';
+import pReduce from 'p-reduce';
+import pMap from 'p-map';
+import {cosmiconfig, defaultLoaders} from 'cosmiconfig';
+import defineLazyProperty from 'define-lazy-prop';
+import pFilter from 'p-filter';
+import {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES} from './lib/constants.js';
+import {
 	normalizeOptions,
 	getIgnores,
 	mergeWithFileConfig,
 	mergeWithFileConfigs,
 	buildConfig,
 	mergeOptions
-} = require('./lib/options-manager');
+} from './lib/options-manager.js';
 
 /** Merge multiple reports into a single report */
 const mergeReports = reports => {
@@ -170,7 +169,7 @@ const getFormatter = async name => {
 	return format;
 };
 
-module.exports = {
+export default {
 	getFormatter,
 	getErrorResults: ESLint.getErrorResults,
 	outputFixes: async ({results}) => ESLint.outputFixes(results),

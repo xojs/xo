@@ -2,11 +2,13 @@ import path from 'path';
 import test from 'ava';
 import execa from 'execa';
 import tempWrite from 'temp-write';
+import createEsmUtils from 'esm-utils';
 import xo from '../index.js';
 
+const {__dirname} = createEsmUtils(import.meta);
 process.chdir(__dirname);
 
-const main = (arguments_, options) => execa(path.join(__dirname, '../cli-main.js'), arguments_, options);
+const main = (arguments_, options) => execa(path.join(__dirname, '../cli.js'), arguments_, options);
 
 const hasUnicornPlugin = config => config.plugins.includes('unicorn');
 const hasPrintConfigGlobal = config => Object.keys(config.globals).includes('printConfig');
