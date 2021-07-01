@@ -278,14 +278,14 @@ test('find configurations close to linted file', async t => {
 
 test('typescript files', async t => {
 	let {results} = await xo.lintText(`console.log([
-  2
+  2,
 ]);
 `, {filePath: 'fixtures/typescript/two-spaces.tsx'});
 
 	t.true(hasRule(results, '@typescript-eslint/indent'));
 
 	({results} = await xo.lintText(`console.log([
-  2
+  2,
 ]);
 `, {filePath: 'fixtures/typescript/two-spaces.tsx', space: 2}));
 	t.is(results[0].errorCount, 0);
@@ -297,13 +297,13 @@ test('typescript files', async t => {
 	t.is(results[0].errorCount, 0);
 
 	({results} = await xo.lintText(`console.log([
-    4
+    4,
 ]);
 `, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
 	t.true(hasRule(results, '@typescript-eslint/indent'));
 
 	({results} = await xo.lintText(`console.log([
-    4
+    4,
 ]);
 `, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts', space: 4}));
 	t.is(results[0].errorCount, 0);
