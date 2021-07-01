@@ -72,7 +72,7 @@
 		"eslint-plugin-node": "^11.1.0",
 		"eslint-plugin-prettier": "^3.4.0",
 		"eslint-plugin-promise": "^5.1.0",
-		"eslint-plugin-unicorn": "^32.0.0",
+		"eslint-plugin-unicorn": "^34.0.1",
 		"esm-utils": "^1.1.0",
 		"find-cache-dir": "^3.3.1",
 		"find-up": "^5.0.0",
@@ -109,11 +109,7 @@
 		"webpack": "^5.41.1"
 	},
 	"eslintConfig": {
-		"extends": "eslint-config-xo",
-		"rules": {
-			"unicorn/prefer-module": "off",
-			"unicorn/prefer-node-protocol": "off"
-		}
+		"extends": "eslint-config-xo"
 	},
 	"eslintIgnore": [
 		"test/fixtures"
