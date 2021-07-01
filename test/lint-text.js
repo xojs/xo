@@ -16,7 +16,7 @@ test('.lintText()', async t => {
 
 test('default `ignores`', async t => {
 	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
-		filePath: 'node_modules/ignored/index.js'
+		filePath: 'node_modules/ignored/index.js',
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
@@ -25,7 +25,7 @@ test('default `ignores`', async t => {
 test('`ignores` option', async t => {
 	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 		filePath: 'ignored/index.js',
-		ignores: ['ignored/**/*.js']
+		ignores: ['ignored/**/*.js'],
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
@@ -34,7 +34,7 @@ test('`ignores` option', async t => {
 test('`ignores` option without cwd', async t => {
 	const result = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
 		filePath: 'ignored/index.js',
-		ignores: ['ignored/**/*.js']
+		ignores: ['ignored/**/*.js'],
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
@@ -47,13 +47,13 @@ test('respect overrides', async t => {
 		overrides: [
 			{
 				files: ['ignored/**/*.js'],
-				ignores: []
-			}
+				ignores: [],
+			},
 		],
 		rules: {
 			'unicorn/prefer-module': 'off',
-			'unicorn/prefer-node-protocol': 'off'
-		}
+			'unicorn/prefer-node-protocol': 'off',
+		},
 	});
 	t.is(result.errorCount, 1);
 	t.is(result.warningCount, 0);
@@ -65,9 +65,9 @@ test('overriden ignore', async t => {
 		overrides: [
 			{
 				files: ['unignored.js'],
-				ignores: ['unignored.js']
-			}
-		]
+				ignores: ['unignored.js'],
+			},
+		],
 	});
 	t.is(result.errorCount, 0);
 	t.is(result.warningCount, 0);
@@ -76,7 +76,7 @@ test('overriden ignore', async t => {
 test('`ignores` option without filename', async t => {
 	await t.throwsAsync(async () => {
 		await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n', {
-			ignores: ['ignored/**/*.js']
+			ignores: ['ignored/**/*.js'],
 		});
 	}, {message: /The `ignores` option requires the `filePath` option to be defined./u});
 });
@@ -89,7 +89,7 @@ test('JSX support', async t => {
 test('plugin support', async t => {
 	const {results} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
 		plugins: ['react'],
-		rules: {'react/jsx-no-undef': 'error'}
+		rules: {'react/jsx-no-undef': 'error'},
 	});
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
@@ -101,7 +101,7 @@ test('prevent use of extended native objects', async t => {
 
 test('extends support', async t => {
 	const {results} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
-		extends: 'xo-react'
+		extends: 'xo-react',
 	});
 	t.true(hasRule(results, 'react/jsx-no-undef'));
 });
@@ -130,7 +130,7 @@ test('extends `react` support with `prettier` option', async t => {
 
 test('regression test for #71', async t => {
 	const {results} = await xo.lintText('const foo = { key: \'value\' };\nconsole.log(foo);\n', {
-		extends: path.join(__dirname, 'fixtures/extends.js')
+		extends: path.join(__dirname, 'fixtures/extends.js'),
 	});
 	t.is(results[0].errorCount, 0);
 });
@@ -227,9 +227,9 @@ test('enable rules based on nodeVersion in override', async t => {
 		overrides: [
 			{
 				files: 'promise-*.js',
-				nodeVersion: '>=6.0.0'
-			}
-		]
+				nodeVersion: '>=6.0.0',
+			},
+		],
 	});
 	t.false(hasRule(results, 'promise/prefer-await-to-then'));
 
@@ -239,9 +239,9 @@ test('enable rules based on nodeVersion in override', async t => {
 		overrides: [
 			{
 				files: 'promise-*.js',
-				nodeVersion: '>=8.0.0'
-			}
-		]
+				nodeVersion: '>=8.0.0',
+			},
+		],
 	}));
 	t.true(hasRule(results, 'promise/prefer-await-to-then'));
 });
@@ -278,14 +278,14 @@ test('find configurations close to linted file', async t => {
 
 test('typescript files', async t => {
 	let {results} = await xo.lintText(`console.log([
-  2
+  2,
 ]);
 `, {filePath: 'fixtures/typescript/two-spaces.tsx'});
 
 	t.true(hasRule(results, '@typescript-eslint/indent'));
 
 	({results} = await xo.lintText(`console.log([
-  2
+  2,
 ]);
 `, {filePath: 'fixtures/typescript/two-spaces.tsx', space: 2}));
 	t.is(results[0].errorCount, 0);
@@ -297,13 +297,13 @@ test('typescript files', async t => {
 	t.is(results[0].errorCount, 0);
 
 	({results} = await xo.lintText(`console.log([
-    4
+    4,
 ]);
 `, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
 	t.true(hasRule(results, '@typescript-eslint/indent'));
 
 	({results} = await xo.lintText(`console.log([
-    4
+    4,
 ]);
 `, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts', space: 4}));
 	t.is(results[0].errorCount, 0);

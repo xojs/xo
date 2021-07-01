@@ -16,7 +16,7 @@ test.skip('opens nothing when there are no errors nor warnings', async t => {
 			if (files.length !== 0) {
 				t.fail();
 			}
-		}
+		},
 	});
 
 	openReport(results);
@@ -31,24 +31,24 @@ test.skip('only opens errors if there are errors and warnings', async t => {
 		{
 			file: path.join(__dirname, 'fixtures/open-report/errors/one.js'),
 			line: 1,
-			column: 7
+			column: 7,
 		},
 		{
 			file: path.join(__dirname, 'fixtures/open-report/errors/two-with-warnings.js'),
 			line: 1,
-			column: 1
+			column: 1,
 		},
 		{
 			file: path.join(__dirname, 'fixtures/open-report/errors/three.js'),
 			line: 1,
-			column: 7
-		}
+			column: 7,
+		},
 	];
 
 	const openReport = proxyquire('../lib/open-report', {
 		'open-editor': files => {
 			t.deepEqual(files, expected);
-		}
+		},
 	});
 	openReport(results);
 });
@@ -61,12 +61,12 @@ test.skip('if a file has errors and warnings, it opens the first error', async t
 		{
 			file: path.join(__dirname, 'fixtures/open-report/errors/two-with-warnings.js'),
 			line: 1,
-			column: 1
-		}
+			column: 1,
+		},
 	];
 
 	const openReport = proxyquire('../lib/open-report', {
-		'open-editor': files => t.deepEqual(files, expected)
+		'open-editor': files => t.deepEqual(files, expected),
 	});
 	openReport(results);
 });
@@ -79,17 +79,17 @@ test.skip('only opens warnings if there are no errors', async t => {
 		{
 			file: path.join(__dirname, 'fixtures/open-report/warnings/one.js'),
 			line: 1,
-			column: 1
+			column: 1,
 		},
 		{
 			file: path.join(__dirname, 'fixtures/open-report/warnings/three.js'),
 			line: 1,
-			column: 1
-		}
+			column: 1,
+		},
 	];
 
 	const openReport = proxyquire('../lib/open-report', {
-		'open-editor': files => t.deepEqual(files, expected)
+		'open-editor': files => t.deepEqual(files, expected),
 	});
 	openReport(results);
 });
