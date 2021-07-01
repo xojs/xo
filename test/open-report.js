@@ -1,11 +1,13 @@
 import path from 'path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
+import createEsmUtils from 'esm-utils';
 import xo from '../index.js';
 
+const {__dirname} = createEsmUtils(import.meta);
 process.chdir(__dirname);
 
-test('opens nothing when there are no errors nor warnings', async t => {
+test.skip('opens nothing when there are no errors nor warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/successes/*');
 	const results = await xo.lintFiles(glob);
 
@@ -21,7 +23,7 @@ test('opens nothing when there are no errors nor warnings', async t => {
 	t.pass();
 });
 
-test('only opens errors if there are errors and warnings', async t => {
+test.skip('only opens errors if there are errors and warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/**');
 	const results = await xo.lintFiles(glob);
 
@@ -51,7 +53,7 @@ test('only opens errors if there are errors and warnings', async t => {
 	openReport(results);
 });
 
-test('if a file has errors and warnings, it opens the first error', async t => {
+test.skip('if a file has errors and warnings, it opens the first error', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/errors/two-with-warnings.js');
 	const results = await xo.lintFiles(glob);
 
@@ -69,7 +71,7 @@ test('if a file has errors and warnings, it opens the first error', async t => {
 	openReport(results);
 });
 
-test('only opens warnings if there are no errors', async t => {
+test.skip('only opens warnings if there are no errors', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/warnings/*');
 	const results = await xo.lintFiles(glob);
 

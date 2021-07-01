@@ -1,14 +1,18 @@
 import path from 'path';
 import test from 'ava';
-import omit from 'lodash/omit';
-import {readJson} from 'fs-extra';
+import {omit} from 'lodash-es';
+import fsExtra from 'fs-extra';
 import slash from 'slash';
-import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants';
-import parentConfig from './fixtures/nested/package.json';
-import childConfig from './fixtures/nested/child/package.json';
-import prettierConfig from './fixtures/prettier/package.json';
-import enginesConfig from './fixtures/engines/package.json';
-import manager from '../lib/options-manager';
+import createEsmUtils from 'esm-utils';
+import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants.js';
+import * as manager from '../lib/options-manager.js';
+
+const {readJson} = fsExtra;
+const {__dirname, require, json} = createEsmUtils(import.meta);
+const parentConfig = json.loadSync('./fixtures/nested/package.json');
+const childConfig = json.loadSync('./fixtures/nested/child/package.json');
+const prettierConfig = json.loadSync('./fixtures/prettier/package.json');
+const enginesConfig = json.loadSync('./fixtures/engines/package.json');
 
 process.chdir(__dirname);
 
