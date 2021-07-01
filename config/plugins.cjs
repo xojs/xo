@@ -6,8 +6,8 @@ module.exports = {
 		ecmaVersion: 2021,
 		sourceType: 'module',
 		ecmaFeatures: {
-			jsx: true
-		}
+			jsx: true,
+		},
 	},
 	// -- End repeat
 	plugins: [
@@ -17,17 +17,17 @@ module.exports = {
 		'promise',
 		'import',
 		'node',
-		'eslint-comments'
+		'eslint-comments',
 	],
 	extends: [
 		'plugin:ava/recommended',
-		'plugin:unicorn/recommended'
+		'plugin:unicorn/recommended',
 	],
 	settings: {
 		'import/core-modules': [
 			'electron',
-			'atom'
-		]
+			'atom',
+		],
 	},
 	rules: {
 		'no-use-extend-native/no-use-extend-native': 'error',
@@ -44,91 +44,91 @@ module.exports = {
 				replacements: {
 					// https://thenextweb.com/dd/2020/07/13/linux-kernel-will-no-longer-use-terms-blacklist-and-slave/
 					whitelist: {
-						allowList: true
+						allowList: true,
 					},
 					blacklist: {
-						denyList: true
+						denyList: true,
 					},
 					master: {
-						main: true
+						main: true,
 					},
 					slave: {
-						secondary: true
+						secondary: true,
 					},
 
 					// Not part of `eslint-plugin-unicorn`
 					application: {
-						app: true
+						app: true,
 					},
 					applications: {
-						apps: true
+						apps: true,
 					},
 
 					// Part of `eslint-plugin-unicorn`
 					arr: {
-						array: true
+						array: true,
 					},
 					e: {
 						error: true,
-						event: true
+						event: true,
 					},
 					el: {
-						element: true
+						element: true,
 					},
 					elem: {
-						element: true
+						element: true,
 					},
 					len: {
-						length: true
+						length: true,
 					},
 					msg: {
-						message: true
+						message: true,
 					},
 					num: {
-						number: true
+						number: true,
 					},
 					obj: {
-						object: true
+						object: true,
 					},
 					opts: {
-						options: true
+						options: true,
 					},
 					param: {
-						parameter: true
+						parameter: true,
 					},
 					params: {
-						parameters: true
+						parameters: true,
 					},
 					prev: {
-						previous: true
+						previous: true,
 					},
 					req: {
-						request: true
+						request: true,
 					},
 					res: {
 						response: true,
-						result: true
+						result: true,
 					},
 					ret: {
-						returnValue: true
+						returnValue: true,
 					},
 					str: {
-						string: true
+						string: true,
 					},
 					temp: {
-						temporary: true
+						temporary: true,
 					},
 					tmp: {
-						temporary: true
+						temporary: true,
 					},
 					val: {
-						value: true
+						value: true,
 					},
 					err: {
-						error: true
-					}
-				}
-			}
+						error: true,
+					},
+				},
+			},
 		],
 
 		// TODO: Restore when it becomes safer: https://github.com/sindresorhus/eslint-plugin-unicorn/issues/681
@@ -148,8 +148,8 @@ module.exports = {
 		'unicorn/better-regex': [
 			'error',
 			{
-				sortCharacterClasses: false
-			}
+				sortCharacterClasses: false,
+			},
 		],
 
 		// TODO: Disabled for now until it becomes more stable: https://github.com/sindresorhus/eslint-plugin-unicorn/search?q=consistent-destructuring+is:issue&state=open&type=issues
@@ -161,7 +161,7 @@ module.exports = {
 		// We only enforce it for single-line statements to not be too opinionated.
 		'unicorn/prefer-ternary': [
 			'error',
-			'only-single-line'
+			'only-single-line',
 		],
 
 		// TODO: Remove this override when the rule is more stable.
@@ -177,8 +177,8 @@ module.exports = {
 		'promise/no-return-wrap': [
 			'error',
 			{
-				allowReject: true
-			}
+				allowReject: true,
+			},
 		],
 		'promise/no-new-statics': 'error',
 		'promise/no-return-in-finally': 'error',
@@ -194,9 +194,9 @@ module.exports = {
 				// TypeScript doesn't yet support using extensions and fails with error TS2691.
 				pattern: {
 					ts: 'never',
-					tsx: 'never'
-				}
-			}
+					tsx: 'never',
+				},
+			},
 		],
 		'import/first': 'error',
 
@@ -207,8 +207,8 @@ module.exports = {
 		'import/namespace': [
 			'error',
 			{
-				allowComputed: true
-			}
+				allowComputed: true,
+			},
 		],
 		'import/no-absolute-path': 'error',
 		'import/no-anonymous-default-export': 'error',
@@ -218,8 +218,8 @@ module.exports = {
 		'import/no-cycle': [
 			'error',
 			{
-				ignoreExternal: true
-			}
+				ignoreExternal: true,
+			},
 		],
 		'import/no-useless-path-segments': 'error',
 
@@ -261,9 +261,9 @@ module.exports = {
 					'**/*.css',
 					'**/*.scss',
 					'**/*.sass',
-					'**/*.less'
-				]
-			}
+					'**/*.less',
+				],
+			},
 		],
 
 		// Redundant with `import/no-extraneous-dependencies`.
@@ -283,15 +283,15 @@ module.exports = {
 			{
 				// TypeScript doesn't yet support using extensions and fails with error TS2691.
 				'.ts': 'never',
-				'.tsx': 'never'
-			}
+				'.tsx': 'never',
+			},
 		],
 		'node/no-mixed-requires': [
 			'error',
 			{
 				grouping: true,
-				allowCall: true
-			}
+				allowCall: true,
+			},
 		],
 		'node/no-new-require': 'error',
 		'node/no-path-concat': 'error',
@@ -325,39 +325,39 @@ module.exports = {
 		'node/no-deprecated-api': 'error',
 		'node/prefer-global/buffer': [
 			'error',
-			'always'
+			'always',
 		],
 		'node/prefer-global/console': [
 			'error',
-			'always'
+			'always',
 		],
 		'node/prefer-global/process': [
 			'error',
-			'always'
+			'always',
 		],
 		'node/prefer-global/text-decoder': [
 			'error',
-			'always'
+			'always',
 		],
 		'node/prefer-global/text-encoder': [
 			'error',
-			'always'
+			'always',
 		],
 		'node/prefer-global/url-search-params': [
 			'error',
-			'always'
+			'always',
 		],
 		'node/prefer-global/url': [
 			'error',
-			'always'
+			'always',
 		],
 		'node/prefer-promises/dns': 'error',
 		'node/prefer-promises/fs': 'error',
 		'eslint-comments/disable-enable-pair': [
 			'error',
 			{
-				allowWholeFile: true
-			}
+				allowWholeFile: true,
+			},
 		],
 		'eslint-comments/no-aggregating-enable': 'error',
 		'eslint-comments/no-duplicate-disable': 'error',
@@ -366,6 +366,6 @@ module.exports = {
 		// 'eslint-comments/no-unlimited-disable': 'error',
 
 		'eslint-comments/no-unused-disable': 'error',
-		'eslint-comments/no-unused-enable': 'error'
-	}
+		'eslint-comments/no-unused-enable': 'error',
+	},
 };

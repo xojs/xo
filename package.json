@@ -16,7 +16,7 @@
 		"node": ">=12.20"
 	},
 	"scripts": {
-		"test": "eslint --quiet . && nyc ava"
+		"test": "eslint --quiet . --ext .js,.cjs && nyc ava"
 	},
 	"files": [
 		"config",
