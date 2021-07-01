@@ -25,34 +25,34 @@ test('normalizeOptions: makes all the options plural and arrays', t => {
 		rule: {'my-rule': 'foo'},
 		setting: {'my-rule': 'bar'},
 		extend: 'foo',
-		extension: 'html'
+		extension: 'html',
 	});
 
 	t.deepEqual(options, {
 		envs: [
-			'node'
+			'node',
 		],
 		extends: [
-			'foo'
+			'foo',
 		],
 		extensions: [
-			'html'
+			'html',
 		],
 		globals: [
-			'foo'
+			'foo',
 		],
 		ignores: [
-			'test.js'
+			'test.js',
 		],
 		plugins: [
-			'my-plugin'
+			'my-plugin',
 		],
 		rules: {
-			'my-rule': 'foo'
+			'my-rule': 'foo',
 		},
 		settings: {
-			'my-rule': 'bar'
-		}
+			'my-rule': 'bar',
+		},
 	});
 });
 
@@ -97,7 +97,7 @@ test('buildConfig: prettier: true', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none'
+		trailingComma: 'none',
 	}]);
 	// eslint-prettier-config must always be last
 	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier');
@@ -122,7 +122,7 @@ test('buildConfig: prettier: true, typescript file', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none'
+		trailingComma: 'none',
 	}]);
 
 	// eslint-prettier-config must always be last
@@ -148,7 +148,7 @@ test('buildConfig: prettier: true, semicolon: false', t => {
 		semi: false,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none'
+		trailingComma: 'none',
 	}]);
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -169,7 +169,7 @@ test('buildConfig: prettier: true, space: 4', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 4,
-		trailingComma: 'none'
+		trailingComma: 'none',
 	}]);
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -190,7 +190,7 @@ test('buildConfig: prettier: true, space: true', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none'
+		trailingComma: 'none',
 	}]);
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -252,7 +252,7 @@ test('buildConfig: nodeVersion: >=6', t => {
 	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
 	t.deepEqual(
 		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
-		['error', {version: '>=6', ignores: ['modules']}]
+		['error', {version: '>=6', ignores: ['modules']}],
 	);
 	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
 });
@@ -266,7 +266,7 @@ test('buildConfig: nodeVersion: >=8', t => {
 	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
 	t.deepEqual(
 		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
-		['error', {version: '>=8', ignores: ['modules']}]
+		['error', {version: '>=8', ignores: ['modules']}],
 	);
 	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
 });
@@ -276,7 +276,7 @@ test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpaci
 		singleQuote: false,
 		trailingComma: 'all',
 		bracketSpacing: false,
-		jsxBracketSameLine: false
+		jsxBracketSameLine: false,
 	};
 	const result = manager.mergeWithPrettierConfig({}, prettierOptions);
 	const expected = {
@@ -284,7 +284,7 @@ test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpaci
 		...prettierOptions,
 		tabWidth: 2,
 		useTabs: true,
-		semi: true
+		semi: true,
 	};
 	t.deepEqual(result, expected);
 });
@@ -293,7 +293,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from xo c
 	const prettierOptions = {
 		tabWidth: 4,
 		useTabs: false,
-		semi: false
+		semi: false,
 	};
 	const result = manager.mergeWithPrettierConfig({space: 4, semicolon: false}, {});
 	const expected = {
@@ -301,7 +301,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from xo c
 		jsxBracketSameLine: false,
 		singleQuote: true,
 		trailingComma: 'none',
-		...prettierOptions
+		...prettierOptions,
 	};
 	t.deepEqual(result, expected);
 });
@@ -310,7 +310,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from pret
 	const prettierOptions = {
 		useTabs: false,
 		semi: false,
-		tabWidth: 4
+		tabWidth: 4,
 	};
 	const result = manager.mergeWithPrettierConfig({}, prettierOptions);
 	const expected = {
@@ -318,7 +318,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from pret
 		jsxBracketSameLine: false,
 		singleQuote: true,
 		trailingComma: 'none',
-		...prettierOptions
+		...prettierOptions,
 	};
 	t.deepEqual(result, expected);
 });
@@ -326,16 +326,16 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from pret
 test('mergeWithPrettierConfig: throw error is `semi`/`semicolon` conflicts', t => {
 	t.throws(() => manager.mergeWithPrettierConfig(
 		{semicolon: true},
-		{semi: false}
+		{semi: false},
 	));
 	t.throws(() => manager.mergeWithPrettierConfig(
 		{semicolon: false},
-		{semi: true}
+		{semi: true},
 	));
 
 	t.notThrows(() => manager.mergeWithPrettierConfig(
 		{semicolon: true},
-		{semi: true}
+		{semi: true},
 	));
 	t.notThrows(() => manager.mergeWithPrettierConfig({semicolon: false}, {semi: false}));
 });
@@ -416,13 +416,13 @@ test('buildConfig: extends', t => {
 	const config = manager.buildConfig({
 		extends: [
 			'plugin:foo/bar',
-			'eslint-config-prettier'
-		]
+			'eslint-config-prettier',
+		],
 	});
 
 	t.deepEqual(config.baseConfig.extends.slice(-2), [
 		'plugin:foo/bar',
-		path.resolve('../node_modules/eslint-config-prettier/index.js')
+		path.resolve('../node_modules/eslint-config-prettier/index.js'),
 	]);
 });
 
@@ -435,7 +435,7 @@ test('buildConfig: typescript', t => {
 		warnOnUnsupportedTypeScriptVersion: false,
 		ecmaFeatures: {jsx: true},
 		project: './tsconfig.json',
-		projectFolderIgnoreList: [/\/node_modules\/(?!.*\.cache\/xo-linter)/]
+		projectFolderIgnoreList: [/\/node_modules\/(?!.*\.cache\/xo-linter)/],
 	});
 });
 
@@ -443,7 +443,7 @@ test('buildConfig: typescript with parserOption', t => {
 	const config = manager.buildConfig({
 		ts: true,
 		parserOptions: {projectFolderIgnoreList: [], sourceType: 'script'},
-		tsConfigPath: 'path/to/tmp-tsconfig.json'
+		tsConfigPath: 'path/to/tmp-tsconfig.json',
 	}, {});
 
 	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
@@ -452,15 +452,15 @@ test('buildConfig: typescript with parserOption', t => {
 		ecmaFeatures: {jsx: true},
 		projectFolderIgnoreList: [],
 		project: 'path/to/tmp-tsconfig.json',
-		sourceType: 'script'
+		sourceType: 'script',
 	});
 });
 
 test('buildConfig: parserOptions', t => {
 	const config = manager.buildConfig({
 		parserOptions: {
-			sourceType: 'script'
-		}
+			sourceType: 'script',
+		},
 	});
 
 	t.is(config.baseConfig.parserOptions.sourceType, 'script');
@@ -469,11 +469,11 @@ test('buildConfig: parserOptions', t => {
 test('buildConfig: prevents useEslintrc option', t => {
 	t.throws(() => {
 		manager.buildConfig({
-			useEslintrc: true
+			useEslintrc: true,
 		});
 	}, {
 		instanceOf: Error,
-		message: 'The `useEslintrc` option is not supported'
+		message: 'The `useEslintrc` option is not supported',
 	});
 });
 
@@ -482,13 +482,13 @@ test('findApplicableOverrides', t => {
 		{files: '**/f*.js'},
 		{files: '**/bar.js'},
 		{files: '**/*oo.js'},
-		{files: '**/*.txt'}
+		{files: '**/*.txt'},
 	]);
 
 	t.is(result.hash, 0b1010);
 	t.deepEqual(result.applicable, [
 		{files: '**/f*.js'},
-		{files: '**/*oo.js'}
+		{files: '**/*oo.js'},
 	]);
 });
 
@@ -551,13 +551,13 @@ test('mergeWithFileConfig: typescript files', async t => {
 		ignores: DEFAULT_IGNORES,
 		cwd,
 		semicolon: false,
-		ts: true
+		ts: true,
 	};
 	t.deepEqual(omit(options, 'tsConfigPath'), expected);
 	t.deepEqual(await readJson(options.tsConfigPath), {
 		extends: path.resolve(cwd, 'tsconfig.json'),
 		files: [path.resolve(cwd, 'file.ts')],
-		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))]
+		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))],
 	});
 });
 
@@ -571,13 +571,13 @@ test('mergeWithFileConfig: tsx files', async t => {
 		ignores: DEFAULT_IGNORES,
 		cwd,
 		semicolon: false,
-		ts: true
+		ts: true,
 	};
 	t.deepEqual(omit(options, 'tsConfigPath'), expected);
 	t.deepEqual(await readJson(options.tsConfigPath), {
 		extends: path.resolve(cwd, 'tsconfig.json'),
 		files: [path.resolve(cwd, 'file.tsx')],
-		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))]
+		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))],
 	});
 });
 
@@ -587,19 +587,19 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 		'no-semicolon.js',
 		'child/semicolon.js',
 		'child-override/two-spaces.js',
-		'child-override/child-prettier-override/semicolon.js'
+		'child-override/child-prettier-override/semicolon.js',
 	].map(file => path.resolve(cwd, file));
 	const result = await manager.mergeWithFileConfigs(paths, {cwd}, [
 		{
 			filepath: path.resolve(cwd, 'child-override', 'child-prettier-override', 'package.json'),
-			config: {overrides: [{files: 'semicolon.js', prettier: true}]}
+			config: {overrides: [{files: 'semicolon.js', prettier: true}]},
 		},
 		{filepath: path.resolve(cwd, 'package.json'), config: {semicolon: true}},
 		{
 			filepath: path.resolve(cwd, 'child-override', 'package.json'),
-			config: {overrides: [{files: 'two-spaces.js', space: 4}]}
+			config: {overrides: [{files: 'two-spaces.js', space: 4}]},
 		},
-		{filepath: path.resolve(cwd, 'child', 'package.json'), config: {semicolon: false}}
+		{filepath: path.resolve(cwd, 'child', 'package.json'), config: {semicolon: false}},
 	]);
 
 	t.deepEqual(result, [
@@ -609,9 +609,9 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				semicolon: true,
 				cwd,
 				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES
+				ignores: DEFAULT_IGNORES,
 			},
-			prettierOptions: {}
+			prettierOptions: {},
 		},
 		{
 			files: [path.resolve(cwd, 'child/semicolon.js')],
@@ -619,9 +619,9 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				semicolon: false,
 				cwd: path.resolve(cwd, 'child'),
 				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES
+				ignores: DEFAULT_IGNORES,
 			},
-			prettierOptions: {}
+			prettierOptions: {},
 		},
 		{
 			files: [path.resolve(cwd, 'child-override/two-spaces.js')],
@@ -635,9 +635,9 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				extends: [],
 				cwd: path.resolve(cwd, 'child-override'),
 				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES
+				ignores: DEFAULT_IGNORES,
 			},
-			prettierOptions: {}
+			prettierOptions: {},
 		},
 		{
 			files: [path.resolve(cwd, 'child-override/child-prettier-override/semicolon.js')],
@@ -651,10 +651,10 @@ test('mergeWithFileConfigs: nested configs with prettier', async t => {
 				extends: [],
 				cwd: path.resolve(cwd, 'child-override', 'child-prettier-override'),
 				extensions: DEFAULT_EXTENSION,
-				ignores: DEFAULT_IGNORES
+				ignores: DEFAULT_IGNORES,
 			},
-			prettierOptions: {endOfLine: 'lf', semi: false, useTabs: true}
-		}
+			prettierOptions: {endOfLine: 'lf', semi: false, useTabs: true},
+		},
 	]);
 });
 
@@ -664,7 +664,7 @@ test('mergeWithFileConfigs: typescript files', async t => {
 	const configFiles = [
 		{filepath: path.resolve(cwd, 'child/sub-child/package.json'), config: {space: 2}},
 		{filepath: path.resolve(cwd, 'package.json'), config: {space: 4}},
-		{filepath: path.resolve(cwd, 'child/package.json'), config: {semicolon: false}}
+		{filepath: path.resolve(cwd, 'child/package.json'), config: {semicolon: false}},
 	];
 	const result = await manager.mergeWithFileConfigs(paths, {cwd}, configFiles);
 
@@ -675,9 +675,9 @@ test('mergeWithFileConfigs: typescript files', async t => {
 			cwd,
 			extensions: DEFAULT_EXTENSION,
 			ignores: DEFAULT_IGNORES,
-			ts: true
+			ts: true,
 		},
-		prettierOptions: {}
+		prettierOptions: {},
 	});
 	t.deepEqual(await readJson(result[0].options.tsConfigPath), {
 		files: [path.resolve(cwd, 'two-spaces.tsx')],
@@ -688,8 +688,8 @@ test('mergeWithFileConfigs: typescript files', async t => {
 			noUnusedLocals: true,
 			noUnusedParameters: true,
 			strict: true,
-			target: 'es2018'
-		}
+			target: 'es2018',
+		},
 	});
 
 	t.deepEqual(omit(result[1], 'options.tsConfigPath'), {
@@ -699,9 +699,9 @@ test('mergeWithFileConfigs: typescript files', async t => {
 			cwd: path.resolve(cwd, 'child'),
 			extensions: DEFAULT_EXTENSION,
 			ignores: DEFAULT_IGNORES,
-			ts: true
+			ts: true,
 		},
-		prettierOptions: {}
+		prettierOptions: {},
 	});
 
 	t.deepEqual(omit(result[2], 'options.tsConfigPath'), {
@@ -711,9 +711,9 @@ test('mergeWithFileConfigs: typescript files', async t => {
 			cwd: path.resolve(cwd, 'child/sub-child'),
 			extensions: DEFAULT_EXTENSION,
 			ignores: DEFAULT_IGNORES,
-			ts: true
+			ts: true,
 		},
-		prettierOptions: {}
+		prettierOptions: {},
 	});
 
 	// Verify that we use the same temporary tsconfig.json for both files group sharing the same original tsconfig.json even if they have different xo config
@@ -723,8 +723,8 @@ test('mergeWithFileConfigs: typescript files', async t => {
 		files: [path.resolve(cwd, 'child/extra-semicolon.ts'), path.resolve(cwd, 'child/sub-child/four-spaces.ts')],
 		include: [
 			slash(path.resolve(cwd, 'child/**/*.ts')),
-			slash(path.resolve(cwd, 'child/**/*.tsx'))
-		]
+			slash(path.resolve(cwd, 'child/**/*.tsx')),
+		],
 	});
 
 	const secondResult = await manager.mergeWithFileConfigs(paths, {cwd}, configFiles);
@@ -745,14 +745,14 @@ test('applyOverrides', t => {
 						rules: {'rule-2': 'c'},
 						extends: ['overrride-extend'],
 						globals: ['override'],
-						plugins: ['override-plugin']
-					}
+						plugins: ['override-plugin'],
+					},
 				],
 				rules: {'rule-1': 'a', 'rule-2': 'b'},
 				extends: ['base-extend'],
 				globals: ['base'],
 				plugins: ['base-plugin'],
-				cwd: '.'
+				cwd: '.',
 			}),
 		{
 			options: {
@@ -762,9 +762,9 @@ test('applyOverrides', t => {
 				plugins: ['base-plugin', 'override-plugin'],
 				envs: [],
 				settings: {},
-				cwd: '.'
+				cwd: '.',
 			},
-			hash: 1
-		}
+			hash: 1,
+		},
 	);
 });

@@ -50,66 +50,66 @@ const cli = meow(`
 	booleanDefault: undefined,
 	flags: {
 		fix: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		reporter: {
-			type: 'string'
+			type: 'string',
 		},
 		env: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		global: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		ignore: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		space: {
-			type: 'string'
+			type: 'string',
 		},
 		semicolon: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		prettier: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		nodeVersion: {
-			type: 'string'
+			type: 'string',
 		},
 		plugin: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		extend: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		open: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		quiet: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		extension: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		cwd: {
-			type: 'string'
+			type: 'string',
 		},
 		printConfig: {
-			type: 'string'
+			type: 'string',
 		},
 		stdin: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		stdinFilename: {
-			type: 'string'
-		}
-	}
+			type: 'string',
+		},
+	},
 });
 
 const {input, flags: options, showVersion} = cli;

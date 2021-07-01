@@ -110,16 +110,16 @@ test('enable rules based on nodeVersion', async t => {
 		hasRule(
 			results,
 			path.resolve('fixtures/engines-overrides/promise-then-transpile.js'),
-			'promise/prefer-await-to-then'
-		)
+			'promise/prefer-await-to-then',
+		),
 	);
 	// The non transpiled files can use `.then`
 	t.false(
 		hasRule(
 			results,
 			path.resolve('fixtures/engines-overrides/promise-then.js'),
-			'promise/prefer-await-to-then'
-		)
+			'promise/prefer-await-to-then',
+		),
 	);
 });
 
@@ -141,32 +141,32 @@ test('find configurations close to linted file', async t => {
 		hasRule(
 			results,
 			path.resolve('fixtures/nested-configs/child/semicolon.js'),
-			'semi'
-		)
+			'semi',
+		),
 	);
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'),
-			'prettier/prettier'
-		)
+			'prettier/prettier',
+		),
 	);
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/nested-configs/no-semicolon.js'),
-			'semi'
-		)
+			'semi',
+		),
 	);
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/nested-configs/child-override/two-spaces.js'),
-			'indent'
-		)
+			'indent',
+		),
 	);
 });
 
@@ -177,24 +177,24 @@ test('typescript files', async t => {
 		hasRule(
 			results,
 			path.resolve('fixtures/typescript/two-spaces.tsx'),
-			'@typescript-eslint/indent'
-		)
+			'@typescript-eslint/indent',
+		),
 	);
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/typescript/child/extra-semicolon.ts'),
-			'@typescript-eslint/no-extra-semi'
-		)
+			'@typescript-eslint/no-extra-semi',
+		),
 	);
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/typescript/child/sub-child/four-spaces.ts'),
-			'@typescript-eslint/indent'
-		)
+			'@typescript-eslint/indent',
+		),
 	);
 });
 
@@ -218,8 +218,8 @@ test('webpack import resolver is used if webpack.config.js is found', async t =>
 	const {results} = await xo.lintFiles(path.resolve(cwd, 'file1.js'), {
 		cwd,
 		rules: {
-			'import/no-unresolved': 2
-		}
+			'import/no-unresolved': 2,
+		},
 	});
 
 	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
@@ -237,14 +237,14 @@ test('webpack import resolver config can be passed through webpack option', asyn
 			config: {
 				resolve: {
 					alias: {
-						file2alias: path.resolve(__dirname, cwd, './file2.js')
-					}
-				}
-			}
+						file2alias: path.resolve(__dirname, cwd, './file2.js'),
+					},
+				},
+			},
 		},
 		rules: {
-			'import/no-unresolved': 2
-		}
+			'import/no-unresolved': 2,
+		},
 	});
 
 	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
@@ -258,8 +258,8 @@ test('webpack import resolver is used if {webpack: true}', async t => {
 		webpack: true,
 		rules: {
 			'import/no-unresolved': 2,
-			'import/no-webpack-loader-syntax': 0
-		}
+			'import/no-webpack-loader-syntax': 0,
+		},
 	});
 
 	t.is(results[0].errorCount, 0, JSON.stringify(results[0]));
@@ -272,8 +272,8 @@ async function configType(t, {dir}) {
 		hasRule(
 			results,
 			path.resolve('fixtures', 'config-files', dir, 'file.js'),
-			'indent'
-		)
+			'indent',
+		),
 	);
 }
 
