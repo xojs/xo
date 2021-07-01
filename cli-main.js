@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-'use strict';
-const getStdin = require('get-stdin');
-const meow = require('meow');
-const formatterPretty = require('eslint-formatter-pretty');
-const semver = require('semver');
-const openReport = require('./lib/open-report.js');
-const xo = require('./index.js');
+import getStdin from 'get-stdin';
+import meow from 'meow';
+import formatterPretty from 'eslint-formatter-pretty';
+import semver from 'semver';
+import openReport from './lib/open-report.js';
+import xo from './index.js';
 
 const cli = meow(`
 	Usage

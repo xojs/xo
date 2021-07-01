@@ -4,7 +4,9 @@ import test from 'ava';
 import execa from 'execa';
 import slash from 'slash';
 import tempWrite from 'temp-write';
+import createEsmUtils from 'esm-utils';
 
+const {__dirname} = createEsmUtils(import.meta);
 process.chdir(__dirname);
 
 const main = (arguments_, options) => execa(path.join(__dirname, '../cli-main.js'), arguments_, options);
