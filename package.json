@@ -109,10 +109,15 @@
 		"webpack": "^5.41.1"
 	},
 	"eslintConfig": {
-		"extends": "eslint-config-xo"
+		"extends": [
+			"eslint-config-xo",
+			"./config/plugins.cjs",
+			"./config/overrides.cjs"
+		]
 	},
 	"eslintIgnore": [
-		"test/fixtures"
+		"test/fixtures",
+		"coverage"
 	],
 	"ava": {
 		"timeout": "1m"

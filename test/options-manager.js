@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import test from 'ava';
 import {omit} from 'lodash-es';
 import fsExtra from 'fs-extra';
@@ -429,7 +429,7 @@ test('buildConfig: extends', t => {
 test('buildConfig: typescript', t => {
 	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
 
-	t.deepEqual(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'xo-typescript');
+	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'xo-typescript');
 	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
