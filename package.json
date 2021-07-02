@@ -111,7 +111,8 @@
 	"eslintConfig": {
 		"extends": [
 			"eslint-config-xo",
-			"./config/plugins.cjs"
+			"./config/plugins.cjs",
+			"./config/overrides.cjs"
 		]
 	},
 	"eslintIgnore": [
