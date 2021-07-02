@@ -1,4 +1,5 @@
-import path from 'path';
+/* eslint-disable ava/no-skip-test */
+import path from 'node:path';
 import test from 'ava';
 import proxyquire from 'proxyquire';
 import createEsmUtils from 'esm-utils';
@@ -13,7 +14,7 @@ test.skip('opens nothing when there are no errors nor warnings', async t => {
 
 	const openReport = proxyquire('../lib/open-report', {
 		'open-editor': files => {
-			if (files.length !== 0) {
+			if (files.length > 0) {
 				t.fail();
 			}
 		},

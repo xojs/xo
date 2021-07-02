@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import test from 'ava';
 import createEsmUtils from 'esm-utils';
 import xo from '../index.js';
@@ -200,6 +200,7 @@ test('typescript files', async t => {
 
 test('typescript 2 space option', async t => {
 	const {errorCount, results} = await xo.lintFiles('two-spaces.tsx', {cwd: 'fixtures/typescript', space: 2});
+	// eslint-disable-next-line ava/assertion-arguments
 	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
@@ -222,6 +223,7 @@ test('webpack import resolver is used if webpack.config.js is found', async t =>
 		},
 	});
 
+	// eslint-disable-next-line ava/assertion-arguments
 	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
 
 	const errorMessage = results[0].messages[0].message;
@@ -247,6 +249,7 @@ test('webpack import resolver config can be passed through webpack option', asyn
 		},
 	});
 
+	// eslint-disable-next-line ava/assertion-arguments
 	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
 });
 
@@ -262,6 +265,7 @@ test('webpack import resolver is used if {webpack: true}', async t => {
 		},
 	});
 
+	// eslint-disable-next-line ava/assertion-arguments
 	t.is(results[0].errorCount, 0, JSON.stringify(results[0]));
 });
 

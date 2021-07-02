@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import {ESLint} from 'eslint';
 import globby from 'globby';
 import {isEqual} from 'lodash-es';
@@ -169,7 +169,7 @@ const getFormatter = async name => {
 	return format;
 };
 
-export default {
+const xo = {
 	getFormatter,
 	getErrorResults: ESLint.getErrorResults,
 	outputFixes: async ({results}) => ESLint.outputFixes(results),
@@ -177,3 +177,5 @@ export default {
 	lintText,
 	lintFiles,
 };
+
+export default xo;
