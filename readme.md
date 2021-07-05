@@ -40,8 +40,10 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 ## Install
 
 ```
-$ npm install --global xo
+$ npm install xo
 ```
+
+*You must install XO locally. You can run it directly with `$ npx xo`.*
 
 *JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting. Vue components are not supported by default. You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
 
@@ -89,8 +91,6 @@ $ xo --help
     - Put options in package.json instead of using flags so other tools can read it.
 ```
 
-*Note that the CLI will use your local install of XO when available, even when run globally.*
-
 ## Default code style
 
 *Any of these can be [overridden](#rules) if necessary.*
@@ -98,6 +98,7 @@ $ xo --help
 - Tab indentation *[(or space)](#space)*
 - Semicolons *[(or not)](#semicolon)*
 - Single-quotes
+- [Trailing comma](https://medium.com/@nikgraf/why-you-should-enforce-dangling-commas-for-multiline-statements-d034c98e36f8) for multiline statements
 - No unused variables
 - Space after keyword `if (condition) {}`
 - Always `===` instead of `==`
@@ -120,9 +121,9 @@ Simply run `$ npm init xo` (with any options) to add XO to your package.json or 
 +		"test": "xo && ava"
  	},
  	"devDependencies": {
--		"ava": "^2.0.0"
-+		"ava": "^2.0.0",
-+		"xo": "^0.25.0"
+-		"ava": "^3.0.0"
++		"ava": "^3.0.0",
++		"xo": "^0.41.0"
  	}
  }
 ```
