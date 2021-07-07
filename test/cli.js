@@ -3,7 +3,6 @@ import path from 'node:path';
 import test from 'ava';
 import execa from 'execa';
 import slash from 'slash';
-import tempWrite from 'temp-write';
 import createEsmUtils from 'esm-utils';
 
 const {__dirname} = createEsmUtils(import.meta);
@@ -12,8 +11,10 @@ process.chdir(__dirname);
 const main = (arguments_, options) => execa(path.join(__dirname, '../cli.js'), arguments_, options);
 
 test('fix option', async t => {
-	const filepath = await tempWrite('console.log()\n', 'x.js');
-	await main(['--fix', filepath]);
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const filepath = path.join(cwd, 'x.js');
+	await fs.promises.writeFile(filepath, 'console.log()\n');
+	await main(['--fix', filepath], {cwd});
 	t.is(fs.readFileSync(filepath, 'utf8').trim(), 'console.log();');
 });
 
@@ -33,10 +34,12 @@ test('stdin-filename option with stdin', async t => {
 });
 
 test('reporter option', async t => {
-	const filepath = await tempWrite('console.log()\n', 'x.js');
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const filepath = path.join(cwd, 'x.js');
+	await fs.promises.writeFile(filepath, 'console.log()\n');
 
 	const error = await t.throwsAsync(() =>
-		main(['--reporter=compact', filepath]),
+		main(['--reporter=compact', filepath], {cwd}),
 	);
 	t.true(error.stdout.includes('Error - '));
 });
@@ -98,15 +101,19 @@ test('supports being extended with a shareable config', async t => {
 });
 
 test('quiet option', async t => {
-	const filepath = await tempWrite('// TODO: quiet\nconsole.log()\n', 'x.js');
-	const error = await t.throwsAsync(main(['--quiet', '--reporter=json', filepath]));
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const filepath = path.join(cwd, 'x.js');
+	await fs.promises.writeFile(filepath, '// TODO: quiet\nconsole.log()\n');
+	const error = await t.throwsAsync(main(['--quiet', '--reporter=json', filepath], {cwd}));
 	const [report] = JSON.parse(error.stdout);
 	t.is(report.warningCount, 0);
 });
 
 test('invalid node-engine option', async t => {
-	const filepath = await tempWrite('console.log()\n', 'x.js');
-	const error = await t.throwsAsync(main(['--node-version', 'v', filepath]));
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const filepath = path.join(cwd, 'x.js');
+	await fs.promises.writeFile(filepath, 'console.log()\n');
+	const error = await t.throwsAsync(main(['--node-version', 'v', filepath], {cwd}));
 	t.is(error.exitCode, 1);
 });
 

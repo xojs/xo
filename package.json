@@ -78,7 +78,7 @@
 		"find-up": "^5.0.0",
 		"fs-extra": "^10.0.0",
 		"get-stdin": "^9.0.0",
-		"globby": "^9.2.0",
+		"globby": "^11.0.4",
 		"imurmurhash": "^0.1.4",
 		"is-path-inside": "^4.0.0",
 		"json-stable-stringify-without-jsonify": "^1.0.1",
@@ -117,7 +117,8 @@
 	},
 	"eslintIgnore": [
 		"test/fixtures",
-		"coverage"
+		"coverage",
+		"temp"
 	],
 	"ava": {
 		"timeout": "1m"
@@ -127,5 +128,8 @@
 			"text",
 			"lcov"
 		]
+	},
+	"xo": {
+		"semicolon": true
 	}
 }
