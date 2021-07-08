@@ -222,10 +222,7 @@ module.exports = {
 			},
 		],
 		'import/no-useless-path-segments': 'error',
-
-		// Disabled as it doesn't work with TypeScript
-		// 'import/newline-after-import': 'error',
-
+		'import/newline-after-import': 'error',
 		'import/no-amd': 'error',
 		'import/no-duplicates': 'error',
 
