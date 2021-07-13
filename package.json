@@ -128,8 +128,5 @@
 			"text",
 			"lcov"
 		]
-	},
-	"xo": {
-		"semicolon": true
 	}
 }

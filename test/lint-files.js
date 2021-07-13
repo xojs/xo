@@ -13,7 +13,7 @@ const hasRule = (results, filePath, ruleId) => {
 
 test('only accepts allowed extensions', async t => {
 	// Markdown files will always produce linter errors and will not be going away
-	const cwd = path.join(__dirname, '..');
+	const cwd = path.join(__dirname, 'fixtures/custom-extension');
 	const mdGlob = '*.md';
 
 	// No files should be linted = no errors
