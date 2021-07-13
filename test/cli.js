@@ -11,7 +11,7 @@ process.chdir(__dirname);
 const main = (arguments_, options) => execa(path.join(__dirname, '../cli.js'), arguments_, options);
 
 test('fix option', async t => {
-	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, './temp/'));
 	const filepath = path.join(cwd, 'x.js');
 	await fs.promises.writeFile(filepath, 'console.log()\n');
 	await main(['--fix', filepath], {cwd});
@@ -34,7 +34,7 @@ test('stdin-filename option with stdin', async t => {
 });
 
 test('reporter option', async t => {
-	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, './temp/'));
 	const filepath = path.join(cwd, 'x.js');
 	await fs.promises.writeFile(filepath, 'console.log()\n');
 
@@ -101,7 +101,7 @@ test('supports being extended with a shareable config', async t => {
 });
 
 test('quiet option', async t => {
-	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, './temp/'));
 	const filepath = path.join(cwd, 'x.js');
 	await fs.promises.writeFile(filepath, '// TODO: quiet\nconsole.log()\n');
 	const error = await t.throwsAsync(main(['--quiet', '--reporter=json', filepath], {cwd}));
@@ -110,7 +110,7 @@ test('quiet option', async t => {
 });
 
 test('invalid node-engine option', async t => {
-	const cwd = await fs.promises.mkdtemp(path.join(__dirname, '../temp/'));
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, './temp/'));
 	const filepath = path.join(cwd, 'x.js');
 	await fs.promises.writeFile(filepath, 'console.log()\n');
 	const error = await t.throwsAsync(main(['--node-version', 'v', filepath], {cwd}));

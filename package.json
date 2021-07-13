@@ -117,10 +117,13 @@
 	},
 	"eslintIgnore": [
 		"test/fixtures",
-		"coverage",
-		"temp"
+		"test/temp",
+		"coverage"
 	],
 	"ava": {
+		"files": [
+			"!test/temp"
+		],
 		"timeout": "1m"
 	},
 	"nyc": {
