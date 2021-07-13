@@ -9,6 +9,7 @@ import pMap from 'p-map';
 import {cosmiconfig, defaultLoaders} from 'cosmiconfig';
 import defineLazyProperty from 'define-lazy-prop';
 import pFilter from 'p-filter';
+import slash from 'slash';
 import {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES} from './lib/constants.js';
 import {
 	normalizeOptions,
@@ -94,9 +95,9 @@ const runEslint = async (paths, options, processorOptions) => {
 
 const globFiles = async (patterns, {ignores, extensions, cwd}) => (
 	await globby(
-		patterns.length === 0 ? [`**/*.{${extensions.join(',')}}`] : arrify(patterns),
-		{ignore: ignores, gitignore: true, cwd},
-	)).filter(file => extensions.includes(path.extname(file).slice(1))).map(file => path.resolve(cwd, file));
+		patterns.length === 0 ? [`**/*.{${extensions.join(',')}}`] : arrify(patterns).map(pattern => slash(pattern)),
+		{ignore: ignores, gitignore: true, absolute: true, cwd},
+	)).filter(file => extensions.includes(path.extname(file).slice(1)));
 
 const getConfig = async options => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
@@ -149,8 +150,8 @@ const lintFiles = async (patterns, inputOptions = {}) => {
 	const configFiles = (await Promise.all(
 		(await globby(
 			CONFIG_FILES.map(configFile => `**/${configFile}`),
-			{ignore: DEFAULT_IGNORES, gitignore: true, cwd: inputOptions.cwd},
-		)).map(async configFile => configExplorer.load(path.resolve(inputOptions.cwd, configFile))),
+			{ignore: DEFAULT_IGNORES, gitignore: true, absolute: true, cwd: inputOptions.cwd},
+		)).map(configFile => configExplorer.load(configFile)),
 	)).filter(Boolean);
 
 	const paths = configFiles.length > 0

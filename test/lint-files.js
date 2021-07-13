@@ -13,21 +13,23 @@ const hasRule = (results, filePath, ruleId) => {
 
 test('only accepts allowed extensions', async t => {
 	// Markdown files will always produce linter errors and will not be going away
-	const mdGlob = path.join(__dirname, '..', '*.md');
+	const cwd = path.join(__dirname, 'fixtures/custom-extension');
+	const mdGlob = '*.md';
 
 	// No files should be linted = no errors
-	const noOptionsResults = await xo.lintFiles(mdGlob, {});
+	const noOptionsResults = await xo.lintFiles(mdGlob, {cwd});
 	t.is(noOptionsResults.errorCount, 0);
 
 	// Markdown files linted (with no plugin for it) = errors
-	const moreExtensionsResults = await xo.lintFiles(mdGlob, {extensions: ['md']});
+	const moreExtensionsResults = await xo.lintFiles(mdGlob, {extensions: ['md'], cwd});
 	t.true(moreExtensionsResults.errorCount > 0);
 });
 
 test('ignores dirs for empty extensions', async t => {
 	{
-		const glob = path.join(__dirname, 'fixtures/nodir/*');
-		const results = await xo.lintFiles(glob, {extensions: ['', 'js']});
+		const cwd = path.join(__dirname, 'fixtures/nodir');
+		const glob = '*';
+		const results = await xo.lintFiles(glob, {extensions: ['', 'js'], cwd});
 		const {results: [fileResult]} = results;
 
 		// Only `fixtures/nodir/noextension` should be linted
@@ -38,11 +40,25 @@ test('ignores dirs for empty extensions', async t => {
 	}
 
 	{
-		const glob = path.join(__dirname, 'fixtures/nodir/nested/*');
-		const results = await xo.lintFiles(glob);
+		const cwd = path.join(__dirname, 'fixtures/nodir');
+		const glob = 'nested/*';
+		const results = await xo.lintFiles(glob, {cwd});
 		const {results: [fileResult]} = results;
 
 		// Ensure `nodir/nested` **would** report if globbed
+		const expected = 'fixtures/nodir/nested/index.js'.split('/').join(path.sep);
+		const actual = path.relative(__dirname, fileResult.filePath);
+		t.is(actual, expected);
+		t.is(results.errorCount, 1);
+	}
+
+	{
+		const cwd = path.join(__dirname, 'fixtures/nodir');
+		// Check Windows-style paths are working
+		const glob = 'nested\\*';
+		const results = await xo.lintFiles(glob, {cwd});
+		const {results: [fileResult]} = results;
+
 		const expected = 'fixtures/nodir/nested/index.js'.split('/').join(path.sep);
 		const actual = path.relative(__dirname, fileResult.filePath);
 		t.is(actual, expected);
@@ -59,7 +75,7 @@ test.serial('cwd option', async t => {
 
 test('do not lint gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/gitignore');
-	const glob = path.posix.join(cwd, '**/*');
+	const glob = '**/*';
 	const ignored = path.resolve('fixtures/gitignore/test/foo.js');
 	const {results} = await xo.lintFiles(glob, {cwd});
 
@@ -68,7 +84,7 @@ test('do not lint gitignored files', async t => {
 
 test('do not lint gitignored files in file with negative gitignores', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
-	const glob = path.posix.join(cwd, '*');
+	const glob = '*';
 	const ignored = path.resolve('fixtures/negative-gitignore/bar.js');
 	const {results} = await xo.lintFiles(glob, {cwd});
 
@@ -77,7 +93,7 @@ test('do not lint gitignored files in file with negative gitignores', async t =>
 
 test('lint negatively gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
-	const glob = path.posix.join(cwd, '*');
+	const glob = '*';
 	const negative = path.resolve('fixtures/negative-gitignore/foo.js');
 	const {results} = await xo.lintFiles(glob, {cwd});
 
@@ -86,7 +102,7 @@ test('lint negatively gitignored files', async t => {
 
 test('do not lint inapplicable negatively gitignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/negative-gitignore');
-	const glob = path.posix.join(cwd, 'bar.js');
+	const glob = 'bar.js';
 	const negative = path.resolve('fixtures/negative-gitignore/foo.js');
 	const {results} = await xo.lintFiles(glob, {cwd});
 
@@ -125,7 +141,7 @@ test('enable rules based on nodeVersion', async t => {
 
 test('do not lint eslintignored files', async t => {
 	const cwd = path.join(__dirname, 'fixtures/eslintignore');
-	const glob = path.posix.join(cwd, '*');
+	const glob = '*';
 	const positive = path.resolve('fixtures/eslintignore/foo.js');
 	const negative = path.resolve('fixtures/eslintignore/bar.js');
 	const {results} = await xo.lintFiles(glob, {cwd});
@@ -216,7 +232,7 @@ test('typescript no semicolon option', async t => {
 
 test('webpack import resolver is used if webpack.config.js is found', async t => {
 	const cwd = 'fixtures/webpack/with-config/';
-	const {results} = await xo.lintFiles(path.resolve(cwd, 'file1.js'), {
+	const {results} = await xo.lintFiles('file1.js', {
 		cwd,
 		rules: {
 			'import/no-unresolved': 2,
@@ -233,7 +249,7 @@ test('webpack import resolver is used if webpack.config.js is found', async t =>
 test('webpack import resolver config can be passed through webpack option', async t => {
 	const cwd = 'fixtures/webpack/no-config/';
 
-	const {results} = await xo.lintFiles(path.resolve(cwd, 'file1.js'), {
+	const {results} = await xo.lintFiles('file1.js', {
 		cwd,
 		webpack: {
 			config: {
@@ -256,7 +272,7 @@ test('webpack import resolver config can be passed through webpack option', asyn
 test('webpack import resolver is used if {webpack: true}', async t => {
 	const cwd = 'fixtures/webpack/no-config/';
 
-	const {results} = await xo.lintFiles(path.resolve(cwd, 'file3.js'), {
+	const {results} = await xo.lintFiles('file3.js', {
 		cwd,
 		webpack: true,
 		rules: {
