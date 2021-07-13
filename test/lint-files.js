@@ -51,6 +51,19 @@ test('ignores dirs for empty extensions', async t => {
 		t.is(actual, expected);
 		t.is(results.errorCount, 1);
 	}
+
+	{
+		const cwd = path.join(__dirname, 'fixtures/nodir');
+		// Check Windows-style paths are working
+		const glob = 'nested\\*';
+		const results = await xo.lintFiles(glob, {cwd});
+		const {results: [fileResult]} = results;
+
+		const expected = 'fixtures/nodir/nested/index.js'.split('/').join(path.sep);
+		const actual = path.relative(__dirname, fileResult.filePath);
+		t.is(actual, expected);
+		t.is(results.errorCount, 1);
+	}
 });
 
 test.serial('cwd option', async t => {
