@@ -1,4 +1,5 @@
 /* eslint-disable ava/no-skip-test */
+import process from 'node:process';
 import path from 'node:path';
 import test from 'ava';
 import proxyquire from 'proxyquire';

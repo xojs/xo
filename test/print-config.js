@@ -1,3 +1,4 @@
+import process from 'node:process';
 import path from 'node:path';
 import test from 'ava';
 import execa from 'execa';

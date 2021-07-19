@@ -322,7 +322,7 @@ module.exports = {
 		'node/no-deprecated-api': 'error',
 		'node/prefer-global/buffer': [
 			'error',
-			'always',
+			'never',
 		],
 		'node/prefer-global/console': [
 			'error',
@@ -330,7 +330,7 @@ module.exports = {
 		],
 		'node/prefer-global/process': [
 			'error',
-			'always',
+			'never',
 		],
 		'node/prefer-global/text-decoder': [
 			'error',

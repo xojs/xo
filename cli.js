@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import process from 'node:process';
 import getStdin from 'get-stdin';
 import meow from 'meow';
 import formatterPretty from 'eslint-formatter-pretty';
