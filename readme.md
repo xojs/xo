@@ -420,7 +420,7 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [Atom](https://github.com/xojs/atom-linter-xo)
 - [Vim](https://github.com/xojs/vim-xo)
 - [TextMate 2](https://github.com/claylo/XO.tmbundle)
-- [VSCode](https://github.com/SamVerschueren/vscode-linter-xo)
+- [VSCode](https://github.com/spence-s/vscode-linter-xo)
 - [Emacs](https://github.com/j-em/xo-emacs)
 - [WebStorm](https://github.com/jamestalmage/xo-with-webstorm)
 
