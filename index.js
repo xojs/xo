@@ -1,7 +1,7 @@
 import process from 'node:process';
 import path from 'node:path';
 import {ESLint} from 'eslint';
-import globby from 'globby';
+import {globby, isGitIgnoredSync} from 'globby';
 import {isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
@@ -123,7 +123,7 @@ const lintText = async (string, inputOptions = {}) => {
 
 		if (
 			micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
-			|| globby.gitignore.sync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
+			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
 			|| await engine.isPathIgnored(filePath)
 		) {
 			return {
