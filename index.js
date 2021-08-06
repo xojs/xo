@@ -111,17 +111,6 @@ const getConfig = async options => {
 	return engine.calculateConfigForFile(filePath);
 };
 
-const getEmptyReport = filename => ({
-	errorCount: 0,
-	warningCount: 0,
-	results: [{
-		errorCount: 0,
-		filePath: filename,
-		messages: [],
-		warningCount: 0,
-	}],
-});
-
 const lintText = async (string, inputOptions = {}) => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(inputOptions));
 	const options = buildConfig(foundOptions, prettierOptions);
@@ -141,7 +130,16 @@ const lintText = async (string, inputOptions = {}) => {
 			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
 			|| await engine.isPathIgnored(filePath)
 		) {
-			return getEmptyReport(filename);
+			return {
+				errorCount: 0,
+				warningCount: 0,
+				results: [{
+					errorCount: 0,
+					filePath: filename,
+					messages: [],
+					warningCount: 0,
+				}],
+			};
 		}
 	}
 
