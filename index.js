@@ -82,9 +82,10 @@ const processReport = (report, {isQuiet = false} = {}) => {
 	return result;
 };
 
-const runEslint = async (filePath, options, processorOptions) => {
+const runEslint = async (options, processorOptions) => {
+	const {filePath, warnIgnored, ...eslintOptions} = options;
+	const engine = new ESLint(eslintOptions);
 	const filename = path.relative(options.cwd, filePath);
-	const engine = new ESLint(options);
 
 	if (
 		micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
@@ -162,9 +163,7 @@ const lintFiles = async (patterns, inputOptions = {}) => {
 				filePath: file,
 			});
 			const options = buildConfig(foundOptions, prettierOptions);
-			delete options.filePath;
-
-			return runEslint(file, options, {isQuiet: inputOptions.quiet});
+			return runEslint(options, {isQuiet: inputOptions.quiet});
 		},
 	);
 
