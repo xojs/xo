@@ -5,18 +5,13 @@ import {globby, isGitIgnoredSync} from 'globby';
 import {isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
-import pReduce from 'p-reduce';
 import pMap from 'p-map';
-import {cosmiconfig, defaultLoaders} from 'cosmiconfig';
 import defineLazyProperty from 'define-lazy-prop';
-import pFilter from 'p-filter';
 import slash from 'slash';
-import {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES} from './lib/constants.js';
 import {
 	normalizeOptions,
 	getIgnores,
 	mergeWithFileConfig,
-	mergeWithFileConfigs,
 	buildConfig,
 	mergeOptions,
 } from './lib/options-manager.js';
