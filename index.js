@@ -87,10 +87,14 @@ const processReport = (report, {isQuiet = false} = {}) => {
 	return result;
 };
 
-const runEslint = async (paths, options, processorOptions) => {
+const runEslint = async (file, options, processorOptions) => {
 	const engine = new ESLint(options);
 
-	const report = await engine.lintFiles(await pFilter(paths, async path => !(await engine.isPathIgnored(path))));
+	if (await engine.isPathIgnored(file)) {
+		return getEmptyReport(file);
+	}
+
+	const report = await engine.lintFiles([file]);
 	return processReport(report, processorOptions);
 };
 
@@ -106,6 +110,17 @@ const getConfig = async options => {
 	const engine = new ESLint(eslintOptions);
 	return engine.calculateConfigForFile(filePath);
 };
+
+const getEmptyReport = filename => ({
+	errorCount: 0,
+	warningCount: 0,
+	results: [{
+		errorCount: 0,
+		filePath: filename,
+		messages: [],
+		warningCount: 0,
+	}],
+});
 
 const lintText = async (string, inputOptions = {}) => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(inputOptions));
@@ -126,16 +141,7 @@ const lintText = async (string, inputOptions = {}) => {
 			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
 			|| await engine.isPathIgnored(filePath)
 		) {
-			return {
-				errorCount: 0,
-				warningCount: 0,
-				results: [{
-					errorCount: 0,
-					filePath: filename,
-					messages: [],
-					warningCount: 0,
-				}],
-			};
+			return getEmptyReport(filename);
 		}
 	}
 
@@ -145,25 +151,26 @@ const lintText = async (string, inputOptions = {}) => {
 };
 
 const lintFiles = async (patterns, inputOptions = {}) => {
+	inputOptions = normalizeOptions(inputOptions);
 	inputOptions.cwd = path.resolve(inputOptions.cwd || process.cwd());
-	const configExplorer = cosmiconfig(MODULE_NAME, {searchPlaces: CONFIG_FILES, loaders: {noExt: defaultLoaders['.json']}, stopDir: inputOptions.cwd});
 
-	const configFiles = (await Promise.all(
-		(await globby(
-			CONFIG_FILES.map(configFile => `**/${configFile}`),
-			{ignore: DEFAULT_IGNORES, gitignore: true, absolute: true, cwd: inputOptions.cwd},
-		)).map(configFile => configExplorer.load(configFile)),
-	)).filter(Boolean);
+	const files = await globFiles(patterns, mergeOptions(inputOptions));
 
-	const paths = configFiles.length > 0
-		? await pReduce(
-			configFiles,
-			async (paths, {filepath, config}) =>
-				[...paths, ...(await globFiles(patterns, {...mergeOptions(inputOptions, config), cwd: path.dirname(filepath)}))],
-			[])
-		: await globFiles(patterns, mergeOptions(inputOptions));
+	const reports = await pMap(
+		files,
+		async file => {
+			const {options: foundOptions, prettierOptions} = mergeWithFileConfig({
+				...inputOptions,
+				filePath: file,
+			});
+			const options = buildConfig(foundOptions, prettierOptions);
+			delete options.filePath;
 
-	return mergeReports(await pMap(await mergeWithFileConfigs([...new Set(paths)], inputOptions, configFiles), async ({files, options, prettierOptions}) => runEslint(files, buildConfig(options, prettierOptions), {isQuiet: options.quiet})));
+			return runEslint(file, options, {isQuiet: inputOptions.quiet});
+		},
+	);
+
+	return mergeReports(reports);
 };
 
 const getFormatter = async name => {
