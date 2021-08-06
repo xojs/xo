@@ -2,7 +2,7 @@ import process from 'node:process';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {isEqual} from 'lodash-es';
+import {drop, isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
 import pMap from 'p-map';
@@ -82,9 +82,8 @@ const processReport = (report, {isQuiet = false} = {}) => {
 	return result;
 };
 
-const runEslint = async (options, processorOptions) => {
-	const {filePath, warnIgnored, ...eslintOptions} = options;
-	const engine = new ESLint(eslintOptions);
+const runEslint = async (filePath, options, processorOptions) => {
+	const engine = new ESLint(drop(options, ['filePath', 'warnIgnored']));
 	const filename = path.relative(options.cwd, filePath);
 
 	if (
@@ -157,13 +156,13 @@ const lintFiles = async (patterns, inputOptions = {}) => {
 
 	const reports = await pMap(
 		files,
-		async file => {
+		async filePath => {
 			const {options: foundOptions, prettierOptions} = mergeWithFileConfig({
 				...inputOptions,
-				filePath: file,
+				filePath,
 			});
 			const options = buildConfig(foundOptions, prettierOptions);
-			return runEslint(options, {isQuiet: inputOptions.quiet});
+			return runEslint(filePath, options, {isQuiet: inputOptions.quiet});
 		},
 	);
 
