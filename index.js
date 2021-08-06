@@ -2,7 +2,7 @@ import process from 'node:process';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {drop, isEqual} from 'lodash-es';
+import {omit, isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
 import pMap from 'p-map';
@@ -83,7 +83,7 @@ const processReport = (report, {isQuiet = false} = {}) => {
 };
 
 const runEslint = async (filePath, options, processorOptions) => {
-	const engine = new ESLint(drop(options, ['filePath', 'warnIgnored']));
+	const engine = new ESLint(omit(options, ['filePath', 'warnIgnored']));
 	const filename = path.relative(options.cwd, filePath);
 
 	if (
