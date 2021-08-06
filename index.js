@@ -82,14 +82,19 @@ const processReport = (report, {isQuiet = false} = {}) => {
 	return result;
 };
 
-const runEslint = async (file, options, processorOptions) => {
+const runEslint = async (filePath, options, processorOptions) => {
+	const filename = path.relative(options.cwd, filePath);
 	const engine = new ESLint(options);
 
-	if (await engine.isPathIgnored(file)) {
-		return getEmptyReport(file);
+	if (
+		micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
+			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
+			|| await engine.isPathIgnored(filePath)
+	) {
+		return;
 	}
 
-	const report = await engine.lintFiles([file]);
+	const report = await engine.lintFiles([filePath]);
 	return processReport(report, processorOptions);
 };
 
@@ -165,7 +170,7 @@ const lintFiles = async (patterns, inputOptions = {}) => {
 		},
 	);
 
-	return mergeReports(reports);
+	return mergeReports(reports.filter(Boolean));
 };
 
 const getFormatter = async name => {
