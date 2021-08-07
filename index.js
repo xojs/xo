@@ -38,12 +38,13 @@ const getConfig = async options => {
 const runEslint = async (lint, options, processorOptions) => {
 	const {filePath, warnIgnored, ...eslintOptions} = options;
 	const engine = new ESLint(eslintOptions);
+	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
 
 	if (
 		filePath
 		&& (
-			micromatch.isMatch(path.relative(options.cwd, filePath), options.baseConfig.ignorePatterns)
-			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
+			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
+			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
 			|| await engine.isPathIgnored(filePath)
 		)
 	) {
