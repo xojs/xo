@@ -10,21 +10,7 @@ import {
 	getIgnores,
 	mergeWithFileConfig,
 } from './lib/options-manager.js';
-import {mergeReports, processReport} from './lib/report.js';
-
-const getIgnoredReport = filePath => ({
-	errorCount: 0,
-	warningCount: 0,
-	results: [
-		{
-			errorCount: 0,
-			warningCount: 0,
-			filePath,
-			messages: [],
-		},
-	],
-	isIgnored: true,
-});
+import {mergeReports, processReport, getIgnoredReport} from './lib/report.js';
 
 const runEslint = async (lint, options) => {
 	const {filePath, eslintOptions, isQuiet} = options;
