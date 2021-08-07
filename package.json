@@ -16,7 +16,7 @@
 		"node": ">=12.20"
 	},
 	"scripts": {
-		"test": "eslint --quiet . --ext .js,.cjs && nyc ava"
+		"test": "node cli.js && nyc ava"
 	},
 	"files": [
 		"config",
@@ -106,18 +106,13 @@
 		"temp-write": "^5.0.0",
 		"webpack": "^5.48.0"
 	},
-	"eslintConfig": {
-		"extends": [
-			"eslint-config-xo",
-			"./config/plugins.cjs",
-			"./config/overrides.cjs"
+	"xo": {
+		"ignores": [
+			"test/fixtures",
+			"test/temp",
+			"coverage"
 		]
 	},
-	"eslintIgnore": [
-		"test/fixtures",
-		"test/temp",
-		"coverage"
-	],
 	"ava": {
 		"files": [
 			"!test/temp"
