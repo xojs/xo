@@ -12,6 +12,44 @@ import {
 } from './lib/options-manager.js';
 import {mergeReports, processReport} from './lib/report.js';
 
+const getIgnoredReport = filePath => ({
+	errorCount: 0,
+	warningCount: 0,
+	results: [
+		{
+			errorCount: 0,
+			warningCount: 0,
+			filePath,
+			messages: [],
+		},
+	],
+	isIgnored: true,
+});
+
+const runEslint = async (lint, options) => {
+	const {filePath, eslintOptions, isQuiet} = options;
+	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
+
+	if (
+		filePath
+		&& (
+			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
+			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
+		)
+	) {
+		return getIgnoredReport(filePath);
+	}
+
+	const eslint = new ESLint(eslintOptions);
+
+	if (filePath && await eslint.isPathIgnored(filePath)) {
+		return getIgnoredReport(filePath);
+	}
+
+	const report = await lint(eslint);
+	return processReport(report, {isQuiet});
+};
+
 const globFiles = async (patterns, options) => {
 	const {ignores, extensions, cwd} = (await mergeWithFileConfig(options)).options;
 
@@ -31,38 +69,6 @@ const getConfig = async options => {
 	const {filePath, eslintOptions} = await parseOptions(options);
 	const engine = new ESLint(eslintOptions);
 	return engine.calculateConfigForFile(filePath);
-};
-
-const runEslint = async (lint, options) => {
-	const {filePath, eslintOptions, isQuiet} = options;
-	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
-	const eslint = new ESLint(eslintOptions);
-
-	if (
-		filePath
-		&& (
-			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
-			|| await eslint.isPathIgnored(filePath)
-		)
-	) {
-		return {
-			errorCount: 0,
-			warningCount: 0,
-			results: [
-				{
-					errorCount: 0,
-					warningCount: 0,
-					filePath,
-					messages: [],
-				},
-			],
-			isIgnored: true,
-		};
-	}
-
-	const report = await lint(eslint);
-	return processReport(report, {isQuiet});
 };
 
 const lintText = async (string, inputOptions = {}) => {
