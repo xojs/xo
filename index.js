@@ -6,23 +6,11 @@ import micromatch from 'micromatch';
 import arrify from 'arrify';
 import slash from 'slash';
 import {
-	normalizeOptions,
+	parseOptions,
 	getIgnores,
 	mergeWithFileConfig,
-	buildConfig,
 } from './lib/options-manager.js';
 import {mergeReports, processReport} from './lib/report.js';
-
-const getOptions = options => {
-	options = normalizeOptions(options);
-	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(options);
-	const {filePath, warnIgnored, ...eslintOptions} = buildConfig({foundOptions, prettierOptions});
-	return {
-		filePath,
-		warnIgnored,
-		eslintOptions,
-	};
-};
 
 const globFiles = async (patterns, options) => {
 	const {ignores, extensions, cwd} = mergeWithFileConfig(options).options;
@@ -40,22 +28,22 @@ const globFiles = async (patterns, options) => {
 };
 
 const getConfig = async options => {
-	const {filePath, eslintOptions} = getOptions(options);
+	const {filePath, eslintOptions} = parseOptions(options);
 	const engine = new ESLint(eslintOptions);
 	return engine.calculateConfigForFile(filePath);
 };
 
-const runEslint = async (lint, options, processorOptions) => {
-	const {filePath, eslintOptions} = options;
-	const engine = new ESLint(eslintOptions);
+const runEslint = async (lint, options) => {
+	const {filePath, eslintOptions, isQuiet} = options;
 	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
+	const eslint = new ESLint(eslintOptions);
 
 	if (
 		filePath
 		&& (
 			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
 			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
-			|| await engine.isPathIgnored(filePath)
+			|| await eslint.isPathIgnored(filePath)
 		)
 	) {
 		return {
@@ -73,34 +61,29 @@ const runEslint = async (lint, options, processorOptions) => {
 		};
 	}
 
-	const report = await lint(engine);
-	return processReport(report, processorOptions);
+	const report = await lint(eslint);
+	return processReport(report, {isQuiet});
 };
 
 const lintText = async (string, inputOptions = {}) => {
-	const options = getOptions(inputOptions);
-	const {filePath, warnIgnored} = options;
+	const options = parseOptions(inputOptions);
+	const {filePath, warnIgnored, eslintOptions} = options;
+	const {ignorePatterns} = eslintOptions.baseConfig;
 
-	if (options.baseConfig.ignorePatterns && !isEqual(getIgnores({}), options.baseConfig.ignorePatterns) && typeof options.filePath !== 'string') {
+	if (typeof filePath !== 'string' && !isEqual(getIgnores({}), ignorePatterns)) {
 		throw new Error('The `ignores` option requires the `filePath` option to be defined.');
 	}
 
 	return runEslint(
-		engine => engine.lintText(string, {filePath, warnIgnored}),
+		eslint => eslint.lintText(string, {filePath, warnIgnored}),
 		options,
-		{isQuiet: inputOptions.quiet},
 	);
 };
 
-const lintFile = async (filePath, inputOptions) => {
-	const options = getOptions({...inputOptions, filePath});
-
-	return runEslint(
-		engine => engine.lintFiles([filePath]),
-		options,
-		{isQuiet: inputOptions.quiet},
-	);
-};
+const lintFile = async (filePath, options) => runEslint(
+	eslint => eslint.lintFiles([filePath]),
+	parseOptions({...options, filePath}),
+);
 
 const lintFiles = async (patterns, inputOptions = {}) => {
 	const files = await globFiles(patterns, inputOptions);
