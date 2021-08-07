@@ -13,6 +13,17 @@ import {
 } from './lib/options-manager.js';
 import {mergeReports, processReport} from './lib/report.js';
 
+const getOptions = options => {
+	options = normalizeOptions(options);
+	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(options);
+	const {filePath, warnIgnored, ...eslintOptions} = buildConfig({foundOptions, prettierOptions});
+	return {
+		filePath,
+		warnIgnored,
+		eslintOptions,
+	};
+};
+
 const globFiles = async (patterns, options) => {
 	const {ignores, extensions, cwd} = mergeWithFileConfig(options).options;
 
@@ -29,14 +40,13 @@ const globFiles = async (patterns, options) => {
 };
 
 const getConfig = async options => {
-	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
-	const {filePath, warnIgnored, ...eslintOptions} = buildConfig(foundOptions, prettierOptions);
+	const {filePath, eslintOptions} = getOptions(options);
 	const engine = new ESLint(eslintOptions);
 	return engine.calculateConfigForFile(filePath);
 };
 
 const runEslint = async (lint, options, processorOptions) => {
-	const {filePath, warnIgnored, ...eslintOptions} = options;
+	const {filePath, eslintOptions} = options;
 	const engine = new ESLint(eslintOptions);
 	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
 
@@ -68,8 +78,7 @@ const runEslint = async (lint, options, processorOptions) => {
 };
 
 const lintText = async (string, inputOptions = {}) => {
-	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(inputOptions));
-	const options = buildConfig(foundOptions, prettierOptions);
+	const options = getOptions(inputOptions);
 	const {filePath, warnIgnored} = options;
 
 	if (options.baseConfig.ignorePatterns && !isEqual(getIgnores({}), options.baseConfig.ignorePatterns) && typeof options.filePath !== 'string') {
@@ -84,11 +93,7 @@ const lintText = async (string, inputOptions = {}) => {
 };
 
 const lintFile = async (filePath, inputOptions) => {
-	const {options: foundOptions, prettierOptions} = mergeWithFileConfig({
-		...inputOptions,
-		filePath,
-	});
-	const options = buildConfig(foundOptions, prettierOptions);
+	const options = getOptions({...inputOptions, filePath});
 
 	return runEslint(
 		engine => engine.lintFiles([filePath]),
