@@ -16,6 +16,17 @@ import {
 } from './lib/options-manager.js';
 import {mergeReports, processReport} from './lib/report.js';
 
+const getEmptyReport = filePath => ({
+	errorCount: 0,
+	warningCount: 0,
+	results: [{
+		errorCount: 0,
+		filePath,
+		messages: [],
+		warningCount: 0,
+	}],
+});
+
 const runEslint = async (filePath, options, processorOptions) => {
 	const engine = new ESLint(omit(options, ['filePath', 'warnIgnored']));
 	const filename = path.relative(options.cwd, filePath);
@@ -25,18 +36,45 @@ const runEslint = async (filePath, options, processorOptions) => {
 			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
 			|| await engine.isPathIgnored(filePath)
 	) {
-		return;
+		return getEmptyReport(filePath);
 	}
 
 	const report = await engine.lintFiles([filePath]);
 	return processReport(report, processorOptions);
 };
 
-const globFiles = async (patterns, {ignores, extensions, cwd}) => (
-	await globby(
-		patterns.length === 0 ? [`**/*.{${extensions.join(',')}}`] : arrify(patterns).map(pattern => slash(pattern)),
+const runEslintText = async (string, options, processorOptions) => {
+	const {filePath, warnIgnored, ...eslintOptions} = options;
+	const engine = new ESLint(eslintOptions);
+
+	if (filePath) {
+		const filename = path.relative(options.cwd, filePath);
+
+		if (
+			micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
+			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
+			|| await engine.isPathIgnored(filePath)
+		) {
+			return getEmptyReport(filePath);
+		}
+	}
+
+	const report = await engine.lintText(string, {filePath, warnIgnored});
+
+	return processReport(report, processorOptions);
+};
+
+const globFiles = async (patterns, options) => {
+	const {ignores, extensions, cwd} = mergeWithFileConfig(options).options;
+	patterns = patterns.length === 0
+		? [`**/*.{${extensions.join(',')}}`]
+		: arrify(patterns).map(pattern => slash(pattern));
+	const files = await globby(
+		patterns,
 		{ignore: ignores, gitignore: true, absolute: true, cwd},
-	)).filter(file => extensions.includes(path.extname(file).slice(1)));
+	);
+	return files.filter(file => extensions.includes(path.extname(file).slice(1)));
+};
 
 const getConfig = async options => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
@@ -53,54 +91,30 @@ const lintText = async (string, inputOptions = {}) => {
 		throw new Error('The `ignores` option requires the `filePath` option to be defined.');
 	}
 
-	const {filePath, warnIgnored, ...eslintOptions} = options;
-	const engine = new ESLint(eslintOptions);
+	return runEslintText(string, options, {isQuiet: inputOptions.quiet});
+};
 
-	if (filePath) {
-		const filename = path.relative(options.cwd, filePath);
-
-		if (
-			micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
-			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
-			|| await engine.isPathIgnored(filePath)
-		) {
-			return {
-				errorCount: 0,
-				warningCount: 0,
-				results: [{
-					errorCount: 0,
-					filePath: filename,
-					messages: [],
-					warningCount: 0,
-				}],
-			};
-		}
-	}
-
-	const report = await engine.lintText(string, {filePath, warnIgnored});
-
-	return processReport(report, {isQuiet: inputOptions.quiet});
+const lintFile = async (filePath, inputOptions) => {
+	const {options: foundOptions, prettierOptions} = mergeWithFileConfig({
+		...inputOptions,
+		filePath,
+	});
+	const options = buildConfig(foundOptions, prettierOptions);
+	return runEslint(filePath, options, {isQuiet: inputOptions.quiet});
 };
 
 const lintFiles = async (patterns, inputOptions = {}) => {
 	inputOptions = normalizeOptions(inputOptions);
 	inputOptions.cwd = path.resolve(inputOptions.cwd || process.cwd());
 
-	const files = await globFiles(patterns, mergeOptions(inputOptions));
+	const files = await globFiles(patterns, inputOptions);
 
 	const reports = await pMap(
 		files,
-		async filePath => {
-			const {options: foundOptions, prettierOptions} = mergeWithFileConfig({
-				...inputOptions,
-				filePath,
-			});
-			const options = buildConfig(foundOptions, prettierOptions);
-			return runEslint(filePath, options, {isQuiet: inputOptions.quiet});
-		},
+		async filePath => lintFile(filePath, inputOptions),
 	);
 
-	return mergeReports(reports.filter(Boolean));
+	return mergeReports(reports);
 };
 
 const getFormatter = async name => {
