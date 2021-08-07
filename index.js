@@ -57,8 +57,8 @@ const getConfig = async options => {
 	return engine.calculateConfigForFile(filePath);
 };
 
-const lintText = async (string, inputOptions = {}) => {
-	const options = await parseOptions(inputOptions);
+const lintText = async (string, options) => {
+	options = await parseOptions(options);
 	const {filePath, warnIgnored, eslintOptions} = options;
 	const {ignorePatterns} = eslintOptions.baseConfig;
 
@@ -77,11 +77,11 @@ const lintFile = async (filePath, options) => runEslint(
 	await parseOptions({...options, filePath}),
 );
 
-const lintFiles = async (patterns, inputOptions = {}) => {
-	const files = await globFiles(patterns, inputOptions);
+const lintFiles = async (patterns, options) => {
+	const files = await globFiles(patterns, options);
 
 	const reports = await Promise.all(
-		files.map(filePath => lintFile(filePath, inputOptions)),
+		files.map(filePath => lintFile(filePath, options)),
 	);
 
 	const report = mergeReports(reports.filter(({isIgnored}) => !isIgnored));
