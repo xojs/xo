@@ -13,7 +13,7 @@ import {
 import {mergeReports, processReport} from './lib/report.js';
 
 const globFiles = async (patterns, options) => {
-	const {ignores, extensions, cwd} = mergeWithFileConfig(options).options;
+	const {ignores, extensions, cwd} = (await mergeWithFileConfig(options)).options;
 
 	patterns = patterns.length === 0
 		? [`**/*.{${extensions.join(',')}}`]
@@ -28,7 +28,7 @@ const globFiles = async (patterns, options) => {
 };
 
 const getConfig = async options => {
-	const {filePath, eslintOptions} = parseOptions(options);
+	const {filePath, eslintOptions} = await parseOptions(options);
 	const engine = new ESLint(eslintOptions);
 	return engine.calculateConfigForFile(filePath);
 };
@@ -66,7 +66,7 @@ const runEslint = async (lint, options) => {
 };
 
 const lintText = async (string, inputOptions = {}) => {
-	const options = parseOptions(inputOptions);
+	const options = await parseOptions(inputOptions);
 	const {filePath, warnIgnored, eslintOptions} = options;
 	const {ignorePatterns} = eslintOptions.baseConfig;
 
@@ -82,7 +82,7 @@ const lintText = async (string, inputOptions = {}) => {
 
 const lintFile = async (filePath, options) => runEslint(
 	eslint => eslint.lintFiles([filePath]),
-	parseOptions({...options, filePath}),
+	await parseOptions({...options, filePath}),
 );
 
 const lintFiles = async (patterns, inputOptions = {}) => {

@@ -493,51 +493,51 @@ test('findApplicableOverrides', t => {
 	]);
 });
 
-test('mergeWithFileConfig: use child if closest', t => {
+test('mergeWithFileConfig: use child if closest', async t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
-	const {options} = manager.mergeWithFileConfig({cwd});
+	const {options} = await manager.mergeWithFileConfig({cwd});
 	const expected = {...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: use parent if closest', t => {
+test('mergeWithFileConfig: use parent if closest', async t => {
 	const cwd = path.resolve('fixtures', 'nested');
-	const {options} = manager.mergeWithFileConfig({cwd});
+	const {options} = await manager.mergeWithFileConfig({cwd});
 	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: use parent if child is ignored', t => {
+test('mergeWithFileConfig: use parent if child is ignored', async t => {
 	const cwd = path.resolve('fixtures', 'nested');
 	const filePath = path.resolve(cwd, 'child-ignore', 'file.js');
-	const {options} = manager.mergeWithFileConfig({cwd, filePath});
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filePath};
 	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: use child if child is empty', t => {
+test('mergeWithFileConfig: use child if child is empty', async t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
-	const {options} = manager.mergeWithFileConfig({cwd});
+	const {options} = await manager.mergeWithFileConfig({cwd});
 	t.deepEqual(options, {extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd});
 });
 
-test('mergeWithFileConfig: read engines from package.json', t => {
+test('mergeWithFileConfig: read engines from package.json', async t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const {options} = manager.mergeWithFileConfig({cwd});
+	const {options} = await manager.mergeWithFileConfig({cwd});
 	const expected = {nodeVersion: enginesConfig.engines.node, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: XO engine options supersede package.json\'s', t => {
+test('mergeWithFileConfig: XO engine options supersede package.json\'s', async t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const {options} = manager.mergeWithFileConfig({cwd, nodeVersion: '>=8'});
+	const {options} = await manager.mergeWithFileConfig({cwd, nodeVersion: '>=8'});
 	const expected = {nodeVersion: '>=8', extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: XO engine options false supersede package.json\'s', t => {
+test('mergeWithFileConfig: XO engine options false supersede package.json\'s', async t => {
 	const cwd = path.resolve('fixtures', 'engines');
-	const {options} = manager.mergeWithFileConfig({cwd, nodeVersion: false});
+	const {options} = await manager.mergeWithFileConfig({cwd, nodeVersion: false});
 	const expected = {nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd};
 	t.deepEqual(options, expected);
 });
@@ -545,7 +545,7 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', t
 test('mergeWithFileConfig: typescript files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filePath = path.resolve(cwd, 'file.ts');
-	const {options} = manager.mergeWithFileConfig({cwd, filePath});
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const expected = {
 		filePath,
 		extensions: DEFAULT_EXTENSION,
@@ -567,7 +567,7 @@ test('mergeWithFileConfig: typescript files', async t => {
 test('mergeWithFileConfig: tsx files', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filePath = path.resolve(cwd, 'file.tsx');
-	const {options} = manager.mergeWithFileConfig({cwd, filePath});
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const expected = {
 		filePath,
 		extensions: DEFAULT_EXTENSION,
