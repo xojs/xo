@@ -1,11 +1,9 @@
-import process from 'node:process';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {omit, isEqual} from 'lodash-es';
+import {isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
-import pMap from 'p-map';
 import slash from 'slash';
 import {
 	normalizeOptions,
@@ -71,7 +69,7 @@ const runEslint = async (lint, options, processorOptions) => {
 const lintText = async (string, inputOptions = {}) => {
 	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(inputOptions));
 	const options = buildConfig(foundOptions, prettierOptions);
-	const {filePath, warnIgnored, ...eslintOptions} = options;
+	const {filePath, warnIgnored} = options;
 
 	if (options.baseConfig.ignorePatterns && !isEqual(getIgnores({}), options.baseConfig.ignorePatterns) && typeof options.filePath !== 'string') {
 		throw new Error('The `ignores` option requires the `filePath` option to be defined.');
@@ -99,9 +97,6 @@ const lintFile = async (filePath, inputOptions) => {
 };
 
 const lintFiles = async (patterns, inputOptions = {}) => {
-	inputOptions = normalizeOptions(inputOptions);
-	inputOptions.cwd = path.resolve(inputOptions.cwd || process.cwd());
-
 	const files = await globFiles(patterns, inputOptions);
 
 	const reports = await Promise.all(
@@ -109,6 +104,7 @@ const lintFiles = async (patterns, inputOptions = {}) => {
 	);
 
 	const report = mergeReports(reports.filter(({isIgnored}) => !isIgnored));
+
 	return report;
 };
 
