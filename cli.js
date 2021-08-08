@@ -173,8 +173,8 @@ if (options.nodeVersion) {
 }
 
 (async () => {
-	if (options.printConfig) {
-		if (input.length > 0) {
+	if (typeof options.printConfig === 'string') {
+		if (input.length > 0 || options.printConfig === '') {
 			console.error('The `--print-config` flag must be used with exactly one filename');
 			process.exit(1);
 		}
