@@ -98,7 +98,7 @@ test('buildConfig: prettier: true', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none',
+		trailingComma: 'all',
 	}]);
 	// eslint-prettier-config must always be last
 	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'prettier');
@@ -123,7 +123,7 @@ test('buildConfig: prettier: true, typescript file', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none',
+		trailingComma: 'all',
 	}]);
 
 	// eslint-prettier-config must always be last
@@ -149,7 +149,7 @@ test('buildConfig: prettier: true, semicolon: false', t => {
 		semi: false,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none',
+		trailingComma: 'all',
 	}]);
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -170,7 +170,7 @@ test('buildConfig: prettier: true, space: 4', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 4,
-		trailingComma: 'none',
+		trailingComma: 'all',
 	}]);
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -191,7 +191,7 @@ test('buildConfig: prettier: true, space: true', t => {
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
-		trailingComma: 'none',
+		trailingComma: 'all',
 	}]);
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -275,7 +275,7 @@ test('buildConfig: nodeVersion: >=8', t => {
 test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
 	const prettierOptions = {
 		singleQuote: false,
-		trailingComma: 'all',
+		trailingComma: 'none',
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
 	};
@@ -301,7 +301,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from xo c
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
 		singleQuote: true,
-		trailingComma: 'none',
+		trailingComma: 'all',
 		...prettierOptions,
 	};
 	t.deepEqual(result, expected);
@@ -318,7 +318,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from pret
 		bracketSpacing: false,
 		jsxBracketSameLine: false,
 		singleQuote: true,
-		trailingComma: 'none',
+		trailingComma: 'all',
 		...prettierOptions,
 	};
 	t.deepEqual(result, expected);
