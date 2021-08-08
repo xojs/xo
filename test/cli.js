@@ -190,3 +190,10 @@ test('print-config flag requires a single filename', async t => {
 	);
 	t.is(error.stderr.trim(), 'The `--print-config` flag must be used with exactly one filename');
 });
+
+test('print-config flag without filename', async t => {
+	const error = await t.throwsAsync(() =>
+		main(['--print-config']),
+	);
+	t.is(error.stderr.trim(), 'The `--print-config` flag must be used with exactly one filename');
+});
