@@ -169,14 +169,14 @@ module.exports = {
 };
 ```
 
-[Globals](https://eslint.org/docs/user-guide/configuring#specifying-globals) and [rules](https://eslint.org/docs/user-guide/configuring#configuring-rules) can be configured inline in files.
+[Globals](https://eslint.org/docs/user-guide/configuring/language-options#specifying-globals) and [rules](https://eslint.org/docs/user-guide/configuring/rules#configuring-rules) can be configured inline in files.
 
 ### envs
 
 Type: `string[]`\
 Default: `['es2021', 'node']`
 
-Which [environments](https://eslint.org/docs/user-guide/configuring#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
+Which [environments](https://eslint.org/docs/user-guide/configuring/language-options#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
 
 ### globals
 
@@ -188,7 +188,7 @@ Additional global variables your code accesses during execution.
 
 Type: `string[]`
 
-Some [paths](lib/options-manager.js) are ignored by default, including paths in `.gitignore` and [.eslintignore](https://eslint.org/docs/user-guide/configuring#eslintignore). Additional ignores can be added here.
+Some [paths](lib/options-manager.js) are ignored by default, including paths in `.gitignore` and [.eslintignore](https://eslint.org/docs/user-guide/configuring/ignoring-code#the-eslintignore-file). Additional ignores can be added here.
 
 ### space
 
@@ -245,13 +245,13 @@ If set to `false`, no rules specific to a Node.js version will be enabled.
 
 Type: `string[]`
 
-Include third-party [plugins](https://eslint.org/docs/user-guide/configuring.html#configuring-plugins).
+Include third-party [plugins](https://eslint.org/docs/user-guide/configuring/plugins#configuring-plugins).
 
 ### extends
 
 Type: `string | string[]`
 
-Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shareable-configs.html) or [plugin configs](https://eslint.org/docs/user-guide/configuring#using-the-configuration-from-a-plugin) to override any of the default rules (like `rules` above).
+Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shareable-configs) or [plugin configs](https://eslint.org/docs/user-guide/configuring/configuration-files#using-a-configuration-from-a-plugin).
 
 ### extensions
 
@@ -263,7 +263,7 @@ Allow more extensions to be linted besides `.js`, `.jsx`, `.mjs`, and `.cjs`. Ma
 
 Type: `object`
 
-[Shared ESLint settings](https://eslint.org/docs/user-guide/configuring#adding-shared-settings) exposed to rules.
+[Shared ESLint settings](https://eslint.org/docs/user-guide/configuring/configuration-files#adding-shared-settings) exposed to rules.
 
 ### parser
 
@@ -275,7 +275,7 @@ ESLint parser. For example, [`@babel/eslint-parser`](https://github.com/babel/ba
 
 Type: `string`
 
-[ESLint processor.](https://eslint.org/docs/user-guide/configuring#specifying-processor)
+[ESLint processor.](https://eslint.org/docs/user-guide/configuring/plugins#specifying-processor)
 
 ### webpack
 
