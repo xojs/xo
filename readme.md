@@ -251,7 +251,7 @@ Include third-party [plugins](https://eslint.org/docs/user-guide/configuring/plu
 
 Type: `string | string[]`
 
-Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shareable-configs) or [plugin configs](https://eslint.org/docs/user-guide/configuring/configuration-files#using-a-configuration-from-a-plugin).
+Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shareable-configs) or [plugin configs](https://eslint.org/docs/user-guide/configuring/configuration-files#using-a-configuration-from-a-plugin) to override any of the default rules (like `rules` above).
 
 ### extensions
 
