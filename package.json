@@ -76,7 +76,6 @@
 		"esm-utils": "^1.1.0",
 		"find-cache-dir": "^3.3.1",
 		"find-up": "^5.0.0",
-		"fs-extra": "^10.0.0",
 		"get-stdin": "^9.0.0",
 		"globby": "^12.0.0",
 		"imurmurhash": "^0.1.4",
