@@ -1,14 +1,13 @@
+import {promises as fs} from 'node:fs';
 import process from 'node:process';
 import path from 'node:path';
 import test from 'ava';
 import {omit} from 'lodash-es';
-import fsExtra from 'fs-extra';
 import slash from 'slash';
 import createEsmUtils from 'esm-utils';
 import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants.js';
 import * as manager from '../lib/options-manager.js';
 
-const {readJson} = fsExtra;
 const {__dirname, require, json} = createEsmUtils(import.meta);
 const parentConfig = json.loadSync('./fixtures/nested/package.json');
 const childConfig = json.loadSync('./fixtures/nested/child/package.json');
@@ -557,7 +556,7 @@ test('mergeWithFileConfig: typescript files', async t => {
 	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	t.regex(slash(options.tsConfigPath), expectedConfigPath);
 	t.deepEqual(omit(options, 'tsConfigPath'), expected);
-	t.deepEqual(await readJson(options.tsConfigPath), {
+	t.deepEqual(JSON.parse(await fs.readFile(options.tsConfigPath, 'utf8')), {
 		extends: path.resolve(cwd, 'tsconfig.json'),
 		files: [path.resolve(cwd, 'file.ts')],
 		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))],
@@ -579,7 +578,7 @@ test('mergeWithFileConfig: tsx files', async t => {
 	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	t.regex(slash(options.tsConfigPath), expectedConfigPath);
 	t.deepEqual(omit(options, 'tsConfigPath'), expected);
-	t.deepEqual(await readJson(options.tsConfigPath), {
+	t.deepEqual(JSON.parse(await fs.readFile(options.tsConfigPath, 'utf8')), {
 		extends: path.resolve(cwd, 'tsconfig.json'),
 		files: [path.resolve(cwd, 'file.tsx')],
 		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))],
