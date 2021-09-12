@@ -578,7 +578,7 @@ test('mergeWithFileConfig: tsx files', async t => {
 	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	t.regex(slash(options.tsConfigPath), expectedConfigPath);
 	t.deepEqual(omit(options, 'tsConfigPath'), expected);
-	t.deepEqual(JSON.parse(await fs.readFile(options.tsConfigPath, 'utf-8')), {
+	t.deepEqual(JSON.parse(await fs.readFile(options.tsConfigPath, 'utf8')), {
 		extends: path.resolve(cwd, 'tsconfig.json'),
 		files: [path.resolve(cwd, 'file.tsx')],
 		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))],
