@@ -200,9 +200,8 @@ module.exports = {
 		],
 		'import/first': 'error',
 
-		// Disabled as it doesn't work with TypeScript.
-		// This issue and some others: https://github.com/benmosher/eslint-plugin-import/issues/1341
-		// 'import/named': 'error',
+		// Enabled, but disabled on TypeScript (https://github.com/xojs/xo/issues/576)
+		'import/named': 'error',
 
 		'import/namespace': [
 			'error',

@@ -437,6 +437,7 @@ test('buildConfig: typescript', t => {
 		project: './tsconfig.json',
 		projectFolderIgnoreList: [/\/node_modules\/(?!.*\.cache\/xo-linter)/],
 	});
+	t.is(config.baseConfig.rules['import/named'], 'off');
 });
 
 test('buildConfig: typescript with parserOption', t => {
