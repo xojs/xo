@@ -57,7 +57,6 @@
 		"@typescript-eslint/parser": "^4.29.0",
 		"arrify": "^3.0.0",
 		"cosmiconfig": "^7.0.0",
-		"debug": "^4.3.2",
 		"define-lazy-prop": "^3.0.0",
 		"eslint": "^7.32.0",
 		"eslint-config-prettier": "^8.3.0",
