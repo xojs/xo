@@ -89,11 +89,11 @@ test('buildConfig: prettier: true', t => {
 
 	t.deepEqual(config.baseConfig.plugins, ['prettier']);
 	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
-	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
+	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `bracketSameLine` with XO defaults
 	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: true,
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
@@ -114,11 +114,11 @@ test('buildConfig: prettier: true, typescript file', t => {
 
 	t.deepEqual(config.baseConfig.plugins, ['prettier']);
 	// Sets the `semi`, `useTabs` and `tabWidth` options in `prettier/prettier` based on the XO `space` and `semicolon` options
-	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` with XO defaults
+	// Sets `singleQuote`, `trailingComma`, `bracketSpacing` and `bracketSameLine` with XO defaults
 	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: true,
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
@@ -144,7 +144,7 @@ test('buildConfig: prettier: true, semicolon: false', t => {
 	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: true,
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 		semi: false,
 		singleQuote: true,
 		tabWidth: 2,
@@ -165,7 +165,7 @@ test('buildConfig: prettier: true, space: 4', t => {
 	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: false,
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 		semi: true,
 		singleQuote: true,
 		tabWidth: 4,
@@ -186,7 +186,7 @@ test('buildConfig: prettier: true, space: true', t => {
 	t.deepEqual(config.baseConfig.rules['prettier/prettier'], ['error', {
 		useTabs: false,
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 		semi: true,
 		singleQuote: true,
 		tabWidth: 2,
@@ -271,12 +271,12 @@ test('buildConfig: nodeVersion: >=8', t => {
 	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
 });
 
-test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `jsxBracketSameLine` from `prettier` config if defined', t => {
+test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `bracketSameLine` from `prettier` config if defined', t => {
 	const prettierOptions = {
 		singleQuote: false,
 		trailingComma: 'none',
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 	};
 	const result = manager.mergeWithPrettierConfig({}, prettierOptions);
 	const expected = {
@@ -298,7 +298,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from xo c
 	const result = manager.mergeWithPrettierConfig({space: 4, semicolon: false}, {});
 	const expected = {
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 		singleQuote: true,
 		trailingComma: 'all',
 		...prettierOptions,
@@ -315,7 +315,7 @@ test('mergeWithPrettierConfig: determine `tabWidth`, `useTabs`, `semi` from pret
 	const result = manager.mergeWithPrettierConfig({}, prettierOptions);
 	const expected = {
 		bracketSpacing: false,
-		jsxBracketSameLine: false,
+		bracketSameLine: false,
 		singleQuote: true,
 		trailingComma: 'all',
 		...prettierOptions,
