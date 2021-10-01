@@ -228,7 +228,7 @@ The [Prettier options](https://prettier.io/docs/en/options.html) will be read fr
 - [trailingComma](https://prettier.io/docs/en/options.html#trailing-commas): `all`
 - [singleQuote](https://prettier.io/docs/en/options.html#quotes): `true`
 - [bracketSpacing](https://prettier.io/docs/en/options.html#bracket-spacing): `false`
-- [jsxBracketSameLine](https://prettier.io/docs/en/options.html#jsx-brackets): `false`
+- [bracketSameLine](https://prettier.io/docs/en/options.html#bracket-line): `false`
 
 If contradicting options are set for both Prettier and XO an error will be thrown.
 
