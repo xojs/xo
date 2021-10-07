@@ -221,7 +221,7 @@ Default: `false`
 
 Format code with [Prettier](https://github.com/prettier/prettier).
 
-[Prettier options](https://prettier.io/docs/en/options.html) will be based on your [Prettier config](https://prettier.io/docs/en/configuration.html). XO will then **_merge_** your options with it's own defaults:
+[Prettier options](https://prettier.io/docs/en/options.html) will be based on your [Prettier config](https://prettier.io/docs/en/configuration.html). XO will then **merge** your options with its own defaults:
 - [semi](https://prettier.io/docs/en/options.html#semicolons): based on [semicolon](#semicolon) option
 - [useTabs](https://prettier.io/docs/en/options.html#tabs): based on [space](#space) option
 - [tabWidth](https://prettier.io/docs/en/options.html#tab-width): based on [space](#space) option
@@ -229,14 +229,14 @@ Format code with [Prettier](https://github.com/prettier/prettier).
 - [singleQuote](https://prettier.io/docs/en/options.html#quotes): `true`
 - [bracketSpacing](https://prettier.io/docs/en/options.html#bracket-spacing): `false`
 
-To stick with Prettier's defaults, add this to your prettier config:
+To stick with Prettier's defaults, add this to your Prettier config:
+
 ```js
 module.exports = {
-  // Asserting prettier defaults here tells XO to not add in it's own defaults:
-  trailingComma: 'es5',
-  singleQuote: false,
-  bracketSpacing: true,
-}
+	trailingComma: 'es5',
+	singleQuote: false,
+	bracketSpacing: true,
+};
 ```
 
 If contradicting options are set for both Prettier and XO an error will be thrown.
