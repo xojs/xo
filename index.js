@@ -13,6 +13,7 @@ import {
 	getIgnores,
 	mergeWithFileConfig,
 	buildConfig,
+	mergeOptions,
 } from './lib/options-manager.js';
 
 /** Merge multiple reports into a single report */
@@ -151,7 +152,7 @@ const lintFiles = async (patterns, inputOptions = {}) => {
 	inputOptions = normalizeOptions(inputOptions);
 	inputOptions.cwd = path.resolve(inputOptions.cwd || process.cwd());
 
-	const files = await globFiles(patterns, mergeWithFileConfig(inputOptions).options);
+	const files = await globFiles(patterns, mergeOptions(inputOptions));
 
 	const reports = await pMap(
 		files,
