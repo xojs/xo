@@ -84,13 +84,8 @@
 		"meow": "^10.1.1",
 		"micromatch": "^4.0.4",
 		"open-editor": "^3.0.0",
-<<<<<<< HEAD
-		"prettier": "^2.4.1",
-=======
 		"p-map": "^5.1.0",
-		"path-exists": "^4.0.0",
-		"prettier": "^2.3.2",
->>>>>>> parent of 3859d06 (Refactor (#585))
+		"prettier": "^2.4.1",
 		"semver": "^7.3.5",
 		"slash": "^4.0.0",
 		"to-absolute-glob": "^2.0.2",
