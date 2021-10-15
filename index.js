@@ -1,92 +1,171 @@
+import process from 'node:process';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {isEqual} from 'lodash-es';
+import {omit, isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
+import pMap from 'p-map';
+import defineLazyProperty from 'define-lazy-prop';
 import slash from 'slash';
 import {
-	parseOptions,
+	normalizeOptions,
 	getIgnores,
 	mergeWithFileConfig,
+	buildConfig,
 } from './lib/options-manager.js';
-import {mergeReports, processReport, getIgnoredReport} from './lib/report.js';
 
-const runEslint = async (lint, options) => {
-	const {filePath, eslintOptions, isQuiet} = options;
-	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
+/** Merge multiple reports into a single report */
+const mergeReports = reports => {
+	const report = {
+		results: [],
+		errorCount: 0,
+		warningCount: 0,
+	};
+
+	for (const currentReport of reports) {
+		report.results.push(...currentReport.results);
+		report.errorCount += currentReport.errorCount;
+		report.warningCount += currentReport.warningCount;
+	}
+
+	return report;
+};
+
+const getReportStatistics = results => {
+	const statistics = {
+		errorCount: 0,
+		warningCount: 0,
+		fixableErrorCount: 0,
+		fixableWarningCount: 0,
+	};
+
+	for (const result of results) {
+		statistics.errorCount += result.errorCount;
+		statistics.warningCount += result.warningCount;
+		statistics.fixableErrorCount += result.fixableErrorCount;
+		statistics.fixableWarningCount += result.fixableWarningCount;
+	}
+
+	return statistics;
+};
+
+const processReport = (report, {isQuiet = false} = {}) => {
+	if (isQuiet) {
+		report = ESLint.getErrorResults(report);
+	}
+
+	const result = {
+		results: report,
+		...getReportStatistics(report),
+	};
+
+	defineLazyProperty(result, 'usedDeprecatedRules', () => {
+		const seenRules = new Set();
+		const rules = [];
+
+		for (const {usedDeprecatedRules} of report) {
+			for (const rule of usedDeprecatedRules) {
+				if (seenRules.has(rule.ruleId)) {
+					continue;
+				}
+
+				seenRules.add(rule.ruleId);
+				rules.push(rule);
+			}
+		}
+
+		return rules;
+	});
+
+	return result;
+};
+
+const runEslint = async (filePath, options, processorOptions) => {
+	const engine = new ESLint(omit(options, ['filePath', 'warnIgnored']));
+	const filename = path.relative(options.cwd, filePath);
 
 	if (
-		filePath
-		&& (
-			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
-		)
+		micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
+			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
+			|| await engine.isPathIgnored(filePath)
 	) {
-		return getIgnoredReport(filePath);
+		return;
 	}
 
-	const eslint = new ESLint(eslintOptions);
-
-	if (filePath && await eslint.isPathIgnored(filePath)) {
-		return getIgnoredReport(filePath);
-	}
-
-	const report = await lint(eslint);
-	return processReport(report, {isQuiet});
+	const report = await engine.lintFiles([filePath]);
+	return processReport(report, processorOptions);
 };
 
-const globFiles = async (patterns, options) => {
-	const {ignores, extensions, cwd} = (await mergeWithFileConfig(options)).options;
-
-	patterns = patterns.length === 0
-		? [`**/*.{${extensions.join(',')}}`]
-		: arrify(patterns).map(pattern => slash(pattern));
-
-	const files = await globby(
-		patterns,
+const globFiles = async (patterns, {ignores, extensions, cwd}) => (
+	await globby(
+		patterns.length === 0 ? [`**/*.{${extensions.join(',')}}`] : arrify(patterns).map(pattern => slash(pattern)),
 		{ignore: ignores, gitignore: true, absolute: true, cwd},
-	);
-
-	return files.filter(file => extensions.includes(path.extname(file).slice(1)));
-};
+	)).filter(file => extensions.includes(path.extname(file).slice(1)));
 
 const getConfig = async options => {
-	const {filePath, eslintOptions} = await parseOptions(options);
+	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(options));
+	const {filePath, warnIgnored, ...eslintOptions} = buildConfig(foundOptions, prettierOptions);
 	const engine = new ESLint(eslintOptions);
 	return engine.calculateConfigForFile(filePath);
 };
 
-const lintText = async (string, options) => {
-	options = await parseOptions(options);
-	const {filePath, warnIgnored, eslintOptions} = options;
-	const {ignorePatterns} = eslintOptions.baseConfig;
+const lintText = async (string, inputOptions = {}) => {
+	const {options: foundOptions, prettierOptions} = mergeWithFileConfig(normalizeOptions(inputOptions));
+	const options = buildConfig(foundOptions, prettierOptions);
 
-	if (typeof filePath !== 'string' && !isEqual(getIgnores({}), ignorePatterns)) {
+	if (options.baseConfig.ignorePatterns && !isEqual(getIgnores({}), options.baseConfig.ignorePatterns) && typeof options.filePath !== 'string') {
 		throw new Error('The `ignores` option requires the `filePath` option to be defined.');
 	}
 
-	return runEslint(
-		eslint => eslint.lintText(string, {filePath, warnIgnored}),
-		options,
-	);
+	const {filePath, warnIgnored, ...eslintOptions} = options;
+	const engine = new ESLint(eslintOptions);
+
+	if (filePath) {
+		const filename = path.relative(options.cwd, filePath);
+
+		if (
+			micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
+			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
+			|| await engine.isPathIgnored(filePath)
+		) {
+			return {
+				errorCount: 0,
+				warningCount: 0,
+				results: [{
+					errorCount: 0,
+					filePath: filename,
+					messages: [],
+					warningCount: 0,
+				}],
+			};
+		}
+	}
+
+	const report = await engine.lintText(string, {filePath, warnIgnored});
+
+	return processReport(report, {isQuiet: inputOptions.quiet});
 };
 
-const lintFile = async (filePath, options) => runEslint(
-	eslint => eslint.lintFiles([filePath]),
-	await parseOptions({...options, filePath}),
-);
+const lintFiles = async (patterns, inputOptions = {}) => {
+	inputOptions = normalizeOptions(inputOptions);
+	inputOptions.cwd = path.resolve(inputOptions.cwd || process.cwd());
 
-const lintFiles = async (patterns, options) => {
-	const files = await globFiles(patterns, options);
+	const files = await globFiles(patterns, mergeWithFileConfig(inputOptions).options);
 
-	const reports = await Promise.all(
-		files.map(filePath => lintFile(filePath, options)),
+	const reports = await pMap(
+		files,
+		async filePath => {
+			const {options: foundOptions, prettierOptions} = mergeWithFileConfig({
+				...inputOptions,
+				filePath,
+			});
+			const options = buildConfig(foundOptions, prettierOptions);
+			return runEslint(filePath, options, {isQuiet: inputOptions.quiet});
+		},
 	);
 
-	const report = mergeReports(reports.filter(({isIgnored}) => !isIgnored));
-
-	return report;
+	return mergeReports(reports.filter(Boolean));
 };
 
 const getFormatter = async name => {
