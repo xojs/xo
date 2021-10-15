@@ -2,16 +2,21 @@ import process from 'node:process';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {omit, isEqual} from 'lodash-es';
+import {isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
+import pReduce from 'p-reduce';
 import pMap from 'p-map';
+import {cosmiconfig, defaultLoaders} from 'cosmiconfig';
 import defineLazyProperty from 'define-lazy-prop';
+import pFilter from 'p-filter';
 import slash from 'slash';
+import {CONFIG_FILES, MODULE_NAME, DEFAULT_IGNORES} from './lib/constants.js';
 import {
 	normalizeOptions,
 	getIgnores,
 	mergeWithFileConfig,
+	mergeWithFileConfigs,
 	buildConfig,
 	mergeOptions,
 } from './lib/options-manager.js';
@@ -82,19 +87,10 @@ const processReport = (report, {isQuiet = false} = {}) => {
 	return result;
 };
 
-const runEslint = async (filePath, options, processorOptions) => {
-	const engine = new ESLint(omit(options, ['filePath', 'warnIgnored']));
-	const filename = path.relative(options.cwd, filePath);
+const runEslint = async (paths, options, processorOptions) => {
+	const engine = new ESLint(options);
 
-	if (
-		micromatch.isMatch(filename, options.baseConfig.ignorePatterns)
-			|| isGitIgnoredSync({cwd: options.cwd, ignore: options.baseConfig.ignorePatterns})(filePath)
-			|| await engine.isPathIgnored(filePath)
-	) {
-		return;
-	}
-
-	const report = await engine.lintFiles([filePath]);
+	const report = await engine.lintFiles(await pFilter(paths, async path => !(await engine.isPathIgnored(path))));
 	return processReport(report, processorOptions);
 };
 
@@ -149,24 +145,25 @@ const lintText = async (string, inputOptions = {}) => {
 };
 
 const lintFiles = async (patterns, inputOptions = {}) => {
-	inputOptions = normalizeOptions(inputOptions);
 	inputOptions.cwd = path.resolve(inputOptions.cwd || process.cwd());
+	const configExplorer = cosmiconfig(MODULE_NAME, {searchPlaces: CONFIG_FILES, loaders: {noExt: defaultLoaders['.json']}, stopDir: inputOptions.cwd});
 
-	const files = await globFiles(patterns, mergeOptions(inputOptions));
+	const configFiles = (await Promise.all(
+		(await globby(
+			CONFIG_FILES.map(configFile => `**/${configFile}`),
+			{ignore: DEFAULT_IGNORES, gitignore: true, absolute: true, cwd: inputOptions.cwd},
+		)).map(configFile => configExplorer.load(configFile)),
+	)).filter(Boolean);
 
-	const reports = await pMap(
-		files,
-		async filePath => {
-			const {options: foundOptions, prettierOptions} = mergeWithFileConfig({
-				...inputOptions,
-				filePath,
-			});
-			const options = buildConfig(foundOptions, prettierOptions);
-			return runEslint(filePath, options, {isQuiet: inputOptions.quiet});
-		},
-	);
+	const paths = configFiles.length > 0
+		? await pReduce(
+			configFiles,
+			async (paths, {filepath, config}) =>
+				[...paths, ...(await globFiles(patterns, {...mergeOptions(inputOptions, config), cwd: path.dirname(filepath)}))],
+			[])
+		: await globFiles(patterns, mergeOptions(inputOptions));
 
-	return mergeReports(reports.filter(Boolean));
+	return mergeReports(await pMap(await mergeWithFileConfigs([...new Set(paths)], inputOptions, configFiles), async ({files, options, prettierOptions}) => runEslint(files, buildConfig(options, prettierOptions), {isQuiet: options.quiet})));
 };
 
 const getFormatter = async name => {
