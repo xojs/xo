@@ -5,6 +5,7 @@ import {isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
 import slash from 'slash';
+import pMap from 'p-map';
 import {
 	parseOptions,
 	getIgnores,
@@ -80,9 +81,8 @@ const lintFile = async (filePath, options) => runEslint(
 const lintFiles = async (patterns, options) => {
 	const files = await globFiles(patterns, options);
 
-	const reports = await Promise.all(
-		files.map(filePath => lintFile(filePath, options)),
-	);
+	// TODO: Try to increase the concurrency in the future with some more testing.
+	const reports = await pMap(files, filePath => lintFile(filePath, options), {concurrency: 1});
 
 	const report = mergeReports(reports.filter(({isIgnored}) => !isIgnored));
 

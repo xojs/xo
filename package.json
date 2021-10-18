@@ -84,6 +84,7 @@
 		"meow": "^10.1.1",
 		"micromatch": "^4.0.4",
 		"open-editor": "^3.0.0",
+		"p-map": "^4.0.0",
 		"prettier": "^2.4.1",
 		"semver": "^7.3.5",
 		"slash": "^4.0.0",
