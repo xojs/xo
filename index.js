@@ -1,7 +1,7 @@
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {isEqual} from 'lodash-es';
+import {isEqual, groupBy} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
 import slash from 'slash';
@@ -12,7 +12,7 @@ import {
 } from './lib/options-manager.js';
 import {mergeReports, processReport, getIgnoredReport} from './lib/report.js';
 
-const runEslint = async (lint, options) => {
+const runEslint = async (lint, options, eslint) => {
 	const {filePath, eslintOptions, isQuiet} = options;
 	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
 
@@ -26,7 +26,7 @@ const runEslint = async (lint, options) => {
 		return getIgnoredReport(filePath);
 	}
 
-	const eslint = new ESLint(eslintOptions);
+	eslint = eslint || new ESLint(eslintOptions);
 
 	if (filePath && await eslint.isPathIgnored(filePath)) {
 		return getIgnoredReport(filePath);
@@ -72,16 +72,29 @@ const lintText = async (string, options) => {
 	);
 };
 
-const lintFile = async (filePath, options) => runEslint(
-	eslint => eslint.lintFiles([filePath]),
-	await parseOptions({...options, filePath}),
-);
-
 const lintFiles = async (patterns, options) => {
 	const files = await globFiles(patterns, options);
 
+	const allOptions = await Promise.all(
+		files.map(filePath => parseOptions({...options, filePath})),
+	);
+
+	// Files with same `xoConfigPath` can lint together
+	// https://github.com/xojs/xo/issues/599
+	const groups = groupBy(allOptions, 'xoConfigPath');
 	const reports = await Promise.all(
-		files.map(filePath => lintFile(filePath, options)),
+		Object.values(groups)
+			.map(filesWithOptions => {
+				const options = filesWithOptions[0];
+				const eslint = new ESLint(options.eslintOptions);
+				const files = filesWithOptions.map(({filePath}) => filePath);
+
+				return runEslint(
+					() => eslint.lintFiles(files),
+					options,
+					eslint,
+				);
+			}),
 	);
 
 	const report = mergeReports(reports.filter(({isIgnored}) => !isIgnored));
