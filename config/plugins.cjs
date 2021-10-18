@@ -12,15 +12,15 @@ module.exports = {
 	// -- End repeat
 	plugins: [
 		'no-use-extend-native',
-		'ava',
+		// 'ava',
 		'unicorn',
-		'promise',
+		// 'promise',
 		'import',
 		'node',
 		'eslint-comments',
 	],
 	extends: [
-		'plugin:ava/recommended',
+		// 'plugin:ava/recommended',
 		'plugin:unicorn/recommended',
 	],
 	settings: {
@@ -173,17 +173,17 @@ module.exports = {
 		// TODO: Temporarily disabled as the rule is buggy.
 		'function-call-argument-newline': 'off',
 
-		'promise/param-names': 'error',
-		'promise/no-return-wrap': [
-			'error',
-			{
-				allowReject: true,
-			},
-		],
-		'promise/no-new-statics': 'error',
-		'promise/no-return-in-finally': 'error',
-		'promise/valid-params': 'error',
-		'promise/prefer-await-to-then': 'error',
+		// 'promise/param-names': 'error',
+		// 'promise/no-return-wrap': [
+		// 	'error',
+		// 	{
+		// 		allowReject: true,
+		// 	},
+		// ],
+		// 'promise/no-new-statics': 'error',
+		// 'promise/no-return-in-finally': 'error',
+		// 'promise/valid-params': 'error',
+		// 'promise/prefer-await-to-then': 'error',
 		'import/default': 'error',
 		'import/export': 'error',
 		'import/extensions': [
