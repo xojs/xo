@@ -71,7 +71,7 @@ const lintFiles = async (patterns, options) => {
 
 	// Files with same `xoConfigPath` can lint together
 	// https://github.com/xojs/xo/issues/599
-	const groups = groupBy(allOptions, 'xoConfigPath');
+	const groups = groupBy(allOptions, 'eslintConfigId');
 
 	const reports = await Promise.all(
 		Object.values(groups)
