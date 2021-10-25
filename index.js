@@ -26,7 +26,10 @@ const runEslint = async (lint, options) => {
 		return getIgnoredReport(filePath);
 	}
 
-	const eslint = new ESLint(eslintOptions);
+	const eslint = new ESLint({
+		...eslintOptions,
+		resolvePluginsRelativeTo: __dirname
+	});
 
 	if (filePath && await eslint.isPathIgnored(filePath)) {
 		return getIgnoredReport(filePath);
