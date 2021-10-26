@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
@@ -28,7 +29,7 @@ const runEslint = async (lint, options) => {
 
 	const eslint = new ESLint({
 		...eslintOptions,
-		resolvePluginsRelativeTo: __dirname
+		resolvePluginsRelativeTo: path.dirname(fileURLToPath(import.meta.url))
 	});
 
 	if (filePath && await eslint.isPathIgnored(filePath)) {
