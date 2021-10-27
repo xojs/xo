@@ -14,7 +14,8 @@ module.exports = {
 		'no-use-extend-native',
 		'ava',
 		'unicorn',
-		'promise',
+		// Disabled as the plugin doesn't support ESLint 8 yet.
+		// 'promise',
 		'import',
 		'node',
 		'eslint-comments',
@@ -173,17 +174,19 @@ module.exports = {
 		// TODO: Temporarily disabled as the rule is buggy.
 		'function-call-argument-newline': 'off',
 
-		'promise/param-names': 'error',
-		'promise/no-return-wrap': [
-			'error',
-			{
-				allowReject: true,
-			},
-		],
-		'promise/no-new-statics': 'error',
-		'promise/no-return-in-finally': 'error',
-		'promise/valid-params': 'error',
-		'promise/prefer-await-to-then': 'error',
+		// Disabled as the plugin doesn't support ESLint 8 yet.
+		// 'promise/param-names': 'error',
+		// 'promise/no-return-wrap': [
+		// 	'error',
+		// 	{
+		// 		allowReject: true,
+		// 	},
+		// ],
+		// 'promise/no-new-statics': 'error',
+		// 'promise/no-return-in-finally': 'error',
+		// 'promise/valid-params': 'error',
+		// 'promise/prefer-await-to-then': 'error',
+
 		'import/default': 'error',
 		'import/export': 'error',
 		'import/extensions': [
