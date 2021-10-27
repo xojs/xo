@@ -29,7 +29,7 @@ const runEslint = async (lint, options) => {
 
 	const eslint = new ESLint({
 		...eslintOptions,
-		resolvePluginsRelativeTo: path.dirname(fileURLToPath(import.meta.url))
+		resolvePluginsRelativeTo: path.dirname(fileURLToPath(import.meta.url)),
 	});
 
 	if (filePath && await eslint.isPathIgnored(filePath)) {
