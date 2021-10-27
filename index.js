@@ -1,4 +1,3 @@
-import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
