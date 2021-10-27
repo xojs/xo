@@ -16,6 +16,7 @@
 		"node": ">=12.20"
 	},
 	"scripts": {
+		"test:clean": "find ./test -type d -name 'node_modules' -prune -not -path ./test/fixtures/project/node_modules -exec rm -rf '{}' +",
 		"test": "node cli.js && nyc ava"
 	},
 	"files": [

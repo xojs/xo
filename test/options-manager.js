@@ -1,8 +1,6 @@
-import {promises as fs} from 'node:fs';
 import process from 'node:process';
 import path from 'node:path';
 import test from 'ava';
-import {omit} from 'lodash-es';
 import slash from 'slash';
 import createEsmUtils from 'esm-utils';
 import {DEFAULT_EXTENSION, DEFAULT_IGNORES} from '../lib/constants.js';
@@ -542,9 +540,10 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', a
 	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: typescript files', async t => {
+test('mergeWithFileConfig: resolves expected typescript file options', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filePath = path.resolve(cwd, 'file.ts');
+	const tsConfigPath = path.resolve(cwd, 'tsconfig.json');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const expected = {
 		filePath,
@@ -553,21 +552,16 @@ test('mergeWithFileConfig: typescript files', async t => {
 		cwd,
 		semicolon: false,
 		ts: true,
+		tsConfigPath,
 	};
-	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
-	t.regex(slash(options.tsConfigPath), expectedConfigPath);
-	t.deepEqual(omit(options, 'tsConfigPath'), expected);
-	t.deepEqual(JSON.parse(await fs.readFile(options.tsConfigPath)), {
-		extends: path.resolve(cwd, 'tsconfig.json'),
-		files: [path.resolve(cwd, 'file.ts')],
-		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))],
-	});
+	t.deepEqual(options, expected);
 });
 
-test('mergeWithFileConfig: tsx files', async t => {
+test('mergeWithFileConfig: resolves expected tsx file options', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filePath = path.resolve(cwd, 'file.tsx');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	const tsConfigPath = path.resolve(cwd, 'tsconfig.json');
 	const expected = {
 		filePath,
 		extensions: DEFAULT_EXTENSION,
@@ -575,15 +569,25 @@ test('mergeWithFileConfig: tsx files', async t => {
 		cwd,
 		semicolon: false,
 		ts: true,
+		tsConfigPath,
 	};
+	t.deepEqual(options, expected);
+});
+
+test('mergeWithFileConfig: uses specified parserOptions.project as tsconfig', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'parseroptions-project');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	const expectedTsConfigPath = path.resolve(cwd, 'projectconfig.json');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedTsConfigPath);
+});
+
+test('mergeWithFileConfig: creates temp tsconfig if none present', async t => {
+	const cwd = path.resolve('fixtures', 'typescript');
 	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	t.regex(slash(options.tsConfigPath), expectedConfigPath);
-	t.deepEqual(omit(options, 'tsConfigPath'), expected);
-	t.deepEqual(JSON.parse(await fs.readFile(options.tsConfigPath)), {
-		extends: path.resolve(cwd, 'tsconfig.json'),
-		files: [path.resolve(cwd, 'file.tsx')],
-		include: [slash(path.resolve(cwd, '**/*.ts')), slash(path.resolve(cwd, '**/*.tsx'))],
-	});
 });
 
 test('applyOverrides', t => {

@@ -1,0 +1,7 @@
+{
+	"xo": {
+		"parserOptions": {
+			"project": "./projectconfig.json"
+		}
+	}
+}

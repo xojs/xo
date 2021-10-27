@@ -1,8 +1,7 @@
-import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {isEqual} from 'lodash-es';
+import {isEqual, groupBy} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
 import slash from 'slash';
@@ -12,33 +11,6 @@ import {
 	mergeWithFileConfig,
 } from './lib/options-manager.js';
 import {mergeReports, processReport, getIgnoredReport} from './lib/report.js';
-
-const runEslint = async (lint, options) => {
-	const {filePath, eslintOptions, isQuiet} = options;
-	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
-
-	if (
-		filePath
-		&& (
-			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
-		)
-	) {
-		return getIgnoredReport(filePath);
-	}
-
-	const eslint = new ESLint({
-		...eslintOptions,
-		resolvePluginsRelativeTo: path.dirname(fileURLToPath(import.meta.url)),
-	});
-
-	if (filePath && await eslint.isPathIgnored(filePath)) {
-		return getIgnoredReport(filePath);
-	}
-
-	const report = await lint(eslint);
-	return processReport(report, {isQuiet});
-};
 
 const globFiles = async (patterns, options) => {
 	const {ignores, extensions, cwd} = (await mergeWithFileConfig(options)).options;
@@ -63,32 +35,76 @@ const getConfig = async options => {
 
 const lintText = async (string, options) => {
 	options = await parseOptions(options);
-	const {filePath, warnIgnored, eslintOptions} = options;
-	const {ignorePatterns} = eslintOptions.baseConfig;
+	const {filePath, warnIgnored, eslintOptions, isQuiet} = options;
+	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
 
 	if (typeof filePath !== 'string' && !isEqual(getIgnores({}), ignorePatterns)) {
 		throw new Error('The `ignores` option requires the `filePath` option to be defined.');
 	}
 
-	return runEslint(
-		eslint => eslint.lintText(string, {filePath, warnIgnored}),
-		options,
-	);
-};
+	if (
+		filePath
+		&& (
+			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
+			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
+		)
+	) {
+		return getIgnoredReport(filePath);
+	}
 
-const lintFile = async (filePath, options) => runEslint(
-	eslint => eslint.lintFiles([filePath]),
-	await parseOptions({...options, filePath}),
-);
+	const eslint = new ESLint(eslintOptions);
+
+	if (filePath && await eslint.isPathIgnored(filePath)) {
+		return getIgnoredReport(filePath);
+	}
+
+	const report = await eslint.lintText(string, {filePath, warnIgnored});
+	return processReport(report, {isQuiet});
+};
 
 const lintFiles = async (patterns, options) => {
 	const files = await globFiles(patterns, options);
 
-	const reports = await Promise.all(
-		files.map(filePath => lintFile(filePath, options)),
+	const allOptions = await Promise.all(
+		files.map(filePath => parseOptions({...options, filePath})),
 	);
 
-	const report = mergeReports(reports.filter(({isIgnored}) => !isIgnored));
+	// Files with same `xoConfigPath` can lint together
+	// https://github.com/xojs/xo/issues/599
+	const groups = groupBy(allOptions, 'eslintConfigId');
+
+	const reports = await Promise.all(
+		Object.values(groups)
+			.map(async filesWithOptions => {
+				const options = filesWithOptions[0];
+				const eslint = new ESLint(options.eslintOptions);
+				const files = [];
+
+				for (const options of filesWithOptions) {
+					const {filePath, eslintOptions} = options;
+					const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
+					if (filePath
+						&& (
+							micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
+							|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
+						)) {
+						continue;
+					}
+
+					// eslint-disable-next-line no-await-in-loop
+					if ((await eslint.isPathIgnored(filePath))) {
+						continue;
+					}
+
+					files.push(filePath);
+				}
+
+				const report = await eslint.lintFiles(files);
+
+				return processReport(report, {isQuiet: options.isQuiet});
+			}));
+
+	const report = mergeReports(reports);
 
 	return report;
 };

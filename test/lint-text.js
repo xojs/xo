@@ -277,36 +277,66 @@ test('find configurations close to linted file', async t => {
 	t.true(hasRule(results, 'indent'));
 });
 
-test('typescript files', async t => {
-	let {results} = await xo.lintText(`console.log([
-  2,
-]);
-`, {filePath: 'fixtures/typescript/two-spaces.tsx'});
-
+test('typescript files: two spaces fails', async t => {
+	const twoSpacesCwd = path.resolve('fixtures', 'typescript');
+	const twoSpacesfilePath = path.resolve(twoSpacesCwd, 'two-spaces.tsx');
+	const twoSpacesText = (await fs.readFile(twoSpacesfilePath)).toString();
+	const {results} = await xo.lintText(twoSpacesText, {
+		filePath: twoSpacesfilePath,
+	});
 	t.true(hasRule(results, '@typescript-eslint/indent'));
+});
 
-	({results} = await xo.lintText(`console.log([
-  2,
-]);
-`, {filePath: 'fixtures/typescript/two-spaces.tsx', space: 2}));
+test('typescript files: two spaces pass', async t => {
+	const twoSpacesCwd = path.resolve('fixtures', 'typescript');
+	const twoSpacesfilePath = path.resolve(twoSpacesCwd, 'two-spaces.tsx');
+	const twoSpacesText = (await fs.readFile(twoSpacesfilePath)).toString();
+	const {results} = await xo.lintText(twoSpacesText, {
+		filePath: twoSpacesfilePath,
+		space: 2,
+	});
 	t.is(results[0].errorCount, 0);
+});
 
-	({results} = await xo.lintText('console.log(\'extra-semicolon\');;\n', {filePath: 'fixtures/typescript/child/extra-semicolon.ts'}));
+test('typescript files: extra semi fail', async t => {
+	const extraSemiCwd = path.resolve('fixtures', 'typescript', 'child');
+	const extraSemiFilePath = path.resolve(extraSemiCwd, 'extra-semicolon.ts');
+	const extraSemiText = (await fs.readFile(extraSemiFilePath)).toString();
+	const {results} = await xo.lintText(extraSemiText, {
+		filePath: extraSemiFilePath,
+	});
 	t.true(hasRule(results, '@typescript-eslint/no-extra-semi'));
+});
 
-	({results} = await xo.lintText('console.log(\'no-semicolon\')\n', {filePath: 'fixtures/typescript/child/no-semicolon.ts', semicolon: false}));
+test('typescript files: extra semi pass', async t => {
+	const noSemiCwd = path.resolve('fixtures', 'typescript', 'child');
+	const noSemiFilePath = path.resolve(noSemiCwd, 'no-semicolon.ts');
+	const noSemiText = (await fs.readFile(noSemiFilePath)).toString();
+	const {results} = await xo.lintText(noSemiText, {
+		filePath: noSemiFilePath,
+		semicolon: false,
+	});
 	t.is(results[0].errorCount, 0);
+});
 
-	({results} = await xo.lintText(`console.log([
-    4,
-]);
-`, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts'}));
+test('typescript files: four space fail', async t => {
+	const fourSpacesCwd = path.resolve('fixtures', 'typescript', 'child', 'sub-child');
+	const fourSpacesFilePath = path.resolve(fourSpacesCwd, 'four-spaces.ts');
+	const fourSpacesText = (await fs.readFile(fourSpacesFilePath)).toString();
+	const {results} = await xo.lintText(fourSpacesText, {
+		filePath: fourSpacesFilePath,
+	});
 	t.true(hasRule(results, '@typescript-eslint/indent'));
+});
 
-	({results} = await xo.lintText(`console.log([
-    4,
-]);
-`, {filePath: 'fixtures/typescript/child/sub-child/four-spaces.ts', space: 4}));
+test('typescript files: four space pass', async t => {
+	const fourSpacesCwd = path.resolve('fixtures', 'typescript', 'child', 'sub-child');
+	const fourSpacesFilePath = path.resolve(fourSpacesCwd, 'four-spaces.ts');
+	const fourSpacesText = (await fs.readFile(fourSpacesFilePath)).toString();
+	const {results} = await xo.lintText(fourSpacesText, {
+		filePath: fourSpacesFilePath,
+		space: 4,
+	});
 	t.is(results[0].errorCount, 0);
 });
 
