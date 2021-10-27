@@ -52,6 +52,11 @@
 		"javascript",
 		"typescript"
 	],
+	"bundledDependencies": [
+		"@typescript-eslint/eslint-plugin",
+		"@typescript-eslint/parser",
+		"eslint-config-xo-typescript"
+	],
 	"dependencies": {
 		"@eslint/eslintrc": "^1.0.1",
 		"@typescript-eslint/eslint-plugin": "^4.32.0",

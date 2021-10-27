@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
@@ -11,6 +12,33 @@ import {
 	mergeWithFileConfig,
 } from './lib/options-manager.js';
 import {mergeReports, processReport, getIgnoredReport} from './lib/report.js';
+
+const runEslint = async (lint, options) => {
+	const {filePath, eslintOptions, isQuiet} = options;
+	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
+
+	if (
+		filePath
+		&& (
+			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
+			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
+		)
+	) {
+		return getIgnoredReport(filePath);
+	}
+
+	const eslint = new ESLint({
+		...eslintOptions,
+		resolvePluginsRelativeTo: path.dirname(fileURLToPath(import.meta.url)),
+	});
+
+	if (filePath && await eslint.isPathIgnored(filePath)) {
+		return getIgnoredReport(filePath);
+	}
+
+	const report = await lint(eslint);
+	return processReport(report, {isQuiet});
+};
 
 const globFiles = async (patterns, options) => {
 	const {ignores, extensions, cwd} = (await mergeWithFileConfig(options)).options;
