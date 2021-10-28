@@ -47,6 +47,24 @@ $ npm install xo --save-dev
 
 *JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting. Vue components are not supported by default. You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
 
+## Notice:
+
+If using version 0.46.0, which includes this fix: #622, you may see an error regarding "parserOptions.project".
+Try adding this to your XO options:
+
+```
+    "parserOptions": {
+      "project": "./tsconfig.xo.json"
+    },
+```
+Where `tsconfig.xo.json` is simply something like:
+```
+{
+  "extends": "./tsconfig.json",
+  "include": ["src"]
+}
+```
+
 ## Usage
 
 ```
