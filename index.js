@@ -1,7 +1,7 @@
 import path from 'node:path';
 import {ESLint} from 'eslint';
 import {globby, isGitIgnoredSync} from 'globby';
-import {isEqual, groupBy} from 'lodash-es';
+import {isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
 import slash from 'slash';
@@ -9,6 +9,7 @@ import {
 	parseOptions,
 	getIgnores,
 	mergeWithFileConfig,
+	getOptionGroups,
 } from './lib/options-manager.js';
 import {mergeReports, processReport, getIgnoredReport} from './lib/report.js';
 
@@ -34,8 +35,8 @@ const getConfig = async options => {
 };
 
 const lintText = async (string, options) => {
-	options = await parseOptions(options);
-	const {filePath, warnIgnored, eslintOptions, isQuiet} = options;
+	const [[options_]] = Object.values(await getOptionGroups([options?.filePath], options));
+	const {filePath, warnIgnored, eslintOptions, isQuiet} = options_;
 	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
 
 	if (typeof filePath !== 'string' && !isEqual(getIgnores({}), ignorePatterns)) {
@@ -65,13 +66,7 @@ const lintText = async (string, options) => {
 const lintFiles = async (patterns, options) => {
 	const files = await globFiles(patterns, options);
 
-	const allOptions = await Promise.all(
-		files.map(filePath => parseOptions({...options, filePath})),
-	);
-
-	// Files with same `xoConfigPath` can lint together
-	// https://github.com/xojs/xo/issues/599
-	const groups = groupBy(allOptions, 'eslintConfigId');
+	const groups = await getOptionGroups(files, options);
 
 	const reports = await Promise.all(
 		Object.values(groups)
