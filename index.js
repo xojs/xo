@@ -35,7 +35,7 @@ const getConfig = async options => {
 };
 
 const lintText = async (string, options) => {
-	const [[options_]] = Object.values(await getOptionGroups([options?.filePath], options));
+	const [[options_]] = Object.values(await getOptionGroups([options && options.filePath], options));
 	const {filePath, warnIgnored, eslintOptions, isQuiet} = options_;
 	const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
 
