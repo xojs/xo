@@ -44,7 +44,7 @@ module.exports = {
 				replacements: {
 					// https://thenextweb.com/dd/2020/07/13/linux-kernel-will-no-longer-use-terms-blacklist-and-slave/
 					whitelist: {
-						allow: true,
+						include: true,
 					},
 					blacklist: {
 						exclude: true,
