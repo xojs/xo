@@ -193,12 +193,7 @@ module.exports = {
 			'error',
 			'always',
 			{
-				ignorePackages: true,
-				// TypeScript doesn't yet support using extensions and fails with error TS2691.
-				pattern: {
-					ts: 'never',
-					tsx: 'never',
-				},
+				ignorePackages: true
 			},
 		],
 		'import/first': 'error',
