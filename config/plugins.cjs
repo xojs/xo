@@ -193,7 +193,7 @@ module.exports = {
 			'error',
 			'always',
 			{
-				ignorePackages: true
+				ignorePackages: true,
 			},
 		],
 		'import/first': 'error',
