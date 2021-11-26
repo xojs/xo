@@ -2,7 +2,7 @@ import process from 'node:process';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'ava';
-import execa from 'execa';
+import {execa} from 'execa';
 import slash from 'slash';
 import createEsmUtils from 'esm-utils';
 

@@ -14,7 +14,13 @@ import {
 import {mergeReports, processReport, getIgnoredReport} from './lib/report.js';
 
 const globFiles = async (patterns, options) => {
-	const {ignores, extensions, cwd} = (await mergeWithFileConfig(options)).options;
+	const {
+		options: {
+			ignores,
+			extensions,
+			cwd,
+		},
+	} = await mergeWithFileConfig(options);
 
 	patterns = patterns.length === 0
 		? [`**/*.{${extensions.join(',')}}`]

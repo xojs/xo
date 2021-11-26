@@ -280,7 +280,7 @@ test('find configurations close to linted file', async t => {
 test('typescript files: two spaces fails', async t => {
 	const twoSpacesCwd = path.resolve('fixtures', 'typescript');
 	const twoSpacesfilePath = path.resolve(twoSpacesCwd, 'two-spaces.tsx');
-	const twoSpacesText = (await fs.readFile(twoSpacesfilePath)).toString();
+	const twoSpacesText = await fs.readFile(twoSpacesfilePath, 'utf8');
 	const {results} = await xo.lintText(twoSpacesText, {
 		filePath: twoSpacesfilePath,
 	});
@@ -290,7 +290,7 @@ test('typescript files: two spaces fails', async t => {
 test('typescript files: two spaces pass', async t => {
 	const twoSpacesCwd = path.resolve('fixtures', 'typescript');
 	const twoSpacesfilePath = path.resolve(twoSpacesCwd, 'two-spaces.tsx');
-	const twoSpacesText = (await fs.readFile(twoSpacesfilePath)).toString();
+	const twoSpacesText = await fs.readFile(twoSpacesfilePath, 'utf8');
 	const {results} = await xo.lintText(twoSpacesText, {
 		filePath: twoSpacesfilePath,
 		space: 2,
@@ -301,7 +301,7 @@ test('typescript files: two spaces pass', async t => {
 test('typescript files: extra semi fail', async t => {
 	const extraSemiCwd = path.resolve('fixtures', 'typescript', 'child');
 	const extraSemiFilePath = path.resolve(extraSemiCwd, 'extra-semicolon.ts');
-	const extraSemiText = (await fs.readFile(extraSemiFilePath)).toString();
+	const extraSemiText = await fs.readFile(extraSemiFilePath, 'utf8');
 	const {results} = await xo.lintText(extraSemiText, {
 		filePath: extraSemiFilePath,
 	});
@@ -311,7 +311,7 @@ test('typescript files: extra semi fail', async t => {
 test('typescript files: extra semi pass', async t => {
 	const noSemiCwd = path.resolve('fixtures', 'typescript', 'child');
 	const noSemiFilePath = path.resolve(noSemiCwd, 'no-semicolon.ts');
-	const noSemiText = (await fs.readFile(noSemiFilePath)).toString();
+	const noSemiText = await fs.readFile(noSemiFilePath, 'utf8');
 	const {results} = await xo.lintText(noSemiText, {
 		filePath: noSemiFilePath,
 		semicolon: false,
@@ -322,7 +322,7 @@ test('typescript files: extra semi pass', async t => {
 test('typescript files: four space fail', async t => {
 	const fourSpacesCwd = path.resolve('fixtures', 'typescript', 'child', 'sub-child');
 	const fourSpacesFilePath = path.resolve(fourSpacesCwd, 'four-spaces.ts');
-	const fourSpacesText = (await fs.readFile(fourSpacesFilePath)).toString();
+	const fourSpacesText = await fs.readFile(fourSpacesFilePath, 'utf8');
 	const {results} = await xo.lintText(fourSpacesText, {
 		filePath: fourSpacesFilePath,
 	});
@@ -332,7 +332,7 @@ test('typescript files: four space fail', async t => {
 test('typescript files: four space pass', async t => {
 	const fourSpacesCwd = path.resolve('fixtures', 'typescript', 'child', 'sub-child');
 	const fourSpacesFilePath = path.resolve(fourSpacesCwd, 'four-spaces.ts');
-	const fourSpacesText = (await fs.readFile(fourSpacesFilePath)).toString();
+	const fourSpacesText = await fs.readFile(fourSpacesFilePath, 'utf8');
 	const {results} = await xo.lintText(fourSpacesText, {
 		filePath: fourSpacesFilePath,
 		space: 4,
