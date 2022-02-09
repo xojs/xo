@@ -14,7 +14,7 @@ test.skip('opens nothing when there are no errors nor warnings', async t => {
 	const results = await xo.lintFiles(glob);
 
 	const openReport = proxyquire('../lib/open-report', {
-		'open-editor': files => {
+		'open-editor'(files) {
 			if (files.length > 0) {
 				t.fail();
 			}
@@ -48,7 +48,7 @@ test.skip('only opens errors if there are errors and warnings', async t => {
 	];
 
 	const openReport = proxyquire('../lib/open-report', {
-		'open-editor': files => {
+		'open-editor'(files) {
 			t.deepEqual(files, expected);
 		},
 	});
