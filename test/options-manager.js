@@ -7,11 +7,11 @@ import MurmurHash3 from 'imurmurhash';
 import {DEFAULT_EXTENSION, DEFAULT_IGNORES, TSCONFIG_DEFAULTS} from '../lib/constants.js';
 import * as manager from '../lib/options-manager.js';
 
-const {__dirname, require, json} = createEsmUtils(import.meta);
-const parentConfig = json.loadSync('./fixtures/nested/package.json');
-const childConfig = json.loadSync('./fixtures/nested/child/package.json');
-const prettierConfig = json.loadSync('./fixtures/prettier/package.json');
-const enginesConfig = json.loadSync('./fixtures/engines/package.json');
+const {__dirname, require, readJson, readJsonSync} = createEsmUtils(import.meta);
+const parentConfig = readJsonSync('./fixtures/nested/package.json');
+const childConfig = readJsonSync('./fixtures/nested/child/package.json');
+const prettierConfig = readJsonSync('./fixtures/prettier/package.json');
+const enginesConfig = readJsonSync('./fixtures/engines/package.json');
 
 process.chdir(__dirname);
 
@@ -552,7 +552,7 @@ test('mergeWithFileConfig: resolves expected typescript file options', async t =
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filePath = path.resolve(cwd, 'file.ts');
 	const tsConfigPath = path.resolve(cwd, 'tsconfig.json');
-	const tsConfig = await json.load(tsConfigPath);
+	const tsConfig = await readJson(tsConfigPath);
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const eslintConfigId = new MurmurHash3(path.resolve(cwd, 'package.json')).hash(tsConfigPath).result();
 	const expected = {
@@ -574,7 +574,7 @@ test('mergeWithFileConfig: resolves expected tsx file options', async t => {
 	const filePath = path.resolve(cwd, 'file.tsx');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const tsConfigPath = path.resolve(cwd, 'tsconfig.json');
-	const tsConfig = await json.load(tsConfigPath);
+	const tsConfig = await readJson(tsConfigPath);
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).hash(tsConfigPath).result();
 	const expected = {
 		filePath,
