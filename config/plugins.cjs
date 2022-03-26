@@ -165,6 +165,9 @@ module.exports = {
 			'only-single-line',
 		],
 
+		// It will be disabled in the next version of eslint-plugin-unicorn.
+		'unicorn/prefer-json-parse-buffer': 'off',
+
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
 
