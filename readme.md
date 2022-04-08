@@ -205,7 +205,7 @@ Type: `object`
 
 Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
 
-Disable the rule in your XO config to turn it off globally in your project.
+Disable a rule in your XO config to turn it off globally in your project.
 
 Example using `package.json`:
 
