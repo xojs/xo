@@ -205,6 +205,22 @@ Type: `object`
 
 Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
 
+Disable a rule in your XO config to turn it off globally in your project.
+
+Example using `package.json`:
+
+```json
+{
+	"xo": {
+		"rules": {
+			"unicorn/no-array-for-each": "off"
+		}
+	}
+}
+```
+
+You could also use `.xo-config.json` or one of the other config file formats supported by XO.
+
 Please take a moment to consider if you really need to use this option.
 
 ### semicolon
