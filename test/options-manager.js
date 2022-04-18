@@ -222,11 +222,11 @@ test('buildConfig: engines: undefined', t => {
 	t.is(config.baseConfig.rules['prefer-destructuring'], 'off');
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
 	t.is(config.baseConfig.rules['unicorn/prefer-flat-map'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/dns'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/fs'], 'off');
-	t.is(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], undefined);
-	t.is(config.baseConfig.rules['node/no-unsupported-features/es-syntax'], undefined);
-	t.is(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], undefined);
+	t.is(config.baseConfig.rules['n/prefer-promises/dns'], 'off');
+	t.is(config.baseConfig.rules['n/prefer-promises/fs'], 'off');
+	t.is(config.baseConfig.rules['n/no-unsupported-features/es-builtins'], undefined);
+	t.is(config.baseConfig.rules['n/no-unsupported-features/es-syntax'], undefined);
+	t.is(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], undefined);
 });
 
 test('buildConfig: nodeVersion: false', t => {
@@ -238,8 +238,8 @@ test('buildConfig: nodeVersion: false', t => {
 	t.is(config.baseConfig.rules['prefer-destructuring'], 'off');
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
 	t.is(config.baseConfig.rules['unicorn/prefer-flat-map'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/dns'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/fs'], 'off');
+	t.is(config.baseConfig.rules['n/prefer-promises/dns'], 'off');
+	t.is(config.baseConfig.rules['n/prefer-promises/fs'], 'off');
 });
 
 test('buildConfig: nodeVersion: >=6', t => {
@@ -247,13 +247,13 @@ test('buildConfig: nodeVersion: >=6', t => {
 
 	// Turn off rule if we support Node.js below 7.6.0
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
-	// Set node/no-unsupported-features rules with the nodeVersion
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
+	// Set n/no-unsupported-features rules with the nodeVersion
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
 	t.deepEqual(
-		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
+		config.baseConfig.rules['n/no-unsupported-features/es-syntax'],
 		['error', {version: '>=6', ignores: ['modules']}],
 	);
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
 });
 
 test('buildConfig: nodeVersion: >=8', t => {
@@ -261,13 +261,13 @@ test('buildConfig: nodeVersion: >=8', t => {
 
 	// Do not turn off rule if we support only Node.js above 7.6.0
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], undefined);
-	// Set node/no-unsupported-features rules with the nodeVersion
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
+	// Set n/no-unsupported-features rules with the nodeVersion
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
 	t.deepEqual(
-		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
+		config.baseConfig.rules['n/no-unsupported-features/es-syntax'],
 		['error', {version: '>=8', ignores: ['modules']}],
 	);
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
 });
 
 test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `bracketSameLine` from `prettier` config if defined', t => {

@@ -17,7 +17,7 @@ module.exports = {
 		// Disabled as the plugin doesn't support ESLint 8 yet.
 		// 'promise',
 		'import',
-		'node',
+		'n', // eslint-plugin-node's successor
 		'eslint-comments',
 	],
 	extends: [
@@ -264,17 +264,17 @@ module.exports = {
 		],
 
 		// Redundant with `import/no-extraneous-dependencies`.
-		// 'node/no-extraneous-import': 'error',
-		// 'node/no-extraneous-require': 'error',
+		// 'n/no-extraneous-import': 'error',
+		// 'n/no-extraneous-require': 'error',
 
 		// Redundant with `import/no-unresolved`.
-		// 'node/no-missing-import': 'error', // This rule is also buggy and doesn't support `node:`.
-		// 'node/no-missing-require': 'error',
+		// 'n/no-missing-import': 'error', // This rule is also buggy and doesn't support `node:`.
+		// 'n/no-missing-require': 'error',
 
-		'node/no-unpublished-bin': 'error',
+		'n/no-unpublished-bin': 'error',
 
 		// We have this enabled in addition to `import/extensions` as this one has an auto-fix.
-		'node/file-extension-in-import': [
+		'n/file-extension-in-import': [
 			'error',
 			'always',
 			{
@@ -283,19 +283,19 @@ module.exports = {
 				'.tsx': 'never',
 			},
 		],
-		'node/no-mixed-requires': [
+		'n/no-mixed-requires': [
 			'error',
 			{
 				grouping: true,
 				allowCall: true,
 			},
 		],
-		'node/no-new-require': 'error',
-		'node/no-path-concat': 'error',
+		'n/no-new-require': 'error',
+		'n/no-path-concat': 'error',
 
 		// Disabled because they're too annoying, see:
 		// https://github.com/mysticatea/eslint-plugin-node/issues/105
-		// 'node/no-unpublished-import': [
+		// 'n/no-unpublished-import': [
 		// 	'error',
 		// 	{
 		// 		allowModules: [
@@ -304,7 +304,7 @@ module.exports = {
 		// 		]
 		// 	}
 		// ],
-		// 'node/no-unpublished-require': [
+		// 'n/no-unpublished-require': [
 		// 	'error',
 		// 	{
 		// 		allowModules: [
@@ -314,42 +314,42 @@ module.exports = {
 		// 	}
 		// ],
 
-		'node/process-exit-as-throw': 'error',
+		'n/process-exit-as-throw': 'error',
 
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in 'bin'. See https://github.com/mysticatea/eslint-plugin-node/issues/96
-		// 'node/shebang': 'error',
+		// 'n/shebang': 'error',
 
-		'node/no-deprecated-api': 'error',
-		'node/prefer-global/buffer': [
+		'n/no-deprecated-api': 'error',
+		'n/prefer-global/buffer': [
 			'error',
 			'never',
 		],
-		'node/prefer-global/console': [
+		'n/prefer-global/console': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/process': [
+		'n/prefer-global/process': [
 			'error',
 			'never',
 		],
-		'node/prefer-global/text-decoder': [
+		'n/prefer-global/text-decoder': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/text-encoder': [
+		'n/prefer-global/text-encoder': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/url-search-params': [
+		'n/prefer-global/url-search-params': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/url': [
+		'n/prefer-global/url': [
 			'error',
 			'always',
 		],
-		'node/prefer-promises/dns': 'error',
-		'node/prefer-promises/fs': 'error',
+		'n/prefer-promises/dns': 'error',
+		'n/prefer-promises/fs': 'error',
 		'eslint-comments/disable-enable-pair': [
 			'error',
 			{
