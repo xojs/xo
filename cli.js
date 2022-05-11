@@ -30,6 +30,7 @@ const cli = meow(`
 	  --stdin           Validate/fix code from stdin
 	  --stdin-filename  Specify a filename for the --stdin option
 	  --print-config    Print the effective ESLint config for the given file
+	  --config-path     Path to the config file to use
 
 	Examples
 	  $ xo
@@ -41,6 +42,7 @@ const cli = meow(`
 	  $ xo --plugin=html --extension=html
 	  $ echo 'const x=true' | xo --stdin --fix
 	  $ xo --print-config=index.js
+		$ xo --config-path=../.x
 
 	Tips
 	  - Add XO to your project with \`npm init xo\`.
@@ -110,10 +112,14 @@ const cli = meow(`
 		stdinFilename: {
 			type: 'string',
 		},
+		configPath: {
+			type: 'string',
+		},
 	},
 });
 
 const {input, flags: options, showVersion} = cli;
+// console.table(options);
 
 // TODO: Fix this properly instead of the below workaround.
 // Revert behavior of meow >8 to pre-8 (7.1.1) for flags using `isMultiple: true`.
