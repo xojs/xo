@@ -119,7 +119,6 @@ const cli = meow(`
 });
 
 const {input, flags: options, showVersion} = cli;
-// console.table(options);
 
 // TODO: Fix this properly instead of the below workaround.
 // Revert behavior of meow >8 to pre-8 (7.1.1) for flags using `isMultiple: true`.
