@@ -42,7 +42,7 @@ const cli = meow(`
 	  $ xo --plugin=html --extension=html
 	  $ echo 'const x=true' | xo --stdin --fix
 	  $ xo --print-config=index.js
-		$ xo --config-path=../.x
+	  $ xo --config-path=../config/.xo-config.json
 
 	Tips
 	  - Add XO to your project with \`npm init xo\`.
