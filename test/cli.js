@@ -26,6 +26,13 @@ test('fix option with stdin', async t => {
 	t.is(stdout, 'console.log();');
 });
 
+test('fix-dry-run option', async t => {
+	const {stdout} = await main(['--fix-dry-run', '--stdin', '--reporter', 'json'], {
+		input: 'console.log()',
+	});
+	t.is(JSON.parse(stdout)[0].output, 'console.log();\n');
+});
+
 test('stdin-filename option with stdin', async t => {
 	const {stdout} = await main(['--stdin', '--stdin-filename=unicorn-file'], {
 		input: 'console.log()\n',
