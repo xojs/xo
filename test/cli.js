@@ -26,7 +26,15 @@ test('fix option with stdin', async t => {
 	t.is(stdout, 'console.log();');
 });
 
-test('fix-dry-run option', async t => {
+test('fix-dry-run option should not overwrite source file', async t => {
+	const cwd = await fs.promises.mkdtemp(path.join(__dirname, './temp/'));
+	const filepath = path.join(cwd, 'x.js');
+	await fs.promises.writeFile(filepath, 'console.log()\n');
+	await main(['--fix-dry-run', filepath], {cwd});
+	t.is(fs.readFileSync(filepath, 'utf8'), 'console.log()\n');
+});
+
+test('fix-dry-run option with stdin', async t => {
 	const {stdout} = await main(['--fix-dry-run', '--stdin', '--reporter', 'json'], {
 		input: 'console.log()',
 	});
