@@ -13,6 +13,7 @@ const cli = meow(`
 
 	Options
 	  --fix             Automagically fix issues
+	  --fix-dry-run     Automatically fix problems without saving the changes to the file system
 	  --reporter        Reporter to use
 	  --env             Environment preset  [Can be set multiple times]
 	  --global          Global variable  [Can be set multiple times]
@@ -51,6 +52,9 @@ const cli = meow(`
 	booleanDefault: undefined,
 	flags: {
 		fix: {
+			type: 'boolean',
+		},
+		fixDryRun: {
 			type: 'boolean',
 		},
 		reporter: {
