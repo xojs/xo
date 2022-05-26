@@ -125,10 +125,5 @@
 			"text",
 			"lcov"
 		]
-	},
-	"bundleDependencies": [
-		"@typescript-eslint/eslint-plugin",
-		"@typescript-eslint/parser",
-		"eslint-config-xo-typescript"
-	]
+	}
 }
