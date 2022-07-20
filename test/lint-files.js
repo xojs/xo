@@ -7,9 +7,11 @@ import xo from '../index.js';
 const {__dirname} = createEsmUtils(import.meta);
 process.chdir(__dirname);
 
-const hasRule = (results, filePath, ruleId) => {
+const hasRule = (results, filePath, ruleId, rulesMeta) => {
 	const result = results.find(x => x.filePath === filePath);
-	return result ? result.messages.some(x => x.ruleId === ruleId) : false;
+	const hasRuleInResults = result ? result.messages.some(x => x.ruleId === ruleId) : false;
+	const hasRuleInResultsMeta = rulesMeta ? typeof rulesMeta[ruleId] === 'object' : true;
+	return hasRuleInResults && hasRuleInResultsMeta;
 };
 
 test('only accepts allowed extensions', async t => {
@@ -120,7 +122,7 @@ test('multiple negative patterns should act as positive patterns', async t => {
 });
 
 test.failing('enable rules based on nodeVersion', async t => {
-	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
 
 	// The transpiled file (as specified in `overrides`) should use `await`
 	t.true(
@@ -128,6 +130,7 @@ test.failing('enable rules based on nodeVersion', async t => {
 			results,
 			path.resolve('fixtures/engines-overrides/promise-then-transpile.js'),
 			'promise/prefer-await-to-then',
+			rulesMeta,
 		),
 	);
 	// The non transpiled files can use `.then`
@@ -136,6 +139,7 @@ test.failing('enable rules based on nodeVersion', async t => {
 			results,
 			path.resolve('fixtures/engines-overrides/promise-then.js'),
 			'promise/prefer-await-to-then',
+			rulesMeta,
 		),
 	);
 });
@@ -152,13 +156,14 @@ test('do not lint eslintignored files', async t => {
 });
 
 test('find configurations close to linted file', async t => {
-	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/nested-configs'});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/nested-configs'});
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/nested-configs/child/semicolon.js'),
 			'semi',
+			rulesMeta,
 		),
 	);
 
@@ -167,6 +172,7 @@ test('find configurations close to linted file', async t => {
 			results,
 			path.resolve('fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'),
 			'prettier/prettier',
+			rulesMeta,
 		),
 	);
 
@@ -175,6 +181,7 @@ test('find configurations close to linted file', async t => {
 			results,
 			path.resolve('fixtures/nested-configs/no-semicolon.js'),
 			'semi',
+			rulesMeta,
 		),
 	);
 
@@ -183,18 +190,20 @@ test('find configurations close to linted file', async t => {
 			results,
 			path.resolve('fixtures/nested-configs/child-override/two-spaces.js'),
 			'indent',
+			rulesMeta,
 		),
 	);
 });
 
 test.serial('typescript files', async t => {
-	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/typescript'});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/typescript'});
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/typescript/two-spaces.tsx'),
 			'@typescript-eslint/indent',
+			rulesMeta,
 		),
 	);
 
@@ -203,6 +212,7 @@ test.serial('typescript files', async t => {
 			results,
 			path.resolve('fixtures/typescript/child/extra-semicolon.ts'),
 			'@typescript-eslint/no-extra-semi',
+			rulesMeta,
 		),
 	);
 
@@ -211,6 +221,7 @@ test.serial('typescript files', async t => {
 			results,
 			path.resolve('fixtures/typescript/child/sub-child/four-spaces.ts'),
 			'@typescript-eslint/indent',
+			rulesMeta,
 		),
 	);
 });
@@ -287,13 +298,14 @@ test('webpack import resolver is used if {webpack: true}', async t => {
 });
 
 async function configType(t, {dir}) {
-	const {results} = await xo.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures', 'config-files', dir, 'file.js'),
 			'indent',
+			rulesMeta,
 		),
 	);
 }

@@ -66,7 +66,10 @@ const lintText = async (string, options) => {
 	}
 
 	const report = await eslint.lintText(string, {filePath, warnIgnored});
-	return processReport(report, {isQuiet});
+
+	const rulesMeta = eslint.getRulesMetaForResults(report);
+
+	return processReport(report, {isQuiet, rulesMeta});
 };
 
 const lintFiles = async (patterns, options) => {
@@ -102,7 +105,9 @@ const lintFiles = async (patterns, options) => {
 
 				const report = await eslint.lintFiles(files);
 
-				return processReport(report, {isQuiet: options.isQuiet});
+				const rulesMeta = eslint.getRulesMetaForResults(report);
+
+				return processReport(report, {isQuiet: options.isQuiet, rulesMeta});
 			}));
 
 	const report = mergeReports(reports);
