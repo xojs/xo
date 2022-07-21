@@ -149,7 +149,7 @@ if (process.env.GITHUB_ACTIONS && !options.fix && !options.reporter) {
 
 const log = async report => {
 	const reporter = options.reporter || process.env.GITHUB_ACTIONS ? await xo.getFormatter(options.reporter || 'compact') : formatterPretty;
-	process.stdout.write(reporter(report.results));
+	process.stdout.write(reporter(report.results, {rulesMeta: report.rulesMeta}));
 	process.exitCode = report.errorCount === 0 ? 0 : 1;
 };
 
