@@ -106,7 +106,7 @@
 		"temp-write": "^5.0.0",
 		"webpack": "^5.73.0"
 	},
-	"peerDependencies": { 
+	"peerDependencies": {
 		"webpack": ">=1.11.0"
 	},
 	"peerDependenciesMeta": {
