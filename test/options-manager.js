@@ -564,7 +564,7 @@ test('mergeWithFileConfig: resolves expected typescript file options', async t =
 		ts: true,
 		tsConfigPath,
 		eslintConfigId,
-		tsConfig: manager.tsConfigAbsPaths(tsConfig, tsConfigPath),
+		tsConfig: manager.tsConfigResolvePaths(tsConfig, tsConfigPath),
 	};
 	t.deepEqual(options, expected);
 });
@@ -585,7 +585,7 @@ test('mergeWithFileConfig: resolves expected tsx file options', async t => {
 		ts: true,
 		tsConfigPath,
 		eslintConfigId,
-		tsConfig: manager.tsConfigAbsPaths(tsConfig, tsConfigPath),
+		tsConfig: manager.tsConfigResolvePaths(tsConfig, tsConfigPath),
 	};
 	t.deepEqual(options, expected);
 });
