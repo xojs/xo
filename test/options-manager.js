@@ -564,7 +564,7 @@ test('mergeWithFileConfig: resolves expected typescript file options', async t =
 		ts: true,
 		tsConfigPath,
 		eslintConfigId,
-		tsConfig,
+		tsConfig: manager.tsConfigResolvePaths(tsConfig, tsConfigPath),
 	};
 	t.deepEqual(options, expected);
 });
@@ -585,22 +585,74 @@ test('mergeWithFileConfig: resolves expected tsx file options', async t => {
 		ts: true,
 		tsConfigPath,
 		eslintConfigId,
-		tsConfig,
+		tsConfig: manager.tsConfigResolvePaths(tsConfig, tsConfigPath),
 	};
 	t.deepEqual(options, expected);
 });
 
 test('mergeWithFileConfig: uses specified parserOptions.project as tsconfig', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'parseroptions-project');
-	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	const filePath = path.resolve(cwd, 'included-file.ts');
 	const expectedTsConfigPath = path.resolve(cwd, 'projectconfig.json');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	t.is(options.tsConfigPath, expectedTsConfigPath);
 });
 
-test('mergeWithFileConfig: extends ts config if needed', async t => {
+test('mergeWithFileConfig: correctly resolves relative tsconfigs excluded file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'relative-configs');
+	const excludedFilePath = path.resolve(cwd, 'excluded-file.ts');
+	const excludeTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath: excludedFilePath});
+	t.regex(options.tsConfigPath, excludeTsConfigPath);
+});
+
+test('mergeWithFileConfig: correctly resolves relative tsconfigs included file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'relative-configs');
+	const includedFilePath = path.resolve(cwd, 'included-file.ts');
+	const includeTsConfigPath = path.resolve(cwd, 'config/tsconfig.json');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath: includedFilePath});
+	t.is(options.tsConfigPath, includeTsConfigPath);
+});
+
+test('mergeWithFileConfig: uses generated tsconfig if specified parserOptions.project excludes file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'parseroptions-project');
+	const filePath = path.resolve(cwd, 'excluded-file.ts');
+	const expectedTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.regex(options.tsConfigPath, expectedTsConfigPath);
+});
+
+test('mergeWithFileConfig: uses generated tsconfig if specified parserOptions.project misses file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'parseroptions-project');
+	const filePath = path.resolve(cwd, 'missed-by-options-file.ts');
+	const expectedTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.regex(options.tsConfigPath, expectedTsConfigPath);
+});
+
+test('mergeWithFileConfig: auto generated ts config extends found ts config if file is not covered', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'extends-config');
 	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const expected = {
+		extends: path.resolve(cwd, 'tsconfig.json'),
+	};
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.regex(slash(options.tsConfigPath), expectedConfigPath);
+	t.deepEqual(expected, options.tsConfig);
+});
+
+test('mergeWithFileConfig: used found ts config if file is covered', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-config');
+	const filePath = path.resolve(cwd, 'foo.ts');
+	const expectedConfigPath = path.resolve(cwd, 'tsconfig.json');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(slash(options.tsConfigPath), expectedConfigPath);
+});
+
+test('mergeWithFileConfig: auto generated ts config extends found ts config if file is explicitly excluded', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'excludes');
+	const filePath = path.resolve(cwd, 'excluded-file.ts');
 	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	const expected = {
 		extends: path.resolve(cwd, 'tsconfig.json'),
