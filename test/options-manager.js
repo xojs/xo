@@ -671,6 +671,15 @@ test('mergeWithFileConfig: creates temp tsconfig if none present', async t => {
 	t.deepEqual(options.tsConfig, TSCONFIG_DEFAULTS);
 });
 
+test('mergeWithFileConfig: tsconfig can properly extend configs in node_modules', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-module');
+	const expectedConfigPath = path.join(cwd, 'tsconfig.json');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	await t.notThrowsAsync(manager.mergeWithFileConfig({cwd, filePath}));
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedConfigPath);
+});
+
 test('applyOverrides', t => {
 	t.deepEqual(
 		manager.applyOverrides(
