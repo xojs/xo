@@ -2,5 +2,7 @@ node_modules
 yarn.lock
 !test/fixtures/project/node_modules
 test/fixtures/project/node_modules/.cache
+!test/fixtures/typescript/extends-module/node_modules
+test/fixtures/typescript/extends-module/node_modules/.cache
 .nyc_output
 coverage
