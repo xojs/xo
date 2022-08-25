@@ -4,5 +4,7 @@ yarn.lock
 test/fixtures/project/node_modules/.cache
 !test/fixtures/typescript/extends-module/node_modules
 test/fixtures/typescript/extends-module/node_modules/.cache
+!test/fixtures/typescript/extends-tsconfig-bases/node_modules
+test/fixtures/typescript/extends-tsconfig-bases/node_modules/.cache
 .nyc_output
 coverage
