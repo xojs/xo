@@ -645,9 +645,9 @@ test('mergeWithFileConfig: auto generated ts config extends found ts config if f
 test('mergeWithFileConfig: used found ts config if file is covered', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'extends-config');
 	const filePath = path.resolve(cwd, 'foo.ts');
-	const expectedConfigPath = slash(path.resolve(cwd, 'tsconfig.json'));
+	const expectedConfigPath = path.resolve(cwd, 'tsconfig.json');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
-	t.is(slash(options.tsConfigPath), expectedConfigPath);
+	t.is(options.tsConfigPath, expectedConfigPath);
 });
 
 test('mergeWithFileConfig: auto generated ts config extends found ts config if file is explicitly excluded', async t => {
