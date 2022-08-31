@@ -135,7 +135,7 @@ test('extends `react` support with `prettier` option', async t => {
 
 test('regression test for #71', async t => {
 	const {results} = await xo.lintText('const foo = { key: \'value\' };\nconsole.log(foo);\n', {
-		extends: path.join(__dirname, 'fixtures/extends.js'),
+		extends: './fixtures/extends.js',
 	});
 	t.is(results[0].errorCount, 0);
 });
