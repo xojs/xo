@@ -603,7 +603,7 @@ test('mergeWithFileConfig: correctly resolves relative tsconfigs excluded file',
 	const excludedFilePath = path.resolve(cwd, 'excluded-file.ts');
 	const excludeTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath: excludedFilePath});
-	t.regex(options.tsConfigPath, excludeTsConfigPath);
+	t.regex(slash(options.tsConfigPath), excludeTsConfigPath);
 });
 
 test('mergeWithFileConfig: correctly resolves relative tsconfigs included file', async t => {
@@ -619,7 +619,7 @@ test('mergeWithFileConfig: uses generated tsconfig if specified parserOptions.pr
 	const filePath = path.resolve(cwd, 'excluded-file.ts');
 	const expectedTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
-	t.regex(options.tsConfigPath, expectedTsConfigPath);
+	t.regex(slash(options.tsConfigPath), expectedTsConfigPath);
 });
 
 test('mergeWithFileConfig: uses generated tsconfig if specified parserOptions.project misses file', async t => {
@@ -627,7 +627,7 @@ test('mergeWithFileConfig: uses generated tsconfig if specified parserOptions.pr
 	const filePath = path.resolve(cwd, 'missed-by-options-file.ts');
 	const expectedTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
-	t.regex(options.tsConfigPath, expectedTsConfigPath);
+	t.regex(slash(options.tsConfigPath), expectedTsConfigPath);
 });
 
 test('mergeWithFileConfig: auto generated ts config extends found ts config if file is not covered', async t => {
@@ -647,7 +647,7 @@ test('mergeWithFileConfig: used found ts config if file is covered', async t => 
 	const filePath = path.resolve(cwd, 'foo.ts');
 	const expectedConfigPath = path.resolve(cwd, 'tsconfig.json');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
-	t.is(slash(options.tsConfigPath), expectedConfigPath);
+	t.is(options.tsConfigPath, expectedConfigPath);
 });
 
 test('mergeWithFileConfig: auto generated ts config extends found ts config if file is explicitly excluded', async t => {
