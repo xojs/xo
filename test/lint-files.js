@@ -323,7 +323,7 @@ test('load config file with relative extends from different cwd', async t => {
 	const directory = 'extends-relative';
 
 	const {results, rulesMeta} = await xo.lintFiles('**/*', {
-		cwd: path.resolve('fixtures', 'config-files', directory)
+		cwd: path.resolve('fixtures', 'config-files', directory),
 	});
 
 	t.true(
