@@ -318,3 +318,20 @@ test(configType, {type: '.xo-config.js', dir: 'xo-config_js'});
 test(configType, {type: '.xo-config.cjs', dir: 'xo-config_cjs'});
 test(configType, {type: '.xo-config.json', dir: 'xo-config_json'});
 test(configType, {type: '.xo-config', dir: 'xo-config'});
+
+test('load config file with relative extends from different cwd', async t => {
+	const directory = 'extends-relative';
+
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {
+		cwd: path.resolve('fixtures', 'config-files', directory),
+	});
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures', 'config-files', directory, 'file.js'),
+			'comma-dangle',
+			rulesMeta,
+		),
+	);
+});

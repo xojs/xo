@@ -416,12 +416,14 @@ test('buildConfig: extends', t => {
 		extends: [
 			'plugin:foo/bar',
 			'eslint-config-prettier',
+			'./fixtures/config-files/xo_config_js/xo.config.js',
 		],
 	});
 
-	t.deepEqual(config.baseConfig.extends.slice(-2), [
+	t.deepEqual(config.baseConfig.extends.slice(-3), [
 		'plugin:foo/bar',
 		path.resolve('../node_modules/eslint-config-prettier/index.js'),
+		'./fixtures/config-files/xo_config_js/xo.config.js',
 	]);
 });
 
