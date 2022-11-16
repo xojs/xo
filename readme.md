@@ -27,7 +27,7 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
 - [Config overrides per files/globs.](#config-overrides)
 - [TypeScript supported by default](#typescript)
-- Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/weiran-zsd/eslint-plugin-node) and more.
+- Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
 - Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
 - Super simple to add XO to a project with [`$ npm init xo`](https://github.com/xojs/create-xo).
