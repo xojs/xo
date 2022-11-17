@@ -53,7 +53,7 @@ const lintText = async (string, options) => {
 		filePath
 		&& (
 			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			|| (await isGitIgnored({cwd})(filePath))
+			|| await isGitIgnored({cwd})(filePath)
 		)
 	) {
 		return getIgnoredReport(filePath);
@@ -90,7 +90,7 @@ const lintFiles = async (patterns, options) => {
 					if (
 						micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
 						// eslint-disable-next-line no-await-in-loop
-						|| (await eslint.isPathIgnored(filePath))
+						|| await eslint.isPathIgnored(filePath)
 					) {
 						continue;
 					}
