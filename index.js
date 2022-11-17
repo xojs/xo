@@ -1,6 +1,6 @@
 import path from 'node:path';
 import {ESLint} from 'eslint';
-import {globby, isGitIgnoredSync} from 'globby';
+import {globby, isGitIgnored} from 'globby';
 import {isEqual} from 'lodash-es';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
@@ -53,7 +53,7 @@ const lintText = async (string, options) => {
 		filePath
 		&& (
 			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			|| isGitIgnoredSync({cwd})(filePath)
+			|| (await isGitIgnored({cwd})(filePath))
 		)
 	) {
 		return getIgnoredReport(filePath);
