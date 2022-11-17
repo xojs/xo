@@ -53,7 +53,6 @@ const lintText = async (string, options) => {
 		filePath
 		&& (
 			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			// TODO: Use async version when `globby` fix `isGitIgnored`
 			|| isGitIgnoredSync({cwd})(filePath)
 		)
 	) {
