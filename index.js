@@ -53,7 +53,7 @@ const lintText = async (string, options) => {
 		filePath
 		&& (
 			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
+			|| isGitIgnoredSync({cwd})(filePath)
 		)
 	) {
 		return getIgnoredReport(filePath);
@@ -87,16 +87,11 @@ const lintFiles = async (patterns, options) => {
 				for (const options of filesWithOptions) {
 					const {filePath, eslintOptions} = options;
 					const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
-					if (filePath
-						&& (
-							micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-							|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
-						)) {
-						continue;
-					}
-
-					// eslint-disable-next-line no-await-in-loop
-					if ((await eslint.isPathIgnored(filePath))) {
+					if (
+						micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
+						// eslint-disable-next-line no-await-in-loop
+						|| (await eslint.isPathIgnored(filePath))
+					) {
 						continue;
 					}
 
