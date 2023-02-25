@@ -6,6 +6,7 @@ import meow from 'meow';
 import formatterPretty from 'eslint-formatter-pretty';
 import semver from 'semver';
 import openReport from './lib/open-report.js';
+import flatXo from './lib/flat-xo/index.js';
 import xo from './index.js';
 
 const cli = meow(`
@@ -31,6 +32,7 @@ const cli = meow(`
 	  --stdin           Validate/fix code from stdin
 	  --stdin-filename  Specify a filename for the --stdin option
 	  --print-config    Print the effective ESLint config for the given file
+		--flat            Use the experimental flat config.
 
 	Examples
 	  $ xo
@@ -111,6 +113,9 @@ const cli = meow(`
 		stdinFilename: {
 			type: 'string',
 		},
+		flat: {
+			type: 'boolean',
+		},
 	},
 });
 
@@ -149,7 +154,7 @@ if (process.env.GITHUB_ACTIONS && !options.fix && !options.reporter) {
 }
 
 const log = async report => {
-	const reporter = options.reporter || process.env.GITHUB_ACTIONS ? await xo.getFormatter(options.reporter || 'compact') : formatterPretty;
+	const reporter = options.reporter || process.env.GITHUB_ACTIONS ? await (options.flat ? flatXo : xo).getFormatter(options.reporter || 'compact') : formatterPretty;
 	process.stdout.write(reporter(report.results, {rulesMeta: report.rulesMeta}));
 	process.exitCode = report.errorCount === 0 ? 0 : 1;
 };
@@ -186,7 +191,7 @@ if (options.nodeVersion) {
 		}
 
 		options.filePath = options.printConfig;
-		const config = await xo.getConfig(options);
+		const config = await (options.flat ? flatXo : xo).getConfig(options);
 		console.log(JSON.stringify(config, undefined, '\t'));
 	} else if (options.stdin) {
 		const stdin = await getStdin();
@@ -196,7 +201,7 @@ if (options.nodeVersion) {
 		}
 
 		if (options.fix) {
-			const {results: [result]} = await xo.lintText(stdin, options);
+			const {results: [result]} = await (options.flat ? flatXo : xo).lintText(stdin, options);
 			// If there is no output, pass the stdin back out
 			process.stdout.write((result && result.output) || stdin);
 			return;
@@ -207,12 +212,12 @@ if (options.nodeVersion) {
 			process.exit(1);
 		}
 
-		await log(await xo.lintText(stdin, options));
+		await log(await (options.flat ? flatXo : xo).lintText(stdin, options));
 	} else {
-		const report = await xo.lintFiles(input, options);
+		const report = await (options.flat ? flatXo : xo).lintFiles(input, options);
 
 		if (options.fix) {
-			await xo.outputFixes(report);
+			await (options.flat ? flatXo : xo).outputFixes(report);
 		}
 
 		if (options.open) {
