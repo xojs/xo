@@ -81,6 +81,7 @@
 		"find-cache-dir": "^4.0.0",
 		"find-up": "^6.3.0",
 		"get-stdin": "^9.0.0",
+		"globals": "^13.20.0",
 		"globby": "^13.1.2",
 		"imurmurhash": "^0.1.4",
 		"json-stable-stringify-without-jsonify": "^1.0.1",
@@ -126,5 +127,10 @@
 			"text",
 			"lcov"
 		]
-	}
+	},
+	"bundleDependencies": [
+		"@typescript-eslint/eslint-plugin",
+		"@typescript-eslint/parser",
+		"eslint-config-xo-typescript"
+	]
 }
