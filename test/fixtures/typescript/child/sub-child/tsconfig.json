@@ -1,9 +1,5 @@
 {
 	"compilerOptions": {
 		"strictNullChecks": true
-	},
-	"include": [
-		"**/*.ts",
-		"**/*.tsx"
-	]
+	}
 }
