@@ -17,7 +17,8 @@
 	},
 	"scripts": {
 		"test:clean": "find ./test -type d -name 'node_modules' -prune -not -path ./test/fixtures/project/node_modules -exec rm -rf '{}' +",
-		"test": "node cli.js && nyc ava"
+		"test": "node cli.js && nyc ava",
+		"clean": "rm -rf node_modules/.cache"
 	},
 	"files": [
 		"config",
@@ -87,6 +88,7 @@
 		"json-stable-stringify-without-jsonify": "^1.0.1",
 		"json5": "^2.2.1",
 		"lodash-es": "^4.17.21",
+		"lodash.pick": "^4.4.0",
 		"meow": "^11.0.0",
 		"micromatch": "^4.0.5",
 		"open-editor": "^4.0.0",
