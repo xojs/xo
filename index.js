@@ -89,7 +89,7 @@ const lintFiles = async (patterns, options) => {
 					const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
 					if (
 						micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-						// eslint-disable-next-line no-await-in-loop
+						// eslint-disable-next-line no-await-in-loop -- Not worth refactoring
 						|| await eslint.isPathIgnored(filePath)
 					) {
 						continue;

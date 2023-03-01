@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable unicorn/prefer-top-level-await */
+/* eslint-disable unicorn/prefer-top-level-await -- TODO: Use top-level await */
 import process from 'node:process';
 import getStdin from 'get-stdin';
 import meow from 'meow';
