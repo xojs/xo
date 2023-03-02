@@ -222,9 +222,20 @@ module.exports = {
 			},
 		],
 		'import/no-useless-path-segments': 'error',
-		'import/newline-after-import': 'error',
+		'import/newline-after-import': [
+			'error',
+			{
+				// TODO: Buggy.
+				// considerComments: true,
+			},
+		],
 		'import/no-amd': 'error',
-		'import/no-duplicates': 'error',
+		'import/no-duplicates': [
+			'error',
+			{
+				'prefer-inline': true,
+			},
+		],
 
 		// We use `unicorn/prefer-module` instead.
 		// 'import/no-commonjs': 'error',
@@ -232,7 +243,13 @@ module.exports = {
 		// Looks useful, but too unstable at the moment
 		// 'import/no-deprecated': 'error',
 
-		'import/no-extraneous-dependencies': 'error',
+		'import/no-empty-named-blocks': 'error',
+		'import/no-extraneous-dependencies': [
+			'error',
+			{
+				includeTypes: true,
+			},
+		],
 		'import/no-mutable-exports': 'error',
 		'import/no-named-as-default-member': 'error',
 		'import/no-named-as-default': 'error',
@@ -245,7 +262,13 @@ module.exports = {
 		// 	}
 		// ],
 
-		'import/order': 'error',
+		'import/order': [
+			'error',
+			{
+				'newlines-between': 'never',
+				warnOnUnassignedImports: true,
+			},
+		],
 		'import/no-unassigned-import': [
 			'error',
 			{

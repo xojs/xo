@@ -346,7 +346,8 @@ test('typescript files: four space pass', async t => {
 		filePath: fourSpacesFilePath,
 		space: 4,
 	});
-	t.is(results[0].errorCount, 0);
+	// eslint-disable-next-line ava/assertion-arguments
+	t.is(results[0].errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test('deprecated rules', async t => {
