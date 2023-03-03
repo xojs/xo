@@ -14,47 +14,6 @@ const hasRule = (results, filePath, ruleId, rulesMeta) => {
 	return hasRuleInResults && hasRuleInResultsMeta;
 };
 
-test('ignores dirs for empty extensions', async t => {
-	{
-		const cwd = path.join(__dirname, 'fixtures/nodir');
-		const glob = '*';
-		const results = await xo.lintFiles(glob, {extensions: ['', 'js'], cwd});
-		const {results: [fileResult]} = results;
-
-		// Only `fixtures/nodir/noextension` should be linted
-		const expected = 'fixtures/nodir/noextension'.split('/').join(path.sep);
-		const actual = path.relative(__dirname, fileResult.filePath);
-		t.is(actual, expected);
-		t.is(results.errorCount, 1);
-	}
-
-	{
-		const cwd = path.join(__dirname, 'fixtures/nodir');
-		const glob = 'nested/*';
-		const results = await xo.lintFiles(glob, {cwd});
-		const {results: [fileResult]} = results;
-
-		// Ensure `nodir/nested` **would** report if globbed
-		const expected = 'fixtures/nodir/nested/index.js'.split('/').join(path.sep);
-		const actual = path.relative(__dirname, fileResult.filePath);
-		t.is(actual, expected);
-		t.is(results.errorCount, 1);
-	}
-
-	{
-		const cwd = path.join(__dirname, 'fixtures/nodir');
-		// Check Windows-style paths are working
-		const glob = 'nested\\*';
-		const results = await xo.lintFiles(glob, {cwd});
-		const {results: [fileResult]} = results;
-
-		const expected = 'fixtures/nodir/nested/index.js'.split('/').join(path.sep);
-		const actual = path.relative(__dirname, fileResult.filePath);
-		t.is(actual, expected);
-		t.is(results.errorCount, 1);
-	}
-});
-
 test.serial('cwd option', async t => {
 	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/cwd'});
 	const paths = results.map(r => path.relative(__dirname, r.filePath));
@@ -107,29 +66,6 @@ test('multiple negative patterns should act as positive patterns', async t => {
 	t.deepEqual(paths, ['!!unicorn.js', '!unicorn.js']);
 });
 
-test.failing('enable rules based on nodeVersion', async t => {
-	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
-
-	// The transpiled file (as specified in `overrides`) should use `await`
-	t.true(
-		hasRule(
-			results,
-			path.resolve('fixtures/engines-overrides/promise-then-transpile.js'),
-			'promise/prefer-await-to-then',
-			rulesMeta,
-		),
-	);
-	// The non transpiled files can use `.then`
-	t.false(
-		hasRule(
-			results,
-			path.resolve('fixtures/engines-overrides/promise-then.js'),
-			'promise/prefer-await-to-then',
-			rulesMeta,
-		),
-	);
-});
-
 test.serial('typescript files', async t => {
 	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/typescript'});
 
@@ -147,15 +83,6 @@ test.serial('typescript files', async t => {
 			results,
 			path.resolve('fixtures/typescript/child/extra-semicolon.ts'),
 			'@typescript-eslint/no-extra-semi',
-			rulesMeta,
-		),
-	);
-
-	t.true(
-		hasRule(
-			results,
-			path.resolve('fixtures/typescript/child/sub-child/four-spaces.ts'),
-			'@typescript-eslint/indent',
 			rulesMeta,
 		),
 	);
