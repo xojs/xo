@@ -15,7 +15,7 @@ Opinionated but configurable ESLint wrapper with lots of goodies included. Enfor
 
 It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
-**XO requires your project to be [ESM](https://medium.com/sindre-sorhus/hello-modules-d1010b4e777b).**
+**XO requires your project to be [ESM](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).**
 
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/main/screenshot.png)
 
