@@ -466,7 +466,6 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue) - ESLint shareable config for Vue to be used with the above
 - [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
-- [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
 - [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript
 
 ## Support
