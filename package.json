@@ -85,7 +85,6 @@
 		"globby": "^13.1.2",
 		"imurmurhash": "^0.1.4",
 		"json-stable-stringify-without-jsonify": "^1.0.1",
-		"json5": "^2.2.1",
 		"lodash-es": "^4.17.21",
 		"meow": "^11.0.0",
 		"micromatch": "^4.0.5",
@@ -94,7 +93,8 @@
 		"semver": "^7.3.8",
 		"slash": "^5.0.0",
 		"to-absolute-glob": "^2.0.2",
-		"typescript": "^5.0.3"
+		"typescript": "^5.0.3",
+		"xo": "file:."
 	},
 	"devDependencies": {
 		"ava": "^5.1.0",
