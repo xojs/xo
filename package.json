@@ -81,6 +81,7 @@
 		"find-cache-dir": "^4.0.0",
 		"find-up": "^6.3.0",
 		"get-stdin": "^9.0.0",
+		"get-tsconfig": "^4.5.0",
 		"globby": "^13.1.2",
 		"imurmurhash": "^0.1.4",
 		"json-stable-stringify-without-jsonify": "^1.0.1",
