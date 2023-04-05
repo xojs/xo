@@ -81,10 +81,10 @@
 		"find-cache-dir": "^4.0.0",
 		"find-up": "^6.3.0",
 		"get-stdin": "^9.0.0",
+		"get-tsconfig": "^4.5.0",
 		"globby": "^13.1.2",
 		"imurmurhash": "^0.1.4",
 		"json-stable-stringify-without-jsonify": "^1.0.1",
-		"json5": "^2.2.1",
 		"lodash-es": "^4.17.21",
 		"meow": "^11.0.0",
 		"micromatch": "^4.0.5",
@@ -93,7 +93,7 @@
 		"semver": "^7.3.8",
 		"slash": "^5.0.0",
 		"to-absolute-glob": "^2.0.2",
-		"typescript": "^4.9.3"
+		"typescript": "^5.0.3"
 	},
 	"devDependencies": {
 		"ava": "^5.1.0",

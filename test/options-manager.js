@@ -691,6 +691,15 @@ test('mergeWithFileConfig: tsconfig can properly extend tsconfig base node_modul
 	t.is(options.tsConfigPath, expectedConfigPath);
 });
 
+test('mergeWithFileConfig: tsconfig can properly resolve extends arrays introduced in ts 5', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-array');
+	const expectedConfigPath = path.join(cwd, 'tsconfig.json');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	await t.notThrowsAsync(manager.mergeWithFileConfig({cwd, filePath}));
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedConfigPath);
+});
+
 test('applyOverrides', t => {
 	t.deepEqual(
 		manager.applyOverrides(
