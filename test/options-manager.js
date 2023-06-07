@@ -99,7 +99,7 @@ test('buildConfig: prettier: true', t => {
 		trailingComma: 'all',
 	}]);
 	// eslint-prettier-config must always be last
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'plugin:prettier/recommended');
+	t.is(config.baseConfig.extends.at(-1), 'plugin:prettier/recommended');
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
@@ -125,8 +125,8 @@ test('buildConfig: prettier: true, typescript file', t => {
 	}]);
 
 	// eslint-prettier-config must always be last
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'plugin:prettier/recommended');
-	t.regex(config.baseConfig.extends[config.baseConfig.extends.length - 2], /xo-typescript/);
+	t.is(config.baseConfig.extends.at(-1), 'plugin:prettier/recommended');
+	t.regex(config.baseConfig.extends.at(-2), /xo-typescript/);
 
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -430,7 +430,7 @@ test('buildConfig: extends', t => {
 test('buildConfig: typescript', t => {
 	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
 
-	t.regex(config.baseConfig.extends[config.baseConfig.extends.length - 1], /xo-typescript/);
+	t.regex(config.baseConfig.extends.at(-1), /xo-typescript/);
 	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
