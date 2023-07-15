@@ -153,6 +153,9 @@ module.exports = {
 			},
 		],
 
+		// Temporarily disabled because it's buggy with TypeScript: https://github.com/sindresorhus/eslint-plugin-unicorn/issues/2175
+		'unicorn/no-empty-file': 'off',
+
 		// TODO: Disabled for now until it becomes more stable: https://github.com/sindresorhus/eslint-plugin-unicorn/search?q=consistent-destructuring+is:issue&state=open&type=issues
 		'unicorn/consistent-destructuring': 'off',
 

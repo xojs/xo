@@ -39,8 +39,8 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 
 ## Install
 
-```
-$ npm install xo --save-dev
+```sh
+npm install xo --save-dev
 ```
 
 *You must install XO locally. You can run it directly with `$ npx xo`.*
