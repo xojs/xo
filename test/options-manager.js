@@ -99,7 +99,7 @@ test('buildConfig: prettier: true', t => {
 		trailingComma: 'all',
 	}]);
 	// eslint-prettier-config must always be last
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'plugin:prettier/recommended');
+	t.is(config.baseConfig.extends.at(-1), 'plugin:prettier/recommended');
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
@@ -125,8 +125,8 @@ test('buildConfig: prettier: true, typescript file', t => {
 	}]);
 
 	// eslint-prettier-config must always be last
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'plugin:prettier/recommended');
-	t.regex(config.baseConfig.extends[config.baseConfig.extends.length - 2], /xo-typescript/);
+	t.is(config.baseConfig.extends.at(-1), 'plugin:prettier/recommended');
+	t.regex(config.baseConfig.extends.at(-2), /xo-typescript/);
 
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -430,7 +430,7 @@ test('buildConfig: extends', t => {
 test('buildConfig: typescript', t => {
 	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
 
-	t.regex(config.baseConfig.extends[config.baseConfig.extends.length - 1], /xo-typescript/);
+	t.regex(config.baseConfig.extends.at(-1), /xo-typescript/);
 	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
@@ -684,6 +684,15 @@ test('mergeWithFileConfig: tsconfig can properly extend configs in node_modules'
 
 test('mergeWithFileConfig: tsconfig can properly extend tsconfig base node_modules', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'extends-tsconfig-bases');
+	const expectedConfigPath = path.join(cwd, 'tsconfig.json');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	await t.notThrowsAsync(manager.mergeWithFileConfig({cwd, filePath}));
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedConfigPath);
+});
+
+test('mergeWithFileConfig: tsconfig can properly resolve extends arrays introduced in ts 5', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-array');
 	const expectedConfigPath = path.join(cwd, 'tsconfig.json');
 	const filePath = path.resolve(cwd, 'does-not-matter.ts');
 	await t.notThrowsAsync(manager.mergeWithFileConfig({cwd, filePath}));

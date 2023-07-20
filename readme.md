@@ -15,7 +15,7 @@ Opinionated but configurable ESLint wrapper with lots of goodies included. Enfor
 
 It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
-**XO requires your project to be [ESM](https://medium.com/sindre-sorhus/hello-modules-d1010b4e777b).**
+**XO requires your project to be [ESM](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).**
 
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/main/screenshot.png)
 
@@ -26,7 +26,7 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Enforces readable code, because you read more code than you write.
 - No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
 - [Config overrides per files/globs.](#config-overrides)
-- [TypeScript supported by default](#typescript)
+- [TypeScript supported by default.](#typescript)
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
 - Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
@@ -39,8 +39,8 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 
 ## Install
 
-```
-$ npm install xo --save-dev
+```sh
+npm install xo --save-dev
 ```
 
 *You must install XO locally. You can run it directly with `$ npx xo`.*
@@ -255,7 +255,7 @@ module.exports = {
 };
 ```
 
-If contradicting options are set for both Prettier and XO an error will be thrown.
+If contradicting options are set for both Prettier and XO, an error will be thrown.
 
 ### nodeVersion
 
@@ -466,7 +466,6 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue) - ESLint shareable config for Vue to be used with the above
 - [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
-- [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
 - [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript
 
 ## Support
