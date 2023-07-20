@@ -234,13 +234,13 @@ test.serial('typescript 2 space option', async t => {
 
 test.serial('typescript 4 space option', async t => {
 	const {errorCount, results} = await xo.lintFiles('child/sub-child/four-spaces.ts', {cwd: 'fixtures/typescript', space: 4});
-	// eslint-disable-next-line ava/assertion-arguments
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
 	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test.serial('typescript no semicolon option', async t => {
 	const {errorCount, results} = await xo.lintFiles('child/no-semicolon.ts', {cwd: 'fixtures/typescript', semicolon: false});
-	// eslint-disable-next-line ava/assertion-arguments
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
 	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
