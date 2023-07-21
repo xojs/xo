@@ -397,6 +397,5 @@ module.exports = {
 
 		'eslint-comments/no-unused-disable': 'error',
 		'eslint-comments/no-unused-enable': 'error',
-		'eslint-comments/require-description': 'error',
 	},
 };
