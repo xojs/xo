@@ -219,6 +219,24 @@ test.serial('typescript files', async t => {
 	t.true(
 		hasRule(
 			results,
+			path.resolve('fixtures/typescript/child/extra-semicolon.mts'),
+			'@typescript-eslint/no-extra-semi',
+			rulesMeta,
+		),
+	);
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/typescript/child/extra-semicolon.cts'),
+			'@typescript-eslint/no-extra-semi',
+			rulesMeta,
+		),
+	);
+
+	t.true(
+		hasRule(
+			results,
 			path.resolve('fixtures/typescript/child/sub-child/four-spaces.ts'),
 			'@typescript-eslint/indent',
 			rulesMeta,
