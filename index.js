@@ -28,7 +28,9 @@ const globFiles = async (patterns, options) => {
 
 	const files = await globby(
 		patterns,
-		{ignore: ignores, gitignore: true, absolute: true, cwd},
+		{
+			ignore: ignores, gitignore: true, absolute: true, cwd,
+		},
 	);
 
 	return files.filter(file => extensions.includes(path.extname(file).slice(1)));

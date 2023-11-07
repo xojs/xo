@@ -498,7 +498,9 @@ test('mergeWithFileConfig: use child if closest', async t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	const expected = {...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -506,7 +508,9 @@ test('mergeWithFileConfig: use parent if closest', async t => {
 	const cwd = path.resolve('fixtures', 'nested');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -515,7 +519,9 @@ test('mergeWithFileConfig: use parent if child is ignored', async t => {
 	const filePath = path.resolve(cwd, 'child-ignore', 'file.js');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filePath, eslintConfigId};
+	const expected = {
+		...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filePath, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -523,14 +529,18 @@ test('mergeWithFileConfig: use child if child is empty', async t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	t.deepEqual(options, {extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId});
+	t.deepEqual(options, {
+		extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	});
 });
 
 test('mergeWithFileConfig: read engines from package.json', async t => {
 	const cwd = path.resolve('fixtures', 'engines');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3().result();
-	const expected = {nodeVersion: enginesConfig.engines.node, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		nodeVersion: enginesConfig.engines.node, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -538,7 +548,9 @@ test('mergeWithFileConfig: XO engine options supersede package.json\'s', async t
 	const cwd = path.resolve('fixtures', 'engines');
 	const {options} = await manager.mergeWithFileConfig({cwd, nodeVersion: '>=8'});
 	const eslintConfigId = new MurmurHash3().result();
-	const expected = {nodeVersion: '>=8', extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		nodeVersion: '>=8', extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -546,7 +558,9 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', a
 	const cwd = path.resolve('fixtures', 'engines');
 	const {options} = await manager.mergeWithFileConfig({cwd, nodeVersion: false});
 	const eslintConfigId = new MurmurHash3().result();
-	const expected = {nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 

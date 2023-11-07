@@ -384,7 +384,7 @@ If some files in your project are transpiled in order to support an older Node.j
 
 For example, if your project targets Node.js 8 but you want to use the latest JavaScript syntax as supported in Node.js 12:
 1. Set the `engines.node` property of your `package.json` to `>=8`
-2. Configure [Babel](https://babeljs.io) to transpile your source files (in `src` directory in this example)
+2. Configure [Babel](https://babeljs.io) to transpile your source files (in `source` directory in this example)
 3. Make sure to include the transpiled files in your published package with the [`files`](https://docs.npmjs.com/files/package.json#files) and [`main`](https://docs.npmjs.com/files/package.json#main) properties of your `package.json`
 4. Configure the XO `overrides` option to set `nodeVersion` to `>=12` for your source files directory
 
@@ -394,14 +394,16 @@ For example, if your project targets Node.js 8 but you want to use the latest Ja
 		"node": ">=12"
 	},
 	"scripts": {
-		"build": "babel src --out-dir dist"
+		"build": "babel source --out-dir distribution"
 	},
-	"main": "dist/index.js",
-	"files": ["dist/**/*.js"],
+	"main": "distribution/index.js",
+	"files": [
+		"distribution/**/*.js"
+	],
 	"xo": {
 		"overrides": [
 			{
-				"files": "{src}/**/*.js",
+				"files": "source/**/*.js",
 				"nodeVersion": ">=16"
 			}
 		]

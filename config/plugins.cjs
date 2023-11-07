@@ -41,7 +41,7 @@ module.exports = {
 				checkFilenames: false,
 				checkDefaultAndNamespaceImports: false,
 				checkShorthandImports: false,
-				extendDefaultReplacements: false,
+				extendDefaultReplacements: true,
 				replacements: {
 					// https://thenextweb.com/dd/2020/07/13/linux-kernel-will-no-longer-use-terms-blacklist-and-slave/
 					whitelist: {
@@ -57,7 +57,7 @@ module.exports = {
 						secondary: true,
 					},
 
-					// Not part of `eslint-plugin-unicorn`
+					// Reverse.
 					application: {
 						app: true,
 					},
@@ -65,68 +65,75 @@ module.exports = {
 						apps: true,
 					},
 
-					// Part of `eslint-plugin-unicorn`
-					arr: {
-						array: true,
+					// Disable some that may be too annoying.
+					env: false,
+					i: false, // Do it at some point, but not ready for it yet. Maybe 2025.
+
+					// Not part of `eslint-plugin-unicorn`. Upstream them at some point.
+					bin: {
+						binary: true,
 					},
-					e: {
-						error: true,
-						event: true,
+					eof: {
+						endOfFile: true,
 					},
-					el: {
-						element: true,
+					impl: {
+						implement: true,
+						implementation: true,
 					},
-					elem: {
-						element: true,
+					anim: {
+						animation: true,
 					},
-					len: {
-						length: true,
+					calc: {
+						calculate: true,
 					},
-					msg: {
-						message: true,
+					dict: {
+						dictionary: true,
 					},
-					num: {
-						number: true,
+					dup: {
+						duplicate: true,
 					},
-					obj: {
-						object: true,
+					enc: {
+						encode: true,
+						encryption: true,
 					},
-					opts: {
-						options: true,
+					gen: {
+						generate: true,
+						general: true,
 					},
-					param: {
-						parameter: true,
+					gfx: {
+						graphics: true,
 					},
-					params: {
-						parameters: true,
+					inc: {
+						increment: true,
 					},
-					prev: {
-						previous: true,
+					iter: {
+						iterate: true,
+						iterator: true,
 					},
-					req: {
-						request: true,
+					nav: {
+						navigate: true,
+						navigation: true,
 					},
-					res: {
-						response: true,
-						result: true,
+					norm: {
+						normalize: true,
 					},
-					ret: {
-						returnValue: true,
+					notif: {
+						notification: true,
 					},
-					str: {
-						string: true,
+					perf: {
+						performance: true,
+					},
+					proc: {
+						process: true,
+					},
+					rand: {
+						random: true,
+					},
+					sys: {
+						system: true,
 					},
 					temp: {
 						temporary: true,
-					},
-					tmp: {
-						temporary: true,
-					},
-					val: {
-						value: true,
-					},
-					err: {
-						error: true,
 					},
 				},
 			},
@@ -153,13 +160,10 @@ module.exports = {
 			},
 		],
 
-		// Temporarily disabled because it's buggy with TypeScript: https://github.com/sindresorhus/eslint-plugin-unicorn/issues/2175
+		// Temporarily disabled because of https://github.com/sindresorhus/eslint-plugin-unicorn/issues/2218
 		'unicorn/no-empty-file': 'off',
 
-		// TODO: Disabled for now until it becomes more stable: https://github.com/sindresorhus/eslint-plugin-unicorn/search?q=consistent-destructuring+is:issue&state=open&type=issues
-		'unicorn/consistent-destructuring': 'off',
-
-		// TODO: Disabled for now as I don't have time to deal with the backslash that might come from this. Try to enable this rule in 2021.
+		// TODO: Disabled for now as I don't have time to deal with the backslash that might come from this. Try to enable this rule in 2025.
 		'unicorn/no-null': 'off',
 
 		// We only enforce it for single-line statements to not be too opinionated.
@@ -355,10 +359,13 @@ module.exports = {
 		// 'n/shebang': 'error',
 
 		'n/no-deprecated-api': 'error',
-		'n/prefer-global/buffer': [
-			'error',
-			'never',
-		],
+
+		// We no longer enforce this as we don't want to use Buffer at all, but sometimes we need to conditionally use the `Buffer` global, but we then don't want the import so the module works cross-platform.
+		// 'n/prefer-global/buffer': [
+		// 	'error',
+		// 	'never',
+		// ],
+
 		'n/prefer-global/console': [
 			'error',
 			'always',
