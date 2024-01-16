@@ -31,6 +31,7 @@ const cli = meow(`
 	  --stdin           Validate/fix code from stdin
 	  --stdin-filename  Specify a filename for the --stdin option
 	  --print-config    Print the effective ESLint config for the given file
+	  --config-path     Path to the config file to use
 
 	Examples
 	  $ xo
@@ -42,6 +43,7 @@ const cli = meow(`
 	  $ xo --plugin=html --extension=html
 	  $ echo 'const x=true' | xo --stdin --fix
 	  $ xo --print-config=index.js
+	  $ xo --config-path=../config/.xo-config.json
 
 	Tips
 	  - Add XO to your project with \`npm init xo\`.
@@ -109,6 +111,9 @@ const cli = meow(`
 			type: 'boolean',
 		},
 		stdinFilename: {
+			type: 'string',
+		},
+		configPath: {
 			type: 'string',
 		},
 	},
