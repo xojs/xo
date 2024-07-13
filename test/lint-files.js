@@ -7,9 +7,11 @@ import xo from '../index.js';
 const {__dirname} = createEsmUtils(import.meta);
 process.chdir(__dirname);
 
-const hasRule = (results, filePath, ruleId) => {
+const hasRule = (results, filePath, ruleId, rulesMeta) => {
 	const result = results.find(x => x.filePath === filePath);
-	return result ? result.messages.some(x => x.ruleId === ruleId) : false;
+	const hasRuleInResults = result ? result.messages.some(x => x.ruleId === ruleId) : false;
+	const hasRuleInResultsMeta = rulesMeta ? typeof rulesMeta[ruleId] === 'object' : true;
+	return hasRuleInResults && hasRuleInResultsMeta;
 };
 
 test('only accepts allowed extensions', async t => {
@@ -120,7 +122,7 @@ test('multiple negative patterns should act as positive patterns', async t => {
 });
 
 test('enable rules based on nodeVersion', async t => {
-	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
 
 	// The transpiled file (as specified in `overrides`) should use `await`
 	t.true(
@@ -128,6 +130,7 @@ test('enable rules based on nodeVersion', async t => {
 			results,
 			path.resolve('fixtures/engines-overrides/promise-then-transpile.js'),
 			'promise/prefer-await-to-then',
+			rulesMeta,
 		),
 	);
 	// The non transpiled files can use `.then`
@@ -136,6 +139,7 @@ test('enable rules based on nodeVersion', async t => {
 			results,
 			path.resolve('fixtures/engines-overrides/promise-then.js'),
 			'promise/prefer-await-to-then',
+			rulesMeta,
 		),
 	);
 });
@@ -152,13 +156,14 @@ test('do not lint eslintignored files', async t => {
 });
 
 test('find configurations close to linted file', async t => {
-	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/nested-configs'});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/nested-configs'});
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/nested-configs/child/semicolon.js'),
 			'semi',
+			rulesMeta,
 		),
 	);
 
@@ -167,6 +172,7 @@ test('find configurations close to linted file', async t => {
 			results,
 			path.resolve('fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'),
 			'prettier/prettier',
+			rulesMeta,
 		),
 	);
 
@@ -175,6 +181,7 @@ test('find configurations close to linted file', async t => {
 			results,
 			path.resolve('fixtures/nested-configs/no-semicolon.js'),
 			'semi',
+			rulesMeta,
 		),
 	);
 
@@ -183,18 +190,20 @@ test('find configurations close to linted file', async t => {
 			results,
 			path.resolve('fixtures/nested-configs/child-override/two-spaces.js'),
 			'indent',
+			rulesMeta,
 		),
 	);
 });
 
 test.serial('typescript files', async t => {
-	const {results} = await xo.lintFiles('**/*', {cwd: 'fixtures/typescript'});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/typescript'});
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures/typescript/two-spaces.tsx'),
 			'@typescript-eslint/indent',
+			rulesMeta,
 		),
 	);
 
@@ -203,6 +212,25 @@ test.serial('typescript files', async t => {
 			results,
 			path.resolve('fixtures/typescript/child/extra-semicolon.ts'),
 			'@typescript-eslint/no-extra-semi',
+			rulesMeta,
+		),
+	);
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/typescript/child/extra-semicolon.mts'),
+			'@typescript-eslint/no-extra-semi',
+			rulesMeta,
+		),
+	);
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures/typescript/child/extra-semicolon.cts'),
+			'@typescript-eslint/no-extra-semi',
+			rulesMeta,
 		),
 	);
 
@@ -211,24 +239,27 @@ test.serial('typescript files', async t => {
 			results,
 			path.resolve('fixtures/typescript/child/sub-child/four-spaces.ts'),
 			'@typescript-eslint/indent',
+			rulesMeta,
 		),
 	);
 });
 
 test.serial('typescript 2 space option', async t => {
 	const {errorCount, results} = await xo.lintFiles('two-spaces.tsx', {cwd: 'fixtures/typescript', space: 2});
-	// eslint-disable-next-line ava/assertion-arguments
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
 	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test.serial('typescript 4 space option', async t => {
-	const {errorCount} = await xo.lintFiles('child/sub-child/four-spaces.ts', {cwd: 'fixtures/typescript', space: 4});
-	t.is(errorCount, 0);
+	const {errorCount, results} = await xo.lintFiles('child/sub-child/four-spaces.ts', {cwd: 'fixtures/typescript', space: 4});
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
+	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test.serial('typescript no semicolon option', async t => {
-	const {errorCount} = await xo.lintFiles('child/no-semicolon.ts', {cwd: 'fixtures/typescript', semicolon: false});
-	t.is(errorCount, 0);
+	const {errorCount, results} = await xo.lintFiles('child/no-semicolon.ts', {cwd: 'fixtures/typescript', semicolon: false});
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
+	t.is(errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test('webpack import resolver is used if webpack.config.js is found', async t => {
@@ -240,7 +271,7 @@ test('webpack import resolver is used if webpack.config.js is found', async t =>
 		},
 	});
 
-	// eslint-disable-next-line ava/assertion-arguments
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
 	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
 
 	const errorMessage = results[0].messages[0].message;
@@ -266,7 +297,7 @@ test('webpack import resolver config can be passed through webpack option', asyn
 		},
 	});
 
-	// eslint-disable-next-line ava/assertion-arguments
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
 	t.is(results[0].errorCount, 1, JSON.stringify(results[0].messages));
 });
 
@@ -282,18 +313,19 @@ test('webpack import resolver is used if {webpack: true}', async t => {
 		},
 	});
 
-	// eslint-disable-next-line ava/assertion-arguments
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
 	t.is(results[0].errorCount, 0, JSON.stringify(results[0]));
 });
 
 async function configType(t, {dir}) {
-	const {results} = await xo.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: path.resolve('fixtures', 'config-files', dir)});
 
 	t.true(
 		hasRule(
 			results,
 			path.resolve('fixtures', 'config-files', dir, 'file.js'),
 			'indent',
+			rulesMeta,
 		),
 	);
 }
@@ -306,3 +338,20 @@ test(configType, {type: '.xo-config.js', dir: 'xo-config_js'});
 test(configType, {type: '.xo-config.cjs', dir: 'xo-config_cjs'});
 test(configType, {type: '.xo-config.json', dir: 'xo-config_json'});
 test(configType, {type: '.xo-config', dir: 'xo-config'});
+
+test('load config file with relative extends from different cwd', async t => {
+	const directory = 'extends-relative';
+
+	const {results, rulesMeta} = await xo.lintFiles('**/*', {
+		cwd: path.resolve('fixtures', 'config-files', directory),
+	});
+
+	t.true(
+		hasRule(
+			results,
+			path.resolve('fixtures', 'config-files', directory, 'file.js'),
+			'comma-dangle',
+			rulesMeta,
+		),
+	);
+});

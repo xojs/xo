@@ -8,11 +8,15 @@ import xo from '../index.js';
 const {__dirname} = createEsmUtils(import.meta);
 process.chdir(__dirname);
 
-const hasRule = (results, expectedRuleId) => results[0].messages.some(({ruleId}) => ruleId === expectedRuleId);
+const hasRule = (results, expectedRuleId, rulesMeta) => {
+	const hasRuleInResults = results[0].messages.some(({ruleId}) => ruleId === expectedRuleId);
+	const hasRuleInMeta = rulesMeta ? typeof rulesMeta[expectedRuleId] === 'object' : true;
+	return hasRuleInResults && hasRuleInMeta;
+};
 
 test('.lintText()', async t => {
-	const {results} = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n');
-	t.true(hasRule(results, 'semi'));
+	const {results, rulesMeta} = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n');
+	t.true(hasRule(results, 'semi', rulesMeta));
 });
 
 test('default `ignores`', async t => {
@@ -83,55 +87,55 @@ test('`ignores` option without filename', async t => {
 });
 
 test('JSX support', async t => {
-	const {results} = await xo.lintText('const app = <div className="appClass">Hello, React!</div>;\n');
-	t.true(hasRule(results, 'no-unused-vars'));
+	const {results, rulesMeta} = await xo.lintText('const app = <div className="appClass">Hello, React!</div>;\n');
+	t.true(hasRule(results, 'no-unused-vars', rulesMeta));
 });
 
 test('plugin support', async t => {
-	const {results} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
+	const {results, rulesMeta} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
 		plugins: ['react'],
 		rules: {'react/jsx-no-undef': 'error'},
 	});
-	t.true(hasRule(results, 'react/jsx-no-undef'));
+	t.true(hasRule(results, 'react/jsx-no-undef', rulesMeta));
 });
 
 test('prevent use of extended native objects', async t => {
-	const {results} = await xo.lintText('[].unicorn();\n');
-	t.true(hasRule(results, 'no-use-extend-native/no-use-extend-native'));
+	const {results, rulesMeta} = await xo.lintText('[].unicorn();\n');
+	t.true(hasRule(results, 'no-use-extend-native/no-use-extend-native', rulesMeta));
 });
 
 test('extends support', async t => {
-	const {results} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
+	const {results, rulesMeta} = await xo.lintText('var React;\nReact.render(<App/>);\n', {
 		extends: 'xo-react',
 	});
-	t.true(hasRule(results, 'react/jsx-no-undef'));
+	t.true(hasRule(results, 'react/jsx-no-undef', rulesMeta));
 });
 
 test('disable style rules when `prettier` option is enabled', async t => {
-	const {results: withoutPrettier} = await xo.lintText('(a) => {}\n', {filePath: 'test.js'});
+	const {results: withoutPrettier, rulesMeta} = await xo.lintText('(a) => {}\n', {filePath: 'test.js'});
 	// `arrow-parens` is enabled
-	t.true(hasRule(withoutPrettier, 'arrow-parens'));
+	t.true(hasRule(withoutPrettier, 'arrow-parens', rulesMeta));
 	// `prettier/prettier` is disabled
-	t.false(hasRule(withoutPrettier, 'prettier/prettier'));
+	t.false(hasRule(withoutPrettier, 'prettier/prettier', rulesMeta));
 
 	const {results: withPrettier} = await xo.lintText('(a) => {}\n', {prettier: true, filePath: 'test.js'});
 	// `arrow-parens` is disabled by `eslint-config-prettier`
-	t.false(hasRule(withPrettier, 'arrow-parens'));
-	// `prettier/prettier` is enabled
+	t.false(hasRule(withPrettier, 'arrow-parens', rulesMeta));
+	// `prettier/prettier` is enabled - this is a special case for rulesMeta - so we remove it from this test
 	t.true(hasRule(withPrettier, 'prettier/prettier'));
 });
 
 test('extends `react` support with `prettier` option', async t => {
-	const {results} = await xo.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true, filePath: 'test.jsx'});
+	const {results, rulesMeta} = await xo.lintText('<Hello name={ firstname } />;\n', {extends: 'xo-react', prettier: true, filePath: 'test.jsx'});
 	// `react/jsx-curly-spacing` is disabled by `eslint-config-prettier`
-	t.false(hasRule(results, 'react/jsx-curly-spacing'));
+	t.false(hasRule(results, 'react/jsx-curly-spacing', rulesMeta));
 	// `prettier/prettier` is enabled
-	t.true(hasRule(results, 'prettier/prettier'));
+	t.true(hasRule(results, 'prettier/prettier', rulesMeta));
 });
 
 test('regression test for #71', async t => {
 	const {results} = await xo.lintText('const foo = { key: \'value\' };\nconsole.log(foo);\n', {
-		extends: path.join(__dirname, 'fixtures/extends.js'),
+		extends: './fixtures/extends.js',
 	});
 	t.is(results[0].errorCount, 0);
 });
@@ -210,11 +214,11 @@ test('enable rules based on nodeVersion', async t => {
 	const filePath = path.join(cwd, 'promise-then.js');
 	const text = await fs.readFile(filePath, 'utf8');
 
-	let {results} = await xo.lintText(text, {nodeVersion: '>=8.0.0'});
-	t.true(hasRule(results, 'promise/prefer-await-to-then'));
+	let {results, rulesMeta} = await xo.lintText(text, {nodeVersion: '>=8.0.0'});
+	t.true(hasRule(results, 'promise/prefer-await-to-then', rulesMeta));
 
-	({results} = await xo.lintText(text, {nodeVersion: '>=6.0.0'}));
-	t.false(hasRule(results, 'promise/prefer-await-to-then'));
+	({results, rulesMeta} = await xo.lintText(text, {nodeVersion: '>=6.0.0'}));
+	t.false(hasRule(results, 'promise/prefer-await-to-then', rulesMeta));
 });
 
 test('enable rules based on nodeVersion in override', async t => {
@@ -222,7 +226,7 @@ test('enable rules based on nodeVersion in override', async t => {
 	const filePath = path.join(cwd, 'promise-then.js');
 	const text = await fs.readFile(filePath, 'utf8');
 
-	let {results} = await xo.lintText(text, {
+	let {results, rulesMeta} = await xo.lintText(text, {
 		nodeVersion: '>=8.0.0',
 		filePath: 'promise-then.js',
 		overrides: [
@@ -232,9 +236,9 @@ test('enable rules based on nodeVersion in override', async t => {
 			},
 		],
 	});
-	t.false(hasRule(results, 'promise/prefer-await-to-then'));
+	t.false(hasRule(results, 'promise/prefer-await-to-then', rulesMeta));
 
-	({results} = await xo.lintText(text, {
+	({results, rulesMeta} = await xo.lintText(text, {
 		nodeVersion: '>=6.0.0',
 		filePath: 'promise-then.js',
 		overrides: [
@@ -244,47 +248,52 @@ test('enable rules based on nodeVersion in override', async t => {
 			},
 		],
 	}));
-	t.true(hasRule(results, 'promise/prefer-await-to-then'));
+	t.true(hasRule(results, 'promise/prefer-await-to-then', rulesMeta));
 });
 
 test('allow unassigned stylesheet imports', async t => {
-	let {results} = await xo.lintText('import \'stylesheet.css\'');
-	t.false(hasRule(results, 'import/no-unassigned-import'));
+	let {results, rulesMeta} = await xo.lintText('import \'stylesheet.css\'');
+	t.false(hasRule(results, 'import/no-unassigned-import', rulesMeta));
 
-	({results} = await xo.lintText('import \'stylesheet.scss\''));
-	t.false(hasRule(results, 'import/no-unassigned-import'));
+	({results, rulesMeta} = await xo.lintText('import \'stylesheet.scss\''));
+	t.false(hasRule(results, 'import/no-unassigned-import', rulesMeta));
 
-	({results} = await xo.lintText('import \'stylesheet.sass\''));
-	t.false(hasRule(results, 'import/no-unassigned-import'));
+	({results, rulesMeta} = await xo.lintText('import \'stylesheet.sass\''));
+	t.false(hasRule(results, 'import/no-unassigned-import', rulesMeta));
 
-	({results} = await xo.lintText('import \'stylesheet.less\''));
-	t.false(hasRule(results, 'import/no-unassigned-import'));
+	({results, rulesMeta} = await xo.lintText('import \'stylesheet.less\''));
+	t.false(hasRule(results, 'import/no-unassigned-import', rulesMeta));
 });
 
 test('find configurations close to linted file', async t => {
-	let {results} = await xo.lintText('console.log(\'semicolon\');\n', {filePath: 'fixtures/nested-configs/child/semicolon.js'});
-	t.true(hasRule(results, 'semi'));
+	let {results, rulesMeta} = await xo.lintText('console.log(\'semicolon\');\n', {filePath: 'fixtures/nested-configs/child/semicolon.js'});
+	t.true(hasRule(results, 'semi', rulesMeta));
 
-	({results} = await xo.lintText('console.log(\'semicolon\');\n', {filePath: 'fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'}));
-	t.true(hasRule(results, 'prettier/prettier'));
+	({results, rulesMeta} = await xo.lintText('console.log(\'semicolon\');\n', {filePath: 'fixtures/nested-configs/child-override/child-prettier-override/semicolon.js'}));
+	t.true(hasRule(results, 'prettier/prettier', rulesMeta));
 
-	({results} = await xo.lintText('console.log(\'no-semicolon\')\n', {filePath: 'fixtures/nested-configs/no-semicolon.js'}));
-	t.true(hasRule(results, 'semi'));
+	({results, rulesMeta} = await xo.lintText('console.log(\'no-semicolon\')\n', {filePath: 'fixtures/nested-configs/no-semicolon.js'}));
+	t.true(hasRule(results, 'semi', rulesMeta));
 
-	({results} = await xo.lintText(`console.log([
+	({results, rulesMeta} = await xo.lintText(`console.log([
   2
 ]);\n`, {filePath: 'fixtures/nested-configs/child-override/two-spaces.js'}));
-	t.true(hasRule(results, 'indent'));
+	t.true(hasRule(results, 'indent', rulesMeta));
+});
+
+test('rulesMeta is added to the report by default', async t => {
+	const report = await xo.lintText('\'use strict\'\nconsole.log(\'unicorn\');\n');
+	t.is(typeof report.rulesMeta, 'object');
 });
 
 test('typescript files: two spaces fails', async t => {
 	const twoSpacesCwd = path.resolve('fixtures', 'typescript');
 	const twoSpacesfilePath = path.resolve(twoSpacesCwd, 'two-spaces.tsx');
 	const twoSpacesText = await fs.readFile(twoSpacesfilePath, 'utf8');
-	const {results} = await xo.lintText(twoSpacesText, {
+	const {results, rulesMeta} = await xo.lintText(twoSpacesText, {
 		filePath: twoSpacesfilePath,
 	});
-	t.true(hasRule(results, '@typescript-eslint/indent'));
+	t.true(hasRule(results, '@typescript-eslint/indent', rulesMeta));
 });
 
 test('typescript files: two spaces pass', async t => {
@@ -302,10 +311,10 @@ test('typescript files: extra semi fail', async t => {
 	const extraSemiCwd = path.resolve('fixtures', 'typescript', 'child');
 	const extraSemiFilePath = path.resolve(extraSemiCwd, 'extra-semicolon.ts');
 	const extraSemiText = await fs.readFile(extraSemiFilePath, 'utf8');
-	const {results} = await xo.lintText(extraSemiText, {
+	const {results, rulesMeta} = await xo.lintText(extraSemiText, {
 		filePath: extraSemiFilePath,
 	});
-	t.true(hasRule(results, '@typescript-eslint/no-extra-semi'));
+	t.true(hasRule(results, '@typescript-eslint/no-extra-semi', rulesMeta));
 });
 
 test('typescript files: extra semi pass', async t => {
@@ -323,10 +332,10 @@ test('typescript files: four space fail', async t => {
 	const fourSpacesCwd = path.resolve('fixtures', 'typescript', 'child', 'sub-child');
 	const fourSpacesFilePath = path.resolve(fourSpacesCwd, 'four-spaces.ts');
 	const fourSpacesText = await fs.readFile(fourSpacesFilePath, 'utf8');
-	const {results} = await xo.lintText(fourSpacesText, {
+	const {results, rulesMeta} = await xo.lintText(fourSpacesText, {
 		filePath: fourSpacesFilePath,
 	});
-	t.true(hasRule(results, '@typescript-eslint/indent'));
+	t.true(hasRule(results, '@typescript-eslint/indent', rulesMeta));
 });
 
 test('typescript files: four space pass', async t => {
@@ -337,7 +346,8 @@ test('typescript files: four space pass', async t => {
 		filePath: fourSpacesFilePath,
 		space: 4,
 	});
-	t.is(results[0].errorCount, 0);
+	// eslint-disable-next-line ava/assertion-arguments -- Type issue
+	t.is(results[0].errorCount, 0, JSON.stringify(results[0].messages));
 });
 
 test('deprecated rules', async t => {
@@ -350,8 +360,8 @@ test('deprecated rules', async t => {
 });
 
 async function configType(t, {dir}) {
-	const {results} = await xo.lintText('var obj = { a: 1 };\n', {cwd: path.resolve('fixtures', 'config-files', dir), filePath: 'file.js'});
-	t.true(hasRule(results, 'no-var'));
+	const {results, rulesMeta} = await xo.lintText('var obj = { a: 1 };\n', {cwd: path.resolve('fixtures', 'config-files', dir), filePath: 'file.js'});
+	t.true(hasRule(results, 'no-var', rulesMeta));
 }
 
 configType.title = (_, {type}) => `load config from ${type}`.trim();

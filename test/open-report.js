@@ -1,4 +1,3 @@
-/* eslint-disable ava/no-skip-test */
 import process from 'node:process';
 import path from 'node:path';
 import test from 'ava';
@@ -9,7 +8,7 @@ import xo from '../index.js';
 const {__dirname} = createEsmUtils(import.meta);
 process.chdir(__dirname);
 
-test.skip('opens nothing when there are no errors nor warnings', async t => {
+test.failing('opens nothing when there are no errors nor warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/successes/*');
 	const results = await xo.lintFiles(glob);
 
@@ -25,7 +24,7 @@ test.skip('opens nothing when there are no errors nor warnings', async t => {
 	t.pass();
 });
 
-test.skip('only opens errors if there are errors and warnings', async t => {
+test.failing('only opens errors if there are errors and warnings', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/**');
 	const results = await xo.lintFiles(glob);
 
@@ -55,7 +54,7 @@ test.skip('only opens errors if there are errors and warnings', async t => {
 	openReport(results);
 });
 
-test.skip('if a file has errors and warnings, it opens the first error', async t => {
+test.failing('if a file has errors and warnings, it opens the first error', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/errors/two-with-warnings.js');
 	const results = await xo.lintFiles(glob);
 
@@ -73,7 +72,7 @@ test.skip('if a file has errors and warnings, it opens the first error', async t
 	openReport(results);
 });
 
-test.skip('only opens warnings if there are no errors', async t => {
+test.failing('only opens warnings if there are no errors', async t => {
 	const glob = path.join(__dirname, 'fixtures/open-report/warnings/*');
 	const results = await xo.lintFiles(glob);
 

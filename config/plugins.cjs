@@ -16,7 +16,7 @@ module.exports = {
 		'unicorn',
 		'promise',
 		'import',
-		'node',
+		'n', // eslint-plugin-node's successor
 		'eslint-comments',
 	],
 	extends: [
@@ -40,7 +40,7 @@ module.exports = {
 				checkFilenames: false,
 				checkDefaultAndNamespaceImports: false,
 				checkShorthandImports: false,
-				extendDefaultReplacements: false,
+				extendDefaultReplacements: true,
 				replacements: {
 					// https://thenextweb.com/dd/2020/07/13/linux-kernel-will-no-longer-use-terms-blacklist-and-slave/
 					whitelist: {
@@ -56,7 +56,7 @@ module.exports = {
 						secondary: true,
 					},
 
-					// Not part of `eslint-plugin-unicorn`
+					// Reverse.
 					application: {
 						app: true,
 					},
@@ -64,68 +64,75 @@ module.exports = {
 						apps: true,
 					},
 
-					// Part of `eslint-plugin-unicorn`
-					arr: {
-						array: true,
+					// Disable some that may be too annoying.
+					env: false,
+					i: false, // Do it at some point, but not ready for it yet. Maybe 2025.
+
+					// Not part of `eslint-plugin-unicorn`. Upstream them at some point.
+					bin: {
+						binary: true,
 					},
-					e: {
-						error: true,
-						event: true,
+					eof: {
+						endOfFile: true,
 					},
-					el: {
-						element: true,
+					impl: {
+						implement: true,
+						implementation: true,
 					},
-					elem: {
-						element: true,
+					anim: {
+						animation: true,
 					},
-					len: {
-						length: true,
+					calc: {
+						calculate: true,
 					},
-					msg: {
-						message: true,
+					dict: {
+						dictionary: true,
 					},
-					num: {
-						number: true,
+					dup: {
+						duplicate: true,
 					},
-					obj: {
-						object: true,
+					enc: {
+						encode: true,
+						encryption: true,
 					},
-					opts: {
-						options: true,
+					gen: {
+						generate: true,
+						general: true,
 					},
-					param: {
-						parameter: true,
+					gfx: {
+						graphics: true,
 					},
-					params: {
-						parameters: true,
+					inc: {
+						increment: true,
 					},
-					prev: {
-						previous: true,
+					iter: {
+						iterate: true,
+						iterator: true,
 					},
-					req: {
-						request: true,
+					nav: {
+						navigate: true,
+						navigation: true,
 					},
-					res: {
-						response: true,
-						result: true,
+					norm: {
+						normalize: true,
 					},
-					ret: {
-						returnValue: true,
+					notif: {
+						notification: true,
 					},
-					str: {
-						string: true,
+					perf: {
+						performance: true,
+					},
+					proc: {
+						process: true,
+					},
+					rand: {
+						random: true,
+					},
+					sys: {
+						system: true,
 					},
 					temp: {
 						temporary: true,
-					},
-					tmp: {
-						temporary: true,
-					},
-					val: {
-						value: true,
-					},
-					err: {
-						error: true,
 					},
 				},
 			},
@@ -152,10 +159,10 @@ module.exports = {
 			},
 		],
 
-		// TODO: Disabled for now until it becomes more stable: https://github.com/sindresorhus/eslint-plugin-unicorn/search?q=consistent-destructuring+is:issue&state=open&type=issues
-		'unicorn/consistent-destructuring': 'off',
+		// Temporarily disabled because of https://github.com/sindresorhus/eslint-plugin-unicorn/issues/2218
+		'unicorn/no-empty-file': 'off',
 
-		// TODO: Disabled for now as I don't have time to deal with the backslash that might come from this. Try to enable this rule in 2021.
+		// TODO: Disabled for now as I don't have time to deal with the backslash that might come from this. Try to enable this rule in 2025.
 		'unicorn/no-null': 'off',
 
 		// We only enforce it for single-line statements to not be too opinionated.
@@ -163,6 +170,9 @@ module.exports = {
 			'error',
 			'only-single-line',
 		],
+
+		// It will be disabled in the next version of eslint-plugin-unicorn.
+		'unicorn/prefer-json-parse-buffer': 'off',
 
 		// TODO: Remove this override when the rule is more stable.
 		'unicorn/consistent-function-scoping': 'off',
@@ -217,9 +227,20 @@ module.exports = {
 			},
 		],
 		'import/no-useless-path-segments': 'error',
-		'import/newline-after-import': 'error',
+		'import/newline-after-import': [
+			'error',
+			{
+				// TODO: Buggy.
+				// considerComments: true,
+			},
+		],
 		'import/no-amd': 'error',
-		'import/no-duplicates': 'error',
+		'import/no-duplicates': [
+			'error',
+			{
+				'prefer-inline': true,
+			},
+		],
 
 		// We use `unicorn/prefer-module` instead.
 		// 'import/no-commonjs': 'error',
@@ -227,7 +248,13 @@ module.exports = {
 		// Looks useful, but too unstable at the moment
 		// 'import/no-deprecated': 'error',
 
-		'import/no-extraneous-dependencies': 'error',
+		'import/no-empty-named-blocks': 'error',
+		'import/no-extraneous-dependencies': [
+			'error',
+			{
+				includeTypes: true,
+			},
+		],
 		'import/no-mutable-exports': 'error',
 		'import/no-named-as-default-member': 'error',
 		'import/no-named-as-default': 'error',
@@ -240,7 +267,20 @@ module.exports = {
 		// 	}
 		// ],
 
-		'import/order': 'error',
+		'import/order': [
+			'error',
+			{
+				groups: [
+					'builtin',
+					'external',
+					'parent',
+					'sibling',
+					'index',
+				],
+				'newlines-between': 'never',
+				warnOnUnassignedImports: true,
+			},
+		],
 		'import/no-unassigned-import': [
 			'error',
 			{
@@ -259,38 +299,40 @@ module.exports = {
 		],
 
 		// Redundant with `import/no-extraneous-dependencies`.
-		// 'node/no-extraneous-import': 'error',
-		// 'node/no-extraneous-require': 'error',
+		// 'n/no-extraneous-import': 'error',
+		// 'n/no-extraneous-require': 'error',
 
 		// Redundant with `import/no-unresolved`.
-		// 'node/no-missing-import': 'error', // This rule is also buggy and doesn't support `node:`.
-		// 'node/no-missing-require': 'error',
+		// 'n/no-missing-import': 'error', // This rule is also buggy and doesn't support `node:`.
+		// 'n/no-missing-require': 'error',
 
-		'node/no-unpublished-bin': 'error',
+		'n/no-unpublished-bin': 'error',
 
 		// We have this enabled in addition to `import/extensions` as this one has an auto-fix.
-		'node/file-extension-in-import': [
+		'n/file-extension-in-import': [
 			'error',
 			'always',
 			{
 				// TypeScript doesn't yet support using extensions and fails with error TS2691.
 				'.ts': 'never',
 				'.tsx': 'never',
+				'.mts': 'never',
+				'.cts': 'never',
 			},
 		],
-		'node/no-mixed-requires': [
+		'n/no-mixed-requires': [
 			'error',
 			{
 				grouping: true,
 				allowCall: true,
 			},
 		],
-		'node/no-new-require': 'error',
-		'node/no-path-concat': 'error',
+		'n/no-new-require': 'error',
+		'n/no-path-concat': 'error',
 
 		// Disabled because they're too annoying, see:
 		// https://github.com/mysticatea/eslint-plugin-node/issues/105
-		// 'node/no-unpublished-import': [
+		// 'n/no-unpublished-import': [
 		// 	'error',
 		// 	{
 		// 		allowModules: [
@@ -299,7 +341,7 @@ module.exports = {
 		// 		]
 		// 	}
 		// ],
-		// 'node/no-unpublished-require': [
+		// 'n/no-unpublished-require': [
 		// 	'error',
 		// 	{
 		// 		allowModules: [
@@ -309,42 +351,45 @@ module.exports = {
 		// 	}
 		// ],
 
-		'node/process-exit-as-throw': 'error',
+		'n/process-exit-as-throw': 'error',
 
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in 'bin'. See https://github.com/mysticatea/eslint-plugin-node/issues/96
-		// 'node/shebang': 'error',
+		// 'n/shebang': 'error',
 
-		'node/no-deprecated-api': 'error',
-		'node/prefer-global/buffer': [
+		'n/no-deprecated-api': 'error',
+
+		// We no longer enforce this as we don't want to use Buffer at all, but sometimes we need to conditionally use the `Buffer` global, but we then don't want the import so the module works cross-platform.
+		// 'n/prefer-global/buffer': [
+		// 	'error',
+		// 	'never',
+		// ],
+
+		'n/prefer-global/console': [
+			'error',
+			'always',
+		],
+		'n/prefer-global/process': [
 			'error',
 			'never',
 		],
-		'node/prefer-global/console': [
+		'n/prefer-global/text-decoder': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/process': [
-			'error',
-			'never',
-		],
-		'node/prefer-global/text-decoder': [
+		'n/prefer-global/text-encoder': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/text-encoder': [
+		'n/prefer-global/url-search-params': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/url-search-params': [
+		'n/prefer-global/url': [
 			'error',
 			'always',
 		],
-		'node/prefer-global/url': [
-			'error',
-			'always',
-		],
-		'node/prefer-promises/dns': 'error',
-		'node/prefer-promises/fs': 'error',
+		'n/prefer-promises/dns': 'error',
+		'n/prefer-promises/fs': 'error',
 		'eslint-comments/disable-enable-pair': [
 			'error',
 			{

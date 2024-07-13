@@ -7,11 +7,11 @@ import MurmurHash3 from 'imurmurhash';
 import {DEFAULT_EXTENSION, DEFAULT_IGNORES, TSCONFIG_DEFAULTS} from '../lib/constants.js';
 import * as manager from '../lib/options-manager.js';
 
-const {__dirname, require, json} = createEsmUtils(import.meta);
-const parentConfig = json.loadSync('./fixtures/nested/package.json');
-const childConfig = json.loadSync('./fixtures/nested/child/package.json');
-const prettierConfig = json.loadSync('./fixtures/prettier/package.json');
-const enginesConfig = json.loadSync('./fixtures/engines/package.json');
+const {__dirname, require, readJson, readJsonSync} = createEsmUtils(import.meta);
+const parentConfig = readJsonSync('./fixtures/nested/package.json');
+const childConfig = readJsonSync('./fixtures/nested/child/package.json');
+const prettierConfig = readJsonSync('./fixtures/prettier/package.json');
+const enginesConfig = readJsonSync('./fixtures/engines/package.json');
 
 process.chdir(__dirname);
 
@@ -99,7 +99,7 @@ test('buildConfig: prettier: true', t => {
 		trailingComma: 'all',
 	}]);
 	// eslint-prettier-config must always be last
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'plugin:prettier/recommended');
+	t.is(config.baseConfig.extends.at(-1), 'plugin:prettier/recommended');
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
 	// Semi rule is not enabled
@@ -125,8 +125,8 @@ test('buildConfig: prettier: true, typescript file', t => {
 	}]);
 
 	// eslint-prettier-config must always be last
-	t.is(config.baseConfig.extends[config.baseConfig.extends.length - 1], 'plugin:prettier/recommended');
-	t.regex(config.baseConfig.extends[config.baseConfig.extends.length - 2], /xo-typescript/);
+	t.is(config.baseConfig.extends.at(-1), 'plugin:prettier/recommended');
+	t.regex(config.baseConfig.extends.at(-2), /xo-typescript/);
 
 	// Indent rule is not enabled
 	t.is(config.baseConfig.rules.indent, undefined);
@@ -222,11 +222,11 @@ test('buildConfig: engines: undefined', t => {
 	t.is(config.baseConfig.rules['prefer-destructuring'], 'off');
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
 	t.is(config.baseConfig.rules['unicorn/prefer-flat-map'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/dns'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/fs'], 'off');
-	t.is(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], undefined);
-	t.is(config.baseConfig.rules['node/no-unsupported-features/es-syntax'], undefined);
-	t.is(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], undefined);
+	t.is(config.baseConfig.rules['n/prefer-promises/dns'], 'off');
+	t.is(config.baseConfig.rules['n/prefer-promises/fs'], 'off');
+	t.is(config.baseConfig.rules['n/no-unsupported-features/es-builtins'], undefined);
+	t.is(config.baseConfig.rules['n/no-unsupported-features/es-syntax'], undefined);
+	t.is(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], undefined);
 });
 
 test('buildConfig: nodeVersion: false', t => {
@@ -238,8 +238,8 @@ test('buildConfig: nodeVersion: false', t => {
 	t.is(config.baseConfig.rules['prefer-destructuring'], 'off');
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
 	t.is(config.baseConfig.rules['unicorn/prefer-flat-map'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/dns'], 'off');
-	t.is(config.baseConfig.rules['node/prefer-promises/fs'], 'off');
+	t.is(config.baseConfig.rules['n/prefer-promises/dns'], 'off');
+	t.is(config.baseConfig.rules['n/prefer-promises/fs'], 'off');
 });
 
 test('buildConfig: nodeVersion: >=6', t => {
@@ -247,13 +247,13 @@ test('buildConfig: nodeVersion: >=6', t => {
 
 	// Turn off rule if we support Node.js below 7.6.0
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], 'off');
-	// Set node/no-unsupported-features rules with the nodeVersion
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
+	// Set n/no-unsupported-features rules with the nodeVersion
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/es-builtins'], ['error', {version: '>=6'}]);
 	t.deepEqual(
-		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
+		config.baseConfig.rules['n/no-unsupported-features/es-syntax'],
 		['error', {version: '>=6', ignores: ['modules']}],
 	);
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
 });
 
 test('buildConfig: nodeVersion: >=8', t => {
@@ -261,13 +261,13 @@ test('buildConfig: nodeVersion: >=8', t => {
 
 	// Do not turn off rule if we support only Node.js above 7.6.0
 	t.is(config.baseConfig.rules['promise/prefer-await-to-then'], undefined);
-	// Set node/no-unsupported-features rules with the nodeVersion
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
+	// Set n/no-unsupported-features rules with the nodeVersion
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/es-builtins'], ['error', {version: '>=8'}]);
 	t.deepEqual(
-		config.baseConfig.rules['node/no-unsupported-features/es-syntax'],
+		config.baseConfig.rules['n/no-unsupported-features/es-syntax'],
 		['error', {version: '>=8', ignores: ['modules']}],
 	);
-	t.deepEqual(config.baseConfig.rules['node/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
 });
 
 test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `bracketSameLine` from `prettier` config if defined', t => {
@@ -416,19 +416,21 @@ test('buildConfig: extends', t => {
 		extends: [
 			'plugin:foo/bar',
 			'eslint-config-prettier',
+			'./fixtures/config-files/xo_config_js/xo.config.js',
 		],
 	});
 
-	t.deepEqual(config.baseConfig.extends.slice(-2), [
+	t.deepEqual(config.baseConfig.extends.slice(-3), [
 		'plugin:foo/bar',
 		path.resolve('../node_modules/eslint-config-prettier/index.js'),
+		'./fixtures/config-files/xo_config_js/xo.config.js',
 	]);
 });
 
 test('buildConfig: typescript', t => {
 	const config = manager.buildConfig({ts: true, tsConfigPath: './tsconfig.json'});
 
-	t.regex(config.baseConfig.extends[config.baseConfig.extends.length - 1], /xo-typescript/);
+	t.regex(config.baseConfig.extends.at(-1), /xo-typescript/);
 	t.is(config.baseConfig.parser, require.resolve('@typescript-eslint/parser'));
 	t.deepEqual(config.baseConfig.parserOptions, {
 		warnOnUnsupportedTypeScriptVersion: false,
@@ -496,7 +498,9 @@ test('mergeWithFileConfig: use child if closest', async t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	const expected = {...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		...childConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -504,7 +508,9 @@ test('mergeWithFileConfig: use parent if closest', async t => {
 	const cwd = path.resolve('fixtures', 'nested');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -513,7 +519,9 @@ test('mergeWithFileConfig: use parent if child is ignored', async t => {
 	const filePath = path.resolve(cwd, 'child-ignore', 'file.js');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	const expected = {...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filePath, eslintConfigId};
+	const expected = {
+		...parentConfig.xo, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, filePath, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -521,14 +529,18 @@ test('mergeWithFileConfig: use child if child is empty', async t => {
 	const cwd = path.resolve('fixtures', 'nested', 'child-empty');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).result();
-	t.deepEqual(options, {extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId});
+	t.deepEqual(options, {
+		extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	});
 });
 
 test('mergeWithFileConfig: read engines from package.json', async t => {
 	const cwd = path.resolve('fixtures', 'engines');
 	const {options} = await manager.mergeWithFileConfig({cwd});
 	const eslintConfigId = new MurmurHash3().result();
-	const expected = {nodeVersion: enginesConfig.engines.node, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		nodeVersion: enginesConfig.engines.node, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -536,7 +548,9 @@ test('mergeWithFileConfig: XO engine options supersede package.json\'s', async t
 	const cwd = path.resolve('fixtures', 'engines');
 	const {options} = await manager.mergeWithFileConfig({cwd, nodeVersion: '>=8'});
 	const eslintConfigId = new MurmurHash3().result();
-	const expected = {nodeVersion: '>=8', extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		nodeVersion: '>=8', extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -544,7 +558,9 @@ test('mergeWithFileConfig: XO engine options false supersede package.json\'s', a
 	const cwd = path.resolve('fixtures', 'engines');
 	const {options} = await manager.mergeWithFileConfig({cwd, nodeVersion: false});
 	const eslintConfigId = new MurmurHash3().result();
-	const expected = {nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId};
+	const expected = {
+		nodeVersion: false, extensions: DEFAULT_EXTENSION, ignores: DEFAULT_IGNORES, cwd, eslintConfigId,
+	};
 	t.deepEqual(options, expected);
 });
 
@@ -552,7 +568,7 @@ test('mergeWithFileConfig: resolves expected typescript file options', async t =
 	const cwd = path.resolve('fixtures', 'typescript', 'child');
 	const filePath = path.resolve(cwd, 'file.ts');
 	const tsConfigPath = path.resolve(cwd, 'tsconfig.json');
-	const tsConfig = await json.load(tsConfigPath);
+	const tsConfig = await readJson(tsConfigPath);
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const eslintConfigId = new MurmurHash3(path.resolve(cwd, 'package.json')).hash(tsConfigPath).result();
 	const expected = {
@@ -564,7 +580,7 @@ test('mergeWithFileConfig: resolves expected typescript file options', async t =
 		ts: true,
 		tsConfigPath,
 		eslintConfigId,
-		tsConfig,
+		tsConfig: manager.tsConfigResolvePaths(tsConfig, tsConfigPath),
 	};
 	t.deepEqual(options, expected);
 });
@@ -574,7 +590,7 @@ test('mergeWithFileConfig: resolves expected tsx file options', async t => {
 	const filePath = path.resolve(cwd, 'file.tsx');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	const tsConfigPath = path.resolve(cwd, 'tsconfig.json');
-	const tsConfig = await json.load(tsConfigPath);
+	const tsConfig = await readJson(tsConfigPath);
 	const eslintConfigId = new MurmurHash3(path.join(cwd, 'package.json')).hash(tsConfigPath).result();
 	const expected = {
 		filePath,
@@ -585,22 +601,74 @@ test('mergeWithFileConfig: resolves expected tsx file options', async t => {
 		ts: true,
 		tsConfigPath,
 		eslintConfigId,
-		tsConfig,
+		tsConfig: manager.tsConfigResolvePaths(tsConfig, tsConfigPath),
 	};
 	t.deepEqual(options, expected);
 });
 
 test('mergeWithFileConfig: uses specified parserOptions.project as tsconfig', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'parseroptions-project');
-	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	const filePath = path.resolve(cwd, 'included-file.ts');
 	const expectedTsConfigPath = path.resolve(cwd, 'projectconfig.json');
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	t.is(options.tsConfigPath, expectedTsConfigPath);
 });
 
-test('mergeWithFileConfig: extends ts config if needed', async t => {
+test('mergeWithFileConfig: correctly resolves relative tsconfigs excluded file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'relative-configs');
+	const excludedFilePath = path.resolve(cwd, 'excluded-file.ts');
+	const excludeTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath: excludedFilePath});
+	t.regex(slash(options.tsConfigPath), excludeTsConfigPath);
+});
+
+test('mergeWithFileConfig: correctly resolves relative tsconfigs included file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'relative-configs');
+	const includedFilePath = path.resolve(cwd, 'included-file.ts');
+	const includeTsConfigPath = path.resolve(cwd, 'config/tsconfig.json');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath: includedFilePath});
+	t.is(options.tsConfigPath, includeTsConfigPath);
+});
+
+test('mergeWithFileConfig: uses generated tsconfig if specified parserOptions.project excludes file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'parseroptions-project');
+	const filePath = path.resolve(cwd, 'excluded-file.ts');
+	const expectedTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.regex(slash(options.tsConfigPath), expectedTsConfigPath);
+});
+
+test('mergeWithFileConfig: uses generated tsconfig if specified parserOptions.project misses file', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'parseroptions-project');
+	const filePath = path.resolve(cwd, 'missed-by-options-file.ts');
+	const expectedTsConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.regex(slash(options.tsConfigPath), expectedTsConfigPath);
+});
+
+test('mergeWithFileConfig: auto generated ts config extends found ts config if file is not covered', async t => {
 	const cwd = path.resolve('fixtures', 'typescript', 'extends-config');
 	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
+	const expected = {
+		extends: path.resolve(cwd, 'tsconfig.json'),
+	};
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.regex(slash(options.tsConfigPath), expectedConfigPath);
+	t.deepEqual(expected, options.tsConfig);
+});
+
+test('mergeWithFileConfig: used found ts config if file is covered', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-config');
+	const filePath = path.resolve(cwd, 'foo.ts');
+	const expectedConfigPath = path.resolve(cwd, 'tsconfig.json');
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedConfigPath);
+});
+
+test('mergeWithFileConfig: auto generated ts config extends found ts config if file is explicitly excluded', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'excludes');
+	const filePath = path.resolve(cwd, 'excluded-file.ts');
 	const expectedConfigPath = new RegExp(`${slash(cwd)}/node_modules/.cache/xo-linter/tsconfig\\..*\\.json[\\/]?$`, 'u');
 	const expected = {
 		extends: path.resolve(cwd, 'tsconfig.json'),
@@ -617,6 +685,33 @@ test('mergeWithFileConfig: creates temp tsconfig if none present', async t => {
 	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
 	t.regex(slash(options.tsConfigPath), expectedConfigPath);
 	t.deepEqual(options.tsConfig, TSCONFIG_DEFAULTS);
+});
+
+test('mergeWithFileConfig: tsconfig can properly extend configs in node_modules', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-module');
+	const expectedConfigPath = path.join(cwd, 'tsconfig.json');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	await t.notThrowsAsync(manager.mergeWithFileConfig({cwd, filePath}));
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedConfigPath);
+});
+
+test('mergeWithFileConfig: tsconfig can properly extend tsconfig base node_modules', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-tsconfig-bases');
+	const expectedConfigPath = path.join(cwd, 'tsconfig.json');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	await t.notThrowsAsync(manager.mergeWithFileConfig({cwd, filePath}));
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedConfigPath);
+});
+
+test('mergeWithFileConfig: tsconfig can properly resolve extends arrays introduced in ts 5', async t => {
+	const cwd = path.resolve('fixtures', 'typescript', 'extends-array');
+	const expectedConfigPath = path.join(cwd, 'tsconfig.json');
+	const filePath = path.resolve(cwd, 'does-not-matter.ts');
+	await t.notThrowsAsync(manager.mergeWithFileConfig({cwd, filePath}));
+	const {options} = await manager.mergeWithFileConfig({cwd, filePath});
+	t.is(options.tsConfigPath, expectedConfigPath);
 });
 
 test('applyOverrides', t => {

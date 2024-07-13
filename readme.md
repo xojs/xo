@@ -9,13 +9,13 @@
 > JavaScript/TypeScript linter (ESLint wrapper) with great defaults
 
 [![Coverage Status](https://codecov.io/gh/xojs/xo/branch/main/graph/badge.svg)](https://codecov.io/gh/xojs/xo/branch/main)
-[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
+[![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto&logoWidth=20)](https://github.com/xojs/xo)
 
 Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` to manage. It just works!
 
 It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
-**XO requires your project to be [ESM](https://blog.sindresorhus.com/hello-modules-d1010b4e777b).**
+**XO requires your project to be [ESM](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).**
 
 ![](https://raw.githubusercontent.com/sindresorhus/eslint-formatter-pretty/main/screenshot.png)
 
@@ -26,8 +26,8 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Enforces readable code, because you read more code than you write.
 - No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
 - [Config overrides per files/globs.](#config-overrides)
-- [TypeScript supported by default](#typescript)
-- Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`node`](https://github.com/mysticatea/eslint-plugin-node) and more.
+- [TypeScript supported by default.](#typescript)
+- Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
 - Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
 - Super simple to add XO to a project with [`$ npm init xo`](https://github.com/xojs/create-xo).
@@ -39,8 +39,8 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 
 ## Install
 
-```
-$ npm install xo --save-dev
+```sh
+npm install xo --save-dev
 ```
 
 *You must install XO locally. You can run it directly with `$ npx xo`.*
@@ -205,6 +205,22 @@ Type: `object`
 
 Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
 
+Disable a rule in your XO config to turn it off globally in your project.
+
+Example using `package.json`:
+
+```json
+{
+	"xo": {
+		"rules": {
+			"unicorn/no-array-for-each": "off"
+		}
+	}
+}
+```
+
+You could also use `.xo-config.json` or one of the other config file formats supported by XO.
+
 Please take a moment to consider if you really need to use this option.
 
 ### semicolon
@@ -239,7 +255,7 @@ module.exports = {
 };
 ```
 
-If contradicting options are set for both Prettier and XO an error will be thrown.
+If contradicting options are set for both Prettier and XO, an error will be thrown.
 
 ### nodeVersion
 
@@ -266,7 +282,7 @@ Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shar
 
 Type: `string[]`
 
-Allow more extensions to be linted besides `.js`, `.jsx`, `.mjs`, and `.cjs`. Make sure they're supported by ESLint or an ESLint plugin.
+Allow more extensions to be linted besides `.js`, `.jsx`, `.mjs`, and `.cjs` as well as their TypeScript equivalents `.ts`, `.tsx`, `.mts` and `.cts`. Make sure they're supported by ESLint or an ESLint plugin.
 
 ### settings
 
@@ -299,9 +315,9 @@ Setting this to an object enables the resolver and passes the object as configur
 
 ## TypeScript
 
-XO will automatically lint TypeScript files (`.ts`, `.d.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
+XO will automatically lint TypeScript files (`.ts`, `.mts`, `.cts`, `.d.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
 
-XO will handle the [@typescript-eslint/parser `project` option](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser#parseroptionsproject) automatically even if you don't have a `tsconfig.json` in your project.
+XO will handle the [@typescript-eslint/parser `project` option](https://typescript-eslint.io/packages/parser/#project) automatically even if you don't have a `tsconfig.json` in your project.
 
 ## GitHub Actions
 
@@ -368,7 +384,7 @@ If some files in your project are transpiled in order to support an older Node.j
 
 For example, if your project targets Node.js 8 but you want to use the latest JavaScript syntax as supported in Node.js 12:
 1. Set the `engines.node` property of your `package.json` to `>=8`
-2. Configure [Babel](https://babeljs.io) to transpile your source files (in `src` directory in this example)
+2. Configure [Babel](https://babeljs.io) to transpile your source files (in `source` directory in this example)
 3. Make sure to include the transpiled files in your published package with the [`files`](https://docs.npmjs.com/files/package.json#files) and [`main`](https://docs.npmjs.com/files/package.json#main) properties of your `package.json`
 4. Configure the XO `overrides` option to set `nodeVersion` to `>=12` for your source files directory
 
@@ -378,14 +394,16 @@ For example, if your project targets Node.js 8 but you want to use the latest Ja
 		"node": ">=12"
 	},
 	"scripts": {
-		"build": "babel src --out-dir dist"
+		"build": "babel source --out-dir distribution"
 	},
-	"main": "dist/index.js",
-	"files": ["dist/**/*.js"],
+	"main": "distribution/index.js",
+	"files": [
+		"distribution/**/*.js"
+	],
 	"xo": {
 		"overrides": [
 			{
-				"files": "{src}/**/*.js",
+				"files": "source/**/*.js",
 				"nodeVersion": ">=16"
 			}
 		]
@@ -450,7 +468,6 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 - [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue) - ESLint shareable config for Vue to be used with the above
 - [stylelint-config-xo](https://github.com/xojs/stylelint-config-xo) - Stylelint shareable config for XO with tab indent
 - [stylelint-config-xo-space](https://github.com/xojs/stylelint-config-xo-space) - Stylelint shareable config for XO with 2-space indent
-- [tslint-xo](https://github.com/xojs/tslint-xo) - TSLint shareable config for XO
 - [eslint-config-xo-typescript](https://github.com/xojs/eslint-config-xo-typescript) - ESLint shareable config for TypeScript
 
 ## Support
@@ -464,11 +481,13 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 ## Badge
 
-Show the world you're using XO → [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
+Show the world you're using XO → [![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto&logoWidth=20)](https://github.com/xojs/xo)
 
 ```md
-[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
+[![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto&logoWidth=20)](https://github.com/xojs/xo)
 ```
+
+Or [customize the badge](https://github.com/xojs/xo/issues/689#issuecomment-1253127616).
 
 You can also find some nice dynamic XO badges on [badgen.net](https://badgen.net/#xo).
 

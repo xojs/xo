@@ -28,7 +28,9 @@ const globFiles = async (patterns, options) => {
 
 	const files = await globby(
 		patterns,
-		{ignore: ignores, gitignore: true, absolute: true, cwd},
+		{
+			ignore: ignores, gitignore: true, absolute: true, cwd,
+		},
 	);
 
 	return files.filter(file => extensions.includes(path.extname(file).slice(1)));
@@ -53,7 +55,7 @@ const lintText = async (string, options) => {
 		filePath
 		&& (
 			micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-			|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
+			|| isGitIgnoredSync({cwd})(filePath)
 		)
 	) {
 		return getIgnoredReport(filePath);
@@ -66,7 +68,10 @@ const lintText = async (string, options) => {
 	}
 
 	const report = await eslint.lintText(string, {filePath, warnIgnored});
-	return processReport(report, {isQuiet});
+
+	const rulesMeta = eslint.getRulesMetaForResults(report);
+
+	return processReport(report, {isQuiet, rulesMeta});
 };
 
 const lintFiles = async (patterns, options) => {
@@ -84,16 +89,11 @@ const lintFiles = async (patterns, options) => {
 				for (const options of filesWithOptions) {
 					const {filePath, eslintOptions} = options;
 					const {cwd, baseConfig: {ignorePatterns}} = eslintOptions;
-					if (filePath
-						&& (
-							micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
-							|| isGitIgnoredSync({cwd, ignore: ignorePatterns})(filePath)
-						)) {
-						continue;
-					}
-
-					// eslint-disable-next-line no-await-in-loop
-					if ((await eslint.isPathIgnored(filePath))) {
+					if (
+						micromatch.isMatch(path.relative(cwd, filePath), ignorePatterns)
+						// eslint-disable-next-line no-await-in-loop -- Not worth refactoring
+						|| await eslint.isPathIgnored(filePath)
+					) {
 						continue;
 					}
 
@@ -102,7 +102,9 @@ const lintFiles = async (patterns, options) => {
 
 				const report = await eslint.lintFiles(files);
 
-				return processReport(report, {isQuiet: options.isQuiet});
+				const rulesMeta = eslint.getRulesMetaForResults(report);
+
+				return processReport(report, {isQuiet: options.isQuiet, rulesMeta});
 			}));
 
 	const report = mergeReports(reports);
