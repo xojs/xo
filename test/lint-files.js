@@ -121,7 +121,7 @@ test('multiple negative patterns should act as positive patterns', async t => {
 	t.deepEqual(paths, ['!!unicorn.js', '!unicorn.js']);
 });
 
-test.failing('enable rules based on nodeVersion', async t => {
+test('enable rules based on nodeVersion', async t => {
 	const {results, rulesMeta} = await xo.lintFiles('**/*', {cwd: 'fixtures/engines-overrides'});
 
 	// The transpiled file (as specified in `overrides`) should use `await`

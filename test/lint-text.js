@@ -209,7 +209,7 @@ test('lint eslintignored files if filename is not given', async t => {
 	t.true(results[0].errorCount > 0);
 });
 
-test.failing('enable rules based on nodeVersion', async t => {
+test('enable rules based on nodeVersion', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filePath = path.join(cwd, 'promise-then.js');
 	const text = await fs.readFile(filePath, 'utf8');
@@ -221,7 +221,7 @@ test.failing('enable rules based on nodeVersion', async t => {
 	t.false(hasRule(results, 'promise/prefer-await-to-then', rulesMeta));
 });
 
-test.failing('enable rules based on nodeVersion in override', async t => {
+test('enable rules based on nodeVersion in override', async t => {
 	const cwd = path.join(__dirname, 'fixtures', 'engines-overrides');
 	const filePath = path.join(cwd, 'promise-then.js');
 	const text = await fs.readFile(filePath, 'utf8');
