@@ -16,7 +16,8 @@
 			"import/no-extraneous-dependencies": "off",
 			"ava/no-ignored-test-files": "off",
 			"unicorn/prefer-module": "off",
-			"unicorn/prefer-node-protocol": "off"
+			"unicorn/prefer-node-protocol": "off",
+			"unicorn/no-anonymous-default-export": "off"
 		}
 	}
 }

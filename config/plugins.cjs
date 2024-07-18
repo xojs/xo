@@ -180,6 +180,9 @@ module.exports = {
 		// TODO: Temporarily disabled until it becomes more mature.
 		'unicorn/no-useless-undefined': 'off',
 
+		// TODO: Enable it when I have tried it more in practice.
+		'unicorn/prefer-string-raw': 'off',
+
 		// TODO: Temporarily disabled as the rule is buggy.
 		'function-call-argument-newline': 'off',
 
@@ -354,7 +357,7 @@ module.exports = {
 		'n/process-exit-as-throw': 'error',
 
 		// Disabled as the rule doesn't exclude scripts executed with `node` but not referenced in 'bin'. See https://github.com/mysticatea/eslint-plugin-node/issues/96
-		// 'n/shebang': 'error',
+		// 'n/hashbang': 'error',
 
 		'n/no-deprecated-api': 'error',
 
