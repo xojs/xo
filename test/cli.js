@@ -197,3 +197,26 @@ test('print-config flag without filename', async t => {
 	);
 	t.is(error.stderr.trim(), 'The `--print-config` flag must be used with exactly one filename');
 });
+
+test('Disable n/no-unsupported-features/*', async t => {
+	const cwd = path.join(__dirname, 'fixtures/disable-n-no-unsupported-features');
+	const {stdout} = await main(['--print-config', 'index.js'], {cwd});
+	const config = JSON.parse(stdout);
+	t.like(config, {
+		rules: {
+			'n/no-unsupported-features/es-builtins': ['off'],
+			'n/no-unsupported-features/es-syntax': ['off'],
+			'n/no-unsupported-features/node-builtins': ['off'],
+		},
+	});
+
+	const {stdout: stdoutOverrides} = await main(['--print-config', 'overrides.js'], {cwd});
+	const configOverrides = JSON.parse(stdoutOverrides);
+	t.like(configOverrides, {
+		rules: {
+			'n/no-unsupported-features/es-builtins': ['off'],
+			'n/no-unsupported-features/es-syntax': ['off'],
+			'n/no-unsupported-features/node-builtins': ['error'],
+		},
+	});
+});

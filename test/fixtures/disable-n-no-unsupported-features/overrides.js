@@ -1,0 +1,1 @@
+const _ = new FormData();
