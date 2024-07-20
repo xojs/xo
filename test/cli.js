@@ -219,4 +219,7 @@ test('Disable n/no-unsupported-features/*', async t => {
 			'n/no-unsupported-features/node-builtins': ['error'],
 		},
 	});
+
+	await t.notThrowsAsync(() => main(['index.js'], {cwd}));
+	await t.throwsAsync(() => main(['overrides.js'], {cwd}));
 });
