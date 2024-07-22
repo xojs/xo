@@ -198,8 +198,8 @@ test('print-config flag without filename', async t => {
 	t.is(error.stderr.trim(), 'The `--print-config` flag must be used with exactly one filename');
 });
 
-test('Disable n/no-unsupported-features/*', async t => {
-	const cwd = path.join(__dirname, 'fixtures/disable-n-no-unsupported-features');
+test('Do not override user-config', async t => {
+	const cwd = path.join(__dirname, 'fixtures/no-override-user-config');
 	const {stdout} = await main(['--print-config', 'index.js'], {cwd});
 	const config = JSON.parse(stdout);
 	t.like(config, {
