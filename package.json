@@ -1,6 +1,6 @@
 {
 	"name": "xo",
-	"version": "0.59.1",
+	"version": "0.59.2",
 	"description": "JavaScript/TypeScript linter (ESLint wrapper) with great defaults",
 	"license": "MIT",
 	"repository": "xojs/xo",
