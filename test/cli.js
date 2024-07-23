@@ -197,3 +197,29 @@ test('print-config flag without filename', async t => {
 	);
 	t.is(error.stderr.trim(), 'The `--print-config` flag must be used with exactly one filename');
 });
+
+test('Do not override user-config', async t => {
+	const cwd = path.join(__dirname, 'fixtures/no-override-user-config');
+	const {stdout} = await main(['--print-config', 'index.js'], {cwd});
+	const config = JSON.parse(stdout);
+	t.like(config, {
+		rules: {
+			'n/no-unsupported-features/es-builtins': ['off'],
+			'n/no-unsupported-features/es-syntax': ['off'],
+			'n/no-unsupported-features/node-builtins': ['off'],
+		},
+	});
+
+	const {stdout: stdoutOverrides} = await main(['--print-config', 'overrides.js'], {cwd});
+	const configOverrides = JSON.parse(stdoutOverrides);
+	t.like(configOverrides, {
+		rules: {
+			'n/no-unsupported-features/es-builtins': ['off'],
+			'n/no-unsupported-features/es-syntax': ['off'],
+			'n/no-unsupported-features/node-builtins': ['error'],
+		},
+	});
+
+	await t.notThrowsAsync(() => main(['index.js'], {cwd}));
+	await t.throwsAsync(() => main(['overrides.js'], {cwd}));
+});

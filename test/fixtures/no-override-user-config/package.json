@@ -1,0 +1,20 @@
+{
+	"xo": {
+		"rules": {
+			"n/no-unsupported-features/es-builtins": "off",
+			"n/no-unsupported-features/es-syntax": "off",
+			"n/no-unsupported-features/node-builtins": "off"
+		},
+		"overrides": [
+			{
+				"files": "overrides.js",
+				"rules": {
+					"n/no-unsupported-features/node-builtins": "error"
+				}
+			}
+		]
+	},
+	"engines": {
+		"node": ">=18"
+	}
+}
