@@ -315,13 +315,6 @@ module.exports = {
 		'n/file-extension-in-import': [
 			'error',
 			'always',
-			{
-				// TypeScript doesn't yet support using extensions and fails with error TS2691.
-				'.ts': 'never',
-				'.tsx': 'never',
-				'.mts': 'never',
-				'.cts': 'never',
-			},
 		],
 		'n/no-mixed-requires': [
 			'error',
