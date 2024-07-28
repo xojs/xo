@@ -253,7 +253,7 @@ test('buildConfig: nodeVersion: >=6', t => {
 		config.baseConfig.rules['n/no-unsupported-features/es-syntax'],
 		['error', {version: '>=6', ignores: ['modules']}],
 	);
-	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=6'}]);
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=6', allowExperimental: true}]);
 });
 
 test('buildConfig: nodeVersion: >=8', t => {
@@ -267,7 +267,7 @@ test('buildConfig: nodeVersion: >=8', t => {
 		config.baseConfig.rules['n/no-unsupported-features/es-syntax'],
 		['error', {version: '>=8', ignores: ['modules']}],
 	);
-	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=8'}]);
+	t.deepEqual(config.baseConfig.rules['n/no-unsupported-features/node-builtins'], ['error', {version: '>=8', allowExperimental: true}]);
 });
 
 test('mergeWithPrettierConfig: use `singleQuote`, `trailingComma`, `bracketSpacing` and `bracketSameLine` from `prettier` config if defined', t => {
