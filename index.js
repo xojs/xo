@@ -76,6 +76,7 @@ const lintText = async (string, options) => {
 
 const lintFiles = async (patterns, options) => {
 	const files = await globFiles(patterns, options);
+	const {isQuiet} = options;
 
 	const groups = await getOptionGroups(files, options);
 
@@ -104,7 +105,7 @@ const lintFiles = async (patterns, options) => {
 
 				const rulesMeta = eslint.getRulesMetaForResults(report);
 
-				return processReport(report, {isQuiet: options.isQuiet, rulesMeta});
+				return processReport(report, {isQuiet, rulesMeta});
 			}));
 
 	const report = mergeReports(reports);
