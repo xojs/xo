@@ -1,7 +1,0 @@
-{
-	"xo": {
-		"parserOptions": {
-			"project": "./config/tsconfig.json"
-		}
-	}
-}

@@ -1,6 +1,0 @@
-{
-	"extends": [
-		"@sindresorhus/tsconfig",
-		"@tsconfig/node16"
-	],
-}
