@@ -11,7 +11,6 @@ import {moduleName} from './constants.js';
 export async function resolveXoConfig(options: LinterOptions): Promise<{
 	flatOptions: FlatXoConfig;
 	flatConfigPath: string;
-	enginesOptions: {engines?: string};
 }> {
 	options.cwd ||= process.cwd();
 
@@ -20,11 +19,6 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 	}
 
 	const stopDirectory = path.dirname(options.cwd);
-
-	const packageConfigExplorer = cosmiconfig('engines', {
-		searchPlaces: ['package.json'],
-		stopDir: options.cwd,
-	});
 
 	const flatConfigExplorer = cosmiconfig(moduleName, {
 		searchPlaces: [
@@ -47,20 +41,7 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 
 	const searchPath = options.filePath ?? options.cwd;
 
-	let [
-		{config: flatOptions = [], filepath: flatConfigPath = ''},
-		{config: enginesOptions = {}},
-	] = await Promise.all([
-		(async () =>
-			(await flatConfigExplorer.search(searchPath)) ?? {})() as Promise<{
-			config: FlatXoConfig | undefined;
-			filepath: string;
-		}>,
-		(async () =>
-			(await packageConfigExplorer.search(searchPath)) ?? {})() as Promise<{
-			config: {engines: string} | undefined;
-		}>,
-	]);
+	let {config: flatOptions = [], filepath: flatConfigPath = ''} = await (flatConfigExplorer.search(searchPath) as Promise<{config: FlatXoConfig | undefined; filepath: string}>) ?? {};
 
 	const globalKeys = [
 		'ignores',
@@ -80,7 +61,6 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 	flatOptions = flatOptions.map(config => pick(config, globalKeys));
 
 	return {
-		enginesOptions,
 		flatOptions,
 		flatConfigPath,
 	};

@@ -14,16 +14,15 @@ test.afterEach.always(async t => {
 	await fs.rm(t.context.cwd, {recursive: true, force: true});
 });
 
-test('resolveXoConfig > no config', async t => {
-	const {enginesOptions, flatOptions, flatConfigPath} = await resolveXoConfig({
+test('no config', async t => {
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({
 		cwd: t.context.cwd,
 	});
-	t.deepEqual(enginesOptions, {});
 	t.deepEqual(flatOptions, []);
 	t.is(flatConfigPath, '');
 });
 
-test('resolveXoConfig > resolves xo config', async t => {
+test('resolves xo config', async t => {
 	const testConfig = `export default [
     {
       space: true,
@@ -34,41 +33,54 @@ test('resolveXoConfig > resolves xo config', async t => {
 		testConfig,
 		'utf8',
 	);
-	const {enginesOptions, flatOptions, flatConfigPath} = await resolveXoConfig({
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({
 		cwd: t.context.cwd,
 	});
 
-	t.deepEqual(enginesOptions, {});
 	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'xo.config.js'));
 	t.deepEqual(flatOptions, [{space: true}]);
 });
 
-test('resolveXoConfig > resolves xo config with engines', async t => {
-	const testConfig = `export default [
-    {
-      space: true,
-    },
-  ];`;
-	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
-		testConfig,
-		'utf8',
-	);
-	await fs.writeFile(
-		path.join(t.context.cwd, 'package.json'),
-		JSON.stringify({
-			engines: {node: '>=16'},
-			...JSON.parse(await fs.readFile(path.join(t.context.cwd, 'package.json'), 'utf8')),
-		}),
-		'utf8',
-	);
-	const {enginesOptions, flatOptions, flatConfigPath} = await resolveXoConfig({
-		cwd: t.context.cwd,
-	});
+test('resolves all config extensions types', async t => {
+	const testConfigEsm = `export default [
+		{
+			space: true,
+		},
+	];`;
 
-	t.is(flatConfigPath, path.join(t.context.cwd, 'xo.config.js'));
-	t.deepEqual(flatOptions, [{space: true}]);
-	t.deepEqual(enginesOptions, {node: '>=16'});
+	const testConfigCjs = `module.exports = [
+		{
+			space: true,
+		},
+	];`;
 
-	t.pass();
+	const jsFile = path.join(t.context.cwd, 'xo.config.js');
+	const cjsFile = path.join(t.context.cwd, 'xo.config.cjs');
+	const mjsFile = path.join(t.context.cwd, 'xo.config.mjs');
+	const tsFile = path.join(t.context.cwd, 'xo.config.ts');
+	const ctsFile = path.join(t.context.cwd, 'xo.config.cts');
+	const mjsFile2 = path.join(t.context.cwd, 'xo.config.mjs');
+
+	for (const file of [jsFile, mjsFile, tsFile, mjsFile2]) {
+		// eslint-disable-next-line no-await-in-loop
+		await fs.writeFile(file, testConfigEsm, 'utf8');
+		// eslint-disable-next-line no-await-in-loop
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd});
+		t.deepEqual(flatConfigPath, file);
+		t.deepEqual(flatOptions, [{space: true}]);
+		// eslint-disable-next-line no-await-in-loop
+		await fs.rm(file);
+	}
+
+	for (const file of [cjsFile, ctsFile]) {
+		// eslint-disable-next-line no-await-in-loop
+		await fs.writeFile(file, testConfigCjs, 'utf8');
+		// eslint-disable-next-line no-await-in-loop
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd});
+		t.deepEqual(flatConfigPath, file);
+		t.deepEqual(flatOptions, [{space: true}]);
+		// eslint-disable-next-line no-await-in-loop
+		await fs.rm(file);
+	}
 });
+
