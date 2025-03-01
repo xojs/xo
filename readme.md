@@ -28,7 +28,6 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - [Flat config customization.](#config)
 - [TypeScript supported by default.](#typescript)
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
-- Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
 - Super simple to add XO to a project with [`$ npm init xo`](https://github.com/xojs/create-xo).
 - Fix many issues automagically with `$ xo --fix`.
@@ -59,6 +58,7 @@ $ xo --help
 
   Options
     --fix             Automagically fix issues
+    --reporter        Reporter to use
     --ignore          Ignore pattern globs, can be set multiple times
     --space           Use space indent instead of tabs [Default: 2]
     --no-semicolon    Prevent use of semicolons
@@ -216,9 +216,9 @@ The `xoToEslintConfig` function is designed for use in an `eslint.config.js` fil
 `eslint.config.js`
 
 ```js
-import Xo from 'xo';
+import Xo from "xo";
 
-export default Xo.xoToEslintConfig([{space: true, prettier: 'compat'}])
+export default Xo.xoToEslintConfig([{ space: true, prettier: "compat" }]);
 ```
 
 ### xo base config

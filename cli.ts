@@ -20,6 +20,7 @@ const cli = meow(
 
   Options
     --fix             Automagically fix issues
+    --reporter        Reporter to use
     --space           Use space indent instead of tabs [Default: 2]
     --semicolon       Use semicolons [Default: true]
     --prettier        Conform to Prettier code style [Default: false]

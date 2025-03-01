@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
+import {allFilesGlob} from '../lib/constants.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 import {getJsRule} from './helpers/get-rule.js';
 
@@ -179,4 +180,16 @@ test('with react option', async t => {
 	t.true(reactPlugin instanceof Object);
 	t.true(reactHooksPlugin instanceof Object);
 	t.is(getJsRule(flatConfig, 'react/no-danger'), 'error');
+});
+
+test('supports files config option as a string', async t => {
+	const flatConfig = await xoToEslintConfig([{files: 'src/**/*.ts'}]);
+
+	t.deepEqual(flatConfig.at(-1)?.files, ['src/**/*.ts']);
+});
+
+test('no files config option defaults to allFilesGlob', async t => {
+	const flatConfig = await xoToEslintConfig([{files: undefined}]);
+
+	t.deepEqual(flatConfig.at(-1)?.files, [allFilesGlob]);
 });

@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import dedent from 'dedent';
-import {$} from 'execa';
+import {$, type ExecaError} from 'execa';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
 const test = _test as TestFn<{cwd: string}>;
@@ -141,6 +141,20 @@ test('xo --stdin --stdin-filename=test.js', async t => {
 test('xo --stdin --stdin-filename=test.ts', async t => {
 	const {stdout} = await $`echo ${'const x: boolean = true'}`.pipe`node ./dist/cli --cwd=${t.context.cwd} --stdin --stdin-filename=test.ts`;
 	t.true(stdout.includes('test.ts'));
+});
+
+test('xo --reporter json', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+
+	const error: ExecaError = await t.throwsAsync($`node ./dist/cli --cwd ${t.context.cwd} --reporter=json`);
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	const results = JSON.parse(error?.stdout?.toString() ?? '');
+
+	t.true(Array.isArray(results));
+	t.is(results.length, 1);
+	t.is(typeof results[0], 'object');
 });
 
 test('xo --stdin --stdin-filename=test.ts --fix', async t => {
