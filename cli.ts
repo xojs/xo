@@ -26,7 +26,6 @@ const cli = meow(
     --prettier        Conform to Prettier code style [Default: false]
     --react           Include React specific parsing and xo-react linting rules [Default: false]
     --prettier        Format with prettier or turn off prettier conflicted rules when set to 'compat' [Default: false]
-    --ts              Auto configure type aware linting on unincluded ts files [Default: true]
     --print-config    Print the effective ESLint config for the given file
     --open            Open files with issues in your editor
     --stdin           Validate/fix code from stdin
@@ -67,10 +66,6 @@ const cli = meow(
 			},
 			prettier: {
 				type: 'boolean',
-			},
-			ts: {
-				type: 'boolean',
-				default: true,
 			},
 			react: {
 				type: 'boolean',
@@ -121,7 +116,7 @@ const linterOptions: LinterOptions = {
 	fix: cliOptions.fix,
 	cwd: (cliOptions.cwd && path.resolve(cliOptions.cwd)) ?? process.cwd(),
 	quiet: cliOptions.quiet,
-	ts: cliOptions.ts,
+	ts: true,
 };
 
 // Make data types for `options.space` match those of the API

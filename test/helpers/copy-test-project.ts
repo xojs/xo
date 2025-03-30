@@ -2,9 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import tempDir from 'temp-dir';
-// Import {$} from 'execa';
 import {pathExists} from 'path-exists';
-import {type XoConfigItem} from '../../lib/types.js';
 
 /**
  * Copies the test project in the temp dir to a new directory.
@@ -37,22 +35,3 @@ export const copyTestProject = async () => {
 	return newCwd;
 };
 
-/**
- * Adds a flag to the xo.config.js file in the test project in the temp dir.
- * Cleans up any previous xo.config.js file.
- *
- * @param cwd - the test project directory
- * @param config - contents of a xo.config.js file as a string
- */
-export const addFlatConfigToProject = async (
-	cwd: string,
-	config: XoConfigItem[],
-) => {
-	const filePath = path.join(cwd, 'xo.config.js');
-
-	if (await pathExists(filePath)) {
-		await fs.rm(filePath, {force: true});
-	}
-
-	await fs.writeFile(filePath, `export default ${JSON.stringify(config)};`);
-};

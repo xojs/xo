@@ -79,13 +79,9 @@ test('flat config > ts > semi', async t => {
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-// Test still failing on ubuntu latest github actions runner.
-// No idea why, cannot repro on macos. Possibly eslint or @typescript-eslint bug.
-test.skip('flat config > ts > semi > no tsconfig', async t => {
+test('flat config > ts > semi > no tsconfig', async t => {
 	const filePath = path.join(t.context.cwd, 'test.ts');
-	t.log('filePath', filePath);
-	await fs.rm(path.join(t.context.cwd, 'tsconfig.json'), {force: true});
-
+	await fs.rm(path.join(t.context.cwd, 'tsconfig.json'));
 	await fs.writeFile(
 		path.join(t.context.cwd, 'xo.config.js'),
 		dedent`
@@ -97,22 +93,18 @@ test.skip('flat config > ts > semi > no tsconfig', async t => {
 		`,
 		'utf8',
 	);
-
-	const {results} = await Xo.lintText(dedent`console.log('hello');\n`, {
-		cwd: t.context.cwd, ts: true,
+	const text = dedent`console.log('hello');\n`;
+	// It is required that an actual file exists for ts to apply type-aware linting when no tsconfig includes it
+	// if the file does not exist, linting ts will fail, js lint text does not require a file to exist
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await Xo.lintText(text, {
+		cwd: t.context.cwd,
+		ts: true,
 		filePath,
 	});
-
-	t.log(results[0]);
-
 	const generatedTsconfig = JSON.parse(await fs.readFile(path.join(t.context.cwd, 'node_modules', '.cache', 'xo-linter', 'tsconfig.xo.json'), 'utf8')) as TsConfigJson;
-
-	t.log(generatedTsconfig);
-
 	t.true(generatedTsconfig.files?.includes(filePath));
-
 	t.is(results?.[0]?.messages?.length, 1);
-
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 

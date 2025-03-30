@@ -6,7 +6,7 @@ import configReact from 'eslint-config-xo-react';
 import {type Options} from 'prettier';
 import pluginPrettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
-import {type FlatXoConfig} from './types.js';
+import {type XoConfigItem} from './types.js';
 import {config} from './config.js';
 import {xoToEslintConfigItem} from './utils.js';
 
@@ -16,7 +16,7 @@ export type CreateConfigOptions = {
 /**
  * Takes a xo flat config and returns an eslint flat config
  */
-export async function xoToEslintConfig(flatXoConfig: FlatXoConfig | undefined, {prettierOptions = {}}: CreateConfigOptions = {}): Promise<Linter.Config[]> {
+export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {prettierOptions = {}}: CreateConfigOptions = {}): Promise<Linter.Config[]> {
 	const baseConfig = [...config];
 	/**
    * Since configs are merged and the last config takes precedence

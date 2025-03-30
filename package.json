@@ -92,6 +92,7 @@
 		"meow": "^13.2.0",
 		"micromatch": "^4.0.8",
 		"open-editor": "^5.1.0",
+		"path-exists": "^5.0.0",
 		"prettier": "^3.5.2",
 		"type-fest": "^4.35.0",
 		"typescript-eslint": "^8.24.1"
@@ -111,7 +112,6 @@
 		"np": "^10.2.0",
 		"npm-package-json-lint": "^8.0.0",
 		"npm-package-json-lint-config-default": "^7.0.1",
-		"path-exists": "^5.0.0",
 		"prettier-plugin-packagejson": "^2.5.8",
 		"temp-dir": "^3.0.0",
 		"xo": "file:."

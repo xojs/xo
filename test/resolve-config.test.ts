@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
+import {type PackageJson} from 'type-fest';
 import {resolveXoConfig} from '../lib/resolve-config.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
@@ -22,7 +23,7 @@ test('no config', async t => {
 	t.is(flatConfigPath, '');
 });
 
-test('resolves xo config', async t => {
+test('resolves xo flat config', async t => {
 	const testConfig = `export default [
     {
       space: true,
@@ -38,6 +39,73 @@ test('resolves xo config', async t => {
 	});
 
 	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'xo.config.js'));
+	t.deepEqual(flatOptions, [{space: true}]);
+});
+
+test('resolves xo object config', async t => {
+	const testConfig = `export default {
+      space: true,
+    };`;
+	await fs.writeFile(
+		path.join(t.context.cwd, 'xo.config.js'),
+		testConfig,
+		'utf8',
+	);
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({
+		cwd: t.context.cwd,
+	});
+
+	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'xo.config.js'));
+	t.deepEqual(flatOptions, [{space: true}]);
+});
+
+test('resolves package.json flat config', async t => {
+	const pkg = JSON.parse(await fs.readFile(
+		path.join(t.context.cwd, 'package.json'),
+		'utf8',
+	)) as PackageJson;
+
+	pkg['xo'] = [{space: true}];
+
+	await fs.rm(
+		path.join(t.context.cwd, 'xo.config.js'),
+		{recursive: true, force: true},
+	);
+
+	await fs.writeFile(
+		path.join(t.context.cwd, 'package.json'),
+		JSON.stringify(pkg),
+		'utf8',
+	);
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({
+		cwd: t.context.cwd,
+	});
+	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'package.json'));
+	t.deepEqual(flatOptions, [{space: true}]);
+});
+
+test('resolves package.json object config', async t => {
+	const pkg = JSON.parse(await fs.readFile(
+		path.join(t.context.cwd, 'package.json'),
+		'utf8',
+	)) as PackageJson;
+
+	pkg['xo'] = {space: true};
+
+	await fs.rm(
+		path.join(t.context.cwd, 'xo.config.js'),
+		{recursive: true, force: true},
+	);
+
+	await fs.writeFile(
+		path.join(t.context.cwd, 'package.json'),
+		JSON.stringify(pkg),
+		'utf8',
+	);
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({
+		cwd: t.context.cwd,
+	});
+	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'package.json'));
 	t.deepEqual(flatOptions, [{space: true}]);
 });
 

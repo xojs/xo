@@ -1,9 +1,9 @@
 <h1 align="center">
-  <br>
-  <img width="400" src="media/logo.svg" alt="XO">
-  <br>
-  <br>
-  <br>
+<br>
+<img width="400" src="media/logo.svg" alt="XO">
+<br>
+<br>
+<br>
 </h1>
 
 > JavaScript/TypeScript linter (ESLint wrapper) with great defaults
@@ -64,7 +64,6 @@ $ xo --help
     --no-semicolon    Prevent use of semicolons
     --prettier        Conform to Prettier code style or turn off conflicting rules
     --react           Include React plugins and xo-react linting rules [Default: false]
-    --ts              Auto configure type aware linting on unincluded ts files [Default: true]
     --open            Open files with issues in your editor
     --quiet           Show only errors and no warnings
     --cwd=<dir>       Working directory for files
@@ -117,7 +116,7 @@ examples:
 `xo.config.js`
 
 ```js
-/** @type {import('xo').FlatXoconfig} */
+/** @type {import('xo').FlatXoConfig} */
 const xoConfig = [...]
 ```
 
@@ -199,19 +198,19 @@ Adds eslint-config-plugin-react, eslint-plugin-react-hooks and eslint-config-xo-
 
 ## TypeScript
 
-XO will automatically lint TypeScript files (`.ts`, `.mts`, `.cts`, `.d.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
+XO will automatically lint TypeScript files (`.ts`, `.mts`, `.cts`, and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
 
 XO will handle the [@typescript-eslint/parser `project` option](https://typescript-eslint.io/packages/parser/#project) automatically even if you don't have a `tsconfig.json` in your project.
 
 ## Usage as an ESLint Configuration
 
-With the introduction of the ESLint flat config, many of the original goals of `xo` were brought into the ESLint core, and shareable configs with plugins because possible. Although we highly recommend the use of the `xo` cli, we understand that some teams need to rely on ESLint directly.
+With the introduction of the ESLint flat config, many of the original goals of `xo` were brought into the ESLint core, and shareable configs with plugins became possible. Although we highly recommend the use of the `xo` cli, we understand that some teams need to rely on ESLint directly.
 
 For these purposes, you can still get most of the features of `xo` by using our ESLint configuration helpers.
 
 ### `xoToEslintConfig`
 
-The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs and ESLint config object. This function will not be able to automatically handle TS integration for you nor automatic prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will however, handle all of these details for you.
+The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will however, handle all of these details for you.
 
 `eslint.config.js`
 
@@ -221,23 +220,7 @@ import Xo from "xo";
 export default Xo.xoToEslintConfig([{ space: true, prettier: "compat" }]);
 ```
 
-### xo base config
-
-As another option, you can use the base xo eslint config as a jumping off point for your eslint config.
-
-`eslint.config.js`
-
-```js
-import { config } from "xo/config";
-
-export default [...config, ...customOptions];
-```
-
 ## Tips
-
-### The --ts option
-
-By default, `XO` will handle all aspects of [type aware linting](https://typescript-eslint.io/getting-started/typed-linting/), even when a file is not included in a tsconfig, which would normally error when using ESLint directly. However, this incurs a small performance penalty of having to look up the tsconfig each time in order to calculate and write an appropriate default tsconfig to use for the file. In situations where you are linting often, you may want to configure your project [correctly for type aware linting](https://typescript-eslint.io/getting-started/typed-linting/). This can help performance in editor plugins.
 
 ### Monorepo
 
