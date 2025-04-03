@@ -11,7 +11,7 @@
 [![Coverage Status](https://codecov.io/gh/xojs/xo/branch/main/graph/badge.svg)](https://codecov.io/gh/xojs/xo/branch/main)
 [![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto&logoWidth=20)](https://github.com/xojs/xo)
 
-Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `.eslintrc` to manage. It just works!
+Opinionated but configurable ESLint wrapper with lots of goodies included. Enforces strict and readable code. Never discuss code style on a pull request again! No decision-making. No `eslint.config.js` to manage. It just works!
 
 It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in rules should be opened over [there](https://github.com/eslint/eslint/issues).
 
@@ -25,16 +25,17 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Zero-config, but [configurable when needed](#config).
 - Enforces readable code, because you read more code than you write.
 - No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
-- [Config overrides per files/globs.](#config-overrides)
+- [Flat config customization.](#config)
 - [TypeScript supported by default.](#typescript)
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
-- Automatically enables rules based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field in your `package.json`.
 - Caches results between runs for much better performance.
 - Super simple to add XO to a project with [`$ npm init xo`](https://github.com/xojs/create-xo).
 - Fix many issues automagically with `$ xo --fix`.
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
 - Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
-- Optionally use the [Prettier](https://github.com/prettier/prettier) code style.
+- Optionally use the [Prettier](https://github.com/prettier/prettier) code style or turn off all prettier rules with the 'compat' option.
+- Optionally use `eslint-config-xo-react` for easy jsx and react linting with zero config.
+- Optionally use with `eslint` [directly](#usage-as-an-eslint-configuration)
 - Great [editor plugins](#editor-plugins).
 
 ## Install
@@ -45,7 +46,7 @@ npm install xo --save-dev
 
 *You must install XO locally. You can run it directly with `$ npx xo`.*
 
-*JSX is supported by default, but you'll need [eslint-config-xo-react](https://github.com/xojs/eslint-config-xo-react#use-with-xo) for React specific linting. Vue components are not supported by default. You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
+*You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
 
 ## Usage
 
@@ -58,18 +59,13 @@ $ xo --help
   Options
     --fix             Automagically fix issues
     --reporter        Reporter to use
-    --env             Environment preset  [Can be set multiple times]
-    --global          Global variable  [Can be set multiple times]
-    --ignore          Additional paths to ignore  [Can be set multiple times]
-    --space           Use space indent instead of tabs  [Default: 2]
+    --ignore          Ignore pattern globs, can be set multiple times
+    --space           Use space indent instead of tabs [Default: 2]
     --no-semicolon    Prevent use of semicolons
-    --prettier        Conform to Prettier code style
-    --node-version    Range of Node.js version to support
-    --plugin          Include third-party plugins  [Can be set multiple times]
-    --extend          Extend defaults with a custom config  [Can be set multiple times]
+    --prettier        Conform to Prettier code style or turn off conflicting rules
+    --react           Include React plugins and xo-react linting rules [Default: false]
     --open            Open files with issues in your editor
     --quiet           Show only errors and no warnings
-    --extension       Additional extension to lint [Can be set multiple times]
     --cwd=<dir>       Working directory for files
     --stdin           Validate/fix code from stdin
     --stdin-filename  Specify a filename for the --stdin option
@@ -80,15 +76,12 @@ $ xo --help
     $ xo index.js
     $ xo *.js !foo.js
     $ xo --space
-    $ xo --env=node --env=mocha
-    $ xo --plugin=react
-    $ xo --plugin=html --extension=html
-    $ echo 'const x=true' | xo --stdin --fix
     $ xo --print-config=index.js
+    $ echo 'const x=true' | xo --stdin --fix
 
   Tips
     - Add XO to your project with `npm init xo`.
-    - Put options in package.json instead of using flags so other tools can read it.
+    - Put options in xo.config.js instead of using flags so other tools can read it.
 ```
 
 ## Default code style
@@ -109,86 +102,44 @@ Check out an [example](index.js) and the [ESLint rules](https://github.com/xojs/
 
 The recommended workflow is to add XO locally to your project and run it with the tests.
 
-Simply run `$ npm init xo` (with any options) to add XO to your package.json or create one.
-
-### Before/after
-
-```diff
- {
- 	"name": "awesome-package",
- 	"scripts": {
--		"test": "ava",
-+		"test": "xo && ava"
- 	},
- 	"devDependencies": {
--		"ava": "^3.0.0"
-+		"ava": "^3.0.0",
-+		"xo": "^0.41.0"
- 	}
- }
-```
-
-Then just run `$ npm test` and XO will be run before your tests.
+Simply run `$ npm init xo` (with any options) to add XO to create an `xo.config.js`.
 
 ## Config
 
-You can configure XO options with one of the following files:
+You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` file in the root directory of your project. XO supports all js/ts file extensions (js,cjs,mjs,ts,cts,mts) automatically. A XO config is an extension of ESLint's Flat Config. Like ESLint, an XO config exports an array of XO config objects. XO config objects extend [ESLint Configuration Objects](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects). This means all the available configuration params for ESLint also work for `XO`. However, `XO` enhances and adds extra params to the configuration objects to make them easier to work with.
 
-1. As JSON in the `xo` property in `package.json`:
+### Config types
 
-```json
-{
-	"name": "awesome-package",
-	"xo": {
-		"space": true
-	}
-}
-```
+XO exports the types `FlatXoConfig`, `XoConfigItem`, and other types for you to get ts validation on your config files.
 
-2. As JSON in `.xo-config` or `.xo-config.json`:
-
-```json
-{
-	"space": true
-}
-```
-
-3. As a JavaScript module in `.xo-config.js` or `xo.config.js`:
+examples:
+`xo.config.js`
 
 ```js
-module.exports = {
-	space: true
-};
+/** @type {import('xo').FlatXoConfig} */
+const xoConfig = [...]
 ```
 
-4. For [ECMAScript module (ESM)](https://nodejs.org/api/esm.html) packages with [`"type": "module"`](https://nodejs.org/api/packages.html#packages_type), as a JavaScript module in `.xo-config.cjs` or `xo.config.cjs`:
+`xo.config.ts`
 
 ```js
-module.exports = {
-	space: true
-};
+import {type FlatXoConfig} from 'xo';
+
+const xoConfig: FlatXoConfig = [...]
 ```
 
-[Globals](https://eslint.org/docs/user-guide/configuring/language-options#specifying-globals) and [rules](https://eslint.org/docs/user-guide/configuring/rules#configuring-rules) can be configured inline in files.
+### files
 
-### envs
+Type: `string | string[] | undefined`\
+Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}`
 
-Type: `string[]`\
-Default: `['es2021', 'node']`
-
-Which [environments](https://eslint.org/docs/user-guide/configuring/language-options#specifying-environments) your code is designed to run in. Each environment brings with it a certain set of predefined global variables.
-
-### globals
-
-Type: `string[]`
-
-Additional global variables your code accesses during execution.
+A glob or array of glob strings which the config object will apply. By default `XO` will apply the configuration to [all files](lib/constants.ts).
 
 ### ignores
 
 Type: `string[]`
 
-Some [paths](lib/options-manager.js) are ignored by default, including paths in `.gitignore` and [.eslintignore](https://eslint.org/docs/user-guide/configuring/ignoring-code#the-eslintignore-file). Additional ignores can be added here.
+Some [paths](lib/constants.ts) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here. For global ignores, keep `ignores` as the only key in the config item.
 
 ### space
 
@@ -199,30 +150,6 @@ Set it to `true` to get 2-space indentation or specify the number of spaces.
 
 This option exists for pragmatic reasons, but I would strongly recommend you read ["Why tabs are superior"](http://lea.verou.me/2012/01/why-tabs-are-clearly-superior/).
 
-### rules
-
-Type: `object`
-
-Override any of the [default rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js). See the [ESLint docs](https://eslint.org/docs/rules/) for more info on each rule.
-
-Disable a rule in your XO config to turn it off globally in your project.
-
-Example using `package.json`:
-
-```json
-{
-	"xo": {
-		"rules": {
-			"unicorn/no-array-for-each": "off"
-		}
-	}
-}
-```
-
-You could also use `.xo-config.json` or one of the other config file formats supported by XO.
-
-Please take a moment to consider if you really need to use this option.
-
 ### semicolon
 
 Type: `boolean`\
@@ -232,12 +159,13 @@ Set it to `false` to enforce no-semicolon style.
 
 ### prettier
 
-Type: `boolean`\
+Type: `boolean | 'compat'`\
 Default: `false`
 
 Format code with [Prettier](https://github.com/prettier/prettier).
 
 [Prettier options](https://prettier.io/docs/en/options.html) will be based on your [Prettier config](https://prettier.io/docs/en/configuration.html). XO will then **merge** your options with its own defaults:
+
 - [semi](https://prettier.io/docs/en/options.html#semicolons): based on [semicolon](#semicolon) option
 - [useTabs](https://prettier.io/docs/en/options.html#tabs): based on [space](#space) option
 - [tabWidth](https://prettier.io/docs/en/options.html#tab-width): based on [space](#space) option
@@ -248,8 +176,8 @@ Format code with [Prettier](https://github.com/prettier/prettier).
 To stick with Prettier's defaults, add this to your Prettier config:
 
 ```js
-module.exports = {
-	trailingComma: 'es5',
+export default {
+	trailingComma: "es5",
 	singleQuote: false,
 	bracketSpacing: true,
 };
@@ -257,174 +185,54 @@ module.exports = {
 
 If contradicting options are set for both Prettier and XO, an error will be thrown.
 
-### nodeVersion
+#### prettier compat
 
-Type: `string | boolean`\
-Default: Value of the `engines.node` key in the project `package.json`
+If the prettier option is set to "compat", instead of formatting your code automatically, xo will turn off all rules that conflict with prettier code style and allow you to pass your formatting to the prettier tool directly.
 
-Enable rules specific to the Node.js versions within the configured range.
+### react
 
-If set to `false`, no rules specific to a Node.js version will be enabled.
-
-### plugins
-
-Type: `string[]`
-
-Include third-party [plugins](https://eslint.org/docs/user-guide/configuring/plugins#configuring-plugins).
-
-### extends
-
-Type: `string | string[]`
-
-Use one or more [shareable configs](https://eslint.org/docs/developer-guide/shareable-configs) or [plugin configs](https://eslint.org/docs/user-guide/configuring/configuration-files#using-a-configuration-from-a-plugin) to override any of the default rules (like `rules` above).
-
-### extensions
-
-Type: `string[]`
-
-Allow more extensions to be linted besides `.js`, `.jsx`, `.mjs`, and `.cjs` as well as their TypeScript equivalents `.ts`, `.tsx`, `.mts` and `.cts`. Make sure they're supported by ESLint or an ESLint plugin.
-
-### settings
-
-Type: `object`
-
-[Shared ESLint settings](https://eslint.org/docs/user-guide/configuring/configuration-files#adding-shared-settings) exposed to rules.
-
-### parser
-
-Type: `string`
-
-ESLint parser. For example, [`@babel/eslint-parser`](https://github.com/babel/babel/tree/main/eslint/babel-eslint-parser) if you're using language features that ESLint doesn't yet support.
-
-### processor
-
-Type: `string`
-
-[ESLint processor.](https://eslint.org/docs/user-guide/configuring/plugins#specifying-processor)
-
-### webpack
-
-Type: `boolean | object`
+Type: `boolean`\
 Default: `false`
 
-Use [eslint-import-resolver-webpack](https://github.com/benmosher/eslint-plugin-import/tree/master/resolvers/webpack) to resolve import search paths. This is enabled automatically if a `webpack.config.js` file is found.
-
-Set this to a boolean to explicitly enable or disable the resolver.
-
-Setting this to an object enables the resolver and passes the object as configuration. See the [resolver readme](https://github.com/benmosher/eslint-plugin-import/blob/master/resolvers/webpack/README.md) along with the [webpack documentation](https://webpack.js.org/configuration/resolve/) for more information.
+Adds eslint-config-plugin-react, eslint-plugin-react-hooks and eslint-config-xo-react to get all the react best practices applied automatically
 
 ## TypeScript
 
-XO will automatically lint TypeScript files (`.ts`, `.mts`, `.cts`, `.d.ts` and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
+XO will automatically lint TypeScript files (`.ts`, `.mts`, `.cts`, and `.tsx`) with the rules defined in [eslint-config-xo-typescript#use-with-xo](https://github.com/xojs/eslint-config-xo-typescript#use-with-xo).
 
 XO will handle the [@typescript-eslint/parser `project` option](https://typescript-eslint.io/packages/parser/#project) automatically even if you don't have a `tsconfig.json` in your project.
 
-## GitHub Actions
+## Usage as an ESLint Configuration
 
-XO uses a different formatter when running in a GitHub Actions workflow to be able to get [inline annotations](https://developer.github.com/changes/2019-09-06-more-check-annotations-shown-in-files-changed-tab/). XO also disables warnings here.
+With the introduction of the ESLint flat config, many of the original goals of `xo` were brought into the ESLint core, and shareable configs with plugins became possible. Although we highly recommend the use of the `xo` cli, we understand that some teams need to rely on ESLint directly.
 
-**Note**: For this to work, the [setup-node](https://github.com/actions/setup-node) action must be run before XO.
+For these purposes, you can still get most of the features of `xo` by using our ESLint configuration helpers.
 
-## Config Overrides
+### `xoToEslintConfig`
 
-XO makes it easy to override configs for specific files. The `overrides` property must be an array of override objects. Each override object must contain a `files` property which is a glob string, or an array of glob strings, relative to the config file. The remaining properties are identical to those described above, and will override the settings of the base config. If multiple override configs match the same file, each matching override is applied in the order it appears in the array. This means the last override in the array takes precedence over earlier ones. Consider the following example:
+The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will however, handle all of these details for you.
 
-```json
-{
-	"xo": {
-		"semicolon": false,
-		"space": 2,
-		"overrides": [
-			{
-				"files": "test/*.js",
-				"space": 3
-			},
-			{
-				 "files": "test/foo.js",
-				 "semicolon": true
-			}
-		]
-	}
-}
-```
+`eslint.config.js`
 
-- The base configuration is simply `space: 2`, `semicolon: false`. These settings are used for every file unless otherwise noted below.
+```js
+import Xo from "xo";
 
-- For every file in `test/*.js`, the base config is used, but `space` is overridden with `3`. The resulting config is:
-
-```json
-{
-	"semicolon": false,
-	"space": 3
-}
-```
-
-- For `test/foo.js`, the base config is first applied, followed the first overrides config (its glob pattern also matches `test/foo.js`), finally the second override config is applied. The resulting config is:
-
-```json
-{
-	"semicolon": true,
-	"space": 3
-}
+export default Xo.xoToEslintConfig([{ space: true, prettier: "compat" }]);
 ```
 
 ## Tips
 
-### Using a parent's config
-
-If you have a directory structure with nested `package.json` files and you want one of the child manifests to be skipped, you can do so by ommiting the `xo` property in the child's `package.json`. For example, when you have separate app and dev `package.json` files with `electron-builder`.
-
 ### Monorepo
 
-Put a `package.json` with your config at the root and omit the `xo` property in the `package.json` of your bundled packages.
-
-### Transpilation
-
-If some files in your project are transpiled in order to support an older Node.js version, you can use the [config overrides](#config-overrides) option to set a specific [`nodeVersion`](#nodeversion) to target your sources files.
-
-For example, if your project targets Node.js 8 but you want to use the latest JavaScript syntax as supported in Node.js 12:
-1. Set the `engines.node` property of your `package.json` to `>=8`
-2. Configure [Babel](https://babeljs.io) to transpile your source files (in `source` directory in this example)
-3. Make sure to include the transpiled files in your published package with the [`files`](https://docs.npmjs.com/files/package.json#files) and [`main`](https://docs.npmjs.com/files/package.json#main) properties of your `package.json`
-4. Configure the XO `overrides` option to set `nodeVersion` to `>=12` for your source files directory
-
-```json
-{
-	"engines": {
-		"node": ">=12"
-	},
-	"scripts": {
-		"build": "babel source --out-dir distribution"
-	},
-	"main": "distribution/index.js",
-	"files": [
-		"distribution/**/*.js"
-	],
-	"xo": {
-		"overrides": [
-			{
-				"files": "source/**/*.js",
-				"nodeVersion": ">=16"
-			}
-		]
-	}
-}
-```
-
-This way your `package.json` will contain the actual minimum Node.js version supported by your published code, but XO will lint your source code as if it targets Node.js 16.
+Put a `xo.config.js` with your config at the root and do not add a config to any of your bundled packages.
 
 ### Including files ignored by default
 
 To include files that XO [ignores by default](lib/constants.js#L1), add them as negative globs in the `ignores` option:
 
-```json
-{
-	"xo": {
-		"ignores": [
-			"!vendor/**"
-		]
-	}
-}
+```js
+const xoConfig = [{ ignores: ["!vendor/**"] }];
+export default xoConfig;
 ```
 
 ## FAQ

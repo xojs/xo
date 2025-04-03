@@ -1,0 +1,10 @@
+{
+	"extends": "@sindresorhus/tsconfig",
+	"compilerOptions": {
+		"outDir": "dist",
+		"resolveJsonModule": true,
+		"sourceMap": true
+	},
+	"include": ["**/*.ts", "scripts/setup-tests.js", "package.json", "**/*.tsx"],
+	"exclude": ["node_modules", "dist"]
+}

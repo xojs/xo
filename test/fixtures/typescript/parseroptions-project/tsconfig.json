@@ -1,4 +1,0 @@
-{
-	"include": ["included-file.ts"],
-	"exclude": ["excluded-file.ts"]
-}
