@@ -217,7 +217,7 @@ The `xoToEslintConfig` function is designed for use in an `eslint.config.js` fil
 ```js
 import xo from 'xo';
 
-export default xo.xoToEslintConfig([{space: true, prettier: 'compat'}]);
+export default await xo.xoToEslintConfig([{space: true, prettier: 'compat'}]);
 ```
 
 ## Tips
