@@ -1,9 +1,9 @@
 <h1 align="center">
-<br>
-<img width="400" src="media/logo.svg" alt="XO">
-<br>
-<br>
-<br>
+	<br>
+	<img width="400" src="media/logo.svg" alt="XO">
+	<br>
+	<br>
+	<br>
 </h1>
 
 > JavaScript/TypeScript linter (ESLint wrapper) with great defaults
@@ -44,9 +44,9 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 npm install xo --save-dev
 ```
 
-_You must install XO locally. You can run it directly with `$ npx xo`._
+*You must install XO locally. You can run it directly with `$ npx xo`.*
 
-_You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app._
+*You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
 
 ## Usage
 
@@ -86,10 +86,10 @@ $ xo --help
 
 ## Default code style
 
-_Any of these can be [overridden](#rules) if necessary._
+*Any of these can be [overridden](#rules) if necessary.*
 
-- Tab indentation _[(or space)](#space)_
-- Semicolons _[(or not)](#semicolon)_
+- Tab indentation *[(or space)](#space)*
+- Semicolons *[(or not)](#semicolon)*
 - Single-quotes
 - [Trailing comma](https://medium.com/@nikgraf/why-you-should-enforce-dangling-commas-for-multiline-statements-d034c98e36f8) for multiline statements
 - No unused variables
@@ -130,8 +130,8 @@ const xoConfig: FlatXoConfig = [...]
 
 ### files
 
-type: `string | string[] | undefined`,
-default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}`;
+Type: `string | string[] | undefined`\
+Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}`
 
 A glob or array of glob strings which the config object will apply. By default `XO` will apply the configuration to [all files](lib/constants.ts).
 
@@ -144,7 +144,7 @@ Some [paths](lib/constants.ts) are ignored by default, including paths in `.giti
 ### space
 
 Type: `boolean | number`\
-Default: `false` _(tab indentation)_
+Default: `false` *(tab indentation)*
 
 Set it to `true` to get 2-space indentation or specify the number of spaces.
 
@@ -153,13 +153,13 @@ This option exists for pragmatic reasons, but I would strongly recommend you rea
 ### semicolon
 
 Type: `boolean`\
-Default: `true` _(Semicolons required)_
+Default: `true` *(Semicolons required)*
 
 Set it to `false` to enforce no-semicolon style.
 
 ### prettier
 
-Type: `boolean|'compat'`\
+Type: `boolean | 'compat'`\
 Default: `false`
 
 Format code with [Prettier](https://github.com/prettier/prettier).
@@ -243,7 +243,7 @@ It means [hugs and kisses](https://en.wiktionary.org/wiki/xoxo).
 
 #### Why not Standard?
 
-The [Standard style](https://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create _one_ code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being _the_ style. My goal with XO is to make it simple to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
+The [Standard style](https://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it simple to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
 
 #### Why not ESLint?
 
@@ -284,7 +284,7 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 ## Related
 
-- [eslint-plugin-unicorn](https://github.com/sindresorhus/eslint-plugin-unicorn) - Various awesome ESLint rules _(Bundled in XO)_
+- [eslint-plugin-unicorn](https://github.com/sindresorhus/eslint-plugin-unicorn) - Various awesome ESLint rules *(Bundled in XO)*
 - [xo-summary](https://github.com/LitoMore/xo-summary) - Display output from `xo` as a list of style errors, ordered by count
 
 ## Badge
