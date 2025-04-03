@@ -1,4 +1,3 @@
-
 import pluginAva from 'eslint-plugin-ava';
 import pluginUnicorn from 'eslint-plugin-unicorn';
 import pluginImport from 'eslint-plugin-import-x';
@@ -28,16 +27,18 @@ if (!configXoTypescript[1]) {
 }
 
 /**
- * The base config that xo builds on top of from user options
- */
+The base config that XO builds on top of from user options.
+*/
 export const config: Linter.Config[] = [
 	{
-		name: 'Xo Default Ignores',
+		name: 'XO Default Ignores',
 		ignores: defaultIgnores,
 	},
 	{
-		name: 'Xo',
-		files: [allFilesGlob],
+		name: 'XO',
+		files: [
+			allFilesGlob,
+		],
 		plugins: {
 			'no-use-extend-native': pluginNoUseExtendNative,
 			ava: pluginAva,
@@ -61,7 +62,10 @@ export const config: Linter.Config[] = [
 		},
 		settings: {
 			'import-x/extensions': allExtensions,
-			'import-x/core-modules': ['electron', 'atom'],
+			'import-x/core-modules': [
+				'electron',
+				'atom',
+			],
 			'import-x/parsers': {
 				espree: jsExtensions,
 				'@typescript-eslint/parser': tsExtensions,
@@ -75,8 +79,8 @@ export const config: Linter.Config[] = [
 			},
 		},
 		/**
-     * These are the base rules that are always applied to all js and ts file types
-     */
+		These are the base rules that are always applied to all js and ts file types
+		*/
 		rules: {
 			...pluginAva?.configs?.['recommended']?.rules,
 			...pluginUnicorn.configs?.recommended?.rules,
@@ -212,8 +216,6 @@ export const config: Linter.Config[] = [
 			'unicorn/no-useless-undefined': 'off',
 			// TODO: Temporarily disabled as the rule is buggy.
 			'function-call-argument-newline': 'off',
-
-			// Disabled as the plugin doesn't support ESLint 8 yet.
 			'promise/param-names': 'error',
 			'promise/no-return-wrap': [
 				'error',
@@ -223,8 +225,14 @@ export const config: Linter.Config[] = [
 			],
 			'promise/no-new-statics': 'error',
 			'promise/no-return-in-finally': 'error',
+			'promise/prefer-await-to-then': [
+				'error',
+				{
+					strict: true,
+				},
+			],
+			'promise/prefer-catch': 'error',
 			'promise/valid-params': 'error',
-			'promise/prefer-await-to-then': 'error',
 			'import-x/default': 'error',
 			'import-x/export': 'error',
 			'import-x/extensions': [
@@ -374,7 +382,9 @@ export const config: Linter.Config[] = [
 		languageOptions: {
 			...configXoTypescript[1]?.languageOptions,
 		},
-		/** This turns on rules in typescript-eslint and turns off rules from eslint that conflict */
+		/**
+		This turns on rules in `typescript-eslint`` and turns off rules from ESLint that conflict.
+		*/
 		rules: {
 			...configXoTypescript[1]?.rules,
 			'unicorn/import-style': 'off',

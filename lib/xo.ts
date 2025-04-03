@@ -29,12 +29,12 @@ import {handleTsconfig} from './handle-ts-files.js';
 
 export class Xo {
 	/**
-	 * Static helper to convert an xo config to an eslint config
-	 * to be used in eslint.config.js
-	 */
+	Static helper to convert an XO config to an ESLint config to be used in `eslint.config.js`.
+	*/
 	static xoToEslintConfig = xoToEslintConfig;
+
 	/**
-	 * Static lintText helper for backwards compat and use in editor extensions and other tools
+	Static helper for backwards compatibility and use in editor extensions and other tools.
 	*/
 	static async lintText(code: string, options: LintTextOptions & LinterOptions & XoConfigOptions) {
 		const xo = new Xo(
@@ -53,11 +53,15 @@ export class Xo {
 				ignores: options.ignores,
 			},
 		);
-		return xo.lintText(code, {filePath: options.filePath, warnIgnored: options.warnIgnored});
+
+		return xo.lintText(code, {
+			filePath: options.filePath,
+			warnIgnored: options.warnIgnored,
+		});
 	}
 
 	/**
-	 * Static lintFiles helper for backwards compat and use in editor extensions and other tools
+	Static helper for backwards compatibility and use in editor extensions and other tools.
 	*/
 	static async lintFiles(globs: string | undefined, options: LinterOptions & XoConfigOptions) {
 		const xo = new Xo(
@@ -76,53 +80,60 @@ export class Xo {
 				ignores: options.ignores,
 			},
 		);
+
 		return xo.lintFiles(globs);
 	}
 
 	/**
-	 * Write the fixes to disk
-	 */
+	Write the fixes to disk.
+	*/
 	static async outputFixes(results: XoLintResult) {
 		await ESLint.outputFixes(results?.results ?? []);
 	}
 
 	/**
-	 * Required linter options,cwd, fix, and filePath (in case of lintText)
-	 */
+	Required linter options: `cwd`, `fix`, and `filePath` (in case of `lintText`).
+	*/
 	linterOptions: LinterOptions;
+
 	/**
-	 * Base Xo config options that allow configuration from cli or other sources
-	 * not to be confused with the xoConfig property which is the resolved Xo config from the flat config AND base config
-	 */
+	Base XO config options that allow configuration from CLI or other sources. Not to be confused with the `xoConfig` property which is the resolved XO config from the flat config AND base config.
+	*/
 	baseXoConfig: XoConfigOptions;
+
 	/**
-	 * File path to the eslint cache
-	 */
+	File path to the ESLint cache.
+	*/
 	cacheLocation: string;
+
 	/**
-	 * A re-usable ESLint instance configured with options calculated from the Xo config
-	 */
+	A re-usable ESLint instance configured with options calculated from the XO config.
+	*/
 	eslint?: ESLint;
+
 	/**
-	 * Xo config derived from both the base config and the resolved flat config
-	 */
+	XO config derived from both the base config and the resolved flat config.
+	*/
 	xoConfig?: XoConfigItem[];
+
 	/**
-	 * The ESLint config calculated from the resolved Xo config
+	The ESLint config calculated from the resolved XO config.
 	*/
 	eslintConfig?: Linter.Config[];
+
 	/**
-	* The flat xo config path, if there is one
+	The flat XO config path, if there is one.
 	*/
 	flatConfigPath?: string | undefined;
 
 	/**
-	 * If any user configs container prettier, we will need to fetch the prettier config
-	 */
+	If any user configs container Prettier, we will need to fetch the Prettier config.
+	*/
 	prettier?: boolean;
+
 	/**
-	 * The prettier config if it exists and is needed
-	 */
+	The Prettier config if it exists and is needed.
+	*/
 	prettierConfig?: prettier.Options;
 
 	constructor(_linterOptions: LinterOptions, _baseXoConfig: XoConfigOptions = {}) {
@@ -140,73 +151,83 @@ export class Xo {
 	}
 
 	/**
-	 * SetXoConfig sets the xo config on the Xo instance
-	 * @private
-	 */
+	Sets the XO config on the XO instance.
+
+	@private
+	*/
 	async setXoConfig() {
-		if (!this.xoConfig) {
-			const {flatOptions, flatConfigPath} = await resolveXoConfig({
-				...this.linterOptions,
-			});
-			this.xoConfig = [this.baseXoConfig, ...flatOptions];
-
-			// Split off the ts rules in a special case, so that you won't get errors
-			// for js files when the ts rules are not in the config.
-			this.xoConfig = this.xoConfig.flatMap(config => {
-				// If the user does not specify files, then we can assume they want everything to work correctly and
-				// for rules to apply to all files. However, ts rules will error with js files, so we need to split them off.
-				// if the user supplies files, then we cannot make the same assumption, so we will not split them off.
-				if (config.files) {
-					return config;
-				}
-
-				const ruleEntries = Object.entries(config.rules ?? {});
-				const otherRules: Array<[string, Linter.RuleEntry]> = [];
-				const tsRules: Array<[string, Linter.RuleEntry]> = [];
-
-				for (const [rule, ruleValue] of ruleEntries) {
-					if (!rule || !ruleValue) {
-						continue;
-					}
-
-					if (rule.startsWith('@typescript-eslint')) {
-						tsRules.push([rule, ruleValue]);
-					} else {
-						otherRules.push([rule, ruleValue]);
-					}
-				}
-
-				// If no ts rules, return the config as is
-				if (tsRules.length === 0) {
-					return config;
-				}
-
-				// If there are ts rules, we need to split them off into a new config
-				const tsConfig: XoConfigItem = {
-					...config,
-					rules: Object.fromEntries(tsRules),
-				};
-				// Apply ts rules to all files
-				tsConfig.files = [tsFilesGlob];
-
-				// Set the other rules to the original config
-				config.rules = Object.fromEntries(otherRules);
-				// These rules should still apply to all files
-				config.files = [allFilesGlob];
-
-				return [tsConfig, config];
-			});
-
-			this.prettier = this.xoConfig.some(config => config.prettier);
-			this.prettierConfig = await prettier.resolveConfig(flatConfigPath, {editorconfig: true}) ?? {};
-			this.flatConfigPath = flatConfigPath;
+		if (this.xoConfig) {
+			return;
 		}
+
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({
+			...this.linterOptions,
+		});
+
+		this.xoConfig = [
+			this.baseXoConfig,
+			...flatOptions,
+		];
+
+		// Split off the TS rules in a special case, so that you won't get errors
+		// for JS files when the TS rules are not in the config.
+		this.xoConfig = this.xoConfig.flatMap(config => {
+			// If the user does not specify files, then we can assume they want everything to work correctly and
+			// for rules to apply to all files. However, TS rules will error with JS files, so we need to split them off.
+			// if the user supplies files, then we cannot make the same assumption, so we will not split them off.
+			if (config.files) {
+				return config;
+			}
+
+			const ruleEntries = Object.entries(config.rules ?? {});
+			const otherRules: Array<[string, Linter.RuleEntry]> = [];
+			const tsRules: Array<[string, Linter.RuleEntry]> = [];
+
+			for (const [rule, ruleValue] of ruleEntries) {
+				if (!rule || !ruleValue) {
+					continue;
+				}
+
+				if (rule.startsWith('@typescript-eslint')) {
+					tsRules.push([rule, ruleValue]);
+				} else {
+					otherRules.push([rule, ruleValue]);
+				}
+			}
+
+			// If no TS rules, return the config as is
+			if (tsRules.length === 0) {
+				return config;
+			}
+
+			// If there are TS rules, we need to split them off into a new config
+			const tsConfig: XoConfigItem = {
+				...config,
+				rules: Object.fromEntries(tsRules),
+			};
+
+			// Apply TS rules to all files
+			tsConfig.files = [tsFilesGlob];
+
+			// Set the other rules to the original config
+			config.rules = Object.fromEntries(otherRules);
+
+			// These rules should still apply to all files
+			config.files = [allFilesGlob];
+
+			return [tsConfig, config];
+		});
+
+		this.prettier = this.xoConfig.some(config => config.prettier);
+		this.prettierConfig = await prettier.resolveConfig(flatConfigPath, {editorconfig: true}) ?? {};
+		this.flatConfigPath = flatConfigPath;
 	}
 
 	/**
-	 * SetEslintConfig sets the eslint config on the Xo instance
-	 * @private
-	 */
+	Sets the ESLint config on the XO instance.
+
+	@private
+	*/
 	async setEslintConfig() {
 		if (!this.xoConfig) {
 			throw new Error('"Xo.setEslintConfig" failed');
@@ -216,62 +237,72 @@ export class Xo {
 	}
 
 	/**
-	 * SetIgnores sets the ignores on the Xo instance
-	 * @private
-	 */
+	Sets the ignores on the XO instance.
+
+	@private
+	*/
 	setIgnores() {
-		if (this.baseXoConfig.ignores) {
-			let ignores: string[] = [];
-
-			if (typeof this.baseXoConfig.ignores === 'string') {
-				ignores = arrify(this.baseXoConfig.ignores);
-			} else if (Array.isArray(this.baseXoConfig.ignores)) {
-				ignores = this.baseXoConfig.ignores;
-			}
-
-			if (!this.xoConfig) {
-				throw new Error('"Xo.setIgnores" failed');
-			}
-
-			if (ignores.length > 0) {
-				this.xoConfig.push({ignores});
-			}
+		if (!this.baseXoConfig.ignores) {
+			return;
 		}
+
+		let ignores: string[] = [];
+
+		if (typeof this.baseXoConfig.ignores === 'string') {
+			ignores = arrify(this.baseXoConfig.ignores);
+		} else if (Array.isArray(this.baseXoConfig.ignores)) {
+			ignores = this.baseXoConfig.ignores;
+		}
+
+		if (!this.xoConfig) {
+			throw new Error('"Xo.setIgnores" failed');
+		}
+
+		if (ignores.length === 0) {
+			return;
+		}
+
+		this.xoConfig.push({ignores});
 	}
 
 	/**
-	 * Checks every ts file to ensure its included in the tsconfig
-	 * and any that are not included are added to a generated tsconfig for type aware linting
-	 *
-	 * @param files the ts files being linted
-	 */
+	Checks every TS file to ensure its included in the tsconfig and any that are not included are added to a generated tsconfig for type aware linting.
+
+	@param files - The TypeScript files being linted.
+	*/
 	async handleUnincludedTsFiles(files?: string[]) {
-		if (this.linterOptions.ts && files && files.length > 0) {
-			const tsFiles = files.filter(file => micromatch.isMatch(file, tsFilesGlob, {dot: true}));
-
-			if (tsFiles.length > 0) {
-				const {fallbackTsConfigPath, unincludedFiles} = await handleTsconfig({
-					cwd: this.linterOptions.cwd,
-					files: tsFiles,
-				});
-
-				if (this.xoConfig && unincludedFiles.length > 0) {
-					const config: XoConfigItem = {};
-					config.files = unincludedFiles.map(file => path.relative(this.linterOptions.cwd, file));
-					config.languageOptions ??= {};
-					config.languageOptions.parserOptions ??= {};
-					config.languageOptions.parserOptions['projectService'] = false;
-					config.languageOptions.parserOptions['project'] = fallbackTsConfigPath;
-					config.languageOptions.parserOptions['tsconfigRootDir'] = this.linterOptions.cwd;
-					this.xoConfig.push(config);
-				}
-			}
+		if (!this.linterOptions.ts || !files || files.length === 0) {
+			return;
 		}
+
+		const tsFiles = files.filter(file => micromatch.isMatch(file, tsFilesGlob, {dot: true}));
+
+		if (tsFiles.length === 0) {
+			return;
+		}
+
+		const {fallbackTsConfigPath, unincludedFiles} = await handleTsconfig({
+			cwd: this.linterOptions.cwd,
+			files: tsFiles,
+		});
+
+		if (!this.xoConfig || unincludedFiles.length === 0) {
+			return;
+		}
+
+		const config: XoConfigItem = {};
+		config.files = unincludedFiles.map(file => path.relative(this.linterOptions.cwd, file));
+		config.languageOptions ??= {};
+		config.languageOptions.parserOptions ??= {};
+		config.languageOptions.parserOptions['projectService'] = false;
+		config.languageOptions.parserOptions['project'] = fallbackTsConfigPath;
+		config.languageOptions.parserOptions['tsconfigRootDir'] = this.linterOptions.cwd;
+		this.xoConfig.push(config);
 	}
 
 	/**
-	 * InitEslint initializes the ESLint instance on the Xo instance
-	 */
+	Initializes the ESLint instance on the XO instance.
+	*/
 	public async initEslint(files?: string[]) {
 		await this.setXoConfig();
 
@@ -300,11 +331,11 @@ export class Xo {
 	}
 
 	/**
-	 * LintFiles lints the files on the Xo instance
-	 * @param globs glob pattern to pass to globby
-	 * @returns XoLintResult
-	 * @throws Error
-	 */
+	Lints the files on the XO instance.
+
+	@param globs - Glob pattern to pass to `globby`.
+	@throws Error
+	*/
 	async lintFiles(globs?: string | string[]): Promise<XoLintResult> {
 		if (!globs || (Array.isArray(globs) && globs.length === 0)) {
 			globs = `**/*.{${allExtensions.join(',')}}`;
@@ -339,12 +370,8 @@ export class Xo {
 	}
 
 	/**
-	 * LintText lints the text on the Xo instance
-	 * @param code
-	 * @param lintTextOptions
-	 * @returns XoLintResult
-	 * @throws Error
-	 */
+	Lints the text on the XO instance.
+	*/
 	async lintText(
 		code: string,
 		lintTextOptions: LintTextOptions,

@@ -25,10 +25,10 @@ test('no config', async t => {
 
 test('resolves xo flat config', async t => {
 	const testConfig = `export default [
-    {
-      space: true,
-    },
-  ];`;
+		{
+			space: true,
+		},
+	];`;
 	await fs.writeFile(
 		path.join(t.context.cwd, 'xo.config.js'),
 		testConfig,
@@ -44,8 +44,8 @@ test('resolves xo flat config', async t => {
 
 test('resolves xo object config', async t => {
 	const testConfig = `export default {
-      space: true,
-    };`;
+			space: true,
+		};`;
 	await fs.writeFile(
 		path.join(t.context.cwd, 'xo.config.js'),
 		testConfig,

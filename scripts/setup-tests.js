@@ -5,11 +5,10 @@ import {$} from 'execa';
 import {pathExists} from 'path-exists';
 
 /**
- * Creates a test project with a package.json and tsconfig.json
- * and installs the dependencies.
- *
- * @returns {string} The path to the test project.
- */
+Creates a test project with a package.json and tsconfig.json and installs the dependencies.
+
+@returns {string} The path to the test project.
+*/
 const cwd = path.join(tempDir, 'test-project');
 
 if (await pathExists(cwd)) {
@@ -44,7 +43,7 @@ await fs.writeFile(
 );
 
 // Npm install in the test project directory
-// which we will repeatedly copy in the temp dir to test the project against
+// which we will repeatedly copy in the temp directory to test the project against
 await $({
 	cwd,
 	stdio: 'inherit',

@@ -1,4 +1,3 @@
-
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import {getTsconfig} from 'get-tsconfig';
@@ -6,13 +5,15 @@ import micromatch, {type Options} from 'micromatch';
 import {tsconfigDefaults, cacheDirName} from './constants.js';
 
 const micromatchOptions: Options = {matchBase: true};
+
 /**
- * This function checks if the files are matched by the tsconfig include, exclude, and it returns the unmatched files.
- * If no tsconfig is found, it will create a fallback tsconfig file in the node_modules/.cache/xo directory.
- *
- * @param options
- * @returns The unmatched files.
- */
+This function checks if the files are matched by the tsconfig include, exclude, and it returns the unmatched files.
+
+If no tsconfig is found, it will create a fallback tsconfig file in the `node_modules/.cache/xo` directory.
+
+@param options
+@returns The unmatched files.
+*/
 export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]}) {
 	const {config: tsConfig = tsconfigDefaults, path: tsConfigPath} = getTsconfig(cwd) ?? {};
 
@@ -28,15 +29,15 @@ export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]
 			continue;
 		}
 
-		// If there is no files or include property - ts uses **/* as default so all TS files are matched
-		// in tsconfig, excludes override includes - so we need to prioritize that matching logic
+		// If there is no files or include property - TS uses `**/*` as default so all TS files are matched.
+		// In tsconfig, excludes override includes - so we need to prioritize that matching logic.
 		if (
 			tsConfig
 			&& !tsConfig.include
 			&& !tsConfig.files
 		) {
-			// If we have an excludes property, we need to check it
-			// If we match on excluded, then we definitively know that there is no tsconfig match
+			// If we have an excludes property, we need to check it.
+			// If we match on excluded, then we definitively know that there is no tsconfig match.
 			if (Array.isArray(tsConfig.exclude)) {
 				const exclude = Array.isArray(tsConfig.exclude) ? tsConfig.exclude : [];
 				hasMatch = !micromatch.isMatch(filePath, exclude, micromatchOptions);

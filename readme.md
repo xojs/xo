@@ -33,9 +33,9 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Fix many issues automagically with `$ xo --fix`.
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
 - Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
-- Optionally use the [Prettier](https://github.com/prettier/prettier) code style or turn off all prettier rules with the 'compat' option.
+- Optionally use the [Prettier](https://github.com/prettier/prettier) code style or turn off all Prettier rules with the `compat` option.
 - Optionally use `eslint-config-xo-react` for easy jsx and react linting with zero config.
-- Optionally use with `eslint` [directly](#usage-as-an-eslint-configuration)
+- Optionally use with ESLint [directly](#usage-as-an-eslint-configuration)
 - Great [editor plugins](#editor-plugins).
 
 ## Install
@@ -53,35 +53,35 @@ npm install xo --save-dev
 ```
 $ xo --help
 
-  Usage
-    $ xo [<file|glob> ...]
+	Usage
+		$ xo [<file|glob> ...]
 
-  Options
-    --fix             Automagically fix issues
-    --reporter        Reporter to use
-    --ignore          Ignore pattern globs, can be set multiple times
-    --space           Use space indent instead of tabs [Default: 2]
-    --no-semicolon    Prevent use of semicolons
-    --prettier        Conform to Prettier code style or turn off conflicting rules
-    --react           Include React plugins and xo-react linting rules [Default: false]
-    --open            Open files with issues in your editor
-    --quiet           Show only errors and no warnings
-    --cwd=<dir>       Working directory for files
-    --stdin           Validate/fix code from stdin
-    --stdin-filename  Specify a filename for the --stdin option
-    --print-config    Print the ESLint configuration for the given file
+	Options
+		--fix             Automagically fix issues
+		--reporter        Reporter to use
+		--ignore          Ignore pattern globs, can be set multiple times
+		--space           Use space indent instead of tabs [Default: 2]
+		--no-semicolon    Prevent use of semicolons
+		--prettier        Conform to Prettier code style or turn off conflicting rules
+		--react           Include React plugins and xo-react linting rules [Default: false]
+		--open            Open files with issues in your editor
+		--quiet           Show only errors and no warnings
+		--cwd=<dir>       Working directory for files
+		--stdin           Validate/fix code from stdin
+		--stdin-filename  Specify a filename for the --stdin option
+		--print-config    Print the ESLint configuration for the given file
 
-  Examples
-    $ xo
-    $ xo index.js
-    $ xo *.js !foo.js
-    $ xo --space
-    $ xo --print-config=index.js
-    $ echo 'const x=true' | xo --stdin --fix
+	Examples
+		$ xo
+		$ xo index.js
+		$ xo *.js !foo.js
+		$ xo --space
+		$ xo --print-config=index.js
+		$ echo 'const x=true' | xo --stdin --fix
 
-  Tips
-    - Add XO to your project with `npm init xo`.
-    - Put options in xo.config.js instead of using flags so other tools can read it.
+	Tips
+		- Add XO to your project with `npm init xo`.
+		- Put options in xo.config.js instead of using flags so other tools can read it.
 ```
 
 ## Default code style
@@ -110,7 +110,7 @@ You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` 
 
 ### Config types
 
-XO exports the types `FlatXoConfig`, `XoConfigItem`, and other types for you to get ts validation on your config files.
+XO exports the types `FlatXoConfig`, `XoConfigItem`, and other types for you to get TypeScript validation on your config files.
 
 examples:
 `xo.config.js`
@@ -148,7 +148,7 @@ Default: `false` *(tab indentation)*
 
 Set it to `true` to get 2-space indentation or specify the number of spaces.
 
-This option exists for pragmatic reasons, but I would strongly recommend you read ["Why tabs are superior"](http://lea.verou.me/2012/01/why-tabs-are-clearly-superior/).
+This option exists for pragmatic reasons, but I would strongly recommend you read [“Why tabs are superior”](http://lea.verou.me/2012/01/why-tabs-are-clearly-superior/).
 
 ### semicolon
 
@@ -177,7 +177,7 @@ To stick with Prettier's defaults, add this to your Prettier config:
 
 ```js
 export default {
-	trailingComma: "es5",
+	trailingComma: 'es5',
 	singleQuote: false,
 	bracketSpacing: true,
 };
@@ -185,16 +185,16 @@ export default {
 
 If contradicting options are set for both Prettier and XO, an error will be thrown.
 
-#### prettier compat
+#### Compat
 
-If the prettier option is set to "compat", instead of formatting your code automatically, xo will turn off all rules that conflict with prettier code style and allow you to pass your formatting to the prettier tool directly.
+If the Prettier option is set to `compat`, instead of formatting your code automatically, XO will turn off all rules that conflict with Prettier code style and allow you to pass your formatting to the Prettier tool directly.
 
 ### react
 
 Type: `boolean`\
 Default: `false`
 
-Adds eslint-config-plugin-react, eslint-plugin-react-hooks and eslint-config-xo-react to get all the react best practices applied automatically
+Adds `eslint-config-plugin-react`, `eslint-plugin-react-hooks`, and `eslint-config-xo-react` to get all the React best practices applied automatically.
 
 ## TypeScript
 
@@ -210,14 +210,14 @@ For these purposes, you can still get most of the features of `xo` by using our 
 
 ### `xoToEslintConfig`
 
-The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will however, handle all of these details for you.
+The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic Prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will however, handle all of these details for you.
 
 `eslint.config.js`
 
 ```js
-import Xo from "xo";
+import xo from 'xo';
 
-export default Xo.xoToEslintConfig([{ space: true, prettier: "compat" }]);
+export default xo.xoToEslintConfig([{space: true, prettier: 'compat'}]);
 ```
 
 ## Tips
@@ -231,7 +231,8 @@ Put a `xo.config.js` with your config at the root and do not add a config to any
 To include files that XO [ignores by default](lib/constants.js#L1), add them as negative globs in the `ignores` option:
 
 ```js
-const xoConfig = [{ ignores: ["!vendor/**"] }];
+const xoConfig = [{ignores: ['!vendor/**']}];
+
 export default xoConfig;
 ```
 

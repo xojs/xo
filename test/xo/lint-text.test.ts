@@ -95,11 +95,10 @@ test('flat config > ts > semi > no tsconfig', async t => {
 	);
 	const text = dedent`console.log('hello');\n`;
 	// It is required that an actual file exists for ts to apply type-aware linting when no tsconfig includes it
-	// if the file does not exist, linting ts will fail, js lint text does not require a file to exist
+	// If the file does not exist, linting ts will fail, js lint text does not require a file to exist
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await Xo.lintText(text, {
 		cwd: t.context.cwd,
-		ts: true,
 		filePath,
 	});
 	const generatedTsconfig = JSON.parse(await fs.readFile(path.join(t.context.cwd, 'node_modules', '.cache', 'xo-linter', 'tsconfig.xo.json'), 'utf8')) as TsConfigJson;

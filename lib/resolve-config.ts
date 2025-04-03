@@ -7,8 +7,8 @@ import {type FlatXoConfig, type LinterOptions, type XoConfigItem} from './types.
 import {moduleName} from './constants.js';
 
 /**
- * Finds the xo config file
- */
+Finds the XO config file.
+*/
 export async function resolveXoConfig(options: LinterOptions): Promise<{
 	flatOptions: XoConfigItem[];
 	flatConfigPath: string;
@@ -44,7 +44,10 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 
 		const searchPath = options.filePath ?? options.cwd;
 
-		let {config: flatOptions = [], filepath: flatConfigPath = ''} = await (flatConfigExplorer.search(searchPath) as Promise<{config: FlatXoConfig | undefined; filepath: string}>) ?? {};
+		let {
+			config: flatOptions = [],
+			filepath: flatConfigPath = '',
+		} = await (flatConfigExplorer.search(searchPath) as Promise<{config: FlatXoConfig | undefined; filepath: string}>) ?? {};
 
 		const globalKeys = [
 			'ignores',

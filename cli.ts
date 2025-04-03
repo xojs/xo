@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import process from 'node:process';
@@ -174,7 +173,7 @@ if (cliOptions.stdin) {
 
 	let shouldRemoveStdInFile = false;
 
-	// For ts, we need a file on the filesystem to lint it or else @typescript-eslint will blow up.
+	// For TypeScript, we need a file on the filesystem to lint it or else @typescript-eslint will blow up.
 	// We create a temporary file in the node_modules/.cache/xo-linter directory to avoid conflicts with the user's files and lint that file as if it were the stdin input as a work around.
 	// We clean up the file after linting.
 	if (cliOptions.stdinFilename && tsExtensions.includes(path.extname(cliOptions.stdinFilename).slice(1))) {

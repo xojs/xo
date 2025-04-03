@@ -5,9 +5,10 @@ import tempDir from 'temp-dir';
 import {pathExists} from 'path-exists';
 
 /**
- * Copies the test project in the temp dir to a new directory.
- * @returns {string} The path to the copied test project.
- */
+Copies the test project in the temp directory to a new directory.
+
+@returns {string} The path to the copied test project.
+*/
 export const copyTestProject = async () => {
 	if (!(await pathExists(tempDir))) {
 		throw new Error('temp-dir/test-project does not exist');
@@ -32,6 +33,7 @@ export const copyTestProject = async () => {
 			exclude: ['node_modules'],
 		}),
 	);
+
 	return newCwd;
 };
 

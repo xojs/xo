@@ -13,16 +13,16 @@ import {xoToEslintConfigItem} from './utils.js';
 export type CreateConfigOptions = {
 	prettierOptions?: Options;
 };
+
 /**
- * Takes a xo flat config and returns an eslint flat config
- */
+Takes a XO flat config and returns an ESlint flat config.
+*/
 export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {prettierOptions = {}}: CreateConfigOptions = {}): Promise<Linter.Config[]> {
 	const baseConfig = [...config];
+
 	/**
-   * Since configs are merged and the last config takes precedence
-   * this means we need to handle both true AND false cases for each option.
-   * ie... we need to turn prettier,space,semi,etc... on or off for a specific file
-   */
+	Since configs are merged and the last config takes precedence this means we need to handle both true AND false cases for each option. For example, we need to turn `prettier`, `space`, `semi`, etc. on or off for a specific file.
+	*/
 	for (const xoConfigItem of flatXoConfig ?? []) {
 		const keysOfXoConfig = Object.keys(xoConfigItem);
 
@@ -36,7 +36,9 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 			continue;
 		}
 
-		/**  An eslint config item derived from the xo config item with rules and files initialized */
+		/**
+		An ESLint config item derived from the XO config item with rules and files initialized.
+		*/
 		const eslintConfigItem = xoToEslintConfigItem(xoConfigItem);
 
 		if (xoConfigItem.semicolon === false) {
@@ -48,8 +50,7 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 		}
 
 		if (xoConfigItem.space) {
-			const spaces
-        = typeof xoConfigItem.space === 'number' ? xoConfigItem.space : 2;
+			const spaces = typeof xoConfigItem.space === 'number' ? xoConfigItem.space : 2;
 			eslintConfigItem.rules['@stylistic/indent'] = [
 				'error',
 				spaces,
@@ -57,17 +58,16 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 				{SwitchCase: 1},
 			];
 		} else if (xoConfigItem.space === false) {
-			// If a user set this false for a small subset of files for some reason,
-			// then we need to set them back to their original values
-			eslintConfigItem.rules['@stylistic/indent']
-        = configXoTypescript[1]?.rules?.['@stylistic/indent'];
+			// If a user sets this to false for a small subset of files for some reason,
+			// then we need to set them back to their original values.
+			eslintConfigItem.rules['@stylistic/indent'] = configXoTypescript[1]?.rules?.['@stylistic/indent'];
 		}
 
 		if (xoConfigItem.prettier) {
 			if (xoConfigItem.prettier === 'compat') {
 				baseConfig.push({...eslintConfigPrettier, files: eslintConfigItem.files});
 			} else {
-				// Validate that prettier options match other xoConfig options
+				// Validate that Prettier options match other `xoConfig` options.
 				if ((xoConfigItem.semicolon && prettierOptions.semi === false) ?? (!xoConfigItem.semicolon && prettierOptions.semi === true)) {
 					throw new Error(`The Prettier config \`semi\` is ${prettierOptions.semi} while Xo \`semicolon\` is ${xoConfigItem.semicolon}, also check your .editorconfig for inconsistencies.`);
 				}
@@ -80,7 +80,7 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 					throw new Error(`The Prettier config \`tabWidth\` is ${prettierOptions.tabWidth} while Xo \`space\` is ${xoConfigItem.space}, also check your .editorconfig for inconsistencies.`);
 				}
 
-				// Add prettier plugin
+				// Add Prettier plugin
 				eslintConfigItem.plugins = {
 					...eslintConfigItem.plugins,
 					prettier: pluginPrettier,
@@ -97,7 +97,7 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 					...prettierOptions,
 				};
 
-				// Configure prettier rules
+				// Configure Prettier rules
 				const rulesWithPrettier: Linter.RulesRecord = {
 					...eslintConfigItem.rules,
 					...(pluginPrettier.configs?.['recommended'] as ESLint.ConfigData)?.rules,
@@ -109,12 +109,12 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 				eslintConfigItem.rules = rulesWithPrettier;
 			}
 		} else if (xoConfigItem.prettier === false) {
-			// Turn prettier off for a subset of files
+			// Turn Prettier off for a subset of files
 			eslintConfigItem.rules['prettier/prettier'] = 'off';
 		}
 
 		if (xoConfigItem.react) {
-			// Ensure the files applied to the react config are the same as the config they are derived from
+			// Ensure the files applied to the React config are the same as the config they are derived from
 			baseConfig.push({...configReact[0], files: eslintConfigItem.files});
 		}
 

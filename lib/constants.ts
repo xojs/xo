@@ -14,6 +14,7 @@ export const defaultIgnores = [
 
 /**
 List of options that values will be concatenanted during option merge.
+
 Only applies to options defined as an Array.
 */
 
@@ -33,12 +34,16 @@ export const moduleName = 'xo';
 
 export const tsconfigDefaults: TsConfigJsonResolved = {
 	compilerOptions: {
-		target: 'es2018',
+		target: 'es2022',
 		strict: true,
 		noImplicitReturns: true,
+		noImplicitOverride: true,
 		noUnusedLocals: true,
 		noUnusedParameters: true,
 		noFallthroughCasesInSwitch: true,
+		noUncheckedIndexedAccess: true,
+		noPropertyAccessFromIndexSignature: true,
+		noUncheckedSideEffectImports: true,
 	},
 };
 

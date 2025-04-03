@@ -11,15 +11,14 @@
 		"url": "https://sindresorhus.com"
 	},
 	"type": "module",
-	"exports": {
-		".": "./dist/index.js",
-		"./config": "./dist/lib/config/index.js",
-		"./types": "./dist/lib/types.js"
-	},
 	"bin": "./dist/cli.js",
+	"exports": {
+		"types": "./dist/index.d.ts",
+		"default": "./dist/index.js"
+	},
 	"sideEffects": false,
 	"engines": {
-		"node": ">=18.18"
+		"node": ">=18.20"
 	},
 	"scripts": {
 		"build": "npm run clean && tsc",
@@ -66,23 +65,23 @@
 	"dependencies": {
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.4.1",
 		"@sindresorhus/tsconfig": "^7.0.0",
-		"@stylistic/eslint-plugin": "^4.0.1",
-		"@typescript-eslint/parser": "^8.24.1",
+		"@stylistic/eslint-plugin": "^4.2.0",
+		"@typescript-eslint/parser": "^8.29.0",
 		"arrify": "^3.0.0",
 		"cosmiconfig": "^9.0.0",
 		"define-lazy-prop": "^3.0.0",
-		"eslint": "^9.21.0",
-		"eslint-config-prettier": "^10.0.1",
+		"eslint": "^9.23.0",
+		"eslint-config-prettier": "^10.1.1",
 		"eslint-config-xo-react": "^0.28.0",
 		"eslint-config-xo-typescript": "^7.0.0",
 		"eslint-formatter-pretty": "^6.0.1",
 		"eslint-plugin-ava": "^15.0.1",
-		"eslint-plugin-import-x": "^4.6.1",
-		"eslint-plugin-n": "^17.15.1",
+		"eslint-plugin-import-x": "^4.10.0",
+		"eslint-plugin-n": "^17.17.0",
 		"eslint-plugin-no-use-extend-native": "^0.7.2",
-		"eslint-plugin-prettier": "^5.2.3",
+		"eslint-plugin-prettier": "^5.2.6",
 		"eslint-plugin-promise": "^7.2.1",
-		"eslint-plugin-unicorn": "^57.0.0",
+		"eslint-plugin-unicorn": "^58.0.0",
 		"find-cache-dir": "^5.0.0",
 		"get-stdin": "^9.0.0",
 		"get-tsconfig": "^4.10.0",
@@ -93,13 +92,13 @@
 		"micromatch": "^4.0.8",
 		"open-editor": "^5.1.0",
 		"path-exists": "^5.0.0",
-		"prettier": "^3.5.2",
-		"type-fest": "^4.35.0",
-		"typescript-eslint": "^8.24.1"
+		"prettier": "^3.5.3",
+		"type-fest": "^4.39.1",
+		"typescript-eslint": "^8.29.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^19.7.1",
-		"@commitlint/config-conventional": "^19.7.1",
+		"@commitlint/cli": "^19.8.0",
+		"@commitlint/config-conventional": "^19.8.0",
 		"@types/eslint": "9.6.1",
 		"@types/lodash.pick": "^4.4.9",
 		"@types/micromatch": "^4.0.9",
@@ -108,11 +107,11 @@
 		"dedent": "^1.5.3",
 		"execa": "^9.5.2",
 		"husky": "^9.1.7",
-		"lint-staged": "^15.4.3",
+		"lint-staged": "^15.5.0",
 		"np": "^10.2.0",
 		"npm-package-json-lint": "^8.0.0",
 		"npm-package-json-lint-config-default": "^7.0.1",
-		"prettier-plugin-packagejson": "^2.5.8",
+		"prettier-plugin-packagejson": "^2.5.10",
 		"temp-dir": "^3.0.0",
 		"xo": "file:."
 	},
