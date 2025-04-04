@@ -290,10 +290,10 @@ XO is based on ESLint. This project started out as just a shareable ESLint confi
 
 ## Badge
 
-Show the world you're using XO → [![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto&logoWidth=20)](https://github.com/xojs/xo)
+Show the world you're using XO → [![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto)](https://github.com/xojs/xo)
 
 ```md
-[![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto&logoWidth=20)](https://github.com/xojs/xo)
+[![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto)](https://github.com/xojs/xo)
 ```
 
 Or [customize the badge](https://github.com/xojs/xo/issues/689#issuecomment-1253127616).
