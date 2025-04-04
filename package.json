@@ -31,7 +31,8 @@
 		"test:setup": "node scripts/setup-tests"
 	},
 	"files": [
-		"dist/lib",
+		"dist/lib/*.js",
+		"dist/lib/*.d.ts",
 		"dist/*.js",
 		"dist/*.d.ts"
 	],
