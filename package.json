@@ -32,7 +32,8 @@
 	},
 	"files": [
 		"dist/lib",
-		"dist/*.js"
+		"dist/*.js",
+		"dist/*.d.ts"
 	],
 	"keywords": [
 		"cli-app",
