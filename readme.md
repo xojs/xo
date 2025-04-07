@@ -228,7 +228,7 @@ Put a `xo.config.js` with your config at the root and do not add a config to any
 
 ### Including files ignored by default
 
-To include files that XO [ignores by default](lib/constants.js), add them as negative globs in the [`ignores` option](#ignores):
+To include files that XO [ignores by default](lib/constants.ts), add them as negative globs in the [`ignores` option](#ignores):
 
 ```js
 const xoConfig = [{ignores: ['!vendor/**']}];
