@@ -63,6 +63,12 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 			eslintConfigItem.rules['@stylistic/indent'] = configXoTypescript[1]?.rules?.['@stylistic/indent'];
 		}
 
+		if (xoConfigItem.react) {
+			// Ensure the files applied to the React config are the same as the config they are derived from
+			baseConfig.push({...configReact[0], files: eslintConfigItem.files});
+		}
+
+		// Prettier should generally be the last config in the array
 		if (xoConfigItem.prettier) {
 			if (xoConfigItem.prettier === 'compat') {
 				baseConfig.push({...eslintConfigPrettier, files: eslintConfigItem.files});
@@ -111,11 +117,6 @@ export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined,
 		} else if (xoConfigItem.prettier === false) {
 			// Turn Prettier off for a subset of files
 			eslintConfigItem.rules['prettier/prettier'] = 'off';
-		}
-
-		if (xoConfigItem.react) {
-			// Ensure the files applied to the React config are the same as the config they are derived from
-			baseConfig.push({...configReact[0], files: eslintConfigItem.files});
 		}
 
 		baseConfig.push(eslintConfigItem);
