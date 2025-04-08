@@ -169,7 +169,6 @@ Format code with [Prettier](https://github.com/prettier/prettier).
 - [semi](https://prettier.io/docs/en/options.html#semicolons): based on [semicolon](#semicolon) option
 - [useTabs](https://prettier.io/docs/en/options.html#tabs): based on [space](#space) option
 - [tabWidth](https://prettier.io/docs/en/options.html#tab-width): based on [space](#space) option
-- [trailingComma](https://prettier.io/docs/en/options.html#trailing-commas): `all`
 - [singleQuote](https://prettier.io/docs/en/options.html#quotes): `true`
 - [bracketSpacing](https://prettier.io/docs/en/options.html#bracket-spacing): `false`
 
@@ -177,7 +176,6 @@ To stick with Prettier's defaults, add this to your Prettier config:
 
 ```js
 export default {
-	trailingComma: 'es5',
 	singleQuote: false,
 	bracketSpacing: true,
 };
