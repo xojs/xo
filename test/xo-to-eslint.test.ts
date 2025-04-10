@@ -193,3 +193,9 @@ test('no files config option defaults to allFilesGlob', async t => {
 
 	t.deepEqual(flatConfig.at(-1)?.files, [allFilesGlob]);
 });
+
+test('prettier rules are applied after react rules', async t => {
+	const flatConfig = await xoToEslintConfig([{prettier: 'compat', react: true}]);
+
+	t.is(getJsRule(flatConfig, 'react/jsx-tag-spacing'), 'off');
+});
