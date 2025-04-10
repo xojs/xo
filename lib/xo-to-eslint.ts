@@ -17,7 +17,7 @@ export type CreateConfigOptions = {
 /**
 Takes a XO flat config and returns an ESlint flat config.
 */
-export async function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {prettierOptions = {}}: CreateConfigOptions = {}): Promise<Linter.Config[]> {
+export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {prettierOptions = {}}: CreateConfigOptions = {}): Linter.Config[] {
 	const baseConfig = [...config];
 
 	/**

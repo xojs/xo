@@ -15,8 +15,8 @@ test.afterEach.always(async t => {
 	await fs.rm(t.context.cwd, {recursive: true, force: true});
 });
 
-test('base config rules', async t => {
-	const flatConfig = await xoToEslintConfig(undefined);
+test('base config rules', t => {
+	const flatConfig = xoToEslintConfig(undefined);
 
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/indent'), [
 		'error',
@@ -28,8 +28,8 @@ test('base config rules', async t => {
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/quotes'), ['error', 'single']);
 });
 
-test('empty config rules', async t => {
-	const flatConfig = await xoToEslintConfig([]);
+test('empty config rules', t => {
+	const flatConfig = xoToEslintConfig([]);
 
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/indent'), [
 		'error',
@@ -41,8 +41,8 @@ test('empty config rules', async t => {
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/quotes'), ['error', 'single']);
 });
 
-test('config with space option', async t => {
-	const flatConfig = await xoToEslintConfig([{space: true}]);
+test('config with space option', t => {
+	const flatConfig = xoToEslintConfig([{space: true}]);
 
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/indent'), [
 		'error',
@@ -52,20 +52,20 @@ test('config with space option', async t => {
 	]);
 });
 
-test('config with semi false option', async t => {
-	const flatConfig = await xoToEslintConfig([{semicolon: false}]);
+test('config with semi false option', t => {
+	const flatConfig = xoToEslintConfig([{semicolon: false}]);
 
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/semi'), ['error', 'never']);
 });
 
-test('config with rules', async t => {
-	const flatConfig = await xoToEslintConfig([{rules: {'no-console': 'error'}}]);
+test('config with rules', t => {
+	const flatConfig = xoToEslintConfig([{rules: {'no-console': 'error'}}]);
 
 	t.is(getJsRule(flatConfig, 'no-console'), 'error');
 });
 
-test('with prettier option', async t => {
-	const flatConfig = await xoToEslintConfig([{prettier: true}]);
+test('with prettier option', t => {
+	const flatConfig = xoToEslintConfig([{prettier: true}]);
 
 	const prettierConfigTs = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object'
@@ -106,8 +106,8 @@ test('with prettier option', async t => {
 	]);
 });
 
-test('with prettier option compat', async t => {
-	const flatConfig = await xoToEslintConfig([{prettier: 'compat'}]);
+test('with prettier option compat', t => {
+	const flatConfig = xoToEslintConfig([{prettier: 'compat'}]);
 
 	const prettierConfigTs = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object'
@@ -126,8 +126,8 @@ test('with prettier option compat', async t => {
 	t.is(getJsRule(flatConfig, '@stylistic/semi'), 'off');
 });
 
-test('with prettier option and space', async t => {
-	const flatConfig = await xoToEslintConfig([{prettier: true, space: true}]);
+test('with prettier option and space', t => {
+	const flatConfig = xoToEslintConfig([{prettier: true, space: true}]);
 
 	const prettierConfigTs = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object'
@@ -168,8 +168,8 @@ test('with prettier option and space', async t => {
 	]);
 });
 
-test('with react option', async t => {
-	const flatConfig = await xoToEslintConfig([{react: true}]);
+test('with react option', t => {
+	const flatConfig = xoToEslintConfig([{react: true}]);
 
 	const reactPlugin = flatConfig.find(config =>
 		typeof config?.plugins?.['react'] === 'object');
@@ -182,20 +182,20 @@ test('with react option', async t => {
 	t.is(getJsRule(flatConfig, 'react/no-danger'), 'error');
 });
 
-test('supports files config option as a string', async t => {
-	const flatConfig = await xoToEslintConfig([{files: 'src/**/*.ts'}]);
+test('supports files config option as a string', t => {
+	const flatConfig = xoToEslintConfig([{files: 'src/**/*.ts'}]);
 
 	t.deepEqual(flatConfig.at(-1)?.files, ['src/**/*.ts']);
 });
 
-test('no files config option defaults to allFilesGlob', async t => {
-	const flatConfig = await xoToEslintConfig([{files: undefined}]);
+test('no files config option defaults to allFilesGlob', t => {
+	const flatConfig = xoToEslintConfig([{files: undefined}]);
 
 	t.deepEqual(flatConfig.at(-1)?.files, [allFilesGlob]);
 });
 
-test('prettier rules are applied after react rules', async t => {
-	const flatConfig = await xoToEslintConfig([{prettier: 'compat', react: true}]);
+test('prettier rules are applied after react rules', t => {
+	const flatConfig = xoToEslintConfig([{prettier: 'compat', react: true}]);
 
 	t.is(getJsRule(flatConfig, 'react/jsx-tag-spacing'), 'off');
 });

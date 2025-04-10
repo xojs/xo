@@ -228,12 +228,12 @@ export class Xo {
 
 	@private
 	*/
-	async setEslintConfig() {
+	setEslintConfig() {
 		if (!this.xoConfig) {
 			throw new Error('"Xo.setEslintConfig" failed');
 		}
 
-		this.eslintConfig ??= await xoToEslintConfig([...this.xoConfig], {prettierOptions: this.prettierConfig});
+		this.eslintConfig ??= xoToEslintConfig([...this.xoConfig], {prettierOptions: this.prettierConfig});
 	}
 
 	/**
@@ -310,7 +310,7 @@ export class Xo {
 
 		await this.handleUnincludedTsFiles(files);
 
-		await this.setEslintConfig();
+		this.setEslintConfig();
 
 		if (!this.xoConfig) {
 			throw new Error('"Xo.initEslint" failed');
