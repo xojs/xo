@@ -335,3 +335,20 @@ test('gives helpful error message when config creates a circular dependency', as
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${t.context.cwd}`);
 	t.true((error.stderr as string)?.includes('Error resolving XO config'));
 });
+
+test('Config errors bubble up from ESLint when incorrect config options are set', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+	const xoConfigPath = path.join(t.context.cwd, 'xo.config.js');
+	const xoConfig = dedent`
+		export default [
+			{
+				invalidOption: 'some invalid value',
+				space: true
+			}
+		]
+	`;
+	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${t.context.cwd}`);
+	t.true((error.stderr as string)?.includes('ConfigError:') && (error.stderr as string)?.includes('Unexpected key "invalidOption" found'));
+});
