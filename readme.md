@@ -192,7 +192,7 @@ If the Prettier option is set to `compat`, instead of formatting your code autom
 Type: `boolean`\
 Default: `false`
 
-Adds `eslint-config-plugin-react`, `eslint-plugin-react-hooks`, and `eslint-config-xo-react` to get all the React best practices applied automatically.
+Adds `eslint-plugin-react`, `eslint-plugin-react-hooks`, and `eslint-config-xo-react` to get all the React best practices applied automatically.
 
 ## TypeScript
 
