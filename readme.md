@@ -96,7 +96,7 @@ $ xo --help
 - Space after keyword `if (condition) {}`
 - Always `===` instead of `==`
 
-Check out an [example](index.js) and the [ESLint rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js).
+Check out an [example](index.ts) and the [ESLint rules](https://github.com/xojs/eslint-config-xo/blob/main/index.js).
 
 ## Workflow
 
