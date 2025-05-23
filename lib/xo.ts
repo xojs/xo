@@ -2,7 +2,7 @@ import path from 'node:path';
 import os from 'node:os';
 import process from 'node:process';
 import {ESLint, type Linter} from 'eslint';
-import findCacheDir from 'find-cache-dir';
+import findCacheDirectory from 'find-cache-directory';
 import {globby} from 'globby';
 import arrify from 'arrify';
 import defineLazyProperty from 'define-lazy-prop';
@@ -147,7 +147,7 @@ export class Xo {
 
 		const backupCacheLocation = path.join(os.tmpdir(), cacheDirName);
 
-		this.cacheLocation = findCacheDir({name: cacheDirName, cwd: this.linterOptions.cwd}) ?? backupCacheLocation;
+		this.cacheLocation = findCacheDirectory({name: cacheDirName, cwd: this.linterOptions.cwd}) ?? backupCacheLocation;
 	}
 
 	/**
