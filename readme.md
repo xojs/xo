@@ -57,19 +57,21 @@ $ xo --help
 		$ xo [<file|glob> ...]
 
 	Options
-		--fix             Automagically fix issues
-		--reporter        Reporter to use
-		--ignore          Ignore pattern globs, can be set multiple times
-		--space           Use space indent instead of tabs [Default: 2]
-		--no-semicolon    Prevent use of semicolons
-		--prettier        Conform to Prettier code style or turn off conflicting rules
-		--react           Include React plugins and xo-react linting rules [Default: false]
-		--open            Open files with issues in your editor
-		--quiet           Show only errors and no warnings
-		--cwd=<dir>       Working directory for files
-		--stdin           Validate/fix code from stdin
-		--stdin-filename  Specify a filename for the --stdin option
-		--print-config    Print the ESLint configuration for the given file
+    	--fix             Automagically fix issues
+    	--reporter        Reporter to use
+    	--space           Use space indent instead of tabs [Default: 2]
+		--config		  Path to a XO configuration file
+    	--semicolon       Use semicolons [Default: true]
+    	--react           Include React specific parsing and xo-react linting rules [Default: false]
+    	--prettier        Format with prettier or turn off prettier conflicted rules when set to 'compat' [Default: false]
+    	--print-config    Print the effective ESLint config for the given file
+		--version		  Print XO version
+    	--open            Open files with issues in your editor
+    	--quiet           Show only errors and no warnings
+    	--stdin           Validate/fix code from stdin
+    	--stdin-filename  Specify a filename for the --stdin option
+    	--ignore          Ignore pattern globs, can be set multiple times
+    	--cwd=<dir>       Working directory for files [Default: process.cwd()]
 
 	Examples
 		$ xo
