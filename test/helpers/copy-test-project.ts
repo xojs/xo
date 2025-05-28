@@ -19,21 +19,6 @@ export const copyTestProject = async () => {
 
 	await fs.cp(testCwd, newCwd, {recursive: true});
 
-	// Create a tsconfig.json file
-	await fs.writeFile(
-		path.join(newCwd, 'tsconfig.json'),
-		JSON.stringify({
-			compilerOptions: {
-				module: 'node16',
-				target: 'ES2022',
-				strictNullChecks: true,
-				lib: ['DOM', 'DOM.Iterable', 'ES2022'],
-			},
-			files: [path.join(newCwd, 'test.ts')],
-			exclude: ['node_modules'],
-		}),
-	);
-
 	return newCwd;
 };
 
