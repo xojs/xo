@@ -166,7 +166,8 @@ export class Xo {
 
 		this.xoConfig = [
 			this.baseXoConfig,
-			...flatOptions,
+			// Ensure resolved options do not mutate between runs
+			...structuredClone(flatOptions),
 		];
 
 		// Split off the TS rules in a special case, so that you won't get errors

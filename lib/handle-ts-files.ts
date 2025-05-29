@@ -40,7 +40,7 @@ export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]
 			// If we match on excluded, then we definitively know that there is no tsconfig match.
 			if (Array.isArray(tsConfig.exclude)) {
 				const exclude = Array.isArray(tsConfig.exclude) ? tsConfig.exclude : [];
-				hasMatch = !micromatch.isMatch(filePath, exclude, micromatchOptions);
+				hasMatch = !micromatch.contains(filePath, exclude, micromatchOptions);
 			} else {
 				// Not explicitly excluded and included by tsconfig defaults
 				hasMatch = true;
@@ -52,7 +52,7 @@ export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]
 			const exclude = Array.isArray(tsConfig.exclude) ? tsConfig.exclude : [];
 			// If we also have an exlcude we need to check all the arrays, (files, include, exclude)
 			// this check not excluded and included in one of the file/include array
-			hasMatch = !micromatch.isMatch(filePath, exclude, micromatchOptions) && micromatch.isMatch(filePath, [...include, ...files], micromatchOptions);
+			hasMatch = !micromatch.contains(filePath, exclude, micromatchOptions) && micromatch.isMatch(filePath, [...include, ...files], micromatchOptions);
 		}
 
 		if (!hasMatch) {

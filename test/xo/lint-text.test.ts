@@ -27,11 +27,11 @@ test('no config > js > semi', async t => {
 });
 
 test('no config > ts > semi', async t => {
-	const filePath = path.join(t.context.cwd, 'test.ts');
-	const {results} = await new Xo({cwd: t.context.cwd}).lintText(
-		dedent`console.log('hello')\n`,
-		{filePath},
-	);
+	const {cwd} = t.context;
+	const filePath = path.join(cwd, 'test.ts');
+	const text = dedent`console.log('hello')\n`;
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 
 	t.is(results?.[0]?.messages?.length, 1);
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
@@ -59,9 +59,10 @@ test('flat config > js > semi', async t => {
 });
 
 test('flat config > ts > semi', async t => {
-	const filePath = path.join(t.context.cwd, 'test.ts');
+	const {cwd} = t.context;
+	const filePath = path.join(cwd, 'test.ts');
 	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		dedent`
 			export default [
 			  {
@@ -71,10 +72,10 @@ test('flat config > ts > semi', async t => {
 		`,
 		'utf8',
 	);
-	const xo = new Xo({cwd: t.context.cwd});
-	const {results} = await xo.lintText(dedent`console.log('hello');\n`, {
-		filePath,
-	});
+	const text = dedent`console.log('hello');\n`;
+	await fs.writeFile(filePath, text, 'utf8');
+	const xo = new Xo({cwd});
+	const {results} = await xo.lintText(text, {filePath});
 	t.is(results?.[0]?.messages?.length, 1);
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
@@ -139,10 +140,11 @@ test('flat config > js > space', async t => {
 });
 
 test('flat config > ts > space', async t => {
-	const filePath = path.join(t.context.cwd, 'test.ts');
+	const {cwd} = t.context;
+	const filePath = path.join(cwd, 'test.ts');
 
 	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		dedent`
 			export default [
 			  {
@@ -153,17 +155,15 @@ test('flat config > ts > space', async t => {
 		'utf8',
 	);
 
-	const xo = new Xo({cwd: t.context.cwd});
-	const {results} = await xo.lintText(
-		dedent`
-			export function foo() {
-				console.log('hello');
-			}\n
-		`,
-		{
-			filePath,
-		},
-	);
+	const text = dedent`
+		export function foo() {
+		    console.log('hello');
+		}\n
+	`;
+	await fs.writeFile(filePath, text, 'utf8');
+
+	const xo = new Xo({cwd});
+	const {results} = await xo.lintText(text, {filePath});
 	t.is(results?.[0]?.messages.length, 1);
 	t.is(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
@@ -188,18 +188,17 @@ test('plugin > js > no-use-extend-native', async t => {
 	);
 });
 
-test('pliugin > ts > no-use-extend-native', async t => {
+test('plugin > ts > no-use-extend-native', async t => {
 	const {cwd} = t.context;
-	const tsFilePath = path.join(t.context.cwd, 'test.ts');
-	const {results} = await new Xo({cwd}).lintText(
-		dedent`
-			import {util} from 'node:util';
+	const filePath = path.join(cwd, 'test.ts');
+	const text = dedent`
+		import {util} from 'node:util';
 
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-			util.isBoolean('50bda47b09923e045759db8e8dd01a0bacd97370'.shortHash() === '50bdcs47');\n
-		`,
-		{filePath: tsFilePath},
-	);
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+		util.isBoolean('50bda47b09923e045759db8e8dd01a0bacd97370'.shortHash() === '50bdcs47');\n
+	`;
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	t.true(results[0]?.messages?.length === 1);
 	t.truthy(results[0]?.messages?.[0]);
 	t.is(
@@ -229,15 +228,14 @@ test('plugin > js > eslint-plugin-import import-x/order', async t => {
 test('plugin > ts > eslint-plugin-import import-x/order', async t => {
 	const {cwd} = t.context;
 	const filePath = path.join(cwd, 'test.ts');
-	const {results} = await new Xo({cwd}).lintText(
-		dedent`
-			import foo from 'foo';
-			import util from 'node:util';
+	const text = dedent`
+		import foo from 'foo';
+		import util from 'node:util';
 
-			util.inspect(foo);\n
-		`,
-		{filePath},
-	);
+		util.inspect(foo);\n
+	`;
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	t.true(results[0]?.messages?.length === 1);
 	t.truthy(results[0]?.messages?.[0]);
 	t.is(results[0]?.messages?.[0]?.ruleId, 'import-x/order');
@@ -262,14 +260,13 @@ test('plugin > js > eslint-plugin-import import-x/extensions', async t => {
 test('plugin > ts > eslint-plugin-import import-x/extensions', async t => {
 	const {cwd} = t.context;
 	const filePath = path.join(cwd, 'test.ts');
-	const {results} = await new Xo({cwd}).lintText(
-		dedent`
-			import foo from './foo';
+	const text = dedent`
+		import foo from './foo';
 
-			console.log(foo);\n
-		`,
-		{filePath},
-	);
+		console.log(foo);\n
+	`;
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	t.true(results[0]?.messages?.length === 1);
 	t.truthy(results[0]?.messages?.[0]);
 	t.is(results[0]?.messages?.[0]?.ruleId, 'import-x/extensions');
@@ -278,14 +275,13 @@ test('plugin > ts > eslint-plugin-import import-x/extensions', async t => {
 test('plugin > ts > eslint-plugin-import import-x/no-absolute-path', async t => {
 	const {cwd} = t.context;
 	const filePath = path.join(cwd, 'test.ts');
-	const {results} = await new Xo({cwd}).lintText(
-		dedent`
-			import foo from '/foo';
+	const text = dedent`
+		import foo from '/foo';
 
-			console.log(foo);\n
-		`,
-		{filePath},
-	);
+		console.log(foo);\n
+	`;
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	t.true(results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/no-absolute-path'));
 });
 
@@ -318,13 +314,12 @@ test('plugin > js > eslint-plugin-n n/prefer-global/process', async t => {
 
 test('plugin > ts > eslint-plugin-n n/prefer-global/process', async t => {
 	const {cwd} = t.context;
-	const tsFilePath = path.join(cwd, 'test.ts');
-	const {results} = await new Xo({cwd}).lintText(
-		dedent`
-			process.cwd();\n
-		`,
-		{filePath: tsFilePath},
-	);
+	const filePath = path.join(cwd, 'test.ts');
+	const text = dedent`
+		process.cwd();\n
+	`;
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	t.true(results[0]?.messages?.length === 1);
 	t.truthy(results[0]?.messages?.[0]);
 	t.is(results[0]?.messages?.[0]?.ruleId, 'n/prefer-global/process');
@@ -351,17 +346,61 @@ test('plugin > js > eslint-plugin-eslint-comments enable-duplicate-disable', asy
 test('plugin > ts > eslint-plugin-eslint-comments no-duplicate-disable', async t => {
 	const {cwd} = t.context;
 	const tsFilePath = path.join(cwd, 'test.ts');
-	const {results} = await new Xo({
-		cwd,
-	}).lintText(
-		dedent`
-			/* eslint-disable no-undef */
-			export const foo = 10; // eslint-disable-line no-undef
-			\n
-		`,
-		{filePath: tsFilePath},
-	);
+	const text = dedent`
+		/* eslint-disable no-undef */
+		export const foo = 10; // eslint-disable-line no-undef
+		\n
+	`;
+	await fs.writeFile(tsFilePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath: tsFilePath});
 	t.true(results[0]?.errorCount === 1);
 	t.true(results[0]?.messages.some(({ruleId}) =>
 		ruleId === '@eslint-community/eslint-comments/no-duplicate-disable'));
+});
+
+test('lint-text can be ran multiple times in a row with top level typescript rules', async t => {
+	const {cwd} = t.context;
+
+	const filePath = path.join(cwd, 'test.ts');
+	// Text should violate the @typescript-eslint/naming-convention rule
+	const text = dedent`
+		const fooBar = 10;
+		const FooBar = 10;
+		const FOO_BAR = 10;
+		const foo_bar = 10;\n
+	`;
+
+	// We must write tsfiles to disk for the typescript rules to apply
+	await fs.writeFile(filePath, text, 'utf8');
+
+	const {results: resultsNoConfig} = await Xo.lintText(text, {cwd, filePath});
+	// Ensure that with no config, the text is linted and errors are found
+	t.true(resultsNoConfig[0]?.errorCount === 3);
+
+	await fs.writeFile(
+		path.join(cwd, 'xo.config.ts'),
+		dedent`
+			export default [
+			  {
+					rules: {
+						'@typescript-eslint/naming-convention': 'off',
+						'@typescript-eslint/no-unused-vars': 'off'
+					},
+			  }
+			];\n
+		`,
+		'utf8',
+	);
+
+	// Now with a config that turns off the naming-convention rule, the text should not have any errors
+	// and should not have any messages when ran multiple times
+	const {results} = await Xo.lintText(text, {cwd, filePath});
+	t.is(results[0]?.errorCount, 0);
+	t.true(results[0]?.messages?.length === 0);
+	const {results: results2} = await Xo.lintText(text, {cwd, filePath});
+	t.is(results2[0]?.errorCount, 0);
+	t.true(results2[0]?.messages?.length === 0);
+	const {results: results3} = await Xo.lintText(text, {cwd, filePath});
+	t.is(results3[0]?.errorCount, 0);
+	t.true(results3[0]?.messages?.length === 0);
 });

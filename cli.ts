@@ -7,7 +7,8 @@ import formatterPretty from 'eslint-formatter-pretty';
 import getStdin from 'get-stdin';
 import meow from 'meow';
 import {pathExists} from 'path-exists';
-import {tsExtensions} from './lib/constants.js';
+import findCacheDirectory from 'find-cache-directory';
+import {cacheDirName, tsExtensions} from './lib/constants.js';
 import type {LinterOptions, XoConfigOptions} from './lib/types.js';
 import {Xo} from './lib/xo.js';
 import openReport from './lib/open-report.js';
@@ -181,7 +182,8 @@ if (cliOptions.stdin) {
 	if (cliOptions.stdinFilename && tsExtensions.includes(path.extname(cliOptions.stdinFilename).slice(1))) {
 		const absoluteFilePath = path.resolve(cliOptions.cwd, cliOptions.stdinFilename);
 		if (!await pathExists(absoluteFilePath)) {
-			cliOptions.stdinFilename = path.join(cliOptions.cwd, 'node_modules', '.cache', 'xo-linter', path.basename(absoluteFilePath));
+			const cacheDir = findCacheDirectory({name: cacheDirName, cwd: linterOptions.cwd}) ?? path.join(cliOptions.cwd, 'node_modules', '.cache', cacheDirName);
+			cliOptions.stdinFilename = path.join(cacheDir, path.basename(absoluteFilePath));
 			shouldRemoveStdInFile = true;
 			baseXoConfigOptions.ignores = [
 				'!**/node_modules/**',
@@ -216,7 +218,7 @@ if (cliOptions.stdin) {
 	}
 
 	const xo = new Xo(linterOptions, baseXoConfigOptions);
-	await log(await xo.lintText(stdin, {filePath: cliOptions.stdinFilename, warnIgnored: true}));
+	await log(await xo.lintText(stdin, {filePath: cliOptions.stdinFilename, warnIgnored: false}));
 	if (shouldRemoveStdInFile) {
 		await fs.rm(cliOptions.stdinFilename);
 	}
