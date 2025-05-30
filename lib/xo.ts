@@ -166,8 +166,7 @@ export class Xo {
 
 		this.xoConfig = [
 			this.baseXoConfig,
-			// Ensure resolved options do not mutate between runs
-			...structuredClone(flatOptions),
+			...flatOptions,
 		];
 
 		// Split off the TS rules in a special case, so that you won't get errors
@@ -210,13 +209,16 @@ export class Xo {
 			// Apply TS rules to all files
 			tsConfig.files = [tsFilesGlob];
 
-			// Set the other rules to the original config
-			config.rules = Object.fromEntries(otherRules);
+			const otherConfig: XoConfigItem = {
+				...config,
+				// Set the other rules to the original config
+				rules: Object.fromEntries(otherRules),
+			};
 
 			// These rules should still apply to all files
-			config.files = [allFilesGlob];
+			otherConfig.files = [allFilesGlob];
 
-			return [tsConfig, config];
+			return [tsConfig, otherConfig];
 		});
 
 		this.prettier = this.xoConfig.some(config => config.prettier);

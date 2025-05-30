@@ -404,3 +404,50 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	t.is(results3[0]?.errorCount, 0);
 	t.true(results3[0]?.messages?.length === 0);
 });
+
+test('config with custom plugin', async t => {
+	const {cwd} = t.context;
+
+	await fs.writeFile(
+		path.join(cwd, 'xo.config.js'),
+		dedent`
+			const testRule = {
+				create(context) {
+					return {
+						Program(node) {
+							context.report({
+								node,
+								message: 'Custom error',
+							});
+						},
+					};
+				},
+			};
+
+			export default [
+				{
+					plugins: {
+						'test-plugin': {
+							rules: {
+								'test-rule': testRule,
+							},
+						},
+					},
+					rules: {
+						'test-plugin/test-rule': 'error',
+					},
+				},
+			];\n
+		`,
+		'utf8',
+	);
+
+	const {results} = await Xo.lintText(dedent`console.log('hello');\n`, {
+		cwd,
+		filePath: path.join(cwd, 'test.js'),
+	});
+
+	t.is(results[0]?.messages?.length, 1);
+	t.is(results[0]?.messages[0]?.ruleId, 'test-plugin/test-rule');
+	t.is(results[0]?.messages[0]?.message, 'Custom error');
+});
