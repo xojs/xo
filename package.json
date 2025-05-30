@@ -28,7 +28,8 @@
 		"prepare": "husky",
 		"release": "np",
 		"test": "npm run build && npm run lint && npm run test:setup && ava",
-		"test:setup": "node scripts/setup-tests"
+		"test:setup": "node scripts/setup-tests",
+		"prepare": "npm run build"
 	},
 	"files": [
 		"dist/lib/*.js",
