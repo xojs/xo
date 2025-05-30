@@ -25,7 +25,7 @@
 		"build:watch": "tsc --watch",
 		"clean": "rm -rf dist",
 		"lint": "node dist/cli.js",
-		"prepare": "npm run build",
+		"prepare": "npm run build && husky",
 		"release": "np",
 		"test": "npm run build && npm run lint && npm run test:setup && ava",
 		"test:setup": "node scripts/setup-tests"
