@@ -1,6 +1,6 @@
 {
 	"name": "xo",
-	"version": "1.0.1",
+	"version": "1.0.3",
 	"description": "JavaScript/TypeScript linter (ESLint wrapper) with great defaults",
 	"license": "MIT",
 	"repository": "xojs/xo",
@@ -25,11 +25,10 @@
 		"build:watch": "tsc --watch",
 		"clean": "rm -rf dist",
 		"lint": "node dist/cli.js",
-		"prepare": "husky",
+		"prepare": "npm run build",
 		"release": "np",
 		"test": "npm run build && npm run lint && npm run test:setup && ava",
-		"test:setup": "node scripts/setup-tests",
-		"prepare": "npm run build"
+		"test:setup": "node scripts/setup-tests"
 	},
 	"files": [
 		"dist/lib/*.js",
