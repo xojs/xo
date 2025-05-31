@@ -31,9 +31,14 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		}
 
 		/** Special case global ignores */
-		if (keysOfXoConfig.length === 1 && keysOfXoConfig[0] === 'ignores') {
-			baseConfig.push({ignores: arrify(xoConfigItem.ignores)});
-			continue;
+		if (xoConfigItem.ignores) {
+			if (keysOfXoConfig.length === 1) {
+				baseConfig.push({ignores: arrify(xoConfigItem.ignores)});
+				continue;
+			} else if (keysOfXoConfig.length === 2 && xoConfigItem.name) {
+				baseConfig.push({name: xoConfigItem.name, ignores: arrify(xoConfigItem.ignores)});
+				continue;
+			}
 		}
 
 		/**

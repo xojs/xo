@@ -199,3 +199,40 @@ test('prettier rules are applied after react rules', t => {
 
 	t.is(getJsRule(flatConfig, 'react/jsx-tag-spacing'), 'off');
 });
+
+test('global ignores are respected', t => {
+	const flatConfig = xoToEslintConfig([
+		{ignores: ['**/test']},
+	]);
+
+	t.deepEqual(flatConfig.at(-1), {ignores: ['**/test']});
+});
+
+test('global ignores as strings are respected', t => {
+	const flatConfig = xoToEslintConfig([
+		{ignores: '**/test'},
+	]);
+
+	t.deepEqual(flatConfig.at(-1), {ignores: ['**/test']});
+});
+
+test('global ignores with names are respected', t => {
+	const flatConfig = xoToEslintConfig([
+		{name: 'test-ignores', ignores: '**/test'},
+	]);
+
+	t.deepEqual(flatConfig.at(-1), {name: 'test-ignores', ignores: ['**/test']});
+});
+
+test('empty configs are filtered', t => {
+	const flatConfig = xoToEslintConfig([
+		{name: 'test-ignores', ignores: '**/test'},
+		{},
+		{},
+		{},
+		{rules: {}},
+	]);
+
+	t.deepEqual(flatConfig.at(-1), {files: [allFilesGlob], rules: {}});
+	t.deepEqual(flatConfig.at(-2), {name: 'test-ignores', ignores: ['**/test']});
+});
