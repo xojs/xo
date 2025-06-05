@@ -15,7 +15,7 @@ If no tsconfig is found, it will create a fallback tsconfig file in the `node_mo
 @returns The unmatched files.
 */
 export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]}) {
-	const {config: tsConfig = tsconfigDefaults, path: tsConfigPath} = getTsconfig(cwd) ?? {};
+	const {config: tsConfig = tsconfigDefaults, path: tsConfigPath} = (files.length === 1 ? getTsconfig(path.dirname(files[0] ?? '')) : getTsconfig(cwd)) ?? {};
 
 	tsConfig.compilerOptions ??= {};
 
@@ -52,7 +52,7 @@ export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]
 			const exclude = Array.isArray(tsConfig.exclude) ? tsConfig.exclude : [];
 			// If we also have an exlcude we need to check all the arrays, (files, include, exclude)
 			// this check not excluded and included in one of the file/include array
-			hasMatch = !micromatch.contains(filePath, exclude, micromatchOptions) && micromatch.isMatch(filePath, [...include, ...files], micromatchOptions);
+			hasMatch = !micromatch.contains(filePath, exclude, micromatchOptions) && micromatch.contains(filePath, [...include, ...files], micromatchOptions);
 		}
 
 		if (!hasMatch) {

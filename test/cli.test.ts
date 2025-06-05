@@ -3,6 +3,8 @@ import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import dedent from 'dedent';
 import {$, type ExecaError} from 'execa';
+import {pathExists} from 'path-exists';
+import {type TsConfigJson} from 'get-tsconfig';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
 const test = _test as TestFn<{cwd: string}>;
@@ -351,4 +353,45 @@ test('Config errors bubble up from ESLint when incorrect config options are set'
 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${t.context.cwd}`);
 	t.true((error.stderr as string)?.includes('ConfigError:') && (error.stderr as string)?.includes('Unexpected key "invalidOption" found'));
+});
+
+test('ts in nested directory', async t => {
+	const filePath = path.join(t.context.cwd, 'nested', 'src', 'test.ts');
+	const baseTsConfigPath = path.join(t.context.cwd, 'tsconfig.json');
+	const tsConfigNestedPath = path.join(t.context.cwd, 'nested', 'tsconfig.json');
+	const tsconfigCachePath = path.join(t.context.cwd, 'node_modules', '.cache', 'xo-linter', 'tsconfig.xo.json');
+
+	// Remove any previous cache file
+	await fs.rm(tsconfigCachePath, {force: true});
+
+	// Write the test.ts file
+	await fs.mkdir(path.dirname(filePath), {recursive: true});
+	await fs.writeFile(filePath, dedent`console.log('hello');\nconst test = 1;\n`, 'utf8');
+
+	// Copy the base tsconfig to the nested directory
+	await fs.copyFile(baseTsConfigPath, tsConfigNestedPath);
+	await fs.rm(baseTsConfigPath);
+	const tsconfig = JSON.parse(await fs.readFile(tsConfigNestedPath, 'utf8')) as TsConfigJson;
+	if (tsconfig.compilerOptions) {
+		tsconfig.compilerOptions.baseUrl = './';
+	}
+
+	tsconfig.include = ['src'];
+
+	await fs.writeFile(tsConfigNestedPath, JSON.stringify(tsconfig, null, 2), 'utf8');
+	// Add an xo config file in root dir
+	const xoConfigPath = path.join(t.context.cwd, 'xo.config.js');
+	const xoConfig = dedent`
+		export default [
+			{ ignores: "xo.config.js" },
+			{
+				rules: {
+					'@typescript-eslint/no-unused-vars': 'off',
+				}
+			}
+		]
+	`;
+	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
+	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
+	t.false(await pathExists(tsconfigCachePath), 'tsconfig.xo.json should not be created in the cache directory when tsconfig.json is present in the nested directory');
 });
