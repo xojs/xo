@@ -395,3 +395,75 @@ test('ts in nested directory', async t => {
 	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
 	t.false(await pathExists(tsconfigCachePath), 'tsconfig.xo.json should not be created in the cache directory when tsconfig.json is present in the nested directory');
 });
+
+test('handles mixed project structure with nested tsconfig and root ts files', async t => {
+	// Set up nested TypeScript files with a tsconfig
+	const nestedFilePath = path.join(t.context.cwd, 'nested', 'src', 'test.ts');
+	const nestedFile2Path = path.join(t.context.cwd, 'nested', 'src', 'test2.ts');
+	const baseTsConfigPath = path.join(t.context.cwd, 'tsconfig.json');
+	const tsConfigNestedPath = path.join(t.context.cwd, 'nested', 'tsconfig.json');
+	const tsconfigCachePath = path.join(t.context.cwd, 'node_modules', '.cache', 'xo-linter', 'tsconfig.xo.json');
+
+	// Root ts file with no tsconfig
+	const rootTsFilePath = path.join(t.context.cwd, 'root.ts');
+
+	// Remove any previous cache file
+	await fs.rm(tsconfigCachePath, {force: true});
+
+	// Create directory structure and files
+	await fs.mkdir(path.dirname(nestedFilePath), {recursive: true});
+	await fs.writeFile(nestedFilePath, dedent`console.log('nested file 1');\nconst test1 = 1;\n`, 'utf8');
+	await fs.writeFile(nestedFile2Path, dedent`console.log('nested file 2');\nconst test2 = 2;\n`, 'utf8');
+
+	// Create the root TS file with no accompanying tsconfig
+	await fs.writeFile(rootTsFilePath, dedent`console.log('root file');\nconst rootVar = 3;\n`, 'utf8');
+
+	// Copy the base tsconfig to the nested directory only
+	await fs.copyFile(baseTsConfigPath, tsConfigNestedPath);
+	await fs.rm(baseTsConfigPath);
+	const tsconfig = JSON.parse(await fs.readFile(tsConfigNestedPath, 'utf8')) as TsConfigJson;
+
+	if (tsconfig.compilerOptions) {
+		tsconfig.compilerOptions.baseUrl = './';
+	}
+
+	// Configure the nested tsconfig to include only the nested src directory
+	tsconfig.include = ['src'];
+	await fs.writeFile(tsConfigNestedPath, JSON.stringify(tsconfig, null, 2), 'utf8');
+
+	// Add an xo config file in root dir
+	const xoConfigPath = path.join(t.context.cwd, 'xo.config.js');
+	const xoConfig = dedent`
+		export default [
+		    { ignores: "xo.config.js" },
+		    {
+		        rules: {
+		            '@typescript-eslint/no-unused-vars': 'off',
+		        }
+		    }
+		]
+	`;
+	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
+
+	// Run XO on the entire directory structure
+	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
+
+	// Verify the cache file was created
+	t.true(await pathExists(tsconfigCachePath), 'tsconfig.xo.json should be created for files not covered by existing tsconfigs');
+
+	// Check the content of the cached tsconfig
+	const cachedTsConfig = JSON.parse(await fs.readFile(tsconfigCachePath, 'utf8')) as TsConfigJson;
+
+	// Verify only the root.ts file is in the cached tsconfig (not the nested files)
+	t.deepEqual(cachedTsConfig.files, [rootTsFilePath], 'tsconfig.xo.json should only contain the root.ts file not covered by existing tsconfig');
+
+	// Verify the nested files aren't included (they should be covered by the nested tsconfig)
+	t.false(
+		cachedTsConfig.files?.includes(nestedFilePath),
+		'tsconfig.xo.json should not include files already covered by nested tsconfig',
+	);
+	t.false(
+		cachedTsConfig.files?.includes(nestedFile2Path),
+		'tsconfig.xo.json should not include files already covered by nested tsconfig',
+	);
+});

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import {getTsconfig, createFilesMatcher} from 'get-tsconfig';
-import {tsconfigDefaults, cacheDirName} from './constants.js';
+import {tsconfigDefaults as tsConfig, cacheDirName} from './constants.js';
 
 /**
 This function checks if the files are matched by the tsconfig include, exclude, and it returns the unmatched files.
@@ -12,30 +12,23 @@ If no tsconfig is found, it will create a fallback tsconfig file in the `node_mo
 @returns The unmatched files.
 */
 export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]}) {
-	const getTsConfigResult = files.length === 1 ? getTsconfig(files[0]) : getTsconfig(cwd);
-
-	const {config: tsConfig = tsconfigDefaults, path: tsConfigPath} = getTsConfigResult ?? {};
-
-	let filesMatcher;
-
-	if (tsConfigPath) {
-		filesMatcher = createFilesMatcher({config: tsConfig, path: tsConfigPath});
-	}
-
-	tsConfig.compilerOptions ??= {};
-
 	const unincludedFiles: string[] = [];
 
-	if (filesMatcher) {
-		for (const filePath of files) {
-			if (filesMatcher(filePath)) {
-				continue;
-			}
+	for (const filePath of files) {
+		const result = getTsconfig(filePath);
 
+		if (!result) {
 			unincludedFiles.push(filePath);
+			continue;
 		}
-	} else {
-		unincludedFiles.push(...files);
+
+		const filesMatcher = createFilesMatcher(result);
+
+		if (filesMatcher(filePath)) {
+			continue;
+		}
+
+		unincludedFiles.push(filePath);
 	}
 
 	const fallbackTsConfigPath = path.join(cwd, 'node_modules', '.cache', cacheDirName, 'tsconfig.xo.json');
