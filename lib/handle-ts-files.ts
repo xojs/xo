@@ -1,10 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import {getTsconfig} from 'get-tsconfig';
-import micromatch, {type Options} from 'micromatch';
-import {tsconfigDefaults, cacheDirName} from './constants.js';
-
-const micromatchOptions: Options = {matchBase: true};
+import {getTsconfig, createFilesMatcher} from 'get-tsconfig';
+import {tsconfigDefaults as tsConfig, cacheDirName} from './constants.js';
 
 /**
 This function checks if the files are matched by the tsconfig include, exclude, and it returns the unmatched files.
@@ -15,49 +12,23 @@ If no tsconfig is found, it will create a fallback tsconfig file in the `node_mo
 @returns The unmatched files.
 */
 export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]}) {
-	const {config: tsConfig = tsconfigDefaults, path: tsConfigPath} = getTsconfig(cwd) ?? {};
-
-	tsConfig.compilerOptions ??= {};
-
 	const unincludedFiles: string[] = [];
 
 	for (const filePath of files) {
-		let hasMatch = false;
+		const result = getTsconfig(filePath);
 
-		if (!tsConfigPath) {
+		if (!result) {
 			unincludedFiles.push(filePath);
 			continue;
 		}
 
-		// If there is no files or include property - TS uses `**/*` as default so all TS files are matched.
-		// In tsconfig, excludes override includes - so we need to prioritize that matching logic.
-		if (
-			tsConfig
-			&& !tsConfig.include
-			&& !tsConfig.files
-		) {
-			// If we have an excludes property, we need to check it.
-			// If we match on excluded, then we definitively know that there is no tsconfig match.
-			if (Array.isArray(tsConfig.exclude)) {
-				const exclude = Array.isArray(tsConfig.exclude) ? tsConfig.exclude : [];
-				hasMatch = !micromatch.contains(filePath, exclude, micromatchOptions);
-			} else {
-				// Not explicitly excluded and included by tsconfig defaults
-				hasMatch = true;
-			}
-		} else {
-			// We have either and include or a files property in tsconfig
-			const include = Array.isArray(tsConfig.include) ? tsConfig.include : [];
-			const files = Array.isArray(tsConfig.files) ? tsConfig.files : [];
-			const exclude = Array.isArray(tsConfig.exclude) ? tsConfig.exclude : [];
-			// If we also have an exlcude we need to check all the arrays, (files, include, exclude)
-			// this check not excluded and included in one of the file/include array
-			hasMatch = !micromatch.contains(filePath, exclude, micromatchOptions) && micromatch.isMatch(filePath, [...include, ...files], micromatchOptions);
+		const filesMatcher = createFilesMatcher(result);
+
+		if (filesMatcher(filePath)) {
+			continue;
 		}
 
-		if (!hasMatch) {
-			unincludedFiles.push(filePath);
-		}
+		unincludedFiles.push(filePath);
 	}
 
 	const fallbackTsConfigPath = path.join(cwd, 'node_modules', '.cache', cacheDirName, 'tsconfig.xo.json');
