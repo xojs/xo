@@ -483,3 +483,153 @@ test('handles mixed project structure with nested tsconfig and root ts files', a
 		'tsconfig.xo.json should not include files already covered by nested tsconfig',
 	);
 });
+
+test('handles basic TypeScript imports between files', async t => {
+	const {cwd} = t.context;
+
+	// Create directories
+	const srcDir = path.join(cwd, 'src');
+	await fs.mkdir(srcDir, {recursive: true});
+
+	// Create a module file to be imported
+	const moduleFilePath = path.join(srcDir, 'module.ts');
+	const moduleContent = dedent`
+		export type Person = {
+			name: string;
+			age: number;
+		};
+
+		export const greet = (person: Person): string => \`Hello, \${person.name}! You are \${person.age} years old.\`;
+	`
+		+ '\n';
+	await fs.writeFile(moduleFilePath, moduleContent, 'utf8');
+
+	// Create a main file that imports from the module
+	const mainFilePath = path.join(srcDir, 'main.ts');
+	const mainFileContent = dedent`
+		import {greet, type Person} from './module.js';
+
+		const person: Person = {
+			name: 'Alice',
+			age: 30,
+		};
+
+		export const message = greet(person);
+	`
+		+ '\n';
+	await fs.writeFile(mainFilePath, mainFileContent, 'utf8');
+
+	// Create a simple tsconfig.json
+	const tsconfigPath = path.join(cwd, 'tsconfig.json');
+	const tsconfig = {
+		compilerOptions: {
+			target: 'ES2022',
+			module: 'NodeNext',
+			moduleResolution: 'NodeNext',
+			strictNullChecks: true,
+		},
+		include: ['src/**/*'],
+	};
+	await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2), 'utf8');
+
+	// Run XO on the project - should not throw because the imports are valid
+	await t.notThrowsAsync(
+		$`node ./dist/cli --cwd ${cwd}`,
+		'XO should successfully lint files with basic imports',
+	);
+
+	// Test with an invalid import to verify error detection
+	const brokenFilePath = path.join(srcDir, 'broken.ts');
+	const brokenFileContent = dedent`
+		import {nonExistentFunction} from './module.js';
+
+		export const result = nonExistentFunction();
+	`
+		+ '\n';
+	await fs.writeFile(brokenFilePath, brokenFileContent, 'utf8');
+
+	// This should throw an error because the import doesn't exist in module.ts
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
+
+	// Verify that the error is related to an import error
+	t.true(
+		(error.stderr as string)?.includes('@typescript-eslint/')
+		|| (error.stdout as string)?.includes('@typescript-eslint/'),
+		'Error should be reported for invalid import',
+	);
+});
+
+test('handles TypeScript path aliases correctly', async t => {
+	const {cwd} = t.context;
+
+	// Create a directory structure with source and utility files
+	const srcDir = path.join(cwd, 'src');
+	const utilsDir = path.join(cwd, 'utils');
+	await fs.mkdir(srcDir, {recursive: true});
+	await fs.mkdir(utilsDir, {recursive: true});
+
+	// Create a utility file that will be imported using path alias
+	const helperPath = path.join(utilsDir, 'helper.ts');
+	const helperContent = dedent`
+		export const helper = (value: string): string => value.toUpperCase();
+	`
+		+ '\n';
+	await fs.writeFile(helperPath, helperContent, 'utf8');
+
+	// Create a source file that imports the utility using the path alias
+	const mainFilePath = path.join(srcDir, 'main.ts');
+	const mainFileContent = dedent`
+		import {helper} from '@utils/helper.js';
+
+		export const result = helper('hello world');
+	`
+		+ '\n';
+	await fs.writeFile(mainFilePath, mainFileContent, 'utf8');
+
+	// Create a tsconfig.json with path aliases
+	const tsconfigPath = path.join(cwd, 'tsconfig.json');
+	const tsconfig = {
+		compilerOptions: {
+			target: 'ES2022',
+			module: 'NodeNext',
+			moduleResolution: 'NodeNext',
+			baseUrl: '.',
+			paths: {
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				'@utils/*': ['utils/*'],
+			},
+			strictNullChecks: true,
+		},
+		include: ['src/**/*', 'utils/**/*'],
+	};
+	await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2), 'utf8');
+
+	// Run XO on the project - should not throw because the imports should resolve correctly
+	await t.notThrowsAsync(
+		$`node ./dist/cli --cwd ${cwd}`,
+		'XO should successfully lint files with path aliases',
+	);
+
+	// Create a broken import to verify that XO would catch unresolved imports
+	const brokenFilePath = path.join(srcDir, 'broken.ts');
+	const brokenFileContent = dedent`
+		import {nonExistent} from '@utils/missing.js';
+
+		export const result = nonExistent('test');\n
+	`
+		+ '\n';
+
+	await fs.writeFile(brokenFilePath, brokenFileContent, 'utf8');
+
+	// This should throw an error because the import doesn't resolve
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
+
+	t.log(error);
+
+	// Verify that the error is related to an unresolved import
+	t.true(
+		(error.stderr as string)?.includes('no-unsafe')
+		|| (error.stdout as string)?.includes('no-unsafe'),
+		'Error should mention unresolved import',
+	);
+});

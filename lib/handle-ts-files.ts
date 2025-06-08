@@ -33,10 +33,6 @@ export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]
 
 	const fallbackTsConfigPath = path.join(cwd, 'node_modules', '.cache', cacheDirName, 'tsconfig.xo.json');
 
-	delete tsConfig.include;
-	delete tsConfig.exclude;
-	delete tsConfig.files;
-
 	tsConfig.files = unincludedFiles;
 
 	if (unincludedFiles.length > 0) {
