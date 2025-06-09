@@ -20,7 +20,6 @@ import {
 	cacheDirName,
 	allExtensions,
 	tsFilesGlob,
-	allFilesGlob,
 } from './constants.js';
 import {xoToEslintConfig} from './xo-to-eslint.js';
 import resolveXoConfig from './resolve-config.js';
@@ -168,58 +167,6 @@ export class Xo {
 			this.baseXoConfig,
 			...flatOptions,
 		];
-
-		// Split off the TS rules in a special case, so that you won't get errors
-		// for JS files when the TS rules are not in the config.
-		this.xoConfig = this.xoConfig.flatMap(config => {
-			// If the user does not specify files, then we can assume they want everything to work correctly and
-			// for rules to apply to all files. However, TS rules will error with JS files, so we need to split them off.
-			// if the user supplies files, then we cannot make the same assumption, so we will not split them off.
-			if (config.files) {
-				return config;
-			}
-
-			const ruleEntries = Object.entries(config.rules ?? {});
-			const otherRules: Array<[string, Linter.RuleEntry]> = [];
-			const tsRules: Array<[string, Linter.RuleEntry]> = [];
-
-			for (const [rule, ruleValue] of ruleEntries) {
-				if (!rule || !ruleValue) {
-					continue;
-				}
-
-				if (rule.startsWith('@typescript-eslint')) {
-					tsRules.push([rule, ruleValue]);
-				} else {
-					otherRules.push([rule, ruleValue]);
-				}
-			}
-
-			// If no TS rules, return the config as is
-			if (tsRules.length === 0) {
-				return config;
-			}
-
-			// If there are TS rules, we need to split them off into a new config
-			const tsConfig: XoConfigItem = {
-				...config,
-				rules: Object.fromEntries(tsRules),
-			};
-
-			// Apply TS rules to all files
-			tsConfig.files = [tsFilesGlob];
-
-			const otherConfig: XoConfigItem = {
-				...config,
-				// Set the other rules to the original config
-				rules: Object.fromEntries(otherRules),
-			};
-
-			// These rules should still apply to all files
-			otherConfig.files = [allFilesGlob];
-
-			return [tsConfig, otherConfig];
-		});
 
 		this.prettier = this.xoConfig.some(config => config.prettier);
 		this.prettierConfig = await prettier.resolveConfig(flatConfigPath, {editorconfig: true}) ?? {};

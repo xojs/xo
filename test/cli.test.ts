@@ -314,30 +314,6 @@ test('ts rules properly split to avoid errors with cjs files when no options.fil
 	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
 });
 
-test('ts rules does error in cjs files if options.files is set', async t => {
-	// Write the test.cjs file
-	const filePath = path.join(t.context.cwd, 'test.cjs');
-	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
-
-	// Write and xo config file with ts rules
-	const xoConfigPath = path.join(t.context.cwd, 'xo.config.js');
-	const xoConfig = dedent`
-		export default [
-			{ ignores: "xo.config.js" },
-			{
-				files: ["test.cjs"],
-				rules: {
-					'@typescript-eslint/no-unused-vars': 'error',
-				}
-			}
-		]
-	`;
-
-	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
-	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${t.context.cwd}`);
-	t.true((error.stderr as string)?.includes('Could not find plugin "@typescript-eslint"'));
-});
-
 test('gives helpful error message when config creates a circular dependency', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
@@ -623,8 +599,6 @@ test('handles TypeScript path aliases correctly', async t => {
 
 	// This should throw an error because the import doesn't resolve
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
-
-	t.log(error);
 
 	// Verify that the error is related to an unresolved import
 	t.true(
