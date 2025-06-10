@@ -44,6 +44,45 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 npm install xo --save-dev
 ```
 
+### Quickstart
+
+
+Use `eslint-config-xo` shared config
+
+> [!TIP]
+> the `--config` option lets you specify a package name
+
+```sh
+npm init @eslint/config@latest -- --config eslint-config-xo
+```
+
+<details>
+<summary>yarn</summary>
+
+```bash
+yarn create @eslint/config -- --config eslint-config-xo
+```
+
+</details>
+
+<details>
+<summary>pnpm</summary>
+
+```bash
+pnpm create @eslint/config@latest -- --config eslint-config-xo
+```
+
+</details>
+
+<details>
+<summary>bun</summary>
+
+```bash
+bun create @eslint/config@latest -- --config eslint-config-xo
+```
+</details>
+
+
 *You must install XO locally. You can run it directly with `$ npx xo`.*
 
 *You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
