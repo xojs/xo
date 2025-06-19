@@ -113,6 +113,22 @@ test('xo --print-config ts', async t => {
 	t.true('rules' in config);
 });
 
+test('xo --print-config relative path', async t => {
+	const fileName = 'test.ts';
+	const filePath = path.join(t.context.cwd, fileName);
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+	const {stdout} = await $`node ./dist/cli --cwd ${t.context.cwd} --print-config=${fileName}`;
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	const config = JSON.parse(stdout);
+	t.true(typeof config === 'object');
+	t.true('rules' in config);
+});
+
+test('xo --print-config no path', async t => {
+	const {stderr}: ExecaError = await t.throwsAsync($`node ./dist/cli --cwd ${t.context.cwd} --print-config`);
+	t.is('The `--print-config` flag must be used with exactly one filename', stderr?.toString() ?? '');
+});
+
 test('xo --ignore', async t => {
 	const testFile = path.join(t.context.cwd, 'test.js');
 	const ignoredFile = path.join(t.context.cwd, 'ignored.js');
