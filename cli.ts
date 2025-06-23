@@ -232,7 +232,9 @@ if (typeof cliOptions.printConfig === 'string') {
 		process.exit(1);
 	}
 
-	const config = await new Xo(linterOptions, baseXoConfigOptions).calculateConfigForFile(cliOptions.printConfig);
+	const absoluteFilePath = path.resolve(cliOptions.cwd, cliOptions.printConfig);
+
+	const config = await new Xo(linterOptions, baseXoConfigOptions).calculateConfigForFile(absoluteFilePath);
 	console.log(JSON.stringify(config, undefined, '\t'));
 } else {
 	const xo = new Xo(linterOptions, baseXoConfigOptions);
