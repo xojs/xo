@@ -48,8 +48,6 @@ export const config: Linter.Config[] = [
 			'@eslint-community/eslint-comments': pluginComments,
 			promise: pluginPromise,
 			'@stylistic': stylisticPlugin, // eslint-disable-line @typescript-eslint/naming-convention
-			// Load the typescript plugin for all files, so that it can be used in the config
-			...configXoTypescript[1]?.plugins,
 		},
 		languageOptions: {
 			globals: {
@@ -379,6 +377,7 @@ export const config: Linter.Config[] = [
 	},
 	{
 		name: 'Xo TypeScript',
+		plugins: configXoTypescript[1]?.plugins,
 		files: [tsFilesGlob],
 		languageOptions: {
 			...configXoTypescript[1]?.languageOptions,
