@@ -6,7 +6,6 @@ import findCacheDirectory from 'find-cache-directory';
 import {globby} from 'globby';
 import arrify from 'arrify';
 import defineLazyProperty from 'define-lazy-prop';
-import micromatch from 'micromatch';
 import prettier from 'prettier';
 import {
 	type XoLintResult,
@@ -24,7 +23,7 @@ import {
 import {xoToEslintConfig} from './xo-to-eslint.js';
 import resolveXoConfig from './resolve-config.js';
 import {handleTsconfig} from './handle-ts-files.js';
-// Import {handleTsconfig} from './handle-ts-files-typescript.js';
+import {matchFilesForTsConfig, preProcessXoConfig} from './utils.js';
 
 export class Xo {
 	/**
@@ -135,6 +134,16 @@ export class Xo {
 	*/
 	prettierConfig?: prettier.Options;
 
+	/**
+	The glob pattern for TypeScript files, for which we will handle TS files and tsconfig.
+	We expand this based on the XO config and the files glob patterns.
+	*/
+	tsFilesGlob: string[] = [tsFilesGlob];
+	/**
+	We use this to also add negative glob patterns incase a user overrides the parserOptions in their XO config.
+	*/
+	tsFilesIgnoresGlob: string[] = [];
+
 	constructor(_linterOptions: LinterOptions, _baseXoConfig: XoConfigOptions = {}) {
 		this.linterOptions = _linterOptions;
 		this.baseXoConfig = _baseXoConfig;
@@ -163,11 +172,14 @@ export class Xo {
 			...this.linterOptions,
 		});
 
-		this.xoConfig = [
+		const {config, tsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig([
 			this.baseXoConfig,
 			...flatOptions,
-		];
+		]);
 
+		this.xoConfig = config;
+		this.tsFilesGlob.push(...tsFilesGlob);
+		this.tsFilesIgnoresGlob.push(...tsFilesIgnoresGlob);
 		this.prettier = this.xoConfig.some(config => config.prettier);
 		this.prettierConfig = await prettier.resolveConfig(flatConfigPath, {editorconfig: true}) ?? {};
 		this.flatConfigPath = flatConfigPath;
@@ -225,7 +237,7 @@ export class Xo {
 			return;
 		}
 
-		const tsFiles = files.filter(file => micromatch.isMatch(file, tsFilesGlob, {dot: true}));
+		const tsFiles = matchFilesForTsConfig(this.linterOptions.cwd, files, this.tsFilesGlob, this.tsFilesIgnoresGlob);
 
 		if (tsFiles.length === 0) {
 			return;
