@@ -63,6 +63,10 @@ export type LinterOptions = {
 	@private
 	*/
 	ts?: boolean;
+	/**
+	 Custom path to config to use for the linter.
+	*/
+	configPath?: string;
 };
 
 export type LintTextOptions = {
