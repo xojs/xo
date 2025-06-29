@@ -180,6 +180,36 @@ test('resolves all config extensions types', async t => {
 		// eslint-disable-next-line no-await-in-loop
 		await fs.rm(path.join(t.context.cwd, file));
 	}
+
+	// Relative paths with dot slashes
+	const jsFileRelativeDot = './xo.config.js';
+	const cjsFileRelativeDot = './xo.config.cjs';
+	const mjsFileRelativeDot = './xo.config.mjs';
+	const tsFileRelativeDot = './xo.config.ts';
+	const ctsFileRelativeDot = './xo.config.cts';
+	const mjsFile2RelativeDot = './xo.config.mjs';
+
+	for (const file of [jsFileRelativeDot, mjsFileRelativeDot, tsFileRelativeDot, mjsFile2RelativeDot]) {
+		// eslint-disable-next-line no-await-in-loop
+		await fs.writeFile(path.join(t.context.cwd, file), testConfigEsm, 'utf8');
+		// eslint-disable-next-line no-await-in-loop
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
+		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
+		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		// eslint-disable-next-line no-await-in-loop
+		await fs.rm(path.join(t.context.cwd, file));
+	}
+
+	for (const file of [cjsFileRelativeDot, ctsFileRelativeDot]) {
+		// eslint-disable-next-line no-await-in-loop
+		await fs.writeFile(path.join(t.context.cwd, file), testConfigCjs, 'utf8');
+		// eslint-disable-next-line no-await-in-loop
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
+		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
+		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		// eslint-disable-next-line no-await-in-loop
+		await fs.rm(path.join(t.context.cwd, file));
+	}
 });
 
 test('resolves all custom config extensions types', async t => {
@@ -243,6 +273,36 @@ test('resolves all custom config extensions types', async t => {
 	}
 
 	for (const file of [cjsFileRelative, ctsFileRelative]) {
+		// eslint-disable-next-line no-await-in-loop
+		await fs.writeFile(path.join(t.context.cwd, file), testConfigCjs, 'utf8');
+		// eslint-disable-next-line no-await-in-loop
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
+		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
+		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		// eslint-disable-next-line no-await-in-loop
+		await fs.rm(path.join(t.context.cwd, file));
+	}
+
+	// Relative paths with dot slashes
+	const jsFileRelativeDot = './custom.xo.config.js';
+	const cjsFileRelativeDot = './custom.xo.config.cjs';
+	const mjsFileRelativeDot = './custom.xo.config.mjs';
+	const tsFileRelativeDot = './custom.xo.config.ts';
+	const ctsFileRelativeDot = './custom.xo.config.cts';
+	const mjsFile2RelativeDot = './custom.xo.config.mjs';
+
+	for (const file of [jsFileRelativeDot, mjsFileRelativeDot, tsFileRelativeDot, mjsFile2RelativeDot]) {
+		// eslint-disable-next-line no-await-in-loop
+		await fs.writeFile(path.join(t.context.cwd, file), testConfigEsm, 'utf8');
+		// eslint-disable-next-line no-await-in-loop
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
+		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
+		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		// eslint-disable-next-line no-await-in-loop
+		await fs.rm(path.join(t.context.cwd, file));
+	}
+
+	for (const file of [cjsFileRelativeDot, ctsFileRelativeDot]) {
 		// eslint-disable-next-line no-await-in-loop
 		await fs.writeFile(path.join(t.context.cwd, file), testConfigCjs, 'utf8');
 		// eslint-disable-next-line no-await-in-loop
