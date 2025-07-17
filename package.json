@@ -133,7 +133,8 @@
 				".history/**/*",
 				"node_modules",
 				"package.json",
-				"xo.config.*"
+				"xo.config.*",
+				"**/*.ts"
 			]
 		}
 	},

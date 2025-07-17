@@ -57,8 +57,9 @@ const cli = meow(
 			space: {
 				type: 'string',
 			},
-			config: {
+			configPath: {
 				type: 'string',
+				aliases: ['config'],
 			},
 			quiet: {
 				type: 'boolean',
@@ -119,6 +120,7 @@ const linterOptions: LinterOptions = {
 	cwd: (cliOptions.cwd && path.resolve(cliOptions.cwd)) ?? process.cwd(),
 	quiet: cliOptions.quiet,
 	ts: true,
+	configPath: cliOptions.configPath,
 };
 
 // Make data types for `options.space` match those of the API

@@ -42,6 +42,7 @@ export class Xo {
 				filePath: options.filePath,
 				quiet: options.quiet,
 				ts: options.ts ?? true,
+				configPath: options.configPath,
 			},
 			{
 				react: options.react,
@@ -69,6 +70,7 @@ export class Xo {
 				filePath: options.filePath,
 				quiet: options.quiet,
 				ts: options.ts,
+				configPath: options.configPath,
 			},
 			{
 				react: options.react,
