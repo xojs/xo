@@ -1158,3 +1158,40 @@ test('supports a custom config file with relative dot slash path for TypeScript'
 	t.true((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
 	t.true((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
 });
+
+test('replaces cache file with directory when file exists at cache path', async t => {
+	const {cwd} = t.context;
+
+	// Create a simple TS file that will trigger cache creation
+	const filePath = path.join(cwd, 'test.ts');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+
+	// Remove the default tsconfig to force cache creation
+	const tsConfigPath = path.join(cwd, 'tsconfig.json');
+	await fs.rm(tsConfigPath, {force: true});
+
+	// Create the cache directory structure up to the parent
+	const cacheParentDir = path.join(cwd, 'node_modules', '.cache');
+	await fs.mkdir(cacheParentDir, {recursive: true});
+
+	// Create a FILE at the path where XO needs to create a directory
+	const cacheDir = path.join(cacheParentDir, 'xo-linter');
+	await fs.writeFile(cacheDir, 'this is a file that should be replaced with a directory', 'utf8');
+
+	// Verify the file exists before running XO
+	const statsBeforeRun = await fs.stat(cacheDir);
+	t.true(statsBeforeRun.isFile(), 'Cache path should initially be a file');
+
+	// Run XO - this should handle the file-to-directory conversion
+	await t.notThrowsAsync($`node ./dist/cli --cwd ${cwd}`);
+
+	// Verify the cache path is now a directory
+	const statsAfterRun = await fs.stat(cacheDir);
+	t.true(statsAfterRun.isDirectory(), 'Cache path should now be a directory');
+
+	// Verify the cached tsconfig and the eslint cache file were created
+	const cachedFiles = await fs.readdir(cacheDir);
+	t.true(cachedFiles.includes('tsconfig.xo.json'), 'Cached tsconfig should exist');
+	t.true(cachedFiles.some(file => file.startsWith('.cache')), 'ESLint cache should exist');
+});
+

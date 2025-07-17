@@ -37,7 +37,6 @@ export async function handleTsconfig({cwd, files}: {cwd: string; files: string[]
 
 	if (unincludedFiles.length > 0) {
 		try {
-			await fs.mkdir(path.dirname(fallbackTsConfigPath), {recursive: true});
 			await fs.writeFile(fallbackTsConfigPath, JSON.stringify(tsConfig, null, 2));
 		} catch (error) {
 			console.error(error);
