@@ -125,7 +125,7 @@ export class Xo {
 	flatConfigPath?: string | undefined;
 
 	/**
-	If any user configs container Prettier, we will need to fetch the Prettier config.
+	If any user configs contains Prettier, we will need to fetch the Prettier config.
 	*/
 	prettier?: boolean;
 
@@ -136,11 +136,13 @@ export class Xo {
 
 	/**
 	The glob pattern for TypeScript files, for which we will handle TS files and tsconfig.
+
 	We expand this based on the XO config and the files glob patterns.
 	*/
 	tsFilesGlob: string[] = [tsFilesGlob];
+
 	/**
-	We use this to also add negative glob patterns incase a user overrides the parserOptions in their XO config.
+	We use this to also add negative glob patterns in case a user overrides the parserOptions in their XO config.
 	*/
 	tsFilesIgnoresGlob: string[] = [];
 
