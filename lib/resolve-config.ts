@@ -46,7 +46,11 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 		let {
 			config: flatOptions = [],
 			filepath: flatConfigPath = '',
-		} = await (flatConfigExplorer.search(searchPath) as Promise<{config: FlatXoConfig | undefined; filepath: string}>) ?? {};
+		} = await (
+			options.configPath
+				? flatConfigExplorer.load(path.resolve(options.cwd, options.configPath)) as Promise<{config: FlatXoConfig | undefined; filepath: string}>
+				: flatConfigExplorer.search(searchPath) as Promise<{config: FlatXoConfig | undefined; filepath: string}>
+		) ?? {};
 
 		flatOptions = arrify(flatOptions);
 

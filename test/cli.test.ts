@@ -993,3 +993,168 @@ test('ts rules apply to js files when "files" is set to a relative glob path', a
 	t.true(cachedTsConfig.files?.includes(tsFilePath), 'TypeScript file should be included in cached tsconfig');
 	t.true(cachedTsConfig.files?.includes(jsFilePath), 'JavaScript file should be included in cached tsconfig');
 });
+
+// Supports a custom config file
+test('supports a custom config file with absolute path', async t => {
+	const {cwd} = t.context;
+
+	// Create a simple JS file
+	const filePath = path.join(cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+
+	// Create a custom XO config file
+	const customConfigPath = path.join(cwd, 'custom.xo.config.js');
+	const customConfig = dedent`
+		export default [
+			{ ignores: "xo.config.js" },
+			{
+				rules: {
+					'no-console': 'error',
+				}
+			}
+		]
+	`;
+	await fs.writeFile(customConfigPath, customConfig, 'utf8');
+
+	// Run XO with the custom config file
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd} --config ${customConfigPath}`);
+	t.true((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+	t.true((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
+});
+
+test('supports a custom config file with relative path', async t => {
+	const {cwd} = t.context;
+
+	// Create a simple JS file
+	const filePath = path.join(cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+
+	// Create a custom XO config file
+	const customConfigPath = path.join(cwd, 'custom.xo.config.js');
+	const customConfig = dedent`
+		export default [
+			{ ignores: "xo.config.js" },
+			{
+				rules: {
+					'no-console': 'error',
+				}
+			}
+		]
+	`;
+	await fs.writeFile(customConfigPath, customConfig, 'utf8');
+
+	// Run XO with the custom config file with relative path
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd} --config ${path.relative(cwd, customConfigPath)}`);
+	t.true((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+	t.true((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
+});
+
+test('supports a custom config file with relative dot slash path', async t => {
+	const {cwd} = t.context;
+
+	// Create a simple JS file
+	const filePath = path.join(cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+
+	// Create a custom XO config file
+	const customConfigPath = path.join(cwd, 'custom.xo.config.js');
+	const customConfig = dedent`
+		export default [
+			{ ignores: "xo.config.js" },
+			{
+				rules: {
+					'no-console': 'error',
+				}
+			}
+		]
+	`;
+	await fs.writeFile(customConfigPath, customConfig, 'utf8');
+
+	// Run XO with the custom config file with relative path
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd} --config ./${path.relative(cwd, customConfigPath)}`);
+	t.true((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+	t.true((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
+});
+
+// Supports custom config file with ts path
+test('supports a custom config file with absolute path for TypeScript', async t => {
+	const {cwd} = t.context;
+
+	// Create a simple TS file
+	const filePath = path.join(cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+
+	// Create a custom XO config file
+	const customConfigPath = path.join(cwd, 'custom.xo.config.ts');
+	const customConfig = dedent`
+		export default [
+			{ ignores: "custom.xo.config.ts" },
+			{
+				rules: {
+					'no-console': 'error',
+				}
+			}
+		]
+	`;
+	await fs.writeFile(customConfigPath, customConfig, 'utf8');
+
+	// Run XO with the custom config file
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd} --config ${customConfigPath}`);
+	t.true((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+	t.true((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
+});
+
+// Supports custom config file with ts path
+test('supports a custom config file with relative path for TypeScript', async t => {
+	const {cwd} = t.context;
+
+	// Create a simple TS file
+	const filePath = path.join(cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+
+	// Create a custom XO config file
+	const customConfigPath = path.join(cwd, 'custom.xo.config.ts');
+	const customConfig = dedent`
+		export default [
+			{ ignores: "custom.xo.config.ts" },
+			{
+				rules: {
+					'no-console': 'error',
+				}
+			}
+		]
+	`;
+	await fs.writeFile(customConfigPath, customConfig, 'utf8');
+
+	// Run XO with the custom config file
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd} --config ${path.relative(cwd, customConfigPath)}`);
+	t.true((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+	t.true((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
+});
+// Supports custom config file with ts path
+test('supports a custom config file with relative dot slash path for TypeScript', async t => {
+	const {cwd} = t.context;
+
+	// Create a simple TS file
+	const filePath = path.join(cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+
+	// Create a custom XO config file
+	const customConfigPath = path.join(cwd, 'custom.xo.config.ts');
+	const customConfig = dedent`
+		export default [
+			{ ignores: "custom.xo.config.ts" },
+			{
+				rules: {
+					'no-console': 'error',
+				}
+			}
+		]
+	`;
+	await fs.writeFile(customConfigPath, customConfig, 'utf8');
+
+	// Run XO with the custom config file
+	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd} --config ./${path.relative(cwd, customConfigPath)}`);
+	t.true((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+	t.true((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
+});
