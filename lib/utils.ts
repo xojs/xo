@@ -46,6 +46,7 @@ export const xoToEslintConfigItem = (xoConfig: XoConfigItem): SetRequired<Linter
 
 /**
 Function used to match files which should be included in the `tsconfig.json` files.
+
 @param cwd - The current working directory to resolve relative filepaths.
 @param files - The _absolute_ file paths to match against the globs.
 @param globs - The globs to match the files against.
@@ -65,10 +66,11 @@ export const matchFilesForTsConfig = (cwd: string, files: string[], globs: strin
 
 /**
 Once a config is resolved, it is pre-processed to ensure that all properties are set correctly.
-This includes ensuring that user-defined properties can override xo defaults, and that files are parsed correctly
-and performantly based on the users xo config.
-@param xoConfig - The flat xo config to pre-process.
-@returns The pre-processed flat xo config.
+
+This includes ensuring that user-defined properties can override XO defaults, and that files are parsed correctly and performantly based on the users XO config.
+
+@param xoConfig - The flat XO config to pre-process.
+@returns The pre-processed flat XO config.
 */
 export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-line complexity
 {config: XoConfigItem[]; tsFilesGlob: string[]; tsFilesIgnoresGlob: string[]} => {
@@ -84,7 +86,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-
 			continue;
 		}
 
-		// Use ts parser/plugin for js files if the config contains TypeScript rules which are applied to JS files.
+		// Use TS parser/plugin for JS files if the config contains TypeScript rules which are applied to JS files.
 		// typescript-eslint rules set to "off" are ignored and not applied to JS files.
 		if (
 			config.rules
@@ -135,7 +137,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-
 			}
 		}
 
-		// If a user sets the parserOptions.project or projectService or tsconfigRootDir, we need to ensure that the tsFilesGlob is set to exclude those files,
+		// If a user sets the `parserOptions.project` or `projectService` or `tsconfigRootDir`, we need to ensure that the tsFilesGlob is set to exclude those files,
 		// as this indicates the user has opted out of the default TypeScript handling for those files.
 		if (
 			config.languageOptions?.parserOptions?.['project'] !== undefined
