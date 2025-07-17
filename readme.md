@@ -34,7 +34,7 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
 - Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
 - Optionally use the [Prettier](https://github.com/prettier/prettier) code style or turn off all Prettier rules with the `compat` option.
-- Optionally use `eslint-config-xo-react` for easy jsx and react linting with zero config.
+- Optionally use `eslint-config-xo-react` for easy JSX and React linting with zero config.
 - Optionally use with ESLint [directly](#usage-as-an-eslint-configuration)
 - Great [editor plugins](#editor-plugins).
 
@@ -63,7 +63,7 @@ $ xo --help
 		--config          Path to a XO configuration file
 		--semicolon       Use semicolons [Default: true]
 		--react           Include React specific parsing and xo-react linting rules [Default: false]
-		--prettier        Format with prettier or turn off prettier conflicted rules when set to 'compat' [Default: false]
+		--prettier        Format with prettier or turn off prettier-conflicted rules when set to 'compat' [Default: false]
 		--print-config    Print the effective ESLint config for the given file
 		--version         Print XO version
 		--open            Open files with issues in your editor
@@ -108,7 +108,7 @@ Simply run `$ npm init xo` (with any options) to add XO to create an `xo.config.
 
 ## Config
 
-You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` file in the root directory of your project. XO supports all js/ts file extensions (js,cjs,mjs,ts,cts,mts) automatically. A XO config is an extension of ESLint's Flat Config. Like ESLint, an XO config exports an array of XO config objects. XO config objects extend [ESLint Configuration Objects](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects). This means all the available configuration params for ESLint also work for `XO`. However, `XO` enhances and adds extra params to the configuration objects to make them easier to work with.
+You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` file in the root directory of your project, or you can add an `xo` field to your `package.json`. XO supports all js/ts file extensions (js,cjs,mjs,ts,cts,mts) automatically. A XO config is an extension of ESLint's Flat Config. Like ESLint, an XO config exports an array of XO config objects. XO config objects extend [ESLint Configuration Objects](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects). This means all the available configuration params for ESLint also work for `XO`. However, `XO` enhances and adds extra params to the configuration objects to make them easier to work with.
 
 ### Config types
 
@@ -124,10 +124,14 @@ const xoConfig = [...]
 
 `xo.config.ts`
 
-```js
+```ts
 import {type FlatXoConfig} from 'xo';
 
 const xoConfig: FlatXoConfig = [...]
+```
+
+```ts
+export default [...] satisfies import('xo').FlatXoConfig
 ```
 
 ### files
@@ -137,11 +141,15 @@ Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}`
 
 A glob or array of glob strings which the config object will apply. By default `XO` will apply the configuration to [all files](lib/constants.ts).
 
+> Tip: If you are adding additional `@typescript-eslint` rules to your config, these rules will apply to JS files as well unless you separate them appropriately with the `files` option. `@typescript-eslint` rules set to `'off'` or `0`, however, will have no effect on JS linting.
+
 ### ignores
 
 Type: `string[]`
 
-Some [paths](lib/constants.ts) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here. For global ignores, keep `ignores` as the only key in the config item.
+Some [paths](lib/constants.ts) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
+
+> Tip: For *global* ignores, keep `ignores` as the only key in the config item. You can optionally set a `name` property. Adding more properties will cause ignores to be scoped down to your files selection, which may have unexpected effects.
 
 ### space
 
@@ -202,15 +210,17 @@ XO will automatically lint TypeScript files (`.ts`, `.mts`, `.cts`, and `.tsx`) 
 
 XO will handle the [@typescript-eslint/parser `project` option](https://typescript-eslint.io/packages/parser/#project) automatically even if you don't have a `tsconfig.json` in your project.
 
+You can opt out of XO's automatic tsconfig handling by specifying your own `languageOptions.parserOptions.project`, `languageOptions.parserOptions.projectService`, or `languageOptions.parserOptions.tsconfigRootDir`. Files in a config with these properties will be excluded from automatic tsconfig handling.
+
 ## Usage as an ESLint Configuration
 
 With the introduction of the ESLint flat config, many of the original goals of `xo` were brought into the ESLint core, and shareable configs with plugins became possible. Although we highly recommend the use of the `xo` cli, we understand that some teams need to rely on ESLint directly.
 
 For these purposes, you can still get most of the features of `xo` by using our ESLint configuration helpers.
 
-### `xoToEslintConfig`
+### xoToEslintConfig
 
-The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic Prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will however, handle all of these details for you.
+The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic Prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will, however, handle all of these details for you.
 
 `eslint.config.js`
 

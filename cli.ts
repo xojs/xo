@@ -25,7 +25,7 @@ const cli = meow(
     --config          Path to a XO configuration file
     --semicolon       Use semicolons [Default: true]
     --react           Include React specific parsing and xo-react linting rules [Default: false]
-    --prettier        Format with prettier or turn off prettier conflicted rules when set to 'compat' [Default: false]
+    --prettier        Format with prettier or turn off Prettier-conflicted rules when set to 'compat' [Default: false]
     --print-config    Print the effective ESLint config for the given file
     --version         Print XO version
     --open            Open files with issues in your editor
