@@ -34,7 +34,7 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
 - Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
 - Optionally use the [Prettier](https://github.com/prettier/prettier) code style or turn off all Prettier rules with the `compat` option.
-- Optionally use `eslint-config-xo-react` for easy jsx and react linting with zero config.
+- Optionally use `eslint-config-xo-react` for easy JSX and React linting with zero config.
 - Optionally use with ESLint [directly](#usage-as-an-eslint-configuration)
 - Great [editor plugins](#editor-plugins).
 
@@ -63,7 +63,7 @@ $ xo --help
 		--config          Path to a XO configuration file
 		--semicolon       Use semicolons [Default: true]
 		--react           Include React specific parsing and xo-react linting rules [Default: false]
-		--prettier        Format with prettier or turn off prettier conflicted rules when set to 'compat' [Default: false]
+		--prettier        Format with prettier or turn off prettier-conflicted rules when set to 'compat' [Default: false]
 		--print-config    Print the effective ESLint config for the given file
 		--version         Print XO version
 		--open            Open files with issues in your editor
@@ -141,7 +141,7 @@ Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}`
 
 A glob or array of glob strings which the config object will apply. By default `XO` will apply the configuration to [all files](lib/constants.ts).
 
-> Tip: If you are adding additional @typescript-eslint rules to your config, these rules will apply to js files as well unless you separate them appropriately with the `files` option. @typescript-eslint rules set to "off" or 0, however, will have no effect on js linting.
+> Tip: If you are adding additional `@typescript-eslint` rules to your config, these rules will apply to JS files as well unless you separate them appropriately with the `files` option. `@typescript-eslint` rules set to `'off'` or `0`, however, will have no effect on JS linting.
 
 ### ignores
 
@@ -220,7 +220,7 @@ For these purposes, you can still get most of the features of `xo` by using our 
 
 ### xoToEslintConfig
 
-The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic Prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will however, handle all of these details for you.
+The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic Prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will, however, handle all of these details for you.
 
 `eslint.config.js`
 
