@@ -128,7 +128,7 @@ export class Xo {
 	flatConfigPath?: string | undefined;
 
 	/**
-	If any user configs contains Prettier, we will need to fetch the Prettier config.
+	If any user configs contain Prettier, we will need to fetch the Prettier config.
 	*/
 	prettier?: boolean;
 
@@ -234,9 +234,10 @@ export class Xo {
 
 	/**
 	Ensures the cache directory exists. This needs to run once before both tsconfig handling and running ESLint occur.
+
 	@private
 	*/
-	async ensureCacheDir() {
+	async ensureCacheDirectory() {
 		try {
 			const cacheStats = await fs.stat(this.cacheLocation);
 			// If file re-create as directory
@@ -293,7 +294,7 @@ export class Xo {
 
 		this.setIgnores();
 
-		await this.ensureCacheDir();
+		await this.ensureCacheDirectory();
 
 		await this.handleUnincludedTsFiles(files);
 
