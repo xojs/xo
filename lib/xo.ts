@@ -1,5 +1,6 @@
 import path from 'node:path';
 import os from 'node:os';
+import fs from 'node:fs/promises';
 import process from 'node:process';
 import {ESLint, type Linter} from 'eslint';
 import findCacheDirectory from 'find-cache-directory';
@@ -127,7 +128,7 @@ export class Xo {
 	flatConfigPath?: string | undefined;
 
 	/**
-	If any user configs contains Prettier, we will need to fetch the Prettier config.
+	If any user configs contain Prettier, we will need to fetch the Prettier config.
 	*/
 	prettier?: boolean;
 
@@ -232,6 +233,25 @@ export class Xo {
 	}
 
 	/**
+	Ensures the cache directory exists. This needs to run once before both tsconfig handling and running ESLint occur.
+
+	@private
+	*/
+	async ensureCacheDirectory() {
+		try {
+			const cacheStats = await fs.stat(this.cacheLocation);
+			// If file, re-create as directory
+			if (cacheStats.isFile()) {
+				await fs.rm(this.cacheLocation, {recursive: true, force: true});
+				await fs.mkdir(this.cacheLocation, {recursive: true});
+			}
+		} catch {
+			// If not exists, create the directory
+			await fs.mkdir(this.cacheLocation, {recursive: true});
+		}
+	}
+
+	/**
 	Checks every TS file to ensure its included in the tsconfig and any that are not included are added to a generated tsconfig for type aware linting.
 
 	@param files - The TypeScript files being linted.
@@ -273,6 +293,8 @@ export class Xo {
 		await this.setXoConfig();
 
 		this.setIgnores();
+
+		await this.ensureCacheDirectory();
 
 		await this.handleUnincludedTsFiles(files);
 
