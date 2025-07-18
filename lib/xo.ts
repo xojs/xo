@@ -240,7 +240,7 @@ export class Xo {
 	async ensureCacheDirectory() {
 		try {
 			const cacheStats = await fs.stat(this.cacheLocation);
-			// If file re-create as directory
+			// If file, re-create as directory
 			if (cacheStats.isFile()) {
 				await fs.rm(this.cacheLocation, {recursive: true, force: true});
 				await fs.mkdir(this.cacheLocation, {recursive: true});
