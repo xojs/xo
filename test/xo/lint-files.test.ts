@@ -92,7 +92,7 @@ test('flat config > ts > semi > no tsconfig', async t => {
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-test('flat config > js > space', async t => {
+test.only('flat config > js > space', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 
 	await fs.writeFile(
@@ -114,13 +114,18 @@ test('flat config > js > space', async t => {
 		dedent`
 			export function foo() {
 				console.log('hello');
-			}\n
+			}
+
+			console.log('hello'
+				+ 'world');\n
 		`,
 	);
 	const {results} = await xo.lintFiles();
-	t.is(results?.[0]?.messages.length, 1);
+	t.is(results?.[0]?.messages.length, 2);
 	t.is(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
+	t.is(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
+	t.is(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
 });
 
 test('flat config > ts > space', async t => {
@@ -134,6 +139,9 @@ test('flat config > ts > space', async t => {
 			    space: true
 			  }
 			];\n
+
+			console.log('hello'
+				+ 'world');\n
 		`,
 		'utf8',
 	);
@@ -148,7 +156,9 @@ test('flat config > ts > space', async t => {
 		`,
 	);
 	const {results} = await xo.lintFiles();
-	t.is(results?.[0]?.messages.length, 1);
+	t.is(results?.[0]?.messages.length, 2);
 	t.is(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
+	t.is(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
+	t.is(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
 });

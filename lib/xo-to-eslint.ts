@@ -62,10 +62,12 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				{SwitchCase: 1},
 			];
+			eslintConfigItem.rules['@stylistic/indent-binary-ops'] = ['error', spaces];
 		} else if (xoConfigItem.space === false) {
 			// If a user sets this to false for a small subset of files for some reason,
-			// then we need to set them back to their original values.
+			// then we need to set them back to their oindent-binary-ops riginal values.
 			eslintConfigItem.rules['@stylistic/indent'] = configXoTypescript[1]?.rules?.['@stylistic/indent'];
+			eslintConfigItem.rules['@stylistic/indent-binary-ops'] = configXoTypescript[1]?.rules?.['@stylistic/indent-binary-ops'];
 		}
 
 		if (xoConfigItem.react) {
