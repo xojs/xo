@@ -92,7 +92,7 @@ test('flat config > ts > semi > no tsconfig', async t => {
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-test.only('flat config > js > space', async t => {
+test('flat config > js > space', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 
 	await fs.writeFile(
@@ -139,9 +139,6 @@ test('flat config > ts > space', async t => {
 			    space: true
 			  }
 			];\n
-
-			console.log('hello'
-				+ 'world');\n
 		`,
 		'utf8',
 	);
@@ -152,7 +149,10 @@ test('flat config > ts > space', async t => {
 		dedent`
 			export function foo() {
 				console.log('hello');
-			}\n
+			}
+
+			console.log('hello'
+				+ 'world');\n
 		`,
 	);
 	const {results} = await xo.lintFiles();
