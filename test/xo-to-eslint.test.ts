@@ -24,6 +24,7 @@ test('base config rules', t => {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		{SwitchCase: 1},
 	]);
+	t.deepEqual(getJsRule(flatConfig, '@stylistic/indent-binary-ops'), ['error', 'tab']);
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/semi'), ['error', 'always']);
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/quotes'), ['error', 'single']);
 });
@@ -37,6 +38,7 @@ test('empty config rules', t => {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		{SwitchCase: 1},
 	]);
+	t.deepEqual(getJsRule(flatConfig, '@stylistic/indent-binary-ops'), ['error', 'tab']);
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/semi'), ['error', 'always']);
 	t.deepEqual(getJsRule(flatConfig, '@stylistic/quotes'), ['error', 'single']);
 });
@@ -50,6 +52,7 @@ test('config with space option', t => {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		{SwitchCase: 1},
 	]);
+	t.deepEqual(getJsRule(flatConfig, '@stylistic/indent-binary-ops'), ['error', 2]);
 });
 
 test('config with semi false option', t => {

@@ -114,13 +114,18 @@ test('flat config > js > space', async t => {
 		dedent`
 			export function foo() {
 				console.log('hello');
-			}\n
+			}
+
+			console.log('hello'
+				+ 'world');\n
 		`,
 	);
 	const {results} = await xo.lintFiles();
-	t.is(results?.[0]?.messages.length, 1);
+	t.is(results?.[0]?.messages.length, 2);
 	t.is(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
+	t.is(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
+	t.is(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
 });
 
 test('flat config > ts > space', async t => {
@@ -144,11 +149,16 @@ test('flat config > ts > space', async t => {
 		dedent`
 			export function foo() {
 				console.log('hello');
-			}\n
+			}
+
+			console.log('hello'
+				+ 'world');\n
 		`,
 	);
 	const {results} = await xo.lintFiles();
-	t.is(results?.[0]?.messages.length, 1);
+	t.is(results?.[0]?.messages.length, 2);
 	t.is(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
+	t.is(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
+	t.is(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
 });
