@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises';
-import process from 'node:process';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {allFilesGlob} from '../lib/constants.js';
