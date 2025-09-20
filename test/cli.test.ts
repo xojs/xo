@@ -1195,3 +1195,20 @@ test('replaces cache file with directory when file exists at cache path', async 
 	t.true(cachedFiles.some(file => file.startsWith('.cache')), 'ESLint cache should exist');
 });
 
+test('prettier validation detects semicolon conflicts', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, 'const x = true\n', 'utf8'); // No semicolon
+
+	// XO: no semicolons, Prettier: semicolons = conflict
+	const packageJson = {
+		xo: {
+			semicolon: false,
+			prettier: true,
+		},
+	};
+	await fs.writeFile(path.join(t.context.cwd, 'package.json'), JSON.stringify(packageJson), 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, '.prettierrc'), '{"semi": true}', 'utf8');
+
+	const error = await t.throwsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
+	t.true(error.message.includes('semicolon'));
+});
