@@ -252,6 +252,30 @@ export class Xo {
 	}
 
 	/**
+	 * Checks if any directly specified files are ignored and throws an error.
+	 * @private
+	 */
+	async checkForIgnoredDirectFiles(globs: string[]): Promise<void> {
+		const {flatOptions} = await resolveXoConfig(this.linterOptions);
+		const combinedIgnores = [
+			...defaultIgnores,
+			...arrify(this.baseXoConfig.ignores),
+			...flatOptions.flatMap(config => config.ignores ? arrify(config.ignores) : []),
+		];
+
+		// Filter non-glob patterns first (synchronous operation)
+		const directFileGlobs = globs.filter(glob =>
+			!glob.includes('*') && !glob.includes('?') && !glob.includes('['));
+
+		// Create all promises immediately - no await in loop
+		const checkPromises = directFileGlobs.map(async glob =>
+			this.validateDirectFile(glob, combinedIgnores));
+
+		// Process all in parallel
+		await Promise.all(checkPromises);
+	}
+
+	/**
 	Checks every TS file to ensure its included in the tsconfig and any that are not included are added to a generated tsconfig for type aware linting.
 
 	@param files - The TypeScript files being linted.
@@ -329,11 +353,14 @@ export class Xo {
 			globs = `**/*.{${allExtensions.join(',')}}`;
 		}
 
-		globs = arrify(globs);
+		const originalGlobs = arrify(globs);
+		await this.checkForIgnoredDirectFiles(originalGlobs);
 
-		let files: string | string[] = await globby(globs, {
-			// Merge in command line ignores
-			ignore: [...defaultIgnores, ...arrify(this.baseXoConfig.ignores)],
+		// Keep system-level ignores, remove only user-defined ignores
+		const files = await globby(originalGlobs, {
+			ignore: [
+				...defaultIgnores, // System files (node_modules, .git, etc)
+			],
 			onlyFiles: true,
 			gitignore: true,
 			absolute: true,
@@ -346,8 +373,9 @@ export class Xo {
 			throw new Error('Failed to initialize ESLint');
 		}
 
+		// Return early with empty result instead of invalid '!**/*' pattern
 		if (files.length === 0) {
-			files = '!**/*';
+			return this.processReport([], {rulesMeta: {}});
 		}
 
 		const results = await this.eslint.lintFiles(files);
@@ -400,6 +428,37 @@ export class Xo {
 		}
 
 		return this.eslint.loadFormatter(name);
+	}
+
+	private async validateDirectFile(glob: string, combinedIgnores: string[]): Promise<void> {
+		try {
+			const absolutePath = path.resolve(this.linterOptions.cwd, glob);
+			const stats = await fs.stat(absolutePath);
+
+			if (!stats.isFile()) {
+				return;
+			}
+
+			// Use globby to test if this file would be ignored
+			const matchedFiles = await globby([glob], {
+				ignore: combinedIgnores,
+				onlyFiles: true,
+				gitignore: true,
+				absolute: false,
+				cwd: this.linterOptions.cwd,
+			});
+
+			// If globby returns empty array, the file is ignored
+			if (matchedFiles.length === 0) {
+				throw new Error(`File '${glob}' is ignored by XO configuration and cannot be linted directly.`);
+			}
+		} catch (error) {
+			// Re-throw our custom error, let other errors pass through
+			if ((error as Error).message?.includes('ignored by XO configuration')) {
+				throw error;
+			}
+			// Let ESLint handle file not found errors normally
+		}
 	}
 
 	private processReport(
