@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises';
+import process from 'node:process';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {allFilesGlob} from '../lib/constants.js';
+import {isFileSystemCaseInsensitive} from '../lib/utils.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 import {getJsRule} from './helpers/get-rule.js';
 
@@ -238,4 +240,19 @@ test('empty configs are filtered', t => {
 
 	t.deepEqual(flatConfig.at(-1), {files: [allFilesGlob], rules: {}});
 	t.deepEqual(flatConfig.at(-2), {name: 'test-ignores', ignores: ['**/test']});
+});
+
+test('automatically configures import resolver case sensitivity', t => {
+	const flatConfig = xoToEslintConfig([{}]);
+	const baseConfig = flatConfig[1];
+
+	const resolver = baseConfig?.settings?.['import-x/resolver'] as {
+		node: {extensions: string[]; caseSensitive: boolean};
+	};
+	const nodeResolver = resolver.node;
+
+	const expected = !isFileSystemCaseInsensitive();
+	t.log('expected caseSensitive:', expected);
+	t.log('actual caseSensitive:', nodeResolver.caseSensitive);
+	t.is(nodeResolver.caseSensitive, expected);
 });

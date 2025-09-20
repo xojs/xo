@@ -1,4 +1,6 @@
 import path from 'node:path';
+import {realpathSync} from 'node:fs';
+import process from 'node:process';
 import micromatch from 'micromatch';
 import {type Linter} from 'eslint';
 import {type SetRequired} from 'type-fest';
@@ -157,3 +159,40 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-
 		tsFilesIgnoresGlob,
 	};
 };
+
+/**
+ * Flip case for A-Z/a-z characters to generate an alternate-cased basename.
+ */
+const flipCase = (s: string) =>
+	s.replaceAll(/[A-Za-z]/g, ch => (ch >= 'a' && ch <= 'z' ? ch.toUpperCase() : ch.toLowerCase()));
+
+/**
+ * Returns true if the given path resides on a case-insensitive filesystem.
+ * Non-invasive: only performs existsSync checks with alternate casing.
+ */
+export const isPathCaseInsensitive = (dir: string): boolean => {
+	try {
+		const abs = path.resolve(dir);
+		const parent = path.dirname(abs);
+		const base = path.basename(abs);
+		const alt = flipCase(base);
+		// If flipping produced the same string (no letters), just bail out as "unknown" → assume sensitive=false.
+		if (alt === base) {
+			return false;
+		}
+
+		// Resolve canonical paths
+		const canonical = realpathSync.native(abs);
+		// Attempt to resolve alternate-cased path; if it resolves to the same canonical path, FS is case-insensitive
+		const canonicalAlt: string | undefined = realpathSync.native(path.join(parent, alt));
+
+		return Boolean(canonicalAlt) && canonicalAlt === canonical;
+	} catch {
+		return false;
+	}
+};
+
+/**
+ * Back-compat helper: detect at CWD.
+ */
+export const isFileSystemCaseInsensitive = (): boolean => isPathCaseInsensitive(process.cwd());
