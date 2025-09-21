@@ -81,7 +81,8 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				baseConfig.push({...eslintConfigPrettier, files: eslintConfigItem.files});
 			} else {
 				// Validate that Prettier options match other `xoConfig` options.
-				if ((xoConfigItem.semicolon && prettierOptions.semi === false) ?? (!xoConfigItem.semicolon && prettierOptions.semi === true)) {
+				/* eslint-disable-next-line */
+				if ((xoConfigItem.semicolon && prettierOptions.semi === false) || (!xoConfigItem.semicolon && prettierOptions.semi === true)) {
 					throw new Error(`The Prettier config \`semi\` is ${prettierOptions.semi} while Xo \`semicolon\` is ${xoConfigItem.semicolon}, also check your .editorconfig for inconsistencies.`);
 				}
 
