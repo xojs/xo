@@ -108,7 +108,7 @@ Simply run `$ npm init xo` (with any options) to add XO to create an `xo.config.
 
 ## Config
 
-You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` file in the root directory of your project, or you can add an `xo` field to your `package.json`. XO supports all js/ts file extensions (js,cjs,mjs,ts,cts,mts) automatically. A XO config is an extension of ESLint's Flat Config. Like ESLint, an XO config exports an array of XO config objects. XO config objects extend [ESLint Configuration Objects](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects). This means all the available configuration params for ESLint also work for `XO`. However, `XO` enhances and adds extra params to the configuration objects to make them easier to work with.
+You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` file in the root directory of your project, or you can add an `xo` field to your `package.json`. XO supports all js/ts file extensions (js,cjs,mjs,ts,cts,mts) and popular framework extensions (vue,svelte,astro) automatically. A XO config is an extension of ESLint's Flat Config. Like ESLint, an XO config exports an array of XO config objects. XO config objects extend [ESLint Configuration Objects](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects). This means all the available configuration params for ESLint also work for `XO`. However, `XO` enhances and adds extra params to the configuration objects to make them easier to work with.
 
 ### Config types
 
@@ -137,7 +137,7 @@ export default [...] satisfies import('xo').FlatXoConfig
 ### files
 
 Type: `string | string[] | undefined`\
-Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}`
+Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,vue,svelte,astro}`
 
 A glob or array of glob strings which the config object will apply. By default `XO` will apply the configuration to [all files](lib/constants.ts).
 

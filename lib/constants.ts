@@ -22,11 +22,13 @@ export const tsExtensions = ['ts', 'tsx', 'cts', 'mts'];
 
 export const jsExtensions = ['js', 'jsx', 'mjs', 'cjs'];
 
+export const frameworkExtensions = ['vue', 'svelte', 'astro'];
+
 export const jsFilesGlob = `**/*.{${jsExtensions.join(',')}}`;
 
 export const tsFilesGlob = `**/*.{${tsExtensions.join(',')}}`;
 
-export const allExtensions = [...jsExtensions, ...tsExtensions];
+export const allExtensions = [...jsExtensions, ...tsExtensions, ...frameworkExtensions];
 
 export const allFilesGlob = `**/*.{${allExtensions.join(',')}}`;
 
