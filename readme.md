@@ -27,7 +27,7 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
 - [Flat config customization.](#config)
 - [TypeScript supported by default.](#typescript)
-- Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import`](https://github.com/benmosher/eslint-plugin-import), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
+- Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import-x`](https://github.com/un-ts/eslint-plugin-import-x), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
 - Caches results between runs for much better performance.
 - Super simple to add XO to a project with [`$ npm init xo`](https://github.com/xojs/create-xo).
 - Fix many issues automagically with `$ xo --fix`.
