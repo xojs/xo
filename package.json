@@ -93,6 +93,7 @@
 		"path-exists": "^5.0.0",
 		"prettier": "^3.6.2",
 		"type-fest": "^5.1.0",
+		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.46.1"
 	},
 	"devDependencies": {

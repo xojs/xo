@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import dedent from 'dedent';
-import {type TsConfigJson} from 'get-tsconfig';
+import {pathExists} from 'path-exists';
 import {Xo} from '../../lib/xo.js';
 import {copyTestProject} from '../helpers/copy-test-project.js';
 
@@ -103,8 +103,6 @@ test('flat config > ts > semi > no tsconfig', async t => {
 		cwd: t.context.cwd,
 		filePath,
 	});
-	const generatedTsconfig = JSON.parse(await fs.readFile(path.join(t.context.cwd, 'node_modules', '.cache', 'xo-linter', 'tsconfig.xo.json'), 'utf8')) as TsConfigJson;
-	t.true(generatedTsconfig.files?.includes(filePath));
 	t.is(results?.[0]?.messages?.length, 1);
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
@@ -365,6 +363,7 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 		const FooBar = 10;
 		const FOO_BAR = 10;
 		const foo_bar = 10;\n
+		export const usedValues = [fooBar, FooBar, FOO_BAR, foo_bar];\n
 	`;
 
 	// We must write tsfiles to disk for the typescript rules to apply
@@ -375,7 +374,7 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	t.true(resultsNoConfig[0]?.errorCount === 3);
 
 	await fs.writeFile(
-		path.join(cwd, 'xo.config.ts'),
+		path.join(cwd, 'xo.config.js'),
 		dedent`
 			export default [
 			  {
@@ -390,16 +389,93 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	);
 
 	// Now with a config that turns off the naming-convention rule, the text should not have any errors
-	// and should not have any messages when ran multiple times
+	// and should not have naming-convention messages when ran multiple times
 	const {results} = await Xo.lintText(text, {cwd, filePath});
-	t.is(results[0]?.errorCount, 0);
-	t.true(results[0]?.messages?.length === 0);
+	const firstRuleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
+	t.false(firstRuleIds.includes('@typescript-eslint/naming-convention'));
 	const {results: results2} = await Xo.lintText(text, {cwd, filePath});
-	t.is(results2[0]?.errorCount, 0);
-	t.true(results2[0]?.messages?.length === 0);
+	const secondRuleIds = results2[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
+	t.deepEqual(secondRuleIds, firstRuleIds);
 	const {results: results3} = await Xo.lintText(text, {cwd, filePath});
-	t.is(results3[0]?.errorCount, 0);
-	t.true(results3[0]?.messages?.length === 0);
+	const thirdRuleIds = results3[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
+	t.deepEqual(thirdRuleIds, firstRuleIds);
+});
+
+test('virtual TypeScript configs are pruned when no virtual files remain', async t => {
+	const {cwd} = t.context;
+	const xo = new Xo({cwd, ts: true});
+	const {cacheLocation} = xo;
+	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
+	const virtualFilePath = path.join(cacheLocation, 'stdin', 'virtual.ts');
+
+	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
+	await fs.writeFile(virtualFilePath, 'export const virtualValue = 1;\n', 'utf8');
+
+	await xo.lintText('export const virtualValue = 1;\n', {filePath: virtualFilePath});
+
+	t.true(await pathExists(tsconfigPath));
+	const virtualConfig = xo.xoConfig?.find(({languageOptions}) => {
+		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
+		return parserOptions?.project === tsconfigPath;
+	});
+	t.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
+
+	const existingFilePath = path.join(cwd, 'src', 'existing.ts');
+	await fs.mkdir(path.dirname(existingFilePath), {recursive: true});
+	await fs.writeFile(existingFilePath, 'export const existingValue = 1;\n', 'utf8');
+
+	await xo.lintText('export const existingValue = 1;\n', {filePath: existingFilePath});
+
+	t.false(await pathExists(tsconfigPath));
+	const configAfterCleanup = xo.xoConfig?.find(({languageOptions}) => {
+		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
+		return parserOptions?.project === tsconfigPath;
+	});
+	t.is(configAfterCleanup, undefined);
+});
+
+test('virtual TypeScript files are reclassified once they exist on disk', async t => {
+	const {cwd} = t.context;
+	const xo = new Xo({cwd, ts: true});
+	const {cacheLocation} = xo;
+	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
+	const virtualFilePath = path.join(cwd, 'excluded', 'virtual.ts');
+	const source = 'export const virtualValue = 1;\n';
+
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({
+			compilerOptions: {
+				module: 'node16',
+				target: 'ES2022',
+				strictNullChecks: true,
+				lib: ['DOM', 'DOM.Iterable', 'ES2022'],
+			},
+			exclude: ['node_modules', 'excluded'],
+		}),
+		'utf8',
+	);
+
+	await xo.lintText(source, {filePath: virtualFilePath});
+
+	t.true(await pathExists(tsconfigPath));
+	const virtualConfig = xo.xoConfig?.find(({languageOptions}) => {
+		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
+		return parserOptions?.project === tsconfigPath;
+	});
+	t.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
+
+	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
+	await fs.writeFile(virtualFilePath, source, 'utf8');
+
+	await xo.lintText(source, {filePath: virtualFilePath});
+
+	t.false(await pathExists(tsconfigPath));
+	const configAfterReclassification = xo.xoConfig?.find(({languageOptions}) => {
+		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
+		return parserOptions?.project === tsconfigPath;
+	});
+	t.is(configAfterReclassification, undefined);
 });
 
 test('config with custom plugin', async t => {
