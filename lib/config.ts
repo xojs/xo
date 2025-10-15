@@ -6,7 +6,6 @@ import pluginComments from '@eslint-community/eslint-plugin-eslint-comments';
 import pluginPromise from 'eslint-plugin-promise';
 import pluginNoUseExtendNative from 'eslint-plugin-no-use-extend-native';
 import configXoTypescript from 'eslint-config-xo-typescript';
-import stylisticPlugin from '@stylistic/eslint-plugin';
 import globals from 'globals';
 import {type Linter} from 'eslint';
 import {
@@ -22,7 +21,7 @@ if (Array.isArray(pluginAva?.configs?.['recommended'])) {
 	throw new TypeError('Invalid eslint-plugin-ava');
 }
 
-if (!configXoTypescript[1]) {
+if (!configXoTypescript[4]) {
 	throw new Error('Invalid eslint-config-xo-typescript');
 }
 
@@ -31,15 +30,16 @@ The base config that XO builds on top of from user options.
 */
 export const config: Linter.Config[] = [
 	{
-		name: 'XO Default Ignores',
+		name: 'xo/ignores',
 		ignores: defaultIgnores,
 	},
 	{
-		name: 'XO',
-		files: [
-			allFilesGlob,
-		],
+		name: 'xo/base',
+		files: [allFilesGlob],
 		plugins: {
+			...configXoTypescript[0]?.plugins,
+			// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+			'@typescript-eslint': configXoTypescript[4]?.plugins?.['@typescript-eslint']!,
 			'no-use-extend-native': pluginNoUseExtendNative,
 			ava: pluginAva,
 			unicorn: pluginUnicorn,
@@ -47,7 +47,6 @@ export const config: Linter.Config[] = [
 			n: pluginN,
 			'@eslint-community/eslint-comments': pluginComments,
 			promise: pluginPromise,
-			'@stylistic': stylisticPlugin, // eslint-disable-line @typescript-eslint/naming-convention
 		},
 		languageOptions: {
 			globals: {
@@ -376,17 +375,22 @@ export const config: Linter.Config[] = [
 		},
 	},
 	{
-		name: 'Xo TypeScript',
-		plugins: configXoTypescript[1]?.plugins,
+		name: 'xo/typescript',
+		plugins: configXoTypescript[4]?.plugins, // ['@typescript-eslint'],
 		files: [tsFilesGlob],
 		languageOptions: {
-			...configXoTypescript[1]?.languageOptions,
+			...configXoTypescript[4]?.languageOptions,
+			parserOptions: {
+				...configXoTypescript[4]?.languageOptions?.parserOptions,
+				// This needs to be explicitly set to `true`
+				projectService: true,
+			},
 		},
 		/**
 		This turns on rules in `typescript-eslint`` and turns off rules from ESLint that conflict.
 		*/
 		rules: {
-			...configXoTypescript[1]?.rules,
+			...configXoTypescript[4]?.rules,
 			'unicorn/import-style': 'off',
 			'n/file-extension-in-import': 'off',
 			// Disabled because of https://github.com/benmosher/eslint-plugin-import-x/issues/1590
@@ -398,7 +402,7 @@ export const config: Linter.Config[] = [
 			'import-x/named': 'off',
 		},
 	},
-	...configXoTypescript.slice(2),
+	...configXoTypescript.slice(5),
 	{
 		files: ['xo.config.{js,ts}'],
 		rules: {

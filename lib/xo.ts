@@ -8,6 +8,7 @@ import {globby} from 'globby';
 import arrify from 'arrify';
 import defineLazyProperty from 'define-lazy-prop';
 import prettier from 'prettier';
+import configXoTypescript from 'eslint-config-xo-typescript';
 import {
 	type XoLintResult,
 	type LinterOptions,
@@ -25,6 +26,10 @@ import {xoToEslintConfig} from './xo-to-eslint.js';
 import resolveXoConfig from './resolve-config.js';
 import {handleTsconfig} from './handle-ts-files.js';
 import {matchFilesForTsConfig, preProcessXoConfig} from './utils.js';
+
+if (!configXoTypescript[4]) {
+	throw new Error('Invalid eslint-config-xo-typescript');
+}
 
 export class Xo {
 	/**
@@ -257,7 +262,7 @@ export class Xo {
 	@param files - The TypeScript files being linted.
 	*/
 	async handleUnincludedTsFiles(files?: string[]) {
-		if (!this.linterOptions.ts || !files || files.length === 0) {
+		if (!this.linterOptions.ts) {
 			return;
 		}
 
@@ -278,7 +283,7 @@ export class Xo {
 
 		const config: XoConfigItem = {};
 		config.files = unincludedFiles.map(file => path.relative(this.linterOptions.cwd, file));
-		config.languageOptions ??= {};
+		config.languageOptions ??= {...configXoTypescript[4]?.languageOptions};
 		config.languageOptions.parserOptions ??= {};
 		config.languageOptions.parserOptions['projectService'] = false;
 		config.languageOptions.parserOptions['project'] = fallbackTsConfigPath;
@@ -331,7 +336,7 @@ export class Xo {
 
 		globs = arrify(globs);
 
-		let files: string | string[] = await globby(globs, {
+		const files: string | string[] = await globby(globs, {
 			// Merge in command line ignores
 			ignore: [...defaultIgnores, ...arrify(this.baseXoConfig.ignores)],
 			onlyFiles: true,
@@ -347,7 +352,7 @@ export class Xo {
 		}
 
 		if (files.length === 0) {
-			files = '!**/*';
+			return this.processReport([]);
 		}
 
 		const results = await this.eslint.lintFiles(files);
@@ -389,6 +394,7 @@ export class Xo {
 			throw new Error('Failed to initialize ESLint');
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 		return this.eslint.calculateConfigForFile(filePath) as Promise<Linter.Config>;
 	}
 

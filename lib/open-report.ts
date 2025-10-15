@@ -6,7 +6,7 @@ const sortResults = (a: ESLint.LintResult, b: ESLint.LintResult) => a.errorCount
 
 const resultToFile = (result: ESLint.LintResult) => {
 	const [message] = result.messages
-		.sort((a, b) => {
+		.toSorted((a, b) => {
 			if (a.severity < b.severity) {
 				return 1;
 			}
@@ -35,7 +35,7 @@ const resultToFile = (result: ESLint.LintResult) => {
 
 const getFiles = (report: XoLintResult, predicate: (result: ESLint.LintResult) => boolean) => report.results
 	.filter(result => predicate(result))
-	.sort(sortResults)
+	.toSorted(sortResults)
 	.map(result => resultToFile(result));
 
 const openReport = async (report: XoLintResult) => {

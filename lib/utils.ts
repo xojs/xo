@@ -1,7 +1,6 @@
 import path from 'node:path';
 import micromatch from 'micromatch';
 import {type Linter} from 'eslint';
-import {type SetRequired} from 'type-fest';
 import arrify from 'arrify';
 import configXoTypescript from 'eslint-config-xo-typescript';
 import {type XoConfigItem} from './types.js';
@@ -21,7 +20,7 @@ Files and rules will always be defined and all other ESLint config properties ar
 @param xoConfig
 @returns eslintConfig
 */
-export const xoToEslintConfigItem = (xoConfig: XoConfigItem): SetRequired<Linter.Config, 'rules' | 'files'> => {
+export const xoToEslintConfigItem = (xoConfig: XoConfigItem): Linter.Config => {
 	const {
 		files,
 		rules,
@@ -33,10 +32,10 @@ export const xoToEslintConfigItem = (xoConfig: XoConfigItem): SetRequired<Linter
 		..._xoConfig
 	} = xoConfig;
 
-	const eslintConfig: SetRequired<Linter.Config, 'rules' | 'files'> = {
+	const eslintConfig: Linter.Config = {
 		..._xoConfig,
-		files: arrify(xoConfig.files ?? allFilesGlob),
-		rules: xoConfig.rules ?? {},
+		...(xoConfig.files ? {files: arrify(xoConfig.files)} : {}),
+		...(xoConfig.rules ? {rules: xoConfig.rules} : {}),
 	};
 
 	eslintConfig.ignores &&= arrify(xoConfig.ignores);
@@ -53,8 +52,8 @@ Function used to match files which should be included in the `tsconfig.json` fil
 @param ignores - The globs to ignore when matching the files.
 @returns An array of file paths that match the globs and do not match the ignores.
 */
-export const matchFilesForTsConfig = (cwd: string, files: string[], globs: string[], ignores: string[]) => micromatch(
-	files.map(file => path.normalize(path.relative(cwd, file))),
+export const matchFilesForTsConfig = (cwd: string, files: string[] | undefined, globs: string[], ignores: string[]) => micromatch(
+	files?.map(file => path.normalize(path.relative(cwd, file))) ?? [],
 	// https://github.com/micromatch/micromatch/issues/217
 	globs.map(glob => path.normalize(glob)),
 	{

@@ -48,7 +48,9 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 			filepath: flatConfigPath = '',
 		} = await (
 			options.configPath
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 				? flatConfigExplorer.load(path.resolve(options.cwd, options.configPath)) as Promise<{config: FlatXoConfig | undefined; filepath: string}>
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 				: flatConfigExplorer.search(searchPath) as Promise<{config: FlatXoConfig | undefined; filepath: string}>
 		) ?? {};
 
