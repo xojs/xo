@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import {preProcessXoConfig, matchFilesForTsConfig} from '../../lib/utils.js';
@@ -352,7 +353,7 @@ test('config with mixed "files" glob filtered and @typescript-eslint rules set t
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.sort(), [
+	t.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -366,7 +367,7 @@ test('config with mixed "files" glob filtered and @typescript-eslint rules set t
 		'/path/to/project/src/index.cts',
 		'/path/to/project/src/index.js',
 		'/path/to/project/src/index.test.js',
-	].sort(), 'All Ts files and only .js files should be matched');
+	].toSorted(), 'All Ts files and only .js files should be matched');
 });
 
 test('config with mixed relative glob "files" and @typescript-eslint rules set to "error"', t => {
@@ -383,7 +384,7 @@ test('config with mixed relative glob "files" and @typescript-eslint rules set t
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.sort(), [
+	t.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -395,7 +396,7 @@ test('config with mixed relative glob "files" and @typescript-eslint rules set t
 		'/path/to/project/src/index.cts',
 		'/path/to/project/src/index.js',
 		'/path/to/project/src/index.test.js',
-	].sort(), 'All Ts files and only .js files in src dir should be matched');
+	].toSorted(), 'All Ts files and only .js files in src dir should be matched');
 });
 
 test('config with mixed relative trickier glob "files" and @typescript-eslint rules set to "error"', t => {
@@ -412,7 +413,7 @@ test('config with mixed relative trickier glob "files" and @typescript-eslint ru
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.sort(), [
+	t.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -424,7 +425,7 @@ test('config with mixed relative trickier glob "files" and @typescript-eslint ru
 		'/path/to/project/src/index.cts',
 		'/path/to/project/src/index.js',
 		'/path/to/project/src/index.test.js',
-	].sort(), 'All Ts files and only .js files in src dir should be matched');
+	].toSorted(), 'All Ts files and only .js files in src dir should be matched');
 });
 
 test('config with mixed relative filepath "files" and @typescript-eslint rules set to "error"', t => {
@@ -441,7 +442,7 @@ test('config with mixed relative filepath "files" and @typescript-eslint rules s
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.sort(), [
+	t.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -452,7 +453,7 @@ test('config with mixed relative filepath "files" and @typescript-eslint rules s
 		'/path/to/project/src/index.mts',
 		'/path/to/project/src/index.cts',
 		'/path/to/project/src/index.js',
-	].sort(), 'All Ts files and single .js files in src dir should be matched');
+	].toSorted(), 'All Ts files and single .js files in src dir should be matched');
 });
 
 test('config with js glob "files" and @typescript-eslint rules set to "error" and ignores a file', t => {
@@ -470,7 +471,7 @@ test('config with js glob "files" and @typescript-eslint rules set to "error" an
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.sort(), [
+	t.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -481,7 +482,7 @@ test('config with js glob "files" and @typescript-eslint rules set to "error" an
 		'/path/to/project/src/index.mts',
 		'/path/to/project/src/index.cts',
 		'/path/to/project/index.js',
-	].sort(), 'All Ts files and .js files in root dir should be matched');
+	].toSorted(), 'All Ts files and .js files in root dir should be matched');
 });
 
 test('config with custom languageOptions and @typescript-eslint rules set to "error"', t => {

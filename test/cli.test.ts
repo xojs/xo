@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
@@ -168,7 +169,7 @@ test('xo --reporter json', async t => {
 	const error: ExecaError = await t.throwsAsync($`node ./dist/cli --cwd ${t.context.cwd} --reporter=json`);
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	const results = JSON.parse(error?.stdout?.toString() ?? '');
+	const results: unknown[] = JSON.parse(error?.stdout?.toString() ?? '');
 
 	t.true(Array.isArray(results));
 	t.is(results.length, 1);

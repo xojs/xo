@@ -47,6 +47,7 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		const eslintConfigItem = xoToEslintConfigItem(xoConfigItem);
 
 		if (xoConfigItem.semicolon === false) {
+			eslintConfigItem.rules ??= {};
 			eslintConfigItem.rules['@stylistic/semi'] = ['error', 'never'];
 			eslintConfigItem.rules['@stylistic/semi-spacing'] = [
 				'error',
@@ -56,6 +57,7 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 
 		if (xoConfigItem.space) {
 			const spaces = typeof xoConfigItem.space === 'number' ? xoConfigItem.space : 2;
+			eslintConfigItem.rules ??= {};
 			eslintConfigItem.rules['@stylistic/indent'] = [
 				'error',
 				spaces,
@@ -66,13 +68,14 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		} else if (xoConfigItem.space === false) {
 			// If a user sets this to false for a small subset of files for some reason,
 			// then we need to set them back to their original values.
+			eslintConfigItem.rules ??= {};
 			eslintConfigItem.rules['@stylistic/indent'] = configXoTypescript[1]?.rules?.['@stylistic/indent'];
 			eslintConfigItem.rules['@stylistic/indent-binary-ops'] = configXoTypescript[1]?.rules?.['@stylistic/indent-binary-ops'];
 		}
 
 		if (xoConfigItem.react) {
 			// Ensure the files applied to the React config are the same as the config they are derived from
-			baseConfig.push({...configReact[0], files: eslintConfigItem.files});
+			baseConfig.push({...configReact[0], files: eslintConfigItem.files, name: 'xo/react'});
 		}
 
 		// Prettier should generally be the last config in the array
@@ -114,6 +117,7 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				// Configure Prettier rules
 				const rulesWithPrettier: Linter.RulesRecord = {
 					...eslintConfigItem.rules,
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 					...(pluginPrettier.configs?.['recommended'] as ESLint.ConfigData)?.rules,
 					// eslint-disable-next-line @typescript-eslint/naming-convention
 					'prettier/prettier': ['error', prettierConfig],
@@ -124,7 +128,12 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 			}
 		} else if (xoConfigItem.prettier === false) {
 			// Turn Prettier off for a subset of files
+			eslintConfigItem.rules ??= {};
 			eslintConfigItem.rules['prettier/prettier'] = 'off';
+		}
+
+		if (Object.keys(eslintConfigItem).length === 0) {
+			continue;
 		}
 
 		baseConfig.push(eslintConfigItem);

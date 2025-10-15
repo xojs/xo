@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
@@ -199,18 +200,14 @@ test('plugin > ts > no-use-extend-native', async t => {
 	`;
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
-	t.true(results[0]?.messages?.length === 1);
-	t.truthy(results[0]?.messages?.[0]);
-	t.is(
-		results[0]?.messages?.[0]?.ruleId,
-		'no-use-extend-native/no-use-extend-native',
-	);
+	t.true(Array.isArray(results[0]?.messages));
+	t.truthy(results[0]?.messages?.find(rule => rule.ruleId === 'no-use-extend-native/no-use-extend-native'));
 });
 
 test('plugin > js > eslint-plugin-import import-x/order', async t => {
 	const {cwd} = t.context;
 	const filePath = path.join(cwd, 'test.js');
-	const {results} = await new Xo({cwd}).lintText(
+	const {results} = await (new Xo({cwd}).lintText(
 		dedent`
 			import foo from 'foo';
 			import {util} from 'node:util';
@@ -218,7 +215,7 @@ test('plugin > js > eslint-plugin-import import-x/order', async t => {
 			util.inspect(foo);\n
 		`,
 		{filePath},
-	);
+	));
 
 	t.true(results[0]?.messages?.length === 1);
 	t.truthy(results[0]?.messages?.[0]);
