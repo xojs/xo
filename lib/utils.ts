@@ -10,6 +10,26 @@ import {
 	jsFilesGlob,
 } from './constants.js';
 
+type LanguageOptionsWithParser = Linter.LanguageOptions & {parser?: Linter.Parser};
+
+type TypeScriptParserOptions = Linter.ParserOptions & {
+	project?: string | string[];
+	projectService?: boolean;
+	tsconfigRootDir?: string;
+	programs?: unknown[];
+};
+
+const typescriptParserConfig = configXoTypescript.find(config => {
+	const languageOptions = config.languageOptions as LanguageOptionsWithParser | undefined;
+	return languageOptions?.parser;
+});
+
+export const typescriptParser = (typescriptParserConfig?.languageOptions as LanguageOptionsWithParser | undefined)?.parser;
+
+if (!typescriptParser) {
+	throw new Error('XO: Failed to locate TypeScript parser in eslint-config-xo-typescript');
+}
+
 /**
 Convert a `xo` config item to an ESLint config item.
 
@@ -71,7 +91,7 @@ This includes ensuring that user-defined properties can override XO defaults, an
 @param xoConfig - The flat XO config to pre-process.
 @returns The pre-processed flat XO config.
 */
-export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-line complexity
+export const preProcessXoConfig = (xoConfig: XoConfigItem[]):
 {config: XoConfigItem[]; tsFilesGlob: string[]; tsFilesIgnoresGlob: string[]} => {
 	const tsFilesGlob: string[] = [];
 	const tsFilesIgnoresGlob: string[] = [];
@@ -79,6 +99,9 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-
 	const processedConfig: XoConfigItem[] = [];
 
 	for (const [idx, {...config}] of xoConfig.entries()) {
+		const languageOptions = config.languageOptions as Linter.LanguageOptions | undefined;
+		const parserOptions = languageOptions?.parserOptions as TypeScriptParserOptions | undefined;
+
 		// We can skip the first config  item, as it is the base config item.
 		if (idx === 0) {
 			processedConfig.push(config);
@@ -89,8 +112,10 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-
 		// typescript-eslint rules set to "off" are ignored and not applied to JS files.
 		if (
 			config.rules
-			&& !config.languageOptions?.parser
-			&& !config.languageOptions?.parserOptions?.['project']
+			// eslint-disable-next-line @typescript-eslint/dot-notation
+			&& !languageOptions?.['parser']
+			&& parserOptions?.project === undefined
+			&& parserOptions?.programs === undefined
 			&& !config.plugins?.['@typescript-eslint']
 		) {
 			const hasTsRules = Object.entries(config.rules).some(rulePair => {
@@ -123,26 +148,26 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): // eslint-disable-
 				}
 
 				if (isAppliedToJsFiles) {
-					config.languageOptions ??= {};
+					const updatedLanguageOptions: Linter.LanguageOptions = languageOptions
+						? {...languageOptions, parser: typescriptParser}
+						: {parser: typescriptParser};
+					config.languageOptions = updatedLanguageOptions;
 					config.plugins ??= {};
 					config.plugins = {
 						...config.plugins,
 						...configXoTypescript[1]?.plugins,
 					};
-					config.languageOptions.parser = configXoTypescript[1]?.languageOptions?.parser;
 					tsFilesGlob.push(...arrify(config.files ?? allFilesGlob));
 					tsFilesIgnoresGlob.push(...arrify(config.ignores));
 				}
 			}
 		}
 
-		// If a user sets the `parserOptions.project` or `projectService` or `tsconfigRootDir`, we need to ensure that the tsFilesGlob is set to exclude those files,
-		// as this indicates the user has opted out of the default TypeScript handling for those files.
-		if (
-			config.languageOptions?.parserOptions?.['project'] !== undefined
-			|| config.languageOptions?.parserOptions?.['projectService'] !== undefined
-			|| config.languageOptions?.parserOptions?.['tsconfigRootDir'] !== undefined
-		) {
+		// If the config sets `parserOptions.project`, `projectService`, `tsconfigRootDir`, or `programs`, treat those files as opt-out for XO's automatic program wiring.
+		if (parserOptions?.project !== undefined
+			|| parserOptions?.projectService !== undefined
+			|| parserOptions?.tsconfigRootDir !== undefined
+			|| parserOptions?.programs !== undefined) {
 			// The glob itself should NOT be negated
 			tsFilesIgnoresGlob.push(...arrify(config.files ?? allFilesGlob));
 		}

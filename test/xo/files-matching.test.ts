@@ -491,7 +491,6 @@ test('config with custom languageOptions and @typescript-eslint rules set to "er
 		{},
 		{
 			languageOptions: {
-				// @ts-expect-error - This is a test, parserOptions.project just needs to be set
 				parser: '@typescript-eslint/parser',
 				parserOptions: {
 					project: './tsconfig.json',

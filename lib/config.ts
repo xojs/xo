@@ -25,6 +25,14 @@ if (!configXoTypescript[4]) {
 	throw new Error('Invalid eslint-config-xo-typescript');
 }
 
+const baseLanguageOptions = configXoTypescript[0]?.languageOptions;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-assertion
+const baseParserOptions = baseLanguageOptions?.['parserOptions'] as unknown as Linter.ParserOptions | undefined;
+
+const typescriptLanguageOptions = configXoTypescript[4]?.languageOptions;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-assertion
+const typescriptParserOptions = typescriptLanguageOptions?.['parserOptions'] as unknown as Linter.ParserOptions | undefined;
+
 /**
 The base config that XO builds on top of from user options.
 */
@@ -53,10 +61,10 @@ export const config: Linter.Config[] = [
 				...globals.es2021,
 				...globals.node,
 			},
-			ecmaVersion: configXoTypescript[0]?.languageOptions?.ecmaVersion,
-			sourceType: configXoTypescript[0]?.languageOptions?.sourceType,
+			ecmaVersion: baseLanguageOptions?.['ecmaVersion'],
+			sourceType: baseLanguageOptions?.['sourceType'],
 			parserOptions: {
-				...configXoTypescript[0]?.languageOptions?.parserOptions,
+				...baseParserOptions,
 			},
 		},
 		settings: {
@@ -381,7 +389,7 @@ export const config: Linter.Config[] = [
 		languageOptions: {
 			...configXoTypescript[4]?.languageOptions,
 			parserOptions: {
-				...configXoTypescript[4]?.languageOptions?.parserOptions,
+				...typescriptParserOptions,
 				// This needs to be explicitly set to `true`
 				projectService: true,
 			},
