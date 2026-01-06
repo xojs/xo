@@ -25,6 +25,29 @@ if (!configXoTypescript[4]) {
 	throw new Error('Invalid eslint-config-xo-typescript');
 }
 
+const typescriptPlugin = configXoTypescript[4]?.plugins?.['@typescript-eslint'];
+if (!typescriptPlugin) {
+	throw new Error('Invalid eslint-config-xo-typescript');
+}
+
+const baseLanguageOptions = configXoTypescript[0]?.languageOptions;
+const baseParserOptions
+	= typeof baseLanguageOptions?.['parserOptions'] === 'object'
+		&& baseLanguageOptions?.['parserOptions'] !== null
+		? (baseLanguageOptions['parserOptions'])
+		: {};
+
+const tsLanguageOptions = configXoTypescript[4]?.languageOptions;
+const tsLanguageOptionsObject
+	= typeof tsLanguageOptions === 'object' && tsLanguageOptions !== null
+		? tsLanguageOptions
+		: {};
+const tsParserOptions
+	= typeof tsLanguageOptions?.['parserOptions'] === 'object'
+		&& tsLanguageOptions?.['parserOptions'] !== null
+		? (tsLanguageOptions['parserOptions'])
+		: {};
+
 /**
 The base config that XO builds on top of from user options.
 */
@@ -38,8 +61,8 @@ export const config: Linter.Config[] = [
 		files: [allFilesGlob],
 		plugins: {
 			...configXoTypescript[0]?.plugins,
-			// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-			'@typescript-eslint': configXoTypescript[4]?.plugins?.['@typescript-eslint']!,
+
+			'@typescript-eslint': typescriptPlugin,
 			'no-use-extend-native': pluginNoUseExtendNative,
 			ava: pluginAva,
 			unicorn: pluginUnicorn,
@@ -53,18 +76,15 @@ export const config: Linter.Config[] = [
 				...globals.es2021,
 				...globals.node,
 			},
-			ecmaVersion: configXoTypescript[0]?.languageOptions?.ecmaVersion,
-			sourceType: configXoTypescript[0]?.languageOptions?.sourceType,
+			ecmaVersion: baseLanguageOptions?.['ecmaVersion'],
+			sourceType: baseLanguageOptions?.['sourceType'],
 			parserOptions: {
-				...configXoTypescript[0]?.languageOptions?.parserOptions,
+				...baseParserOptions,
 			},
 		},
 		settings: {
 			'import-x/extensions': allExtensions,
-			'import-x/core-modules': [
-				'electron',
-				'atom',
-			],
+			'import-x/core-modules': ['electron', 'atom'],
 			'import-x/parsers': {
 				espree: jsExtensions,
 				'@typescript-eslint/parser': tsExtensions,
@@ -379,9 +399,9 @@ export const config: Linter.Config[] = [
 		plugins: configXoTypescript[4]?.plugins, // ['@typescript-eslint'],
 		files: [tsFilesGlob],
 		languageOptions: {
-			...configXoTypescript[4]?.languageOptions,
+			...tsLanguageOptionsObject,
 			parserOptions: {
-				...configXoTypescript[4]?.languageOptions?.parserOptions,
+				...tsParserOptions,
 				// This needs to be explicitly set to `true`
 				projectService: true,
 			},
