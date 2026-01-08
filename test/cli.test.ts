@@ -451,27 +451,8 @@ test('handles mixed project structure with nested tsconfig and root ts files', a
 	`;
 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-	// Run XO on the entire directory structure
+	// Run XO on the entire directory structure - should handle unincluded files with in-memory programs
 	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
-
-	// Verify the cache file was created
-	t.true(await pathExists(tsconfigCachePath), 'tsconfig.xo.json should be created for files not covered by existing tsconfigs');
-
-	// Check the content of the cached tsconfig
-	const cachedTsConfig = JSON.parse(await fs.readFile(tsconfigCachePath, 'utf8')) as TsConfigJson;
-
-	// Verify only the root.ts file is in the cached tsconfig (not the nested files)
-	t.deepEqual(cachedTsConfig.files, [rootTsFilePath], 'tsconfig.xo.json should only contain the root.ts file not covered by existing tsconfig');
-
-	// Verify the nested files aren't included (they should be covered by the nested tsconfig)
-	t.false(
-		cachedTsConfig.files?.includes(nestedFilePath),
-		'tsconfig.xo.json should not include files already covered by nested tsconfig',
-	);
-	t.false(
-		cachedTsConfig.files?.includes(nestedFile2Path),
-		'tsconfig.xo.json should not include files already covered by nested tsconfig',
-	);
 });
 
 test('handles basic TypeScript imports between files', async t => {
@@ -765,16 +746,11 @@ test('ts rules apply to js files when "files" is not set', async t => {
 	`;
 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-	// Run XO
+	// Run XO - should handle both TS and JS files with in-memory TypeScript programs
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
 	t.true((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 	t.true((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
 	t.true((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
-	t.true(await pathExists(tsconfigCachePath), 'cached tsconfig.xo.json should be created');
-	// Verify the JS file is not included in the cached tsconfig
-	const cachedTsConfig = JSON.parse(await fs.readFile(tsconfigCachePath, 'utf8')) as TsConfigJson;
-	t.true(cachedTsConfig.files?.includes(tsFilePath), 'TypeScript file should be included in cached tsconfig');
-	t.true(cachedTsConfig.files?.includes(jsFilePath), 'JavaScript file should be included in cached tsconfig');
 });
 
 test('ts rules apply to js files when "files" is set to a glob', async t => {
@@ -817,16 +793,11 @@ test('ts rules apply to js files when "files" is set to a glob', async t => {
 	`;
 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-	// Run XO
+	// Run XO - should handle both TS and JS files with in-memory TypeScript programs
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
 	t.true((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 	t.true((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
 	t.true((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
-	t.true(await pathExists(tsconfigCachePath), 'cached tsconfig.xo.json should be created');
-	// Verify the JS file is not included in the cached tsconfig
-	const cachedTsConfig = JSON.parse(await fs.readFile(tsconfigCachePath, 'utf8')) as TsConfigJson;
-	t.true(cachedTsConfig.files?.includes(tsFilePath), 'TypeScript file should be included in cached tsconfig');
-	t.true(cachedTsConfig.files?.includes(jsFilePath), 'JavaScript file should be included in cached tsconfig');
 });
 
 test('ts rules apply to js files when "files" is set to a file path', async t => {
@@ -869,16 +840,11 @@ test('ts rules apply to js files when "files" is set to a file path', async t =>
 	`;
 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-	// Run XO
+	// Run XO - should handle both TS and JS files with in-memory TypeScript programs
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
 	t.true((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 	t.true((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
 	t.true((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
-	t.true(await pathExists(tsconfigCachePath), 'cached tsconfig.xo.json should be created');
-	// Verify the JS file is not included in the cached tsconfig
-	const cachedTsConfig = JSON.parse(await fs.readFile(tsconfigCachePath, 'utf8')) as TsConfigJson;
-	t.true(cachedTsConfig.files?.includes(tsFilePath), 'TypeScript file should be included in cached tsconfig');
-	t.true(cachedTsConfig.files?.includes(jsFilePath), 'JavaScript file should be included in cached tsconfig');
 });
 
 test('ts rules apply to js files when "files" is set to a relative file path', async t => {
@@ -926,16 +892,11 @@ test('ts rules apply to js files when "files" is set to a relative file path', a
 	`;
 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-	// Run XO
+	// Run XO - should handle both TS and JS files with in-memory TypeScript programs
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
 	t.true((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 	t.true((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
 	t.true((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
-	t.true(await pathExists(tsconfigCachePath), 'cached tsconfig.xo.json should be created');
-	// Verify the JS file is not included in the cached tsconfig
-	const cachedTsConfig = JSON.parse(await fs.readFile(tsconfigCachePath, 'utf8')) as TsConfigJson;
-	t.true(cachedTsConfig.files?.includes(tsFilePath), 'TypeScript file should be included in cached tsconfig');
-	t.true(cachedTsConfig.files?.includes(jsFilePath), 'JavaScript file should be included in cached tsconfig');
 });
 
 test('ts rules apply to js files when "files" is set to a relative glob path', async t => {
@@ -983,16 +944,11 @@ test('ts rules apply to js files when "files" is set to a relative glob path', a
 	`;
 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-	// Run XO
+	// Run XO - should handle both TS and JS files with in-memory TypeScript programs
 	const error = await t.throwsAsync<ExecaError>($`node ./dist/cli --cwd ${cwd}`);
 	t.true((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 	t.true((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
 	t.true((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
-	t.true(await pathExists(tsconfigCachePath), 'cached tsconfig.xo.json should be created');
-	// Verify the JS file is not included in the cached tsconfig
-	const cachedTsConfig = JSON.parse(await fs.readFile(tsconfigCachePath, 'utf8')) as TsConfigJson;
-	t.true(cachedTsConfig.files?.includes(tsFilePath), 'TypeScript file should be included in cached tsconfig');
-	t.true(cachedTsConfig.files?.includes(jsFilePath), 'JavaScript file should be included in cached tsconfig');
 });
 
 // Supports a custom config file
@@ -1190,9 +1146,8 @@ test('replaces cache file with directory when file exists at cache path', async 
 	const statsAfterRun = await fs.stat(cacheDir);
 	t.true(statsAfterRun.isDirectory(), 'Cache path should now be a directory');
 
-	// Verify the cached tsconfig and the eslint cache file were created
+	// Verify the eslint cache file was created
 	const cachedFiles = await fs.readdir(cacheDir);
-	t.true(cachedFiles.includes('tsconfig.xo.json'), 'Cached tsconfig should exist');
 	t.true(cachedFiles.some(file => file.startsWith('.cache')), 'ESLint cache should exist');
 });
 

@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import dedent from 'dedent';
-import {type TsConfigJson} from 'get-tsconfig';
+import {pathExists} from 'path-exists';
 import {Xo} from '../../lib/xo.js';
 import {copyTestProject} from '../helpers/copy-test-project.js';
 
@@ -103,8 +103,6 @@ test('flat config > ts > semi > no tsconfig', async t => {
 		cwd: t.context.cwd,
 		filePath,
 	});
-	const generatedTsconfig = JSON.parse(await fs.readFile(path.join(t.context.cwd, 'node_modules', '.cache', 'xo-linter', 'tsconfig.xo.json'), 'utf8')) as TsConfigJson;
-	t.true(generatedTsconfig.files?.includes(filePath));
 	t.is(results?.[0]?.messages?.length, 1);
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
@@ -400,6 +398,39 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	const {results: results3} = await Xo.lintText(text, {cwd, filePath});
 	t.is(results3[0]?.errorCount, 0);
 	t.true(results3[0]?.messages?.length === 0);
+});
+
+test('virtual TypeScript configs are pruned when no virtual files remain', async t => {
+	const {cwd} = t.context;
+	const xo = new Xo({cwd, ts: true});
+	const {cacheLocation} = xo;
+	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
+	const virtualFilePath = path.join(cacheLocation, 'stdin', 'virtual.ts');
+
+	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
+	await fs.writeFile(virtualFilePath, 'export const virtualValue = 1;\n', 'utf8');
+
+	await xo.lintText('export const virtualValue = 1;\n', {filePath: virtualFilePath});
+
+	t.true(await pathExists(tsconfigPath));
+	const virtualConfig = xo.xoConfig?.find(({languageOptions}) => {
+		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
+		return parserOptions?.project === tsconfigPath;
+	});
+	t.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
+
+	const existingFilePath = path.join(cwd, 'src', 'existing.ts');
+	await fs.mkdir(path.dirname(existingFilePath), {recursive: true});
+	await fs.writeFile(existingFilePath, 'export const existingValue = 1;\n', 'utf8');
+
+	await xo.lintText('export const existingValue = 1;\n', {filePath: existingFilePath});
+
+	t.false(await pathExists(tsconfigPath));
+	const configAfterCleanup = xo.xoConfig?.find(({languageOptions}) => {
+		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
+		return parserOptions?.project === tsconfigPath;
+	});
+	t.is(configAfterCleanup, undefined);
 });
 
 test('config with custom plugin', async t => {
