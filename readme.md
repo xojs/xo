@@ -306,6 +306,12 @@ Show the world you're using XO → [![XO code style](https://shields.io/badge/co
 [![XO code style](https://shields.io/badge/code_style-5ed9c7?logo=xo&labelColor=gray&logoSize=auto)](https://github.com/xojs/xo)
 ```
 
+Large badge: [![XO code style](https://shields.io/badge/code_style-5ed9c7?style=for-the-badge&logo=xo&labelColor=gray)](https://github.com/xojs/xo)
+
+```md
+[![XO code style](https://shields.io/badge/code_style-5ed9c7?style=for-the-badge&logo=xo&labelColor=gray)](https://github.com/xojs/xo)
+```
+
 Or [customize the badge](https://github.com/xojs/xo/issues/689#issuecomment-1253127616).
 
 You can also find some nice dynamic XO badges on [badgen.net](https://badgen.net/#xo).
