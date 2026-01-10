@@ -31,6 +31,10 @@ if (!configXoTypescript[4]) {
 	throw new Error('Invalid eslint-config-xo-typescript');
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object'
+	&& value !== null
+	&& !Array.isArray(value);
+
 export class Xo {
 	/**
 	Static helper to convert an XO config to an ESLint config to be used in `eslint.config.js`.
@@ -284,10 +288,12 @@ export class Xo {
 		const config: XoConfigItem = {};
 		config.files = unincludedFiles.map(file => path.relative(this.linterOptions.cwd, file));
 		config.languageOptions ??= {...configXoTypescript[4]?.languageOptions};
-		config.languageOptions.parserOptions ??= {};
-		config.languageOptions.parserOptions['projectService'] = false;
-		config.languageOptions.parserOptions['project'] = fallbackTsConfigPath;
-		config.languageOptions.parserOptions['tsconfigRootDir'] = this.linterOptions.cwd;
+		const existingParserOptions = config.languageOptions['parserOptions'];
+		const parserOptions = isRecord(existingParserOptions) ? existingParserOptions : {};
+		config.languageOptions['parserOptions'] = parserOptions;
+		parserOptions['projectService'] = false;
+		parserOptions['project'] = fallbackTsConfigPath;
+		parserOptions['tsconfigRootDir'] = this.linterOptions.cwd;
 		this.xoConfig.push(config);
 	}
 
