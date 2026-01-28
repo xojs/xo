@@ -401,6 +401,50 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	t.deepEqual(thirdRuleIds, firstRuleIds);
 });
 
+test('lint-text refreshes TypeScript program for unincluded files', async t => {
+	const {cwd} = t.context;
+	const filePath = path.join(cwd, 'excluded', 'stale.ts');
+	const xo = new Xo({cwd, ts: true});
+
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({
+			compilerOptions: {
+				module: 'node16',
+				target: 'ES2022',
+				strictNullChecks: true,
+				lib: ['DOM', 'DOM.Iterable', 'ES2022'],
+			},
+			exclude: ['node_modules', 'excluded'],
+		}),
+		'utf8',
+	);
+
+	await fs.mkdir(path.dirname(filePath), {recursive: true});
+
+	const unsafeText = dedent`
+		const parsed = JSON.parse('{"count":1}');
+		parsed.count.toFixed(1);\n
+	`;
+
+	await fs.writeFile(filePath, unsafeText, 'utf8');
+	const {results: unsafeResults} = await xo.lintText(unsafeText, {filePath});
+	const unsafeRuleIds = unsafeResults[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
+	t.true(unsafeRuleIds.includes('@typescript-eslint/no-unsafe-assignment'));
+	t.true(unsafeRuleIds.includes('@typescript-eslint/no-unsafe-member-access'));
+
+	const safeText = dedent`
+		const parsed = {count: 1};
+		parsed.count.toFixed(1);\n
+	`;
+
+	await fs.writeFile(filePath, safeText, 'utf8');
+	const {results: safeResults} = await xo.lintText(safeText, {filePath});
+	const safeRuleIds = safeResults[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
+	t.false(safeRuleIds.includes('@typescript-eslint/no-unsafe-assignment'));
+	t.false(safeRuleIds.includes('@typescript-eslint/no-unsafe-member-access'));
+});
+
 test('virtual TypeScript configs are pruned when no virtual files remain', async t => {
 	const {cwd} = t.context;
 	const xo = new Xo({cwd, ts: true});

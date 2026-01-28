@@ -14,6 +14,7 @@ const rootNodeModules = path.join(process.cwd(), 'node_modules');
 const dependencies = [
 	['typescript'],
 	['@types', 'node'],
+	['undici-types'],
 	['@sindresorhus', 'tsconfig'],
 ];
 

@@ -1,6 +1,5 @@
 import path from 'node:path';
 import os from 'node:os';
-import fileSystem from 'node:fs';
 import fs from 'node:fs/promises';
 import process from 'node:process';
 import {ESLint, type Linter} from 'eslint';
@@ -299,68 +298,29 @@ export class Xo {
 		// Get ALL TypeScript files being linted (both new and previously handled)
 		const allTsFiles = matchFilesForTsConfig(this.linterOptions.cwd, files, this.tsFilesGlob, this.tsFilesIgnoresGlob);
 
-		// Clean up configs for files no longer being linted
-		const activeFiles = new Set(allTsFiles);
-		for (const handledFile of this.fileConfigs.keys()) {
-			if (!activeFiles.has(handledFile)) {
-				this.fileConfigs.delete(handledFile);
-			}
-		}
+		if (allTsFiles.length === 0) {
+			this.fileConfigs.clear();
 
-		const cacheRoot = path.resolve(this.cacheLocation);
-		const virtualFilesToRecheck: string[] = [];
-
-		// Clean up virtual files no longer being linted and recheck virtual files that now exist on disk
-		let prunedVirtualFiles = false;
-		for (const virtualFile of this.virtualFiles) {
-			if (!activeFiles.has(virtualFile)) {
-				this.virtualFiles.delete(virtualFile);
-				prunedVirtualFiles = true;
-				continue;
+			if (this.virtualFiles.size > 0) {
+				await this.addVirtualFilesToConfig([]);
 			}
 
-			if (!fileSystem.existsSync(virtualFile)) {
-				continue;
-			}
-
-			const absolutePath = path.resolve(virtualFile);
-			const relativeToCache = path.relative(cacheRoot, absolutePath);
-			const isInCache = !relativeToCache.startsWith('..') && !path.isAbsolute(relativeToCache);
-
-			if (!isInCache) {
-				this.virtualFiles.delete(virtualFile);
-				virtualFilesToRecheck.push(virtualFile);
-				prunedVirtualFiles = true;
-			}
-		}
-
-		// Filter to only new files that need config
-		const tsFiles = allTsFiles.filter(file => !this.fileConfigs.has(file) && !this.virtualFiles.has(file));
-		const filesToHandle = [...new Set([...tsFiles, ...virtualFilesToRecheck])];
-
-		if (prunedVirtualFiles) {
-			await this.addVirtualFilesToConfig([]);
-		}
-
-		if (filesToHandle.length === 0) {
 			return;
 		}
 
 		const {program, existingFiles, virtualFiles} = handleTsconfig({
-			files: filesToHandle,
+			files: allTsFiles,
 			cwd: this.linterOptions.cwd,
 			cacheLocation: this.cacheLocation,
 		});
 
-		// Handle virtual files with tsconfig approach (no redundant fs checks)
-		if (virtualFiles.length > 0) {
-			await this.addVirtualFilesToConfig(virtualFiles);
-		}
+		this.fileConfigs.clear();
 
-		// Handle existing files with in-memory TypeScript Program (no redundant fs checks)
 		if (existingFiles.length > 0) {
 			this.addExistingFilesToConfig(existingFiles, program);
 		}
+
+		await this.addVirtualFilesToConfig(virtualFiles);
 	}
 
 	/**
@@ -491,7 +451,7 @@ export class Xo {
 		}
 
 		try {
-			const nextVirtualFiles = new Set([...this.virtualFiles, ...files]);
+			const nextVirtualFiles = new Set(files);
 
 			const tsconfigPath = path.join(this.cacheLocation, 'tsconfig.stdin.json');
 			const configIndex = this.xoConfig.findIndex(configItem => {
