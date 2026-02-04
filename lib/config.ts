@@ -16,6 +16,7 @@ import {
 	jsExtensions,
 	allExtensions,
 } from './constants.js';
+import {isFileSystemCaseInsensitive} from './utils.js';
 
 if (Array.isArray(pluginAva?.configs?.['recommended'])) {
 	throw new TypeError('Invalid eslint-plugin-ava');
@@ -79,7 +80,10 @@ export const config: Linter.Config[] = [
 				'node_modules/@types',
 			],
 			'import-x/resolver': {
-				node: allExtensions,
+				node: {
+					extensions: allExtensions,
+					caseSensitive: !isFileSystemCaseInsensitive(),
+				},
 			},
 		},
 		/**
