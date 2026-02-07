@@ -8,6 +8,7 @@ import pluginNoUseExtendNative from 'eslint-plugin-no-use-extend-native';
 import configXoTypescript from 'eslint-config-xo-typescript';
 import globals from 'globals';
 import {type Linter} from 'eslint';
+import {fixupPluginRules} from '@eslint/compat';
 import {
 	defaultIgnores,
 	tsExtensions,
@@ -30,6 +31,10 @@ const baseParserOptions = baseLanguageOptions?.parserOptions ?? {};
 const typescriptLanguageOptions = (configXoTypescript[4]?.languageOptions ?? {}) as Linter.LanguageOptions;
 const typescriptParserOptions = typescriptLanguageOptions.parserOptions ?? {};
 
+// TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
+const fixedUpBasePlugins = Object.fromEntries(Object.entries(configXoTypescript[0]?.plugins ?? {}).map(([key, plugin]) => [key, fixupPluginRules(plugin)]));
+const fixedUpTypescriptPlugins = Object.fromEntries(Object.entries(configXoTypescript[4]?.plugins ?? {}).map(([key, plugin]) => [key, fixupPluginRules(plugin)]));
+
 /**
 The base config that XO builds on top of from user options.
 */
@@ -42,16 +47,16 @@ export const config: Linter.Config[] = [
 		name: 'xo/base',
 		files: [allFilesGlob],
 		plugins: {
-			...configXoTypescript[0]?.plugins,
-			// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-			'@typescript-eslint': configXoTypescript[4]?.plugins?.['@typescript-eslint']!,
+			...fixedUpBasePlugins,
+			...fixedUpTypescriptPlugins,
 			'no-use-extend-native': pluginNoUseExtendNative,
-			ava: pluginAva,
+			// TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
+			ava: fixupPluginRules(pluginAva),
 			unicorn: pluginUnicorn,
-			'import-x': pluginImport,
-			n: pluginN,
-			'@eslint-community/eslint-comments': pluginComments,
-			promise: pluginPromise,
+			'import-x': fixupPluginRules(pluginImport),
+			n: fixupPluginRules(pluginN),
+			'@eslint-community/eslint-comments': fixupPluginRules(pluginComments),
+			promise: fixupPluginRules(pluginPromise),
 		},
 		languageOptions: {
 			globals: {
@@ -381,7 +386,7 @@ export const config: Linter.Config[] = [
 	},
 	{
 		name: 'xo/typescript',
-		plugins: configXoTypescript[4]?.plugins, // ['@typescript-eslint'],
+		plugins: fixedUpTypescriptPlugins,
 		files: [tsFilesGlob],
 		languageOptions: {
 			...typescriptLanguageOptions,

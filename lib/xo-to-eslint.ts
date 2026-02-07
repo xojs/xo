@@ -6,6 +6,7 @@ import configReact from 'eslint-config-xo-react';
 import {type Options} from 'prettier';
 import pluginPrettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import {fixupConfigRules, fixupPluginRules} from '@eslint/compat';
 import {type XoConfigItem} from './types.js';
 import {config} from './config.js';
 import {xoToEslintConfigItem} from './utils.js';
@@ -133,7 +134,8 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 
 		if (xoConfigItem.react) {
 			// Ensure the files applied to the React config are the same as the config they are derived from
-			baseConfig.push({...configReact[0], files: eslintConfigItem.files, name: 'xo/react'});
+			// TODO: Remove `fixupConfigRules` wrapping when eslint-config-xo-react supports ESLint 10 natively.
+			baseConfig.push({...fixupConfigRules(configReact)[0], files: eslintConfigItem.files, name: 'xo/react'});
 		}
 
 		// Prettier should generally be the last config in the array
@@ -156,9 +158,10 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				}
 
 				// Add Prettier plugin
+				// TODO: Remove `fixupPluginRules` wrapping when eslint-plugin-prettier supports ESLint 10 natively.
 				eslintConfigItem.plugins = {
 					...eslintConfigItem.plugins,
-					prettier: pluginPrettier,
+					prettier: fixupPluginRules(pluginPrettier),
 				};
 
 				const prettierConfig = {
