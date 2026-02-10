@@ -185,9 +185,12 @@ export class Xo {
 		if (!path.isAbsolute(this.linterOptions.cwd)) {
 			this.linterOptions.cwd = path.resolve(process.cwd(), this.linterOptions.cwd);
 		}
+
 		try {
 			this.linterOptions.cwd = realpathSync(this.linterOptions.cwd);
-		} catch {}
+		} catch {
+			// Ignore invalid paths here; the caller will handle errors later.
+		}
 
 		const backupCacheLocation = path.join(os.tmpdir(), cacheDirName);
 
