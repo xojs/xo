@@ -76,7 +76,7 @@
 		"eslint-config-xo-react": "^0.29.0",
 		"eslint-config-xo-typescript": "^9.0.0",
 		"eslint-formatter-pretty": "^7.0.0",
-		"eslint-plugin-ava": "^15.1.0",
+		"eslint-plugin-ava": "^16.0.0",
 		"eslint-plugin-import-x": "^4.16.1",
 		"eslint-plugin-n": "^17.23.2",
 		"eslint-plugin-no-use-extend-native": "^0.7.2",
@@ -143,5 +143,10 @@
 			"text",
 			"lcov"
 		]
+	},
+	"xo": {
+		"rules": {
+			"ava/no-ignored-test-files": "off"
+		}
 	}
 }

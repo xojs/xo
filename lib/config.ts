@@ -18,10 +18,6 @@ import {
 	allExtensions,
 } from './constants.js';
 
-if (Array.isArray(pluginAva?.configs?.['recommended'])) {
-	throw new TypeError('Invalid eslint-plugin-ava');
-}
-
 if (!configXoTypescript[4]) {
 	throw new Error('Invalid eslint-config-xo-typescript');
 }
@@ -43,6 +39,8 @@ export const config: Linter.Config[] = [
 		name: 'xo/ignores',
 		ignores: defaultIgnores,
 	},
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+	...(pluginAva.configs!['recommended'] as Linter.Config[]),
 	{
 		name: 'xo/base',
 		files: [allFilesGlob],
@@ -50,9 +48,9 @@ export const config: Linter.Config[] = [
 			...fixedUpBasePlugins,
 			...fixedUpTypescriptPlugins,
 			'no-use-extend-native': pluginNoUseExtendNative,
-			// TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
-			ava: fixupPluginRules(pluginAva),
+			ava: pluginAva,
 			unicorn: pluginUnicorn,
+			// TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
 			'import-x': fixupPluginRules(pluginImport),
 			n: fixupPluginRules(pluginN),
 			'@eslint-community/eslint-comments': fixupPluginRules(pluginComments),
@@ -91,7 +89,6 @@ export const config: Linter.Config[] = [
 		These are the base rules that are always applied to all js and ts file types
 		*/
 		rules: {
-			...pluginAva?.configs?.['recommended']?.rules,
 			...pluginUnicorn.configs?.recommended?.rules,
 			'no-use-extend-native/no-use-extend-native': 'error',
 			// TODO: Remove this override at some point.
