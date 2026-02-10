@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
+import process from 'node:process';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import dedent from 'dedent';
 import {Xo} from '../../lib/xo.js';
@@ -162,4 +164,25 @@ test('flat config > ts > space', async t => {
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
 	t.is(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
 	t.is(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
+});
+
+test('realpath normalizes cwd', async t => {
+	if (process.platform === 'win32') {
+		t.pass();
+		return;
+	}
+
+	const realCwd = t.context.cwd;
+	const symlinkParent = await fs.mkdtemp(path.join(os.tmpdir(), 'xo-symlink-'));
+	const symlinkPath = path.join(symlinkParent, 'project');
+
+	try {
+		await fs.symlink(realCwd, symlinkPath, 'dir');
+		const xo = new Xo({cwd: symlinkPath});
+		const expected = await fs.realpath(symlinkPath);
+		t.is(xo.linterOptions.cwd, expected);
+	} finally {
+		await fs.rm(symlinkPath, {recursive: true, force: true});
+		await fs.rm(symlinkParent, {recursive: true, force: true});
+	}
 });
