@@ -1,4 +1,6 @@
 import path from 'node:path';
+import {realpathSync} from 'node:fs';
+import process from 'node:process';
 import micromatch from 'micromatch';
 import {type Linter} from 'eslint';
 import arrify from 'arrify';
@@ -181,3 +183,28 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 		tsFilesIgnoresGlob,
 	};
 };
+
+
+const flipCase = (value: string): string => value.replaceAll(/[A-Za-z]/g, character => (character >= 'a' && character <= 'z' ? character.toUpperCase() : character.toLowerCase()));
+
+export const isPathCaseInsensitive = (directory: string): boolean => {
+	try {
+		const absoluteDirectory = path.resolve(directory);
+		const parentDirectory = path.dirname(absoluteDirectory);
+		const baseDirectoryName = path.basename(absoluteDirectory);
+		const alternateCasedDirectoryName = flipCase(baseDirectoryName);
+
+		if (alternateCasedDirectoryName === baseDirectoryName) {
+			return false;
+		}
+
+		const canonicalPath = realpathSync.native(absoluteDirectory);
+		const alternateCanonicalPath = realpathSync.native(path.join(parentDirectory, alternateCasedDirectoryName));
+
+		return canonicalPath === alternateCanonicalPath;
+	} catch {
+		return false;
+	}
+};
+
+export const isFileSystemCaseInsensitive = (): boolean => isPathCaseInsensitive(process.cwd());

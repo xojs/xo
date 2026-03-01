@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
+import {isFileSystemCaseInsensitive} from '../lib/utils.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
 const test = _test as TestFn<{cwd: string}>; // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion
@@ -186,4 +187,18 @@ test('empty configs are filtered', t => {
 	]);
 
 	t.deepEqual(flatConfig.at(-2), {name: 'test-ignores', ignores: ['**/test']});
+});
+
+
+test('auto-configures import resolver case sensitivity', t => {
+	const flatConfig = xoToEslintConfig([{}]);
+	const baseConfig = flatConfig.find(config => config.name === 'xo/base');
+	const resolver = baseConfig?.settings?.['import-x/resolver'] as {
+		node: {
+			extensions: string[];
+			caseSensitive: boolean;
+		};
+	};
+
+	t.is(resolver.node.caseSensitive, !isFileSystemCaseInsensitive());
 });
