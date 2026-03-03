@@ -68,12 +68,15 @@ test('config with rules', t => {
 test('with prettier option', t => {
 	const flatConfig = xoToEslintConfig([{prettier: true}]);
 
-	const prettierConfigJs = flatConfig.find(config =>
+	const prettierPluginConfig = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object');
 
-	t.truthy(prettierConfigJs);
+	t.truthy(prettierPluginConfig);
 
-	t.deepEqual(prettierConfigJs?.rules?.['prettier/prettier'], [
+	const prettierRuleConfig = flatConfig.find(config =>
+		config?.rules?.['prettier/prettier'] !== undefined);
+
+	t.deepEqual(prettierRuleConfig?.rules?.['prettier/prettier'], [
 		'error',
 		{
 			bracketSameLine: false,
@@ -103,12 +106,15 @@ test('with prettier option compat', t => {
 test('with prettier option and space', t => {
 	const flatConfig = xoToEslintConfig([{prettier: true, space: true}]);
 
-	const prettierConfigJs = flatConfig.find(config =>
+	const prettierPluginConfig = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object');
 
-	t.truthy(prettierConfigJs);
+	t.truthy(prettierPluginConfig);
 
-	t.deepEqual(prettierConfigJs?.rules?.['prettier/prettier'], [
+	const prettierRuleConfig = flatConfig.find(config =>
+		config?.rules?.['prettier/prettier'] !== undefined);
+
+	t.deepEqual(prettierRuleConfig?.rules?.['prettier/prettier'], [
 		'error',
 		{
 			bracketSameLine: false,
@@ -134,6 +140,80 @@ test('with react option', t => {
 	t.true(reactPlugin instanceof Object);
 	t.true(reactHooksPlugin instanceof Object);
 	t.is(flatConfig.at(-1)?.rules?.['react/no-danger'], 'error');
+});
+
+test('react hooks config works with react option', t => {
+	const userReactHooksPlugin = {rules: {}};
+
+	const flatConfig = xoToEslintConfig([
+		{react: true},
+		{
+			plugins: {'react-hooks': userReactHooksPlugin},
+			rules: {
+				'react-hooks/rules-of-hooks': 'error',
+			},
+		},
+	]);
+
+	const reactHooksPlugins = flatConfig.filter(config =>
+		typeof config?.plugins?.['react-hooks'] === 'object');
+
+	t.is(reactHooksPlugins.length, 1);
+	t.is(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
+	t.is(flatConfig.at(-1)?.rules?.['react-hooks/rules-of-hooks'], 'error');
+});
+
+test('user plugin overrides win regardless of order', t => {
+	const userReactHooksPlugin = {rules: {}};
+
+	const flatConfig = xoToEslintConfig([
+		{
+			plugins: {'react-hooks': userReactHooksPlugin},
+		},
+		{react: true},
+	]);
+
+	const reactHooksPlugins = flatConfig.filter(config =>
+		typeof config?.plugins?.['react-hooks'] === 'object');
+
+	t.is(reactHooksPlugins.length, 1);
+	t.is(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
+});
+
+test('all plugins are consolidated into a single config entry', t => {
+	const flatConfig = xoToEslintConfig([{react: true, prettier: true}]);
+
+	const pluginConfigs = flatConfig.filter(config => config.plugins && Object.keys(config.plugins).length > 0);
+
+	t.is(pluginConfigs.length, 1);
+	t.is(pluginConfigs[0]?.name, 'xo/plugins');
+	t.truthy(pluginConfigs[0]?.plugins?.['react']);
+	t.truthy(pluginConfigs[0]?.plugins?.['react-hooks']);
+	t.truthy(pluginConfigs[0]?.plugins?.['prettier']);
+});
+
+test('non-js/ts plugin is hoisted without affecting file-scoped rules', t => {
+	const jsonPlugin = {rules: {'no-duplicate-keys': {create: () => ({})}}};
+
+	const flatConfig = xoToEslintConfig([
+		{
+			plugins: {json: jsonPlugin},
+			files: ['**/*.json'],
+			rules: {
+				'json/no-duplicate-keys': 'error',
+			},
+		},
+	]);
+
+	// Plugin should be hoisted into the single plugins entry
+	const pluginConfigs = flatConfig.filter(config => config.plugins && Object.keys(config.plugins).length > 0);
+	t.is(pluginConfigs.length, 1);
+	t.is(pluginConfigs[0]?.plugins?.['json'], jsonPlugin);
+
+	// The rule should still be scoped to the correct files
+	const jsonRuleConfig = flatConfig.find(config =>
+		config?.rules?.['json/no-duplicate-keys'] !== undefined);
+	t.deepEqual(jsonRuleConfig?.files, ['**/*.json']);
 });
 
 test('supports files config option as a string', t => {

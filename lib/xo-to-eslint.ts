@@ -14,11 +14,69 @@ export type CreateConfigOptions = {
 	prettierOptions?: Options;
 };
 
+type Plugins = NonNullable<Linter.Config['plugins']>;
+type Plugin = Plugins[string];
+
+/**
+Merge all plugins from every config into a single config entry at the start of the array, ensuring user-provided plugins take precedence. This avoids ESLint's flat config rejecting duplicate plugin names.
+*/
+const hoistPlugins = (configs: Linter.Config[], userPluginOverrides: Map<string, Plugin>): Linter.Config[] => {
+	const plugins: Linter.Config['plugins'] = {};
+	const configsWithoutPlugins: Linter.Config[] = [];
+
+	for (const configItem of configs) {
+		const {plugins: configPlugins} = configItem;
+
+		if (!configPlugins) {
+			configsWithoutPlugins.push(configItem);
+			continue;
+		}
+
+		// ESLint flat config rejects duplicate plugin names, so merge all plugins into one config.
+		Object.assign(plugins, configPlugins);
+
+		const {plugins: _ignored, ...configWithoutPlugins} = configItem;
+
+		if (Object.keys(configWithoutPlugins).length > 0) {
+			configsWithoutPlugins.push(configWithoutPlugins);
+		}
+	}
+
+	for (const [pluginName, plugin] of userPluginOverrides) {
+		plugins[pluginName] = plugin;
+	}
+
+	if (Object.keys(plugins).length === 0) {
+		return configsWithoutPlugins;
+	}
+
+	return [
+		{
+			name: 'xo/plugins',
+			plugins,
+		},
+		...configsWithoutPlugins,
+	];
+};
+
 /**
 Takes a XO flat config and returns an ESlint flat config.
 */
 export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {prettierOptions = {}}: CreateConfigOptions = {}): Linter.Config[] {
 	const baseConfig = [...config];
+	const userPluginOverrides = new Map<string, Plugin>();
+
+	for (const xoConfigItem of flatXoConfig ?? []) {
+		const {plugins} = xoConfigItem;
+
+		if (!plugins) {
+			continue;
+		}
+
+		for (const [pluginName, plugin] of Object.entries(plugins)) {
+			userPluginOverrides.set(pluginName, plugin);
+		}
+	}
 
 	/**
 	Since configs are merged and the last config takes precedence this means we need to handle both true AND false cases for each option. For example, we need to turn `prettier`, `space`, `semi`, etc. on or off for a specific file.
@@ -139,7 +197,8 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		baseConfig.push(eslintConfigItem);
 	}
 
-	return baseConfig;
+	// User plugins should always win, even if XO injects plugins later in the config list.
+	return hoistPlugins(baseConfig, userPluginOverrides);
 }
 
 export default xoToEslintConfig;
