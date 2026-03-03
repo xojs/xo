@@ -25,14 +25,11 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 			searchPlaces: [
 				'package.json',
 				`${moduleName}.config.js`,
-				`${moduleName}.config.cjs`,
 				`${moduleName}.config.mjs`,
 				`${moduleName}.config.ts`,
-				`${moduleName}.config.cts`,
 				`${moduleName}.config.mts`,
 			],
 			loaders: {
-				'.cts': defaultLoaders['.ts'], // eslint-disable-line @typescript-eslint/naming-convention
 				'.mts': defaultLoaders['.ts'], // eslint-disable-line @typescript-eslint/naming-convention
 			},
 			stopDir: stopDirectory,
