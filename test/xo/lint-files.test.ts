@@ -166,6 +166,21 @@ test('flat config > ts > space', async t => {
 	t.is(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
 });
 
+test('lints dotfiles', async t => {
+	await fs.writeFile(path.join(t.context.cwd, '.foo.js'), dedent`console.log('hello')\n`, 'utf8');
+	const {results} = await new Xo({cwd: t.context.cwd}).lintFiles();
+	t.is(results.length, 1);
+	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+});
+
+test('lints dotfiles in subdirectories', async t => {
+	await fs.mkdir(path.join(t.context.cwd, '.config'), {recursive: true});
+	await fs.writeFile(path.join(t.context.cwd, '.config', 'test.js'), dedent`console.log('hello')\n`, 'utf8');
+	const {results} = await new Xo({cwd: t.context.cwd}).lintFiles();
+	t.is(results.length, 1);
+	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+});
+
 test('normalize cwd path casing', async t => {
 	const temporaryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'xo-cwd-case-'));
 	const canonicalDirectory = path.join(temporaryDirectory, 'project');

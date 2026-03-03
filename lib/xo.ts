@@ -383,6 +383,7 @@ export class Xo {
 			onlyFiles: true,
 			gitignore: true,
 			absolute: true,
+			dot: true,
 			cwd: this.linterOptions.cwd,
 		});
 
