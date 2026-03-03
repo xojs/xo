@@ -46,7 +46,7 @@ npm install xo --save-dev
 
 *You must install XO locally. You can run it directly with `$ npx xo`.*
 
-*For framework-specific linting, see [Vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo), [Svelte](https://github.com/sveltejs/eslint-plugin-svelte), and [Astro](#astro).*
+*For framework-specific linting, see [Astro](#astro), [Svelte](#svelte), and [Vue](#vue).*
 
 ## Usage
 
@@ -219,6 +219,46 @@ import astroPlugin from 'eslint-plugin-astro';
 
 const xoConfig = [
 	...astroPlugin.configs.recommended,
+];
+
+export default xoConfig;
+```
+
+### Svelte
+
+To lint [Svelte](https://svelte.dev) files, install [`eslint-plugin-svelte`](https://github.com/sveltejs/eslint-plugin-svelte):
+
+```sh
+npm install --save-dev eslint-plugin-svelte
+```
+
+Then spread its recommended config in your `xo.config.js`:
+
+```js
+import sveltePlugin from 'eslint-plugin-svelte';
+
+const xoConfig = [
+	...sveltePlugin.configs.recommended,
+];
+
+export default xoConfig;
+```
+
+### Vue
+
+To lint [Vue](https://vuejs.org) files, install [`eslint-plugin-vue`](https://github.com/vuejs/eslint-plugin-vue):
+
+```sh
+npm install --save-dev eslint-plugin-vue
+```
+
+Then spread its recommended config in your `xo.config.js`:
+
+```js
+import vuePlugin from 'eslint-plugin-vue';
+
+const xoConfig = [
+	...vuePlugin.configs['flat/recommended'],
 ];
 
 export default xoConfig;

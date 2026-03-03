@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
+import micromatch from 'micromatch';
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
+import {frameworkExtensions} from '../lib/constants.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
 const test = _test as TestFn<{cwd: string}>; // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion
@@ -186,4 +188,22 @@ test('empty configs are filtered', t => {
 	]);
 
 	t.deepEqual(flatConfig.at(-2), {name: 'test-ignores', ignores: ['**/test']});
+});
+
+test('base config applies to framework file types', t => {
+	const flatConfig = xoToEslintConfig(undefined);
+	const baseConfig = flatConfig.find(config => config.name === 'xo/base');
+	const filesGlob = baseConfig?.files?.[0];
+
+	if (typeof filesGlob !== 'string') {
+		t.fail('expected xo/base files[0] to be a string glob');
+		return;
+	}
+
+	for (const extension of frameworkExtensions) {
+		t.true(
+			micromatch.isMatch(`test.${extension}`, filesGlob),
+			`base config should match .${extension} files`,
+		);
+	}
 });
