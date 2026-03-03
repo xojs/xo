@@ -20,16 +20,18 @@ test('no config > js > semi', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 	const {results} = await new Xo({cwd: t.context.cwd}).lintFiles('**/*');
-	t.is(results?.[0]?.messages.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	t.is(lintResult?.messages.length, 1);
+	t.is(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('no config > ts > semi', async t => {
 	const filePath = path.join(t.context.cwd, 'test.ts');
 	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 	const {results} = await new Xo({cwd: t.context.cwd}).lintFiles('**/*');
-	t.is(results?.[0]?.messages?.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	t.is(lintResult?.messages?.length, 1);
+	t.is(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('flat config > js > semi', async t => {

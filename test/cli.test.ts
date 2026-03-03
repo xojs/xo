@@ -127,7 +127,7 @@ test('xo --print-config relative path', async t => {
 
 test('xo --print-config no path', async t => {
 	const {stderr}: ExecaError = await t.throwsAsync($`node ./dist/cli --cwd ${t.context.cwd} --print-config`);
-	t.is('The `--print-config` flag must be used with exactly one filename', stderr?.toString() ?? '');
+	t.is(stderr?.toString() ?? '', 'The `--print-config` flag must be used with exactly one filename');
 });
 
 test('xo --ignore', async t => {
@@ -281,28 +281,28 @@ test('xo lints ts files implicitly excluded from tsconfig.json with rootDir', as
 
 // For some reason, this test fails on CI but not locally on my mac
 // the following test is identical with a dot file and it passes CI for some unknown reason
-test.skip('ts rules properly split to avoid errors with cjs files when no options.files is set', async t => {
-	// Write the test.cjs file
-	const filePath = path.join(t.context.cwd, 'whatever.cjs');
-	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+// test.skip('ts rules properly split to avoid errors with cjs files when no options.files is set', async t => {
+// 	// Write the test.cjs file
+// 	const filePath = path.join(t.context.cwd, 'whatever.cjs');
+// 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 
-	// Write and xo config file with ts rules
-	const xoConfigPath = path.join(t.context.cwd, 'xo.config.js');
-	const xoConfig = dedent`
-		export default [
-			{ ignores: "xo.config.js" },
-			{
-				rules: {
-					'@typescript-eslint/no-unused-vars': 'error',
-				}
-			}
-		]
-	`;
+// 	// Write and xo config file with ts rules
+// 	const xoConfigPath = path.join(t.context.cwd, 'xo.config.js');
+// 	const xoConfig = dedent`
+// 		export default [
+// 			{ ignores: "xo.config.js" },
+// 			{
+// 				rules: {
+// 					'@typescript-eslint/no-unused-vars': 'error',
+// 				}
+// 			}
+// 		]
+// 	`;
 
-	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
+// 	await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
-});
+// 	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
+// });
 
 test('applies type aware lint rules to .lintstagedrc.cjs', async t => {
 	// Write the test.cjs file

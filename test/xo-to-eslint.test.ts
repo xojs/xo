@@ -225,7 +225,7 @@ test('supports files config option as a string', t => {
 test('no files config option remains undefined', t => {
 	const flatConfig = xoToEslintConfig([{files: undefined, space: true}]);
 
-	t.deepEqual(flatConfig.at(-1)?.files, undefined);
+	t.is(flatConfig.at(-1)?.files, undefined);
 });
 
 test('prettier rules are applied after react rules', t => {
