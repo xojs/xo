@@ -46,7 +46,7 @@ npm install xo --save-dev
 
 *You must install XO locally. You can run it directly with `$ npx xo`.*
 
-*You'll need [eslint-config-xo-vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo) for specific linting in a Vue app.*
+*For framework-specific linting, see [Vue](https://github.com/ChocPanda/eslint-config-xo-vue#use-with-xo), [Svelte](https://github.com/sveltejs/eslint-plugin-svelte), and [Astro](#astro).*
 
 ## Usage
 
@@ -203,6 +203,26 @@ Type: `boolean`\
 Default: `false`
 
 Adds `eslint-plugin-react`, `eslint-plugin-react-hooks`, and `eslint-config-xo-react` to get all the React best practices applied automatically.
+
+### Astro
+
+To lint [Astro](https://astro.build) files, install [`eslint-plugin-astro`](https://github.com/ota-meshi/eslint-plugin-astro):
+
+```sh
+npm install --save-dev eslint-plugin-astro
+```
+
+Then spread its recommended config in your `xo.config.js`:
+
+```js
+import astroPlugin from 'eslint-plugin-astro';
+
+const xoConfig = [
+	...astroPlugin.configs.recommended,
+];
+
+export default xoConfig;
+```
 
 ## TypeScript
 
