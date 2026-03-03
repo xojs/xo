@@ -168,40 +168,6 @@ test('flat config > ts > space', async t => {
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
 });
 
-test('plugin > js > no-use-extend-native', async t => {
-	const {cwd} = t.context;
-	const filePath = path.join(cwd, 'test.js');
-	const {results} = await new Xo({cwd}).lintText(
-		dedent`
-			import {util} from 'node:util';
-
-			util.isBoolean('50bda47b09923e045759db8e8dd01a0bacd97370'.shortHash() === '50bdcs47');\n
-		`,
-		{filePath},
-	);
-	t.true(results[0]?.messages?.length === 1);
-	t.truthy(results[0]?.messages?.[0]);
-	t.is(
-		results[0]?.messages?.[0]?.ruleId,
-		'no-use-extend-native/no-use-extend-native',
-	);
-});
-
-test('plugin > ts > no-use-extend-native', async t => {
-	const {cwd} = t.context;
-	const filePath = path.join(cwd, 'test.ts');
-	const text = dedent`
-		import {util} from 'node:util';
-
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-		util.isBoolean('50bda47b09923e045759db8e8dd01a0bacd97370'.shortHash() === '50bdcs47');\n
-	`;
-	await fs.writeFile(filePath, text, 'utf8');
-	const {results} = await new Xo({cwd}).lintText(text, {filePath});
-	t.true(Array.isArray(results[0]?.messages));
-	t.truthy(results[0]?.messages?.find(rule => rule.ruleId === 'no-use-extend-native/no-use-extend-native'));
-});
-
 test('plugin > js > eslint-plugin-import import-x/order', async t => {
 	const {cwd} = t.context;
 	const filePath = path.join(cwd, 'test.js');

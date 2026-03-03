@@ -3,11 +3,10 @@ import pluginUnicorn from 'eslint-plugin-unicorn';
 import pluginImport from 'eslint-plugin-import-x';
 import pluginN from 'eslint-plugin-n';
 import pluginComments from '@eslint-community/eslint-plugin-eslint-comments';
-import pluginPromise from 'eslint-plugin-promise';
-import pluginNoUseExtendNative from 'eslint-plugin-no-use-extend-native';
+/// import pluginPromise from 'eslint-plugin-promise';
 import configXoTypescript from 'eslint-config-xo-typescript';
 import globals from 'globals';
-import {type Linter} from 'eslint';
+import {type ESLint, type Linter} from 'eslint';
 import {fixupPluginRules} from '@eslint/compat';
 import {
 	defaultIgnores,
@@ -17,6 +16,7 @@ import {
 	jsExtensions,
 	allExtensions,
 } from './constants.js';
+import noUseExtendNativeRule from './rules/no-use-extend-native.js';
 
 if (!configXoTypescript[4]) {
 	throw new Error('Invalid eslint-config-xo-typescript');
@@ -26,6 +26,12 @@ const baseLanguageOptions = configXoTypescript[0]?.languageOptions as Linter.Lan
 const baseParserOptions = baseLanguageOptions?.parserOptions ?? {};
 const typescriptLanguageOptions = (configXoTypescript[4]?.languageOptions ?? {}) as Linter.LanguageOptions;
 const typescriptParserOptions = typescriptLanguageOptions.parserOptions ?? {};
+
+const pluginNoUseExtendNative: ESLint.Plugin = {
+	rules: {
+		'no-use-extend-native': noUseExtendNativeRule,
+	},
+};
 
 // TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
 const fixedUpBasePlugins = Object.fromEntries(Object.entries(configXoTypescript[0]?.plugins ?? {}).map(([key, plugin]) => [key, fixupPluginRules(plugin)]));
@@ -50,11 +56,11 @@ export const config: Linter.Config[] = [
 			'no-use-extend-native': pluginNoUseExtendNative,
 			ava: pluginAva,
 			unicorn: pluginUnicorn,
+			'import-x': pluginImport,
+			'@eslint-community/eslint-comments': pluginComments,
 			// TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
-			'import-x': fixupPluginRules(pluginImport),
 			n: fixupPluginRules(pluginN),
-			'@eslint-community/eslint-comments': fixupPluginRules(pluginComments),
-			promise: fixupPluginRules(pluginPromise),
+			/// promise: fixupPluginRules(pluginPromise),
 		},
 		languageOptions: {
 			globals: {
@@ -222,23 +228,24 @@ export const config: Linter.Config[] = [
 			'unicorn/no-useless-undefined': 'off',
 			// TODO: Temporarily disabled as the rule is buggy.
 			'function-call-argument-newline': 'off',
-			'promise/param-names': 'error',
-			'promise/no-return-wrap': [
-				'error',
-				{
-					allowReject: true,
-				},
-			],
-			'promise/no-new-statics': 'error',
-			'promise/no-return-in-finally': 'error',
-			'promise/prefer-await-to-then': [
-				'error',
-				{
-					strict: true,
-				},
-			],
-			'promise/prefer-catch': 'error',
-			'promise/valid-params': 'error',
+			// Commented out because it's not ready for ESLint 10.
+			// 'promise/param-names': 'error',
+			// 'promise/no-return-wrap': [
+			// 	'error',
+			// 	{
+			// 		allowReject: true,
+			// 	},
+			// ],
+			// 'promise/no-new-statics': 'error',
+			// 'promise/no-return-in-finally': 'error',
+			// 'promise/prefer-await-to-then': [
+			// 	'error',
+			// 	{
+			// 		strict: true,
+			// 	},
+			// ],
+			// 'promise/prefer-catch': 'error',
+			// 'promise/valid-params': 'error',
 			'import-x/default': 'error',
 			'import-x/export': 'error',
 			'import-x/extensions': [

@@ -296,8 +296,7 @@ test('base config applies to framework file types', t => {
 	const filesGlob = baseConfig?.files?.[0];
 
 	if (typeof filesGlob !== 'string') {
-		t.fail('expected xo/base files[0] to be a string glob');
-		return;
+		throw new TypeError('expected xo/base files[0] to be a string glob');
 	}
 
 	for (const extension of frameworkExtensions) {
