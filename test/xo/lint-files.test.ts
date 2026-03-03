@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+import {realpathSync} from 'node:fs';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import dedent from 'dedent';
@@ -162,4 +164,26 @@ test('flat config > ts > space', async t => {
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
 	t.is(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
 	t.is(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
+});
+
+test('normalize cwd path casing', async t => {
+	const temporaryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'xo-cwd-case-'));
+	const canonicalDirectory = path.join(temporaryDirectory, 'project');
+	const mismatchedCaseDirectory = path.join(temporaryDirectory, 'PrOjEcT');
+
+	try {
+		await fs.mkdir(canonicalDirectory);
+
+		try {
+			await fs.stat(mismatchedCaseDirectory);
+		} catch {
+			t.pass();
+			return;
+		}
+
+		const xo = new Xo({cwd: mismatchedCaseDirectory});
+		t.is(xo.linterOptions.cwd, realpathSync.native(mismatchedCaseDirectory));
+	} finally {
+		await fs.rm(temporaryDirectory, {recursive: true, force: true});
+	}
 });

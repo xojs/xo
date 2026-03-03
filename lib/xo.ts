@@ -1,6 +1,7 @@
 import path from 'node:path';
 import os from 'node:os';
 import fs from 'node:fs/promises';
+import {realpathSync} from 'node:fs';
 import process from 'node:process';
 import {ESLint, type Linter} from 'eslint';
 import findCacheDirectory from 'find-cache-directory';
@@ -183,6 +184,12 @@ export class Xo {
 		// Fix relative cwd paths
 		if (!path.isAbsolute(this.linterOptions.cwd)) {
 			this.linterOptions.cwd = path.resolve(process.cwd(), this.linterOptions.cwd);
+		}
+
+		try {
+			this.linterOptions.cwd = realpathSync.native(this.linterOptions.cwd);
+		} catch {
+			// Ignore invalid paths here; the caller will handle errors later.
 		}
 
 		const backupCacheLocation = path.join(os.tmpdir(), cacheDirName);
