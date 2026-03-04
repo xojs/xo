@@ -568,3 +568,16 @@ test('config with custom plugin', async t => {
 	t.is(results[0]?.messages[0]?.ruleId, 'test-plugin/test-rule');
 	t.is(results[0]?.messages[0]?.message, 'Custom error');
 });
+
+test('rulesMeta is included in lint results', async t => {
+	const {cwd} = t.context;
+	const filePath = path.join(cwd, 'test.js');
+	const {rulesMeta, results} = await new Xo({cwd}).lintText(
+		dedent`console.log('hello')\n`,
+		{filePath},
+	);
+	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	t.truthy(rulesMeta);
+	t.truthy(rulesMeta['@stylistic/semi']);
+	t.is(rulesMeta['@stylistic/semi']?.type, 'layout');
+});
