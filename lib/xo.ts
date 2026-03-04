@@ -356,6 +356,7 @@ export class Xo {
 			warnIgnored: false,
 			cache: true,
 			cacheLocation: this.cacheLocation,
+			cacheStrategy: 'content',
 			fix: this.linterOptions.fix,
 		};
 
