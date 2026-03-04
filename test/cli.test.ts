@@ -1168,3 +1168,12 @@ test('prettier validation detects semicolon conflicts', async t => {
 	const error = await t.throwsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
 	t.true(error.message.includes('semicolon'));
 });
+
+test('xo does not hang when node_modules is missing', async t => {
+	const cwd = path.join(t.context.cwd, 'no-modules');
+	await fs.mkdir(cwd, {recursive: true});
+	await fs.writeFile(path.join(cwd, 'package.json'), '{}', 'utf8');
+	await fs.writeFile(path.join(cwd, 'test.js'), 'console.log(\'hello\');\n', 'utf8');
+
+	await t.notThrowsAsync($({timeout: 10_000})`node ./dist/cli --cwd ${cwd}`);
+});
