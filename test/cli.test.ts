@@ -6,6 +6,7 @@ import dedent from 'dedent';
 import {$, type ExecaError} from 'execa';
 import {pathExists} from 'path-exists';
 import {type TsConfigJson} from 'get-tsconfig';
+import {ignoredFileWarningMessage} from '../lib/xo.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
 const test = _test as TestFn<{cwd: string}>;
@@ -23,6 +24,13 @@ test('xo --cwd', async t => {
 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 
 	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd}`);
+});
+
+test('xo warns when explicit file is ignored', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+	const {stdout} = await $`node ./dist/cli --cwd ${t.context.cwd} --ignore="test.js" test.js`;
+	t.true(stdout.includes(ignoredFileWarningMessage));
 });
 
 test('xo --fix', async t => {
@@ -1175,5 +1183,5 @@ test('xo does not hang when node_modules is missing', async t => {
 	await fs.writeFile(path.join(cwd, 'package.json'), '{}', 'utf8');
 	await fs.writeFile(path.join(cwd, 'test.js'), 'console.log(\'hello\');\n', 'utf8');
 
-	await t.notThrowsAsync($({timeout: 10_000})`node ./dist/cli --cwd ${cwd}`);
+	await t.notThrowsAsync($`node ./dist/cli --cwd ${cwd}`);
 });

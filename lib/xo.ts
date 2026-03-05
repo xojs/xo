@@ -1,11 +1,11 @@
 import path from 'node:path';
 import os from 'node:os';
+import syncFs from 'node:fs';
 import fs from 'node:fs/promises';
-import {realpathSync} from 'node:fs';
 import process from 'node:process';
 import {ESLint, type Linter} from 'eslint';
 import findCacheDirectory from 'find-cache-directory';
-import {globby} from 'globby';
+import {globby, isDynamicPattern} from 'globby';
 import arrify from 'arrify';
 import defineLazyProperty from 'define-lazy-prop';
 import prettier from 'prettier';
@@ -27,13 +27,69 @@ import {
 import {xoToEslintConfig} from './xo-to-eslint.js';
 import resolveXoConfig from './resolve-config.js';
 import {handleTsconfig} from './handle-ts-files.js';
-import {matchFilesForTsConfig, preProcessXoConfig, typescriptParser} from './utils.js';
+import {
+	matchFilesForTsConfig,
+	preProcessXoConfig,
+	typescriptParser,
+} from './utils.js';
 
 type TypeScriptParserOptions = Linter.ParserOptions & {
 	project?: string | string[] | boolean;
 	projectService?: boolean;
 	tsconfigRootDir?: string;
 	programs?: unknown[];
+};
+
+export const ignoredFileWarningMessage = 'File ignored because of a matching ignore pattern.';
+
+const createIgnoredLintResult = (filePath: string): ESLint.LintResult => ({
+	filePath,
+	messages: [
+		{
+			ruleId: null,
+			severity: 1,
+			message: ignoredFileWarningMessage,
+			line: 0,
+			column: 0,
+		},
+	],
+	suppressedMessages: [],
+	errorCount: 0,
+	fatalErrorCount: 0,
+	warningCount: 1,
+	fixableErrorCount: 0,
+	fixableWarningCount: 0,
+	usedDeprecatedRules: [],
+});
+
+const resolveExplicitFilePath = (cwd: string, glob: string): string | undefined => {
+	if (isDynamicPattern(glob)) {
+		// Negated and wildcard globs are treated as regular glob filtering, not as explicit file paths that should trigger an ignored-file warning.
+		return undefined;
+	}
+
+	const absolutePath = path.resolve(cwd, glob);
+
+	try {
+		if (syncFs.statSync(absolutePath).isFile()) {
+			return absolutePath;
+		}
+	} catch {
+		// File does not exist or is inaccessible.
+	}
+
+	return undefined;
+};
+
+const getIgnoredExplicitFileResults = async (cwd: string, globs: string[], eslint: ESLint): Promise<ESLint.LintResult[]> => {
+	const explicitFilePaths = [...new Set(globs
+		.map(glob => resolveExplicitFilePath(cwd, glob))
+		.filter(filePath => filePath !== undefined))];
+
+	const results = await Promise.all(explicitFilePaths.map(async filePath =>
+		await eslint.isPathIgnored(filePath) ? createIgnoredLintResult(filePath) : undefined));
+
+	return results.filter(result => result !== undefined);
 };
 
 export class Xo {
@@ -187,7 +243,7 @@ export class Xo {
 		}
 
 		try {
-			this.linterOptions.cwd = realpathSync.native(this.linterOptions.cwd);
+			this.linterOptions.cwd = syncFs.realpathSync.native(this.linterOptions.cwd);
 		} catch {
 			// Ignore invalid paths here; the caller will handle errors later.
 		}
@@ -394,15 +450,19 @@ export class Xo {
 			throw new Error('Failed to initialize ESLint');
 		}
 
+		const {eslint} = this;
+		const ignoredResults = await getIgnoredExplicitFileResults(this.linterOptions.cwd, globs, eslint);
+
 		if (files.length === 0) {
-			return this.processReport([]);
+			return this.processReport(ignoredResults);
 		}
 
-		const results = await this.eslint.lintFiles(files);
+		const results = await eslint.lintFiles(files);
 
-		const rulesMeta = this.eslint.getRulesMetaForResults(results);
+		const rulesMeta = eslint.getRulesMetaForResults(results);
 
-		return this.processReport(results, {rulesMeta});
+		// No overlap: `warnIgnored: false` makes ESLint silently drop ignored files from `results`.
+		return this.processReport([...results, ...ignoredResults], {rulesMeta});
 	}
 
 	/**

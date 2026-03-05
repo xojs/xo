@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import dedent from 'dedent';
-import {Xo} from '../../lib/xo.js';
+import {Xo, ignoredFileWarningMessage} from '../../lib/xo.js';
 import {copyTestProject} from '../helpers/copy-test-project.js';
 
 const test = _test as TestFn<{cwd: string}>;
@@ -179,6 +179,109 @@ test('lints dotfiles in subdirectories', async t => {
 	const {results} = await new Xo({cwd: t.context.cwd}).lintFiles();
 	t.is(results.length, 1);
 	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+});
+
+test('quiet mode suppresses ignored-file warning', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd, quiet: true}, {ignores: ['test.js']});
+	const {results, warningCount} = await xo.lintFiles('test.js');
+	t.is(results.length, 0);
+	t.is(warningCount, 0);
+});
+
+test('warns when explicit file is ignored by config', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['test.js']});
+	const {results, warningCount} = await xo.lintFiles('test.js');
+	t.is(results.length, 1);
+	t.is(warningCount, 1);
+	t.is(results[0]?.messages[0]?.message, ignoredFileWarningMessage);
+});
+
+test('warns when explicit file is ignored by resolved flat config', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['test.js'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results, warningCount} = await xo.lintFiles('test.js');
+	t.is(results.length, 1);
+	t.is(warningCount, 1);
+	t.is(results[0]?.messages[0]?.message, ignoredFileWarningMessage);
+});
+
+test('scoped ignores in config do not remove files from linting', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				rules: {
+					'no-console': 'off',
+				},
+				ignores: ['test.js'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results, warningCount} = await xo.lintFiles('test.js');
+	t.is(results.length, 1);
+	t.is(warningCount, 0);
+	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated global ignore patterns keep explicitly unignored files linted', async t => {
+	const filePath = path.join(t.context.cwd, 'keep.js');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['*.js', '!keep.js'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results, warningCount} = await xo.lintFiles('keep.js');
+	t.is(results.length, 1);
+	t.is(warningCount, 0);
+	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('no warning for nonexistent explicit file', async t => {
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results} = await xo.lintFiles('nonexistent.js');
+	t.is(results.length, 0);
+});
+
+test('no warning for glob pattern when all files are ignored', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['test.js']});
+	const {results} = await xo.lintFiles('*.js');
+	t.is(results.length, 0);
+});
+
+test('mixed explicit files: some ignored, some not', async t => {
+	const fileA = path.join(t.context.cwd, 'a.js');
+	const fileB = path.join(t.context.cwd, 'b.js');
+	await fs.writeFile(fileA, dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(fileB, dedent`console.log('hello');\n`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['b.js']});
+	const {results} = await xo.lintFiles(['a.js', 'b.js']);
+	t.is(results.length, 2);
+	const linted = results.find(r => r.filePath === fileA);
+	const ignored = results.find(r => r.filePath === fileB);
+	t.truthy(linted);
+	t.is(linted!.messages.length, 0);
+	t.truthy(ignored);
+	t.is(ignored!.messages[0]?.message, ignoredFileWarningMessage);
 });
 
 test('normalize cwd path casing', async t => {
