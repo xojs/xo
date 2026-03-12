@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+import process from 'node:process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
@@ -29,7 +30,8 @@ test('xo --cwd', async t => {
 test('xo warns when explicit file is ignored', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
-	const {stdout} = await $`node ./dist/cli --cwd ${t.context.cwd} --ignore="test.js" test.js`;
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	const {stdout} = await $({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${t.context.cwd} --ignore="test.js" test.js`;
 	t.true(stdout.includes(ignoredFileWarningMessage));
 });
 

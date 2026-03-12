@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
+import {type Linter} from 'eslint';
 import micromatch from 'micromatch';
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {frameworkExtensions} from '../lib/constants.js';
@@ -268,6 +269,25 @@ test('empty configs are filtered', t => {
 	]);
 
 	t.deepEqual(flatConfig.at(-2), {name: 'test-ignores', ignores: ['**/test']});
+});
+
+test('supports ESLint-native files format with nested arrays', t => {
+	const flatConfig = xoToEslintConfig([{files: ['**/*.svelte', ['**/*.test.*', '**/*.spec.*']]}]);
+
+	t.deepEqual(flatConfig.at(-1)?.files, ['**/*.svelte', ['**/*.test.*', '**/*.spec.*']]);
+});
+
+test('Linter.Config objects are accepted as XoConfigItem', t => {
+	// Simulates spreading an ESLint plugin config (typed as Linter.Config) into XO config
+	const eslintPluginConfig: Linter.Config = {
+		files: ['**/*.svelte'],
+		rules: {'no-console': 'warn'},
+	};
+
+	const flatConfig = xoToEslintConfig([eslintPluginConfig]);
+
+	t.deepEqual(flatConfig.at(-1)?.files, ['**/*.svelte']);
+	t.is(flatConfig.at(-1)?.rules?.['no-console'], 'warn');
 });
 
 test('base config applies to framework file types', t => {

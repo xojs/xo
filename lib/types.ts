@@ -86,9 +86,11 @@ export type XoConfigItem = Simplify<XoConfigOptions & Omit<Linter.Config, 'files
 	/**
 	An array of glob patterns indicating the files that the configuration object should apply to. If not specified, the configuration object applies to all files.
 
+	Accepts a single glob string, an array of globs, or ESLint's native format where nested arrays create AND patterns.
+
 	@see [Ignore Patterns](https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new#excluding-files-with-ignores)
 	*/
-	files?: string | string[] | undefined;
+	files?: string | Array<string | string[]> | undefined;
 
 	/**
 	An array of glob patterns indicating the files that the configuration object should not apply to. If not specified, the configuration object applies to all files matched by files.

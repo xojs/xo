@@ -136,7 +136,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 				let isAppliedToJsFiles = false;
 
 				if (config.files) {
-					const normalizedFiles = arrify(config.files).map(file => path.normalize(file));
+					const normalizedFiles = arrify(config.files).flat().map(file => path.normalize(file));
 					// Strip the basename off any globs
 					const globs = normalizedFiles.map(file => micromatch.scan(file, {dot: true}).glob).filter(Boolean);
 					// Check if the files globs match a test file with a js extension
@@ -157,7 +157,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 						...config.plugins,
 						...configXoTypescript[1]?.plugins,
 					};
-					tsFilesGlob.push(...arrify(config.files ?? allFilesGlob));
+					tsFilesGlob.push(...arrify(config.files ?? allFilesGlob).flat());
 					tsFilesIgnoresGlob.push(...arrify(config.ignores));
 				}
 			}
@@ -169,7 +169,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 			|| parserOptions?.tsconfigRootDir !== undefined
 			|| parserOptions?.programs !== undefined) {
 			// The glob itself should NOT be negated
-			tsFilesIgnoresGlob.push(...arrify(config.files ?? allFilesGlob));
+			tsFilesIgnoresGlob.push(...arrify(config.files ?? allFilesGlob).flat());
 		}
 
 		processedConfig.push(config);

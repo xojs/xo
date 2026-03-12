@@ -136,16 +136,16 @@ export default [...] satisfies import('xo').FlatXoConfig
 
 ### files
 
-Type: `string | string[] | undefined`\
+Type: `string | (string | string[])[]`\
 Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,vue,svelte,astro}`
 
-A glob or array of glob strings which the config object will apply. By default `XO` will apply the configuration to [all files](lib/constants.ts).
+A glob string, array of globs, or ESLint's native format (where nested arrays create AND patterns) indicating which files the config object applies to. By default `XO` will apply the configuration to [all files](lib/constants.ts). This is compatible with ESLint plugin configs, so you can spread them directly into your XO config.
 
 > Tip: If you are adding additional `@typescript-eslint` rules to your config, these rules will apply to JS files as well unless you separate them appropriately with the `files` option. `@typescript-eslint` rules set to `'off'` or `0`, however, will have no effect on JS linting.
 
 ### ignores
 
-Type: `string[]`
+Type: `string | string[]`
 
 Some [paths](lib/constants.ts) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
 
