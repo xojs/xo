@@ -33,6 +33,8 @@
 	"files": [
 		"dist/lib/*.js",
 		"dist/lib/*.d.ts",
+		"dist/lib/rules/*.js",
+		"dist/lib/rules/*.d.ts",
 		"dist/*.js",
 		"dist/*.d.ts"
 	],
