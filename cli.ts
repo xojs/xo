@@ -20,6 +20,7 @@ const cli = meow(
 
   Options
     --fix             Automagically fix issues
+    --fix-dry-run     Automagically fix issues without saving the changes to the file system
     --reporter        Reporter to use
     --space           Use space indent instead of tabs [Default: 2]
     --config          Path to a XO configuration file
@@ -48,6 +49,10 @@ const cli = meow(
 		booleanDefault: undefined,
 		flags: {
 			fix: {
+				type: 'boolean',
+				default: false,
+			},
+			fixDryRun: {
 				type: 'boolean',
 				default: false,
 			},
@@ -116,7 +121,7 @@ const baseXoConfigOptions: XoConfigOptions = {
 };
 
 const linterOptions: LinterOptions = {
-	fix: cliOptions.fix,
+	fix: cliOptions.fix || cliOptions.fixDryRun,
 	cwd: (cliOptions.cwd && path.resolve(cliOptions.cwd)) ?? process.cwd(),
 	quiet: cliOptions.quiet,
 	ts: true,
@@ -201,7 +206,7 @@ if (cliOptions.stdin) {
 		}
 	}
 
-	if (cliOptions.fix) {
+	if (linterOptions.fix) {
 		const xo = new Xo(linterOptions, baseXoConfigOptions);
 		const {results: [result]} = await xo.lintText(stdin, {
 			filePath: cliOptions.stdinFilename,

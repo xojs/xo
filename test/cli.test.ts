@@ -43,6 +43,15 @@ test('xo --fix', async t => {
 	t.is(fileContent, dedent`console.log('hello');\n`);
 });
 
+test('xo --fix-dry-run', async t => {
+	const filePath = path.join(t.context.cwd, 'test.js');
+	const original = dedent`console.log('hello')\n`;
+	await fs.writeFile(filePath, original, 'utf8');
+	await t.notThrowsAsync($`node ./dist/cli --cwd ${t.context.cwd} --fix-dry-run`);
+	const fileContent = await fs.readFile(filePath, 'utf8');
+	t.is(fileContent, original, 'File should not be modified with --fix-dry-run');
+});
+
 test('xo --fix --space', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 	await fs.writeFile(filePath, dedent`function test() {\n   return true;\n}\n`, 'utf8');
@@ -159,6 +168,11 @@ test('xo --stdin', async t => {
 test('xo --stdin --fix', async t => {
 	const {stdout} = await $`echo ${'const x = true'}`.pipe`node ./dist/cli --cwd=${t.context.cwd} --stdin --fix`;
 	// Not sure what these extra escaped single quotes are
+	t.is(stdout, 'const x = true;');
+});
+
+test('xo --stdin --fix-dry-run', async t => {
+	const {stdout} = await $`echo ${'const x = true'}`.pipe`node ./dist/cli --cwd=${t.context.cwd} --stdin --fix-dry-run`;
 	t.is(stdout, 'const x = true;');
 });
 

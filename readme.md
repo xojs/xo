@@ -58,6 +58,7 @@ $ xo --help
 
 	Options
 		--fix             Automagically fix issues
+		--fix-dry-run     Automagically fix issues without saving the changes to the file system
 		--reporter        Reporter to use
 		--space           Use space indent instead of tabs [Default: 2]
 		--config          Path to a XO configuration file
