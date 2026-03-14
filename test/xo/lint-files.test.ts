@@ -22,16 +22,18 @@ test('no config > js > semi', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 	const {results} = await new Xo({cwd: t.context.cwd}).lintFiles('**/*');
-	t.is(results?.[0]?.messages.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	t.is(lintResult?.messages.length, 1);
+	t.is(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('no config > ts > semi', async t => {
 	const filePath = path.join(t.context.cwd, 'test.ts');
 	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 	const {results} = await new Xo({cwd: t.context.cwd}).lintFiles('**/*');
-	t.is(results?.[0]?.messages?.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	t.is(lintResult?.messages?.length, 1);
+	t.is(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('flat config > js > semi', async t => {
@@ -292,15 +294,10 @@ test('normalize cwd path casing', async t => {
 	try {
 		await fs.mkdir(canonicalDirectory);
 
-		try {
-			await fs.stat(mismatchedCaseDirectory);
-		} catch {
-			t.pass();
-			return;
-		}
-
-		const xo = new Xo({cwd: mismatchedCaseDirectory});
-		t.is(xo.linterOptions.cwd, realpathSync.native(mismatchedCaseDirectory));
+		const mismatchedCaseDirectoryExists = await fs.stat(mismatchedCaseDirectory).then(() => true, () => false);
+		const cwd = mismatchedCaseDirectoryExists ? mismatchedCaseDirectory : canonicalDirectory;
+		const xo = new Xo({cwd});
+		t.is(xo.linterOptions.cwd, realpathSync.native(cwd));
 	} finally {
 		await fs.rm(temporaryDirectory, {recursive: true, force: true});
 	}

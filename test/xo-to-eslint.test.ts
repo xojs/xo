@@ -226,7 +226,7 @@ test('supports files config option as a string', t => {
 test('no files config option remains undefined', t => {
 	const flatConfig = xoToEslintConfig([{files: undefined, space: true}]);
 
-	t.deepEqual(flatConfig.at(-1)?.files, undefined);
+	t.is(flatConfig.at(-1)?.files, undefined);
 });
 
 test('prettier rules are applied after react rules', t => {
@@ -296,8 +296,7 @@ test('base config applies to framework file types', t => {
 	const filesGlob = baseConfig?.files?.[0];
 
 	if (typeof filesGlob !== 'string') {
-		t.fail('expected xo/base files[0] to be a string glob');
-		return;
+		throw new TypeError('expected xo/base files[0] to be a string glob');
 	}
 
 	for (const extension of frameworkExtensions) {

@@ -6,6 +6,7 @@ import configReact from 'eslint-config-xo-react';
 import {type Options} from 'prettier';
 import pluginPrettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import {fixupConfigRules, fixupPluginRules} from '@eslint/compat';
 import {type XoConfigItem} from './types.js';
 import {config} from './config.js';
 import {xoToEslintConfigItem} from './utils.js';
@@ -133,7 +134,8 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 
 		if (xoConfigItem.react) {
 			// Ensure the files applied to the React config are the same as the config they are derived from
-			baseConfig.push({...configReact[0], files: eslintConfigItem.files, name: 'xo/react'});
+			// TODO: Remove `fixupConfigRules` wrapping when eslint-config-xo-react supports ESLint 10 natively.
+			baseConfig.push({...fixupConfigRules(configReact)[0], files: eslintConfigItem.files, name: 'xo/react'});
 		}
 
 		// Prettier should generally be the last config in the array
@@ -142,7 +144,7 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				baseConfig.push({...eslintConfigPrettier, files: eslintConfigItem.files});
 			} else {
 				// Validate that Prettier options match other `xoConfig` options.
-				/* eslint-disable-next-line */
+				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 				if ((xoConfigItem.semicolon && prettierOptions.semi === false) || (!xoConfigItem.semicolon && prettierOptions.semi === true)) {
 					throw new Error(`The Prettier config \`semi\` is ${prettierOptions.semi} while Xo \`semicolon\` is ${xoConfigItem.semicolon}, also check your .editorconfig for inconsistencies.`);
 				}
@@ -156,9 +158,10 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				}
 
 				// Add Prettier plugin
+				// TODO: Remove `fixupPluginRules` wrapping when eslint-plugin-prettier supports ESLint 10 natively.
 				eslintConfigItem.plugins = {
 					...eslintConfigItem.plugins,
-					prettier: pluginPrettier,
+					prettier: fixupPluginRules(pluginPrettier),
 				};
 
 				const prettierConfig = {

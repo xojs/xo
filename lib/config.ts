@@ -3,11 +3,11 @@ import pluginUnicorn from 'eslint-plugin-unicorn';
 import pluginImport from 'eslint-plugin-import-x';
 import pluginN from 'eslint-plugin-n';
 import pluginComments from '@eslint-community/eslint-plugin-eslint-comments';
-import pluginPromise from 'eslint-plugin-promise';
-import pluginNoUseExtendNative from 'eslint-plugin-no-use-extend-native';
+/// import pluginPromise from 'eslint-plugin-promise';
 import configXoTypescript from 'eslint-config-xo-typescript';
 import globals from 'globals';
-import {type Linter} from 'eslint';
+import {type ESLint, type Linter} from 'eslint';
+import {fixupPluginRules} from '@eslint/compat';
 import {
 	defaultIgnores,
 	tsExtensions,
@@ -16,10 +16,7 @@ import {
 	jsExtensions,
 	allExtensions,
 } from './constants.js';
-
-if (Array.isArray(pluginAva?.configs?.['recommended'])) {
-	throw new TypeError('Invalid eslint-plugin-ava');
-}
+import noUseExtendNativeRule from './rules/no-use-extend-native.js';
 
 if (!configXoTypescript[4]) {
 	throw new Error('Invalid eslint-config-xo-typescript');
@@ -30,6 +27,16 @@ const baseParserOptions = baseLanguageOptions?.parserOptions ?? {};
 const typescriptLanguageOptions = (configXoTypescript[4]?.languageOptions ?? {}) as Linter.LanguageOptions;
 const typescriptParserOptions = typescriptLanguageOptions.parserOptions ?? {};
 
+const pluginNoUseExtendNative: ESLint.Plugin = {
+	rules: {
+		'no-use-extend-native': noUseExtendNativeRule,
+	},
+};
+
+// TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
+const fixedUpBasePlugins = Object.fromEntries(Object.entries(configXoTypescript[0]?.plugins ?? {}).map(([key, plugin]) => [key, fixupPluginRules(plugin)]));
+const fixedUpTypescriptPlugins = Object.fromEntries(Object.entries(configXoTypescript[4]?.plugins ?? {}).map(([key, plugin]) => [key, fixupPluginRules(plugin)]));
+
 /**
 The base config that XO builds on top of from user options.
 */
@@ -38,20 +45,22 @@ export const config: Linter.Config[] = [
 		name: 'xo/ignores',
 		ignores: defaultIgnores,
 	},
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+	...(pluginAva.configs!['recommended'] as Linter.Config[]),
 	{
 		name: 'xo/base',
 		files: [allFilesGlob],
 		plugins: {
-			...configXoTypescript[0]?.plugins,
-			// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-			'@typescript-eslint': configXoTypescript[4]?.plugins?.['@typescript-eslint']!,
+			...fixedUpBasePlugins,
+			...fixedUpTypescriptPlugins,
 			'no-use-extend-native': pluginNoUseExtendNative,
 			ava: pluginAva,
 			unicorn: pluginUnicorn,
 			'import-x': pluginImport,
-			n: pluginN,
 			'@eslint-community/eslint-comments': pluginComments,
-			promise: pluginPromise,
+			// TODO: Remove `fixupPluginRules` wrapping when these plugins support ESLint 10 natively.
+			n: fixupPluginRules(pluginN),
+			/// promise: fixupPluginRules(pluginPromise),
 		},
 		languageOptions: {
 			globals: {
@@ -86,7 +95,6 @@ export const config: Linter.Config[] = [
 		These are the base rules that are always applied to all js and ts file types
 		*/
 		rules: {
-			...pluginAva?.configs?.['recommended']?.rules,
 			...pluginUnicorn.configs?.recommended?.rules,
 			'no-use-extend-native/no-use-extend-native': 'error',
 			// TODO: Remove this override at some point.
@@ -220,23 +228,24 @@ export const config: Linter.Config[] = [
 			'unicorn/no-useless-undefined': 'off',
 			// TODO: Temporarily disabled as the rule is buggy.
 			'function-call-argument-newline': 'off',
-			'promise/param-names': 'error',
-			'promise/no-return-wrap': [
-				'error',
-				{
-					allowReject: true,
-				},
-			],
-			'promise/no-new-statics': 'error',
-			'promise/no-return-in-finally': 'error',
-			'promise/prefer-await-to-then': [
-				'error',
-				{
-					strict: true,
-				},
-			],
-			'promise/prefer-catch': 'error',
-			'promise/valid-params': 'error',
+			// Commented out because it's not ready for ESLint 10.
+			// 'promise/param-names': 'error',
+			// 'promise/no-return-wrap': [
+			// 	'error',
+			// 	{
+			// 		allowReject: true,
+			// 	},
+			// ],
+			// 'promise/no-new-statics': 'error',
+			// 'promise/no-return-in-finally': 'error',
+			// 'promise/prefer-await-to-then': [
+			// 	'error',
+			// 	{
+			// 		strict: true,
+			// 	},
+			// ],
+			// 'promise/prefer-catch': 'error',
+			// 'promise/valid-params': 'error',
 			'import-x/default': 'error',
 			'import-x/export': 'error',
 			'import-x/extensions': [
@@ -381,7 +390,7 @@ export const config: Linter.Config[] = [
 	},
 	{
 		name: 'xo/typescript',
-		plugins: configXoTypescript[4]?.plugins, // ['@typescript-eslint'],
+		plugins: fixedUpTypescriptPlugins,
 		files: [tsFilesGlob],
 		languageOptions: {
 			...typescriptLanguageOptions,
