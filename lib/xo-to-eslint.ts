@@ -135,13 +135,13 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		if (xoConfigItem.react) {
 			// Ensure the files applied to the React config are the same as the config they are derived from
 			// TODO: Remove `fixupConfigRules` wrapping when eslint-config-xo-react supports ESLint 10 natively.
-			baseConfig.push({...fixupConfigRules(configReact)[0], files: eslintConfigItem.files, name: 'xo/react'});
+			baseConfig.push({...fixupConfigRules(configReact)[0], ...(eslintConfigItem.files ? {files: eslintConfigItem.files} : {}), name: 'xo/react'});
 		}
 
 		// Prettier should generally be the last config in the array
 		if (xoConfigItem.prettier) {
 			if (xoConfigItem.prettier === 'compat') {
-				baseConfig.push({...eslintConfigPrettier, files: eslintConfigItem.files});
+				baseConfig.push({...eslintConfigPrettier, ...(eslintConfigItem.files ? {files: eslintConfigItem.files} : {})});
 			} else {
 				// Validate that Prettier options match other `xoConfig` options.
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

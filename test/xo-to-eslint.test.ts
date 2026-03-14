@@ -143,6 +143,23 @@ test('with react option', t => {
 	t.is(flatConfig.at(-1)?.rules?.['react/no-danger'], 'error');
 });
 
+test('react option without files does not set files property', t => {
+	const flatConfig = xoToEslintConfig([{react: true}]);
+
+	const reactConfig = flatConfig.find(config => config.name === 'xo/react');
+	t.truthy(reactConfig);
+	t.false('files' in reactConfig!, 'react config should not have a files property when no files are specified');
+});
+
+test('prettier compat option without files does not set files property', t => {
+	const flatConfig = xoToEslintConfig([{prettier: 'compat'}]);
+
+	const compatConfig = flatConfig.find(config =>
+		config?.rules?.['@stylistic/semi'] === 'off');
+	t.truthy(compatConfig);
+	t.false('files' in compatConfig!, 'prettier compat config should not have a files property when no files are specified');
+});
+
 test('react hooks config works with react option', t => {
 	const userReactHooksPlugin = {rules: {}};
 
