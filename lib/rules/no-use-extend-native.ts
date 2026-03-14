@@ -194,7 +194,7 @@ const nativeObjectDefinitions: NativeObjectDefinition[] = [
 	},
 	{
 		typeName: 'RegExp',
-		instance: /./u,
+		instance: /./v,
 		static: RegExp,
 		prototype: RegExp.prototype,
 	},

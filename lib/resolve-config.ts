@@ -42,7 +42,7 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 
 		let {
 			config: flatOptions = [],
-			filepath: flatConfigPath = '',
+			filepath: flatConfigPath = '', // eslint-disable-line @typescript-eslint/no-useless-default-assignment
 		} = await (
 			options.configPath
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -58,6 +58,7 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 			flatConfigPath,
 		};
 	} catch (error) {
+		// eslint-disable-next-line preserve-caught-error
 		throw new AggregateError([error], 'Error resolving XO config, there is likely an issue with your config file. Please check the file for mistakes.');
 	}
 }

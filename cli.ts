@@ -132,7 +132,7 @@ const linterOptions: LinterOptions = {
 if (typeof cliOptions.space === 'string') {
 	cliOptions.space = cliOptions.space.trim();
 
-	if (/^\d+$/u.test(cliOptions.space)) {
+	if (/^\d+$/v.test(cliOptions.space)) {
 		baseXoConfigOptions.space = Number.parseInt(cliOptions.space, 10);
 	} else if (cliOptions.space === 'true') {
 		baseXoConfigOptions.space = true;
