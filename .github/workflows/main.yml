@@ -19,8 +19,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
-      - run: npm test
-      # - uses: codecov/codecov-action@v1
-      #   if: matrix.node-version == 14
-      #   with:
-      #     fail_ci_if_error: true
+      - name: Run tests
+        if: matrix.node-version != 24
+        run: npm test
+      - name: Run tests with coverage
+        if: matrix.node-version == 24
+        run: npm run build && npm run lint && npm run test:setup && npx c8 --reporter=lcov ava
+      - name: Upload coverage to Qlty
+        if: matrix.node-version == 24
+        uses: qltysh/qlty-action/coverage@v2
+        with:
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: coverage/lcov.info
