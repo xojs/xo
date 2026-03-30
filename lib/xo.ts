@@ -172,163 +172,145 @@ export class Xo {
 	/**
 	Required linter options: `cwd`, `fix`, and `filePath` (in case of `lintText`).
 	*/
-	linterOptions: LinterOptions;
-
-	/**
-	Base XO config options that allow configuration from CLI or other sources. Not to be confused with the `xoConfig` property which is the resolved XO config from the flat config AND base config.
-	*/
-	baseXoConfig: XoConfigOptions;
+	_linterOptions: LinterOptions;
 
 	/**
 	File path to the ESLint cache.
 	*/
-	cacheLocation: string;
-
-	/**
-	A re-usable ESLint instance configured with options calculated from the XO config.
-	*/
-	eslint?: ESLint;
+	_cacheLocation: string;
 
 	/**
 	XO config derived from both the base config and the resolved flat config.
 	*/
-	xoConfig?: XoConfigItem[];
+	_xoConfig?: XoConfigItem[];
+
+	/**
+	Base XO config options that allow configuration from CLI or other sources. Not to be confused with the `xoConfig` property which is the resolved XO config from the flat config AND base config.
+	*/
+	readonly #baseXoConfig: XoConfigOptions;
+
+	/**
+	A re-usable ESLint instance configured with options calculated from the XO config.
+	*/
+	#eslint?: ESLint;
 
 	/**
 	The ESLint config calculated from the resolved XO config.
 	*/
-	eslintConfig?: Linter.Config[];
-
-	/**
-	The flat XO config path, if there is one.
-	*/
-	flatConfigPath?: string | undefined;
-
-	/**
-	If any user configs contain Prettier, we will need to fetch the Prettier config.
-	*/
-	prettier?: boolean;
+	#eslintConfig?: Linter.Config[];
 
 	/**
 	The Prettier config if it exists and is needed.
 	*/
-	prettierConfig?: prettier.Options;
+	#prettierConfig?: prettier.Options;
 
 	/**
 	The glob pattern for TypeScript files, for which we will handle TS files and tsconfig.
 
 	We expand this based on the XO config and the files glob patterns.
 	*/
-	tsFilesGlob: string[] = [tsFilesGlob];
+	readonly #tsFilesGlob: string[] = [tsFilesGlob];
 
 	/**
 	We use this to also add negative glob patterns in case a user overrides the parserOptions in their XO config.
 	*/
-	tsFilesIgnoresGlob: string[] = [];
+	readonly #tsFilesIgnoresGlob: string[] = [];
 
 	/**
 	Track whether ignores have been added to prevent duplicate ignore configs.
 	*/
-	private ignoresHandled = false;
+	#ignoresHandled = false;
 
 	/**
 	Store per-file configs separately from base config to prevent unbounded array growth.
 	Key: file path, Value: config for that file.
 	This prevents memory bloat in long-running processes (e.g., language servers).
 	*/
-	private readonly fileConfigs = new Map<string, XoConfigItem>();
+	readonly #fileConfigs = new Map<string, XoConfigItem>();
 
 	/**
 	Track virtual/stdin files that share a single tsconfig.stdin.json.
 	These are handled differently from regular files.
 	*/
-	private readonly virtualFiles = new Set<string>();
+	readonly #virtualFiles = new Set<string>();
 
 	constructor(_linterOptions: LinterOptions, _baseXoConfig: XoConfigOptions = {}) {
-		this.linterOptions = _linterOptions;
-		this.baseXoConfig = _baseXoConfig;
+		this._linterOptions = _linterOptions;
+		this.#baseXoConfig = _baseXoConfig;
 
 		// Fix relative cwd paths
-		if (!path.isAbsolute(this.linterOptions.cwd)) {
-			this.linterOptions.cwd = path.resolve(process.cwd(), this.linterOptions.cwd);
+		if (!path.isAbsolute(this._linterOptions.cwd)) {
+			this._linterOptions.cwd = path.resolve(process.cwd(), this._linterOptions.cwd);
 		}
 
 		try {
-			this.linterOptions.cwd = syncFs.realpathSync.native(this.linterOptions.cwd);
+			this._linterOptions.cwd = syncFs.realpathSync.native(this._linterOptions.cwd);
 		} catch {
 			// Ignore invalid paths here; the caller will handle errors later.
 		}
 
 		const backupCacheLocation = path.join(os.tmpdir(), cacheDirName);
 
-		this.cacheLocation = findCacheDirectory({name: cacheDirName, cwd: this.linterOptions.cwd}) ?? backupCacheLocation;
+		this._cacheLocation = findCacheDirectory({name: cacheDirName, cwd: this._linterOptions.cwd}) ?? backupCacheLocation;
 	}
 
 	/**
 	Sets the XO config on the XO instance.
-
-	@private
 	*/
 	async setXoConfig() {
-		if (this.xoConfig) {
+		if (this._xoConfig) {
 			return;
 		}
 
 		const {flatOptions, flatConfigPath} = await resolveXoConfig({
-			...this.linterOptions,
+			...this._linterOptions,
 		});
 
 		const {config: xoConfig, tsFilesGlob: tsGlob, tsFilesIgnoresGlob} = preProcessXoConfig([
-			this.baseXoConfig,
+			this.#baseXoConfig,
 			...flatOptions,
 		]);
 
-		this.xoConfig = xoConfig;
-		this.tsFilesGlob.push(...tsGlob);
-		this.tsFilesIgnoresGlob.push(...tsFilesIgnoresGlob);
-		this.prettier = this.xoConfig.some(xoConfigItem => xoConfigItem.prettier);
-		this.prettierConfig = await prettier.resolveConfig(flatConfigPath, {editorconfig: true}) ?? {};
-		this.flatConfigPath = flatConfigPath;
+		this._xoConfig = xoConfig;
+		this.#tsFilesGlob.push(...tsGlob);
+		this.#tsFilesIgnoresGlob.push(...tsFilesIgnoresGlob);
+		this.#prettierConfig = await prettier.resolveConfig(flatConfigPath, {editorconfig: true}) ?? {};
 	}
 
 	/**
 	Sets the ESLint config on the XO instance.
-
-	@private
 	*/
 	setEslintConfig() {
-		if (!this.xoConfig) {
+		if (!this._xoConfig) {
 			throw new Error('"Xo.setEslintConfig" failed');
 		}
 
 		// Combine base config with per-file configs from Map
 		// Deduplicate configs since multiple files can share the same config object
-		const uniqueFileConfigs = [...new Set(this.fileConfigs.values())];
-		const allConfigs = [...this.xoConfig, ...uniqueFileConfigs];
+		const uniqueFileConfigs = [...new Set(this.#fileConfigs.values())];
+		const allConfigs = [...this._xoConfig, ...uniqueFileConfigs];
 
 		// Always regenerate to support instance reuse with new files
-		this.eslintConfig = xoToEslintConfig(allConfigs, {prettierOptions: this.prettierConfig});
+		this.#eslintConfig = xoToEslintConfig(allConfigs, {prettierOptions: this.#prettierConfig});
 	}
 
 	/**
 	Sets the ignores on the XO instance.
-
-	@private
 	*/
 	setIgnores() {
-		if (this.ignoresHandled || !this.baseXoConfig.ignores) {
+		if (this.#ignoresHandled || !this.#baseXoConfig.ignores) {
 			return;
 		}
 
 		let ignores: string[] = [];
 
-		if (typeof this.baseXoConfig.ignores === 'string') {
-			ignores = arrify(this.baseXoConfig.ignores);
-		} else if (Array.isArray(this.baseXoConfig.ignores)) {
-			ignores = this.baseXoConfig.ignores;
+		if (typeof this.#baseXoConfig.ignores === 'string') {
+			ignores = arrify(this.#baseXoConfig.ignores);
+		} else if (Array.isArray(this.#baseXoConfig.ignores)) {
+			ignores = this.#baseXoConfig.ignores;
 		}
 
-		if (!this.xoConfig) {
+		if (!this._xoConfig) {
 			throw new Error('"Xo.setIgnores" failed');
 		}
 
@@ -336,26 +318,24 @@ export class Xo {
 			return;
 		}
 
-		this.xoConfig.push({ignores});
-		this.ignoresHandled = true;
+		this._xoConfig.push({ignores});
+		this.#ignoresHandled = true;
 	}
 
 	/**
 	Ensures the cache directory exists. This needs to run once before both tsconfig handling and running ESLint occur.
-
-	@private
 	*/
 	async ensureCacheDirectory() {
 		try {
-			const cacheStats = await fs.stat(this.cacheLocation);
+			const cacheStats = await fs.stat(this._cacheLocation);
 			// If file, re-create as directory
 			if (cacheStats.isFile()) {
-				await fs.rm(this.cacheLocation, {recursive: true, force: true});
-				await fs.mkdir(this.cacheLocation, {recursive: true});
+				await fs.rm(this._cacheLocation, {recursive: true, force: true});
+				await fs.mkdir(this._cacheLocation, {recursive: true});
 			}
 		} catch {
 			// If not exists, create the directory
-			await fs.mkdir(this.cacheLocation, {recursive: true});
+			await fs.mkdir(this._cacheLocation, {recursive: true});
 		}
 	}
 
@@ -365,17 +345,17 @@ export class Xo {
 	@param files - The TypeScript files being linted.
 	*/
 	async handleUnincludedTsFiles(files?: string[]): Promise<void> {
-		if (!this.linterOptions.ts || !files || files.length === 0) {
+		if (!this._linterOptions.ts || !files || files.length === 0) {
 			return;
 		}
 
 		// Get ALL TypeScript files being linted (both new and previously handled)
-		const allTsFiles = matchFilesForTsConfig(this.linterOptions.cwd, files, this.tsFilesGlob, this.tsFilesIgnoresGlob);
+		const allTsFiles = matchFilesForTsConfig(this._linterOptions.cwd, files, this.#tsFilesGlob, this.#tsFilesIgnoresGlob);
 
 		if (allTsFiles.length === 0) {
-			this.fileConfigs.clear();
+			this.#fileConfigs.clear();
 
-			if (this.virtualFiles.size > 0) {
+			if (this.#virtualFiles.size > 0) {
 				await this.addVirtualFilesToConfig([]);
 			}
 
@@ -384,11 +364,11 @@ export class Xo {
 
 		const {program, existingFiles, virtualFiles} = handleTsconfig({
 			files: allTsFiles,
-			cwd: this.linterOptions.cwd,
-			cacheLocation: this.cacheLocation,
+			cwd: this._linterOptions.cwd,
+			cacheLocation: this._cacheLocation,
 		});
 
-		this.fileConfigs.clear();
+		this.#fileConfigs.clear();
 
 		if (existingFiles.length > 0) {
 			this.addExistingFilesToConfig(existingFiles, program);
@@ -411,27 +391,27 @@ export class Xo {
 
 		this.setEslintConfig();
 
-		if (!this.xoConfig) {
+		if (!this._xoConfig) {
 			throw new Error('"Xo.initEslint" failed');
 		}
 
 		const eslintOptions: ESLint.Options = {
-			cwd: this.linterOptions.cwd,
-			overrideConfig: this.eslintConfig,
+			cwd: this._linterOptions.cwd,
+			overrideConfig: this.#eslintConfig,
 			overrideConfigFile: true,
 			globInputPaths: false,
 			warnIgnored: false,
 			cache: true,
-			cacheLocation: this.cacheLocation,
+			cacheLocation: this._cacheLocation,
 			cacheStrategy: 'content',
-			fix: this.linterOptions.fix,
+			fix: this._linterOptions.fix,
 			applySuppressions: true,
-			suppressionsLocation: this.linterOptions.suppressionsLocation,
+			suppressionsLocation: this._linterOptions.suppressionsLocation,
 		};
 
 		// Always create new instance to support reuse with updated config
 		// ESLint's file-based cache (cacheLocation) persists across instances
-		this.eslint = new ESLint(eslintOptions);
+		this.#eslint = new ESLint(eslintOptions);
 	}
 
 	/**
@@ -453,17 +433,17 @@ export class Xo {
 		const hasExplicitFilePaths = globs.some(glob => !isDynamicPattern(glob));
 
 		const files: string | string[] = await globby(globs, {
-			ignore: [...defaultIgnores, ...arrify(this.baseXoConfig.ignores)],
+			ignore: [...defaultIgnores, ...arrify(this.#baseXoConfig.ignores)],
 			onlyFiles: true,
 			gitignore: true,
 			globalGitignore: true,
 			absolute: true,
 			dot: true,
-			cwd: this.linterOptions.cwd,
+			cwd: this._linterOptions.cwd,
 		});
 
-		if (this.linterOptions.suppressionsLocation) {
-			const suppressionsFilePath = path.resolve(this.linterOptions.cwd, this.linterOptions.suppressionsLocation);
+		if (this._linterOptions.suppressionsLocation) {
+			const suppressionsFilePath = path.resolve(this._linterOptions.cwd, this._linterOptions.suppressionsLocation);
 
 			if (!syncFs.existsSync(suppressionsFilePath)) {
 				throw createErrorWithExitCode(suppressionsFileMissingErrorMessage, 2);
@@ -472,12 +452,12 @@ export class Xo {
 
 		await this.initEslint(files);
 
-		if (!this.eslint) {
+		if (!this.#eslint) {
 			throw new Error('Failed to initialize ESLint');
 		}
 
-		const {eslint} = this;
-		const ignoredResults = await getIgnoredExplicitFileResults(this.linterOptions.cwd, globs, eslint);
+		const eslint = this.#eslint;
+		const ignoredResults = await getIgnoredExplicitFileResults(this._linterOptions.cwd, globs, eslint);
 
 		if (files.length === 0) {
 			if (hasExplicitFilePaths && ignoredResults.length === 0) {
@@ -504,8 +484,8 @@ export class Xo {
 	): Promise<XoLintResult> {
 		const {filePath, warnIgnored} = lintTextOptions;
 
-		if (this.linterOptions.suppressionsLocation) {
-			const suppressionsFilePath = path.resolve(this.linterOptions.cwd, this.linterOptions.suppressionsLocation);
+		if (this._linterOptions.suppressionsLocation) {
+			const suppressionsFilePath = path.resolve(this._linterOptions.cwd, this._linterOptions.suppressionsLocation);
 
 			if (!syncFs.existsSync(suppressionsFilePath)) {
 				throw createErrorWithExitCode(suppressionsFileMissingErrorMessage, 2);
@@ -514,16 +494,16 @@ export class Xo {
 
 		await this.initEslint([filePath]);
 
-		if (!this.eslint) {
+		if (!this.#eslint) {
 			throw new Error('Failed to initialize ESLint');
 		}
 
-		const results = await this.eslint?.lintText(code, {
+		const results = await this.#eslint?.lintText(code, {
 			filePath,
 			warnIgnored,
 		});
 
-		const rulesMeta = this.eslint.getRulesMetaForResults(results ?? []);
+		const rulesMeta = this.#eslint.getRulesMetaForResults(results ?? []);
 
 		return this.processReport(results ?? [], {rulesMeta});
 	}
@@ -531,37 +511,37 @@ export class Xo {
 	async calculateConfigForFile(filePath: string): Promise<Linter.Config> {
 		await this.initEslint([filePath]);
 
-		if (!this.eslint) {
+		if (!this.#eslint) {
 			throw new Error('Failed to initialize ESLint');
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-		return this.eslint.calculateConfigForFile(filePath) as Promise<Linter.Config>;
+		return this.#eslint.calculateConfigForFile(filePath) as Promise<Linter.Config>;
 	}
 
 	async getFormatter(name: string) {
 		await this.initEslint();
 
-		if (!this.eslint) {
+		if (!this.#eslint) {
 			throw new Error('Failed to initialize ESLint');
 		}
 
-		return this.eslint.loadFormatter(name);
+		return this.#eslint.loadFormatter(name);
 	}
 
 	/**
 	Add virtual files to the config with a tsconfig approach.
 	*/
 	private async addVirtualFilesToConfig(files: string[]): Promise<void> {
-		if (!this.xoConfig) {
+		if (!this._xoConfig) {
 			return;
 		}
 
 		try {
 			const nextVirtualFiles = new Set(files);
 
-			const tsconfigPath = path.join(this.cacheLocation, 'tsconfig.stdin.json');
-			const configIndex = this.xoConfig.findIndex(configItem => {
+			const tsconfigPath = path.join(this._cacheLocation, 'tsconfig.stdin.json');
+			const configIndex = this._xoConfig.findIndex(configItem => {
 				const {languageOptions} = configItem;
 				const parserOptionsCandidate = (languageOptions as Linter.LanguageOptions | undefined)?.parserOptions;
 				const parserOptions = parserOptionsCandidate as TypeScriptParserOptions | undefined;
@@ -570,7 +550,7 @@ export class Xo {
 
 			if (nextVirtualFiles.size > 0) {
 				const filesArray = [...nextVirtualFiles];
-				const relativeFiles = filesArray.map(file => path.relative(this.linterOptions.cwd, file));
+				const relativeFiles = filesArray.map(file => path.relative(this._linterOptions.cwd, file));
 
 				const tsconfigContent = {
 					compilerOptions: {
@@ -589,9 +569,9 @@ export class Xo {
 					const parserOptions: TypeScriptParserOptions = {
 						projectService: false,
 						project: tsconfigPath,
-						tsconfigRootDir: this.linterOptions.cwd,
+						tsconfigRootDir: this._linterOptions.cwd,
 					};
-					this.xoConfig.push({
+					this._xoConfig.push({
 						files: relativeFiles,
 						languageOptions: {
 							parser: typescriptParser,
@@ -599,26 +579,26 @@ export class Xo {
 						},
 					});
 				} else {
-					const existingConfig = this.xoConfig[configIndex];
-					this.xoConfig[configIndex] = {
+					const existingConfig = this._xoConfig[configIndex];
+					this._xoConfig[configIndex] = {
 						...existingConfig,
 						files: relativeFiles,
 					};
 				}
 
-				this.virtualFiles.clear();
+				this.#virtualFiles.clear();
 				for (const file of nextVirtualFiles) {
-					this.virtualFiles.add(file);
+					this.#virtualFiles.add(file);
 				}
 
 				return;
 			}
 
 			if (configIndex >= 0) {
-				this.xoConfig.splice(configIndex, 1);
+				this._xoConfig.splice(configIndex, 1);
 			}
 
-			this.virtualFiles.clear();
+			this.#virtualFiles.clear();
 
 			await fs.rm(tsconfigPath, {force: true});
 		} catch (error) {
@@ -630,7 +610,7 @@ export class Xo {
 	Add existing files to the config with an in-memory TypeScript Program.
 	*/
 	private addExistingFilesToConfig(files: string[], program?: ts.Program): void {
-		if (!this.xoConfig || files.length === 0) {
+		if (!this._xoConfig || files.length === 0) {
 			return;
 		}
 
@@ -644,7 +624,7 @@ export class Xo {
 		}
 
 		const config: XoConfigItem = {
-			files: files.map(file => path.relative(this.linterOptions.cwd, file)),
+			files: files.map(file => path.relative(this._linterOptions.cwd, file)),
 			languageOptions: {
 				parser: typescriptParser,
 				parserOptions,
@@ -656,7 +636,7 @@ export class Xo {
 		// The config is immutable after creation, so sharing is safe.
 		// Deduplication happens in setEslintConfig() via Set to avoid duplicate configs in the final array.
 		for (const file of files) {
-			this.fileConfigs.set(file, config);
+			this.#fileConfigs.set(file, config);
 		}
 	}
 
@@ -664,7 +644,7 @@ export class Xo {
 		report: ESLint.LintResult[],
 		{rulesMeta = {}} = {},
 	): XoLintResult {
-		if (this.linterOptions.quiet) {
+		if (this._linterOptions.quiet) {
 			report = ESLint.getErrorResults(report);
 		}
 

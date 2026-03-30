@@ -314,7 +314,7 @@ test('normalize cwd path casing', async t => {
 		const mismatchedCaseDirectoryExists = await fs.stat(mismatchedCaseDirectory).then(() => true, () => false);
 		const cwd = mismatchedCaseDirectoryExists ? mismatchedCaseDirectory : canonicalDirectory;
 		const xo = new Xo({cwd});
-		t.is(xo.linterOptions.cwd, realpathSync.native(cwd));
+		t.is(xo._linterOptions.cwd, realpathSync.native(cwd));
 	} finally {
 		await fs.rm(temporaryDirectory, {recursive: true, force: true});
 	}

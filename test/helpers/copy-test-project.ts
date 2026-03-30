@@ -7,7 +7,7 @@ import {pathExists} from 'path-exists';
 /**
 Copies the test project in the temp directory to a new directory.
 
-@returns {string} The path to the copied test project.
+@returns The path to the copied test project.
 */
 export const copyTestProject = async () => {
 	if (!(await pathExists(tempDir))) {

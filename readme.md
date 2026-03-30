@@ -50,7 +50,7 @@ npm install xo --save-dev
 
 ## Usage
 
-```
+```console
 $ xo --help
 
 	Usage
@@ -91,7 +91,7 @@ $ xo --help
 
 ## Default code style
 
-*Any of these can be [overridden](#rules) if necessary.*
+*Any of these can be [overridden](#shareable-configs) if necessary.*
 
 - Tab indentation *[(or space)](#space)*
 - Semicolons *[(or not)](#semicolon)*
@@ -358,15 +358,15 @@ xo --suppressions-location config/suppressions.json
 
 ## FAQ
 
-#### What does XO mean?
+### What does XO mean?
 
 It means [hugs and kisses](https://en.wiktionary.org/wiki/xoxo).
 
-#### Why not Standard?
+### Why not Standard?
 
 The [Standard style](https://standardjs.com) is a really cool idea. I too wish we could have one style to rule them all! But the reality is that the JS community is just too diverse and opinionated to create *one* code style. They also made the mistake of pushing their own style instead of the most popular one. In contrast, XO is more pragmatic and has no aspiration of being *the* style. My goal with XO is to make it simple to enforce consistent code style with close to no config. XO comes with my code style preference by default, as I mainly made it for myself, but everything is configurable.
 
-#### Why not ESLint?
+### Why not ESLint?
 
 XO is based on ESLint. This project started out as just a shareable ESLint config, but it quickly grew out of that. I wanted something even simpler. Just typing `xo` and be done. No decision-making. No config. I also have some exciting future plans for it. However, you can still get most of the XO benefits while using ESLint directly with the [ESLint shareable config](https://github.com/xojs/eslint-config-xo).
 
@@ -425,14 +425,3 @@ Large badge: [![XO code style](https://shields.io/badge/code_style-5ed9c7?style=
 Or [customize the badge](https://github.com/xojs/xo/issues/689#issuecomment-1253127616).
 
 You can also find some nice dynamic XO badges on [badgen.net](https://badgen.net/#xo).
-
-## Team
-
-- [Sindre Sorhus](https://github.com/sindresorhus)
-
-###### Former
-
-- [James Talmage](https://github.com/jamestalmage)
-- [Michael Mayer](https://github.com/schnittstabil)
-- [Mario Nebl](https://github.com/marionebl)
-- [Pierre Vanduynslager](https://github.com/pvdlg)

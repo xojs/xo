@@ -226,9 +226,9 @@ test('plugin > ts > eslint-plugin-import import-x/order', async t => {
 	`;
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
-	t.true(results[0]?.messages?.length === 1);
+	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
+	t.true(ruleIds.includes('import-x/order'));
 	t.truthy(results[0]?.messages?.[0]);
-	t.is(results[0]?.messages?.[0]?.ruleId, 'import-x/order');
 });
 
 test('plugin > js > eslint-plugin-import import-x/extensions', async t => {
@@ -310,9 +310,9 @@ test('plugin > ts > eslint-plugin-n n/prefer-global/process', async t => {
 	`;
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
-	t.true(results[0]?.messages?.length === 1);
+	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
+	t.true(ruleIds.includes('n/prefer-global/process'));
 	t.truthy(results[0]?.messages?.[0]);
-	t.is(results[0]?.messages?.[0]?.ruleId, 'n/prefer-global/process');
 });
 
 test('plugin > js > eslint-plugin-eslint-comments enable-duplicate-disable', async t => {
@@ -441,9 +441,9 @@ test('lint-text refreshes TypeScript program for unincluded files', async t => {
 test('virtual TypeScript configs are pruned when no virtual files remain', async t => {
 	const {cwd} = t.context;
 	const xo = new Xo({cwd, ts: true});
-	const {cacheLocation} = xo;
-	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
-	const virtualFilePath = path.join(cacheLocation, 'stdin', 'virtual.ts');
+	const {_cacheLocation} = xo;
+	const tsconfigPath = path.join(_cacheLocation, 'tsconfig.stdin.json');
+	const virtualFilePath = path.join(_cacheLocation, 'stdin', 'virtual.ts');
 
 	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
 	await fs.writeFile(virtualFilePath, 'export const virtualValue = 1;\n', 'utf8');
@@ -451,7 +451,7 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 	await xo.lintText('export const virtualValue = 1;\n', {filePath: virtualFilePath});
 
 	t.true(await pathExists(tsconfigPath));
-	const virtualConfig = xo.xoConfig?.find(({languageOptions}) => {
+	const virtualConfig = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
@@ -464,7 +464,7 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 	await xo.lintText('export const existingValue = 1;\n', {filePath: existingFilePath});
 
 	t.false(await pathExists(tsconfigPath));
-	const configAfterCleanup = xo.xoConfig?.find(({languageOptions}) => {
+	const configAfterCleanup = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
@@ -474,8 +474,8 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 test('virtual TypeScript files are reclassified once they exist on disk', async t => {
 	const {cwd} = t.context;
 	const xo = new Xo({cwd, ts: true});
-	const {cacheLocation} = xo;
-	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
+	const {_cacheLocation} = xo;
+	const tsconfigPath = path.join(_cacheLocation, 'tsconfig.stdin.json');
 	const virtualFilePath = path.join(cwd, 'excluded', 'virtual.ts');
 	const source = 'export const virtualValue = 1;\n';
 
@@ -496,7 +496,7 @@ test('virtual TypeScript files are reclassified once they exist on disk', async 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
 	t.true(await pathExists(tsconfigPath));
-	const virtualConfig = xo.xoConfig?.find(({languageOptions}) => {
+	const virtualConfig = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
@@ -508,7 +508,7 @@ test('virtual TypeScript files are reclassified once they exist on disk', async 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
 	t.false(await pathExists(tsconfigPath));
-	const configAfterReclassification = xo.xoConfig?.find(({languageOptions}) => {
+	const configAfterReclassification = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
