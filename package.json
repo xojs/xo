@@ -18,7 +18,7 @@
 	},
 	"sideEffects": false,
 	"engines": {
-		"node": ">=20.19"
+		"node": ">=22"
 	},
 	"scripts": {
 		"build": "npm run clean && tsc",
@@ -67,10 +67,10 @@
 		"typescript"
 	],
 	"dependencies": {
-		"@eslint/compat": "^2.0.2",
+		"@eslint/compat": "^2.0.3",
 		"@sindresorhus/tsconfig": "^8.1.0",
 		"arrify": "^3.0.0",
-		"cosmiconfig": "^9.0.0",
+		"cosmiconfig": "^9.0.1",
 		"define-lazy-prop": "^3.0.0",
 		"eslint": "^10.1.0",
 		"eslint-config-prettier": "^10.1.8",
@@ -80,22 +80,22 @@
 		"eslint-plugin-prettier": "^5.5.5",
 		"find-cache-directory": "^6.0.0",
 		"get-stdin": "^10.0.0",
-		"get-tsconfig": "^4.13.6",
+		"get-tsconfig": "^4.13.7",
 		"globby": "^16.2.0",
-		"jiti": "^2.2.0",
+		"jiti": "^2.6.1",
 		"meow": "^14.1.0",
 		"micromatch": "^4.0.8",
 		"open-editor": "^6.0.0",
 		"path-exists": "^5.0.0",
 		"prettier": "^3.8.1",
-		"type-fest": "^5.4.3",
+		"type-fest": "^5.5.0",
 		"typescript": "^6.0.2"
 	},
 	"devDependencies": {
-		"@types/node": "^25.2.1",
-		"@types/micromatch": "^4.0.8",
+		"@types/node": "^25.5.0",
+		"@types/micromatch": "^4.0.10",
 		"ava": "^7.0.0",
-		"dedent": "^1.7.1",
+		"dedent": "^1.7.2",
 		"eslint-plugin-vue": "^10.8.0",
 		"execa": "^9.6.1",
 		"husky": "^9.1.7",

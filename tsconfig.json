@@ -2,6 +2,12 @@
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
 		"outDir": "dist",
+		"lib": [
+			"DOM",
+			"DOM.Iterable",
+			"ES2023",
+			"ES2025.Iterator"
+		],
 		"resolveJsonModule": true,
 		"sourceMap": true
 	},

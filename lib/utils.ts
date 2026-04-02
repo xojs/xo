@@ -93,11 +93,8 @@ Validate an XO config array for legacy ESLint config properties that are not sup
 @param xoConfig - The flat XO config to validate.
 */
 export const validateXoConfig = (xoConfig: XoConfigItem[]): void => {
-	for (const [index, config] of xoConfig.entries()) {
-		if (index === 0) {
-			continue; // Skip internal base config prepended by XO
-		}
-
+	// Skip the first item (internal base config prepended by XO)
+	for (const config of xoConfig.values().drop(1)) {
 		for (const key of Object.keys(config)) {
 			const hint = legacyPropertyHints[key];
 			if (hint) {
@@ -122,17 +119,12 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 	const tsFilesGlob: string[] = [];
 	const tsFilesIgnoresGlob: string[] = [];
 
-	const processedConfig: XoConfigItem[] = [];
+	// The first config item is the internal base config; push it through unmodified.
+	const processedConfig: XoConfigItem[] = xoConfig[0] ? [{...xoConfig[0]}] : [];
 
-	for (const [idx, {...config}] of xoConfig.entries()) {
+	for (const {...config} of xoConfig.values().drop(1)) {
 		const languageOptions = config.languageOptions as Linter.LanguageOptions | undefined;
 		const parserOptions = languageOptions?.parserOptions as TypeScriptParserOptions | undefined;
-
-		// We can skip the first config item, as it is the base config item.
-		if (idx === 0) {
-			processedConfig.push(config);
-			continue;
-		}
 
 		// Use TS parser/plugin for JS files if the config contains TypeScript rules which are applied to JS files.
 		// typescript-eslint rules set to "off" are ignored and not applied to JS files.
