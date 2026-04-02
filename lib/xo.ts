@@ -701,7 +701,7 @@ export class Xo {
 			});
 
 			if (nextVirtualFiles.size > 0) {
-				const filesArray = [...nextVirtualFiles];
+				const filesArray = nextVirtualFiles.values().toArray();
 				const relativeFiles = filesArray.map(file => path.relative(this._linterOptions.cwd, file));
 
 				const tsconfigContent = {
