@@ -13,8 +13,14 @@
 	"type": "module",
 	"bin": "./dist/cli.js",
 	"exports": {
-		"types": "./dist/index.d.ts",
-		"default": "./dist/index.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./eslint-adapter": {
+			"types": "./dist/lib/eslint-adapter.d.ts",
+			"default": "./dist/lib/eslint-adapter.js"
+		}
 	},
 	"sideEffects": false,
 	"engines": {

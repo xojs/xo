@@ -312,20 +312,16 @@ You can opt out of XO's automatic tsconfig handling by specifying your own `lang
 
 ## Usage as an ESLint Configuration
 
-With the introduction of the ESLint flat config, many of the original goals of `xo` were brought into the ESLint core, and shareable configs with plugins became possible. Although we highly recommend the use of the `xo` cli, we understand that some teams need to rely on ESLint directly.
+If you want to use ESLint directly without the `xo` CLI, use [`eslint-config-xo`](https://github.com/xojs/eslint-config-xo).
 
-For these purposes, you can still get most of the features of `xo` by using our ESLint configuration helpers.
+### ESLint adapter
 
-### xoToEslintConfig
-
-The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic Prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will, however, handle all of these details for you.
+If you already use the `xo` CLI and want your editor's ESLint integration to match exactly, use the `xo/eslint-adapter` subpath export. It automatically reads your `xo.config.js` and converts it to an ESLint flat config.
 
 `eslint.config.js`
 
 ```js
-import xo from 'xo';
-
-export default xo.xoToEslintConfig([{space: true, prettier: 'compat'}]);
+export {default} from 'xo/eslint-adapter';
 ```
 
 ## Tips
@@ -360,7 +356,7 @@ When XO finds errors, warnings are automatically hidden to reduce noise and let 
 
 XO automatically respects an [`eslint-suppressions.json`](https://eslint.org/docs/latest/use/suppressions) file if one exists in the working directory. This lets you suppress existing violations while still enforcing rules on new code — useful for incrementally adopting stricter rules in a large codebase.
 
-To generate the suppressions file, create a temporary `eslint.config.js` using [`xoToEslintConfig`](#xotoeslintconfig) and run ESLint with `--suppress-all`:
+To generate the suppressions file, create a temporary `eslint.config.js` using [`xo/eslint-adapter`](#eslint-adapter) and run ESLint with `--suppress-all`:
 
 ```sh
 npx eslint --suppress-all

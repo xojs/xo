@@ -83,6 +83,7 @@ const hoistPlugins = (configs: Linter.Config[], userPluginOverrides: Map<string,
 	];
 };
 
+// TODO: Remove this export if no one complains. Users should use `xo/eslint-adapter` instead.
 /**
 Takes a XO flat config and returns an ESlint flat config.
 */
