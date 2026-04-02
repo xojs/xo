@@ -6,6 +6,7 @@ import process from 'node:process';
 import {ESLint, type Linter} from 'eslint';
 import findCacheDirectory from 'find-cache-directory';
 import {globby, isDynamicPattern} from 'globby';
+import micromatch from 'micromatch';
 import arrify from 'arrify';
 import defineLazyProperty from 'define-lazy-prop';
 import prettier from 'prettier';
@@ -71,6 +72,32 @@ const createIgnoredLintResult = (filePath: string): ESLint.LintResult => ({
 	usedDeprecatedRules: [],
 });
 
+const normalizeGlobPath = (filePath: string): string => filePath.split(path.sep).join('/');
+
+const pathMatchesPattern = (filePath: string, pattern: string): boolean => micromatch.isMatch(normalizeGlobPath(filePath), normalizeGlobPath(pattern), {dot: true});
+
+const isIgnoredByPatterns = (filePath: string, patterns: string[]): boolean => {
+	let ignored = false;
+
+	for (const pattern of patterns) {
+		if (pattern.startsWith('!')) {
+			if (pathMatchesPattern(filePath, pattern.slice(1))) {
+				ignored = false;
+			}
+
+			continue;
+		}
+
+		if (pathMatchesPattern(filePath, pattern)) {
+			ignored = true;
+		}
+	}
+
+	return ignored;
+};
+
+const isIgnoredFile = (cwd: string, filePath: string, patterns: string[]): boolean => isIgnoredByPatterns(path.relative(cwd, filePath), patterns);
+
 const resolveExplicitFilePath = (cwd: string, glob: string): string | undefined => {
 	if (isDynamicPattern(glob)) {
 		// Negated and wildcard globs are treated as regular glob filtering, not as explicit file paths that should trigger an ignored-file warning.
@@ -90,15 +117,137 @@ const resolveExplicitFilePath = (cwd: string, glob: string): string | undefined 
 	return undefined;
 };
 
-const getIgnoredExplicitFileResults = async (cwd: string, globs: string[], eslint: ESLint): Promise<ESLint.LintResult[]> => {
+const getIgnoredExplicitFileResults = async (cwd: string, globs: string[], eslint: ESLint, discoveryIgnores: string[] = []): Promise<ESLint.LintResult[]> => {
 	const explicitFilePaths = [...new Set(globs
 		.map(glob => resolveExplicitFilePath(cwd, glob))
 		.filter(filePath => filePath !== undefined))];
 
-	const results = await Promise.all(explicitFilePaths.map(async filePath =>
-		await eslint.isPathIgnored(filePath) ? createIgnoredLintResult(filePath) : undefined));
+	const results = await Promise.all(explicitFilePaths.map(async filePath => {
+		if (isIgnoredFile(cwd, filePath, discoveryIgnores)) {
+			return createIgnoredLintResult(filePath);
+		}
+
+		return await eslint.isPathIgnored(filePath) ? createIgnoredLintResult(filePath) : undefined;
+	}));
 
 	return results.filter(result => result !== undefined);
+};
+
+const isGlobalIgnoreConfig = (config: XoConfigItem): boolean => {
+	const keys = Object.keys(config);
+
+	return Boolean(config.ignores && (keys.length === 1 || (keys.length === 2 && config.name)));
+};
+
+const expandIgnoreNegationForEslint = (pattern: string): string[] => {
+	const negatedPattern = pattern.slice(1);
+	const {base, isGlob} = micromatch.scan(negatedPattern, {parts: true});
+	const parentPath = isGlob ? base : path.posix.dirname(negatedPattern);
+
+	if (!parentPath || parentPath === '.') {
+		return [pattern];
+	}
+
+	const expandedPatterns = parentPath.split('/').map((_, index, segments) => `!${segments.slice(0, index + 1).join('/')}`);
+	expandedPatterns.push(pattern);
+
+	return expandedPatterns;
+};
+
+const expandIgnoreNegationsForEslint = (patterns: string[]): string[] => patterns.flatMap(pattern => pattern.startsWith('!') ? expandIgnoreNegationForEslint(pattern) : [pattern]);
+
+const expandGlobalIgnoreConfigForEslint = (config: XoConfigItem): XoConfigItem => {
+	if (!isGlobalIgnoreConfig(config)) {
+		return config;
+	}
+
+	return {
+		...config,
+		ignores: expandIgnoreNegationsForEslint(arrify(config.ignores)),
+	};
+};
+
+const stripDefaultIgnoreConfigs = (configs: Linter.Config[]): Linter.Config[] => configs.map(configItem => {
+	const {ignores} = configItem;
+	const isDefaultIgnoreConfig = ignores?.length && ignores.every(pattern => defaultIgnores.includes(pattern));
+
+	if (!isDefaultIgnoreConfig) {
+		return configItem;
+	}
+
+	const {ignores: _ignored, ...configWithoutIgnores} = configItem;
+
+	return configWithoutIgnores;
+});
+
+const defaultIgnoreOverlapsReopenedPattern = (defaultIgnore: string, pattern: string): boolean => {
+	const {base, isGlob} = micromatch.scan(pattern, {parts: true});
+	const reopenedBase = isGlob ? base : path.posix.dirname(pattern) || pattern;
+	const {base: defaultBase, isGlob: isDefaultGlob} = micromatch.scan(defaultIgnore, {parts: true});
+	const ignoreBase = isDefaultGlob ? defaultBase : defaultIgnore;
+
+	return micromatch.isMatch(pattern, defaultIgnore, {dot: true})
+		|| micromatch.isMatch(defaultIgnore, pattern, {dot: true})
+		|| !ignoreBase
+		|| !reopenedBase
+		|| ignoreBase.startsWith(`${reopenedBase}/`)
+		|| reopenedBase.startsWith(`${ignoreBase}/`);
+};
+
+const getReopenedDefaultPatterns = (patterns: string[]): string[] => patterns
+	.filter(pattern => pattern.startsWith('!'))
+	.map(pattern => pattern.slice(1))
+	.filter(pattern => defaultIgnores.some(defaultIgnore => defaultIgnoreOverlapsReopenedPattern(defaultIgnore, pattern)));
+
+/**
+XO only compensates for negations that reopen its built-in default ignores.
+User-provided positive ignores are still used only for pruning.
+The flow is:
+1. discover with `defaultIgnores + positive global ignores`
+2. if a negation reopens a built-in default ignore, run one extra pass with only that default ignore relaxed
+3. apply the real global ignore order in XO: default ignores, then config ignores, then CLI ignores
+4. let ESLint make the final ignore decision
+
+This keeps the common "lint files XO ignores by default" behavior without trying to fully reimplement ESLint's ignore engine during discovery.
+*/
+const discoverLintFiles = async ({cwd, globs, positiveGlobalIgnores, discoveryIgnores, reopenedDefaultPatterns}: {
+	cwd: string;
+	globs: string[];
+	positiveGlobalIgnores: string[];
+	discoveryIgnores: string[];
+	reopenedDefaultPatterns: string[];
+}): Promise<string[]> => {
+	const discoveredFiles = await globby(globs, {
+		ignore: [...defaultIgnores, ...positiveGlobalIgnores],
+		onlyFiles: true,
+		gitignore: true,
+		globalGitignore: true,
+		absolute: true,
+		dot: true,
+		cwd,
+	});
+
+	const effectiveIgnores = [...defaultIgnores, ...discoveryIgnores];
+
+	if (reopenedDefaultPatterns.length === 0) {
+		return discoveredFiles.filter(filePath => !isIgnoredFile(cwd, filePath, effectiveIgnores));
+	}
+
+	const reopenedFiles = await globby(globs, {
+		ignore: [
+			...positiveGlobalIgnores,
+			...defaultIgnores.filter(defaultIgnore => !reopenedDefaultPatterns.some(pattern => defaultIgnoreOverlapsReopenedPattern(defaultIgnore, pattern))),
+		],
+		onlyFiles: true,
+		gitignore: true,
+		globalGitignore: true,
+		absolute: true,
+		dot: true,
+		cwd,
+	});
+
+	return [...new Set([...discoveredFiles, ...reopenedFiles])]
+		.filter(filePath => !isIgnoredFile(cwd, filePath, effectiveIgnores));
 };
 
 export class Xo {
@@ -217,11 +366,6 @@ export class Xo {
 	readonly #tsFilesIgnoresGlob: string[] = [];
 
 	/**
-	Track whether ignores have been added to prevent duplicate ignore configs.
-	*/
-	#ignoresHandled = false;
-
-	/**
 	Store per-file configs separately from base config to prevent unbounded array growth.
 	Key: file path, Value: config for that file.
 	This prevents memory bloat in long-running processes (e.g., language servers).
@@ -277,49 +421,26 @@ export class Xo {
 		this.#prettierConfig = await prettier.resolveConfig(flatConfigPath, {editorconfig: true}) ?? {};
 	}
 
-	/**
-	Sets the ESLint config on the XO instance.
-	*/
-	setEslintConfig() {
+	setEslintConfig(cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), stripDefaultIgnores = false) {
 		if (!this._xoConfig) {
 			throw new Error('"Xo.setEslintConfig" failed');
 		}
 
 		// Combine base config with per-file configs from Map
 		// Deduplicate configs since multiple files can share the same config object
+		const [baseConfig = {}, ...resolvedConfigs] = this._xoConfig;
+		const configWithoutCliIgnores = Object.fromEntries(Object.entries(baseConfig).filter(([key]) => key !== 'ignores'));
+		const expandedResolvedConfigs = resolvedConfigs.map(config => expandGlobalIgnoreConfigForEslint(config));
 		const uniqueFileConfigs = [...new Set(this.#fileConfigs.values())];
-		const allConfigs = [...this._xoConfig, ...uniqueFileConfigs];
+		const cliIgnoreConfig = cliIgnores.length > 0 ? [{ignores: expandIgnoreNegationsForEslint(cliIgnores)}] : [];
+		const allConfigs = [configWithoutCliIgnores, ...expandedResolvedConfigs, ...cliIgnoreConfig, ...uniqueFileConfigs];
 
 		// Always regenerate to support instance reuse with new files
 		this.#eslintConfig = xoToEslintConfig(allConfigs, {prettierOptions: this.#prettierConfig});
-	}
 
-	/**
-	Sets the ignores on the XO instance.
-	*/
-	setIgnores() {
-		if (this.#ignoresHandled || !this.#baseXoConfig.ignores) {
-			return;
+		if (stripDefaultIgnores) {
+			this.#eslintConfig = stripDefaultIgnoreConfigs(this.#eslintConfig);
 		}
-
-		let ignores: string[] = [];
-
-		if (typeof this.#baseXoConfig.ignores === 'string') {
-			ignores = arrify(this.#baseXoConfig.ignores);
-		} else if (Array.isArray(this.#baseXoConfig.ignores)) {
-			ignores = this.#baseXoConfig.ignores;
-		}
-
-		if (!this._xoConfig) {
-			throw new Error('"Xo.setIgnores" failed');
-		}
-
-		if (ignores.length === 0) {
-			return;
-		}
-
-		this._xoConfig.push({ignores});
-		this.#ignoresHandled = true;
 	}
 
 	/**
@@ -380,16 +501,14 @@ export class Xo {
 	/**
 	Initializes the ESLint instance on the XO instance.
 	*/
-	public async initEslint(files?: string[]) {
+	public async initEslint(files?: string[], cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), stripDefaultIgnores = false) {
 		await this.setXoConfig();
-
-		this.setIgnores();
 
 		await this.ensureCacheDirectory();
 
 		await this.handleUnincludedTsFiles(files);
 
-		this.setEslintConfig();
+		this.setEslintConfig(cliIgnores, stripDefaultIgnores);
 
 		if (!this._xoConfig) {
 			throw new Error('"Xo.initEslint" failed');
@@ -431,15 +550,22 @@ export class Xo {
 		// Dynamic glob patterns matching nothing is acceptable — the project may simply have no matching files yet.
 		// The default glob substitution above is always dynamic, so this is false when no globs were provided.
 		const hasExplicitFilePaths = globs.some(glob => !isDynamicPattern(glob));
+		await this.setXoConfig();
 
-		const files: string | string[] = await globby(globs, {
-			ignore: [...defaultIgnores, ...arrify(this.#baseXoConfig.ignores)],
-			onlyFiles: true,
-			gitignore: true,
-			globalGitignore: true,
-			absolute: true,
-			dot: true,
+		const cliIgnores = arrify(this.#baseXoConfig.ignores);
+		const configIgnores = (this._xoConfig ?? []).slice(1)
+			.filter(config => isGlobalIgnoreConfig(config))
+			.flatMap(config => arrify(config.ignores));
+		const globalIgnores = [...configIgnores, ...cliIgnores];
+		const positiveGlobalIgnores = globalIgnores.filter(pattern => !pattern.startsWith('!'));
+		const reopenedDefaultPatterns = getReopenedDefaultPatterns(globalIgnores);
+		const discoveryIgnores = [...configIgnores, ...cliIgnores];
+		const files = await discoverLintFiles({
 			cwd: this._linterOptions.cwd,
+			globs,
+			positiveGlobalIgnores,
+			discoveryIgnores,
+			reopenedDefaultPatterns,
 		});
 
 		if (this._linterOptions.suppressionsLocation) {
@@ -450,14 +576,14 @@ export class Xo {
 			}
 		}
 
-		await this.initEslint(files);
+		await this.initEslint(files, cliIgnores, true);
 
 		if (!this.#eslint) {
 			throw new Error('Failed to initialize ESLint');
 		}
 
 		const eslint = this.#eslint;
-		const ignoredResults = await getIgnoredExplicitFileResults(this._linterOptions.cwd, globs, eslint);
+		const ignoredResults = await getIgnoredExplicitFileResults(this._linterOptions.cwd, globs, eslint, [...defaultIgnores, ...discoveryIgnores]);
 
 		if (files.length === 0) {
 			if (hasExplicitFilePaths && ignoredResults.length === 0) {

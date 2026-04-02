@@ -240,21 +240,269 @@ test('scoped ignores in config do not remove files from linting', async t => {
 	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
 });
 
-test('negated global ignore patterns keep explicitly unignored files linted', async t => {
-	const filePath = path.join(t.context.cwd, 'keep.js');
-	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+test('negated default ignore patterns in config file allow linting default-ignored directories', async t => {
+	const distDirectory = path.join(t.context.cwd, 'dist');
+	await fs.mkdir(distDirectory, {recursive: true});
+	await fs.writeFile(path.join(distDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
 	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
 		export default [
 			{
-				ignores: ['*.js', '!keep.js'],
+				ignores: ['!dist/**'],
 			},
 		];
 	`, 'utf8');
 	const xo = new Xo({cwd: t.context.cwd});
-	const {results, warningCount} = await xo.lintFiles('keep.js');
+	const {results} = await xo.lintFiles();
+	const distResult = results?.find(result => result.filePath.includes('dist/index.js'));
+	t.truthy(distResult, 'dist/index.js should be linted');
+	t.is(distResult?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns in config can reopen a narrower built-in directory pattern', async t => {
+	const lintedDirectory = path.join(t.context.cwd, 'dist', 'src');
+	const ignoredDirectory = path.join(t.context.cwd, 'dist', 'ignored');
+	await fs.mkdir(lintedDirectory, {recursive: true});
+	await fs.mkdir(ignoredDirectory, {recursive: true});
+	await fs.writeFile(path.join(lintedDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(ignoredDirectory, 'index.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/src/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results} = await xo.lintFiles();
+	const lintedResult = results?.find(result => result.filePath.includes('dist/src/index.js'));
+	const ignoredResult = results?.find(result => result.filePath.includes('dist/ignored/index.js'));
+	t.truthy(lintedResult, 'dist/src/index.js should be linted');
+	t.falsy(ignoredResult, 'dist/ignored/index.js should still be ignored');
+	t.is(lintedResult?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns in config keep explicit reopened directory paths lintable', async t => {
+	const lintedDirectory = path.join(t.context.cwd, 'dist', 'src');
+	await fs.mkdir(lintedDirectory, {recursive: true});
+	await fs.writeFile(path.join(lintedDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/src/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results, warningCount} = await xo.lintFiles('dist/src/index.js');
 	t.is(results.length, 1);
 	t.is(warningCount, 0);
 	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns in config keep explicit reopened file paths lintable', async t => {
+	const lintedDirectory = path.join(t.context.cwd, 'dist', 'src');
+	const ignoredDirectory = path.join(t.context.cwd, 'dist', 'ignored');
+	await fs.mkdir(lintedDirectory, {recursive: true});
+	await fs.mkdir(ignoredDirectory, {recursive: true});
+	await fs.writeFile(path.join(lintedDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(ignoredDirectory, 'index.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/src/index.js'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results, warningCount} = await xo.lintFiles('dist/src/index.js');
+	t.is(results.length, 1);
+	t.is(warningCount, 0);
+	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns in config keep directory globs lintable', async t => {
+	const lintedDirectory = path.join(t.context.cwd, 'dist', 'src');
+	const ignoredDirectory = path.join(t.context.cwd, 'dist', 'ignored');
+	await fs.mkdir(lintedDirectory, {recursive: true});
+	await fs.mkdir(ignoredDirectory, {recursive: true});
+	await fs.writeFile(path.join(lintedDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(ignoredDirectory, 'index.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/src/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results} = await xo.lintFiles('dist');
+	const lintedResult = results?.find(result => result.filePath.includes('dist/src/index.js'));
+	const ignoredResult = results?.find(result => result.filePath.includes('dist/ignored/index.js'));
+	t.truthy(lintedResult, 'dist/src/index.js should be linted');
+	t.falsy(ignoredResult, 'dist/ignored/index.js should still be ignored');
+	t.is(lintedResult?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns in config keep sibling reopened directory files ignored for explicit paths', async t => {
+	const lintedDirectory = path.join(t.context.cwd, 'dist', 'src');
+	const ignoredDirectory = path.join(t.context.cwd, 'dist', 'ignored');
+	await fs.mkdir(lintedDirectory, {recursive: true});
+	await fs.mkdir(ignoredDirectory, {recursive: true});
+	await fs.writeFile(path.join(lintedDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(ignoredDirectory, 'index.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/src/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results} = await xo.lintFiles('dist/ignored/index.js');
+	t.is(results.length, 1);
+	t.is(results[0]?.messages[0]?.message, ignoredFileWarningMessage);
+});
+
+test('positive CLI ignores still win for explicit paths when config reopens a default-ignored directory', async t => {
+	const privateDirectory = path.join(t.context.cwd, 'dist', 'private');
+	await fs.mkdir(privateDirectory, {recursive: true});
+	await fs.writeFile(path.join(privateDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['dist/private/**']});
+	const {results} = await xo.lintFiles('dist/private/index.js');
+	t.is(results.length, 1);
+	t.is(results[0]?.messages[0]?.message, ignoredFileWarningMessage);
+});
+
+test('negated default ignore patterns via CLI allow linting default-ignored directories', async t => {
+	const distDirectory = path.join(t.context.cwd, 'dist');
+	await fs.mkdir(distDirectory, {recursive: true});
+	await fs.writeFile(path.join(distDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['!dist/**']});
+	const {results} = await xo.lintFiles();
+	const distResult = results?.find(result => result.filePath.includes('dist/index.js'));
+	t.truthy(distResult, 'dist/index.js should be linted');
+	t.is(distResult?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns via CLI can unignore a narrower built-in directory pattern', async t => {
+	const temporaryDirectory = path.join(t.context.cwd, 'tmp');
+	await fs.mkdir(temporaryDirectory, {recursive: true});
+	await fs.writeFile(path.join(temporaryDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['!tmp/**']});
+	const {results} = await xo.lintFiles('tmp/index.js');
+	t.is(results.length, 1);
+	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns via CLI can unignore a narrower built-in file pattern', async t => {
+	const filePath = path.join(t.context.cwd, 'app.min.js');
+	const siblingFilePath = path.join(t.context.cwd, 'vendor.min.js');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(siblingFilePath, dedent`console.log('hello');\n`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['!app.min.js']});
+	const {results} = await xo.lintFiles();
+	const lintedResult = results?.find(result => result.filePath.includes('app.min.js'));
+	const siblingResult = results?.find(result => result.filePath.includes('vendor.min.js'));
+	t.truthy(lintedResult, 'app.min.js should be linted');
+	t.falsy(siblingResult, 'vendor.min.js should still be ignored');
+	t.is(results.length, 1);
+	t.is(lintedResult?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore patterns in config can unignore a narrower built-in file pattern without linting siblings', async t => {
+	const filePath = path.join(t.context.cwd, 'app.min.js');
+	const siblingFilePath = path.join(t.context.cwd, 'vendor.min.js');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(siblingFilePath, dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!app.min.js'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results} = await xo.lintFiles();
+	const lintedResult = results?.find(result => result.filePath.includes('app.min.js'));
+	const siblingResult = results?.find(result => result.filePath.includes('vendor.min.js'));
+	t.truthy(lintedResult, 'app.min.js should be linted');
+	t.falsy(siblingResult, 'vendor.min.js should still be ignored');
+	t.is(lintedResult?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('positive CLI ignores keep precedence over config negations that reopen default ignores', async t => {
+	const privateDirectory = path.join(t.context.cwd, 'dist', 'private');
+	const publicDirectory = path.join(t.context.cwd, 'dist', 'public');
+	await fs.mkdir(privateDirectory, {recursive: true});
+	await fs.mkdir(publicDirectory, {recursive: true});
+	await fs.writeFile(path.join(privateDirectory, 'index.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(publicDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd}, {ignores: ['dist/private/**']});
+	const {results} = await xo.lintFiles();
+	const publicResult = results?.find(result => result.filePath.includes('dist/public/index.js'));
+	const privateResult = results?.find(result => result.filePath.includes('dist/private/index.js'));
+	t.truthy(publicResult, 'dist/public/index.js should be linted');
+	t.falsy(privateResult, 'dist/private/index.js should still be ignored');
+	t.is(publicResult?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
+test('negated default ignore only removes the matching default pattern', async t => {
+	const distDirectory = path.join(t.context.cwd, 'dist');
+	const coverageDirectory = path.join(t.context.cwd, 'coverage');
+	await fs.mkdir(distDirectory, {recursive: true});
+	await fs.mkdir(coverageDirectory, {recursive: true});
+	await fs.writeFile(path.join(distDirectory, 'index.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(coverageDirectory, 'report.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results} = await xo.lintFiles();
+	const distResult = results?.find(result => result.filePath.includes('dist/index.js'));
+	const coverageResult = results?.find(result => result.filePath.includes('coverage/report.js'));
+	t.truthy(distResult, 'dist/index.js should be linted');
+	t.falsy(coverageResult, 'coverage/report.js should still be ignored');
+});
+
+test('three-level nesting: ignore, un-ignore, re-ignore', async t => {
+	const lintedDirectory = path.join(t.context.cwd, 'dist', 'src');
+	const secretDirectory = path.join(t.context.cwd, 'dist', 'src', 'secret');
+	await fs.mkdir(lintedDirectory, {recursive: true});
+	await fs.mkdir(secretDirectory, {recursive: true});
+	await fs.writeFile(path.join(lintedDirectory, 'index.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(secretDirectory, 'key.js'), dedent`console.log('hello');\n`, 'utf8');
+	await fs.writeFile(path.join(t.context.cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/src/**', 'dist/src/secret/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd: t.context.cwd});
+	const {results} = await xo.lintFiles();
+	const lintedResult = results?.find(result => result.filePath.includes('dist/src/index.js'));
+	const secretResult = results?.find(result => result.filePath.includes('dist/src/secret/key.js'));
+	t.truthy(lintedResult, 'dist/src/index.js should be linted');
+	t.falsy(secretResult, 'dist/src/secret/key.js should still be ignored');
+	t.is(lintedResult?.messages[0]?.ruleId, '@stylistic/semi');
 });
 
 test('throws for nonexistent explicit file', async t => {

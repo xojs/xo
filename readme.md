@@ -154,6 +154,16 @@ Some [paths](lib/constants.ts) are ignored by default, including paths in `.giti
 
 > Tip: For *global* ignores, keep `ignores` as the only key in the config item. You can optionally set a `name` property. Adding more properties will cause ignores to be scoped down to your files selection, which may have unexpected effects.
 
+Global negated ignores are supported in both config files and the CLI for reopening XO's built-in ignored paths. This includes directory globs like `!dist/**`, file globs like `!**/*.min.js`, and literal file paths like `!dist/src/index.js`.
+
+When global ignores are involved, XO uses them in this order:
+
+1. Built-in default ignores
+2. Global config `ignores`
+3. CLI `ignores`
+
+XO keeps positive ignores for fast file discovery and only rechecks XO's own default-ignored paths. ESLint makes the final ignore decision.
+
 ### space
 
 Type: `boolean | number`\
@@ -330,6 +340,14 @@ To include files that XO [ignores by default](lib/constants.ts), add them as neg
 
 ```js
 const xoConfig = [{ignores: ['!vendor/**']}];
+
+export default xoConfig;
+```
+
+This also works for narrower carve-outs:
+
+```js
+const xoConfig = [{ignores: ['!dist/src/**', '!dist/src/index.js']}];
 
 export default xoConfig;
 ```

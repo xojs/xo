@@ -707,6 +707,26 @@ test('vue > semicolon option applies to vue files', async t => {
 	t.true(ruleIds.includes('@stylistic/semi'));
 });
 
+test('negated default ignore in config allows lintText on files in default-ignored directories', async t => {
+	const {cwd} = t.context;
+	const distDirectory = path.join(cwd, 'dist');
+	await fs.mkdir(distDirectory, {recursive: true});
+	const filePath = path.join(distDirectory, 'index.js');
+	const text = dedent`console.log('hello')\n`;
+	await fs.writeFile(filePath, text, 'utf8');
+	await fs.writeFile(path.join(cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/**'],
+			},
+		];
+	`, 'utf8');
+	const xo = new Xo({cwd});
+	const {results} = await xo.lintText(text, {filePath});
+	t.is(results.length, 1);
+	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
+});
+
 test('suppressions > lintText respects suppressions file', async t => {
 	const filePath = path.join(t.context.cwd, 'test.js');
 	const suppressionsPath = path.join(t.context.cwd, 'eslint-suppressions.json');
