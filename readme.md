@@ -316,7 +316,7 @@ If you want to use ESLint directly without the `xo` CLI, use [`eslint-config-xo`
 
 ### ESLint adapter
 
-If you already use the `xo` CLI and want your editor's ESLint integration to match exactly, use the `xo/eslint-adapter` subpath export. It automatically reads your `xo.config.js` and converts it to an ESLint flat config.
+Editors with an ESLint extension (like VS Code) need an `eslint.config.js` to lint inline. Add one that re-exports the adapter — it reads your `xo.config.js` and generates the matching ESLint config automatically, so your editor shows the same errors as running `xo`.
 
 `eslint.config.js`
 
