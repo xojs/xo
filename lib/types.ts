@@ -3,6 +3,13 @@ import {type ESLint, type Rule, type Linter} from 'eslint';
 
 export type Space = boolean | number | string | undefined;
 
+export type TypeScriptParserOptions = Linter.ParserOptions & {
+	project?: string | string[] | boolean;
+	projectService?: boolean;
+	tsconfigRootDir?: string;
+	programs?: unknown[];
+};
+
 export type XoConfigOptions = {
 	/**
 	Use spaces for indentation.
@@ -60,7 +67,6 @@ export type LinterOptions = {
 
 	Ensures that TypeScript files are linted with the type-aware parser even if they are not explicitly included in the tsconfig.
 
-	@private
 	*/
 	ts?: boolean;
 

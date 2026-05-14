@@ -35,8 +35,8 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 				`${moduleName}.config.mts`,
 			],
 			loaders: {
-				'.ts': loadTypeScriptConfig, // eslint-disable-line @typescript-eslint/naming-convention
-				'.mts': loadTypeScriptConfig, // eslint-disable-line @typescript-eslint/naming-convention
+				'.ts': loadTypeScriptConfig,
+				'.mts': loadTypeScriptConfig,
 			},
 			stopDir: stopDirectory,
 			cache: true,
@@ -50,10 +50,10 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 			config: flatOptions = [],
 			filepath: flatConfigPath = '', // eslint-disable-line @typescript-eslint/no-useless-default-assignment
 		} = await (
-			options.configPath
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+			options.configPath !== undefined && options.configPath !== ''
+
 				? flatConfigExplorer.load(path.resolve(options.cwd, options.configPath)) as Promise<{config: FlatXoConfig | undefined; filepath: string}>
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
 				: flatConfigExplorer.search(searchPath) as Promise<{config: FlatXoConfig | undefined; filepath: string}>
 		) ?? {};
 
@@ -64,8 +64,7 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 			flatConfigPath,
 		};
 	} catch (error) {
-		// eslint-disable-next-line preserve-caught-error
-		throw new AggregateError([error], 'Error resolving XO config, there is likely an issue with your config file. Please check the file for mistakes.');
+		throw new Error('Error resolving XO config, there is likely an issue with your config file. Please check the file for mistakes.', {cause: error});
 	}
 }
 

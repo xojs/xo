@@ -6,7 +6,7 @@ import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {frameworkExtensions} from '../lib/constants.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
-const test = _test as TestFn<{cwd: string}>; // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion
+const test = _test as TestFn<{cwd: string}>;
 
 test.beforeEach(async t => {
 	t.context.cwd = await copyTestProject();
@@ -153,7 +153,7 @@ test('with react option', t => {
 test('react option without files does not set files property', t => {
 	const flatConfig = xoToEslintConfig([{react: true}]);
 
-	const reactConfig = flatConfig.find(config => config.rules?.['react/self-closing-comp']);
+	const reactConfig = flatConfig.find(config => config.rules?.['react/self-closing-comp'] !== undefined);
 	t.truthy(reactConfig);
 	t.false('files' in reactConfig!, 'react config should not have a files property when no files are specified');
 });

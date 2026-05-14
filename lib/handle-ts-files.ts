@@ -67,7 +67,10 @@ This function checks if the files are matched by the tsconfig include, exclude, 
 
 If no tsconfig is found, it will create an in-memory TypeScript Program for type-aware linting.
 
-@param options
+@param options - The options for handling the tsconfig.
+@param options.files - The TypeScript files to check against the tsconfig.
+@param options.cwd - The current working directory.
+@param options.cacheLocation - The cache directory used to detect virtual/stdin files.
 @returns The unmatched files and an in-memory TypeScript Program.
 */
 export function handleTsconfig({files, cwd, cacheLocation}: {files: string[]; cwd: string; cacheLocation?: string}) {
@@ -82,7 +85,7 @@ export function handleTsconfig({files, cwd, cacheLocation}: {files: string[]; cw
 			continue;
 		}
 
-		const cacheKey = result.path ? path.resolve(result.path) : filePath;
+		const cacheKey = result.path === '' ? filePath : path.resolve(result.path);
 		let filesMatcher = filesMatcherCache.get(cacheKey);
 
 		if (!filesMatcher) {
@@ -108,17 +111,15 @@ export function handleTsconfig({files, cwd, cacheLocation}: {files: string[]; cw
 	const virtualFiles: string[] = [];
 
 	for (const file of unincludedFiles) {
-		const fileExists = fs.existsSync(file);
-
 		// Files that don't exist are always virtual
-		if (!fileExists) {
+		if (!fs.existsSync(file)) {
 			virtualFiles.push(file);
 			continue;
 		}
 
 		// Check if file is in cache directory (like stdin files)
 		// These need tsconfig treatment even though they exist on disk
-		if (cacheLocation) {
+		if (cacheLocation !== undefined) {
 			const absolutePath = path.resolve(file);
 			const cacheRoot = path.resolve(cacheLocation);
 			const relativeToCache = path.relative(cacheRoot, absolutePath);

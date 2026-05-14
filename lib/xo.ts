@@ -17,6 +17,7 @@ import {
 	type LintTextOptions,
 	type XoConfigOptions,
 	type XoConfigItem,
+	type TypeScriptParserOptions,
 } from './types.js';
 import {
 	defaultIgnores,
@@ -33,13 +34,6 @@ import {
 	preProcessXoConfig,
 	typescriptParser,
 } from './utils.js';
-
-type TypeScriptParserOptions = Linter.ParserOptions & {
-	project?: string | string[] | boolean;
-	projectService?: boolean;
-	tsconfigRootDir?: string;
-	programs?: unknown[];
-};
 
 type XoError = Error & {
 	exitCode: number;
@@ -77,23 +71,23 @@ const normalizeGlobPath = (filePath: string): string => filePath.split(path.sep)
 const pathMatchesPattern = (filePath: string, pattern: string): boolean => micromatch.isMatch(normalizeGlobPath(filePath), normalizeGlobPath(pattern), {dot: true});
 
 const isIgnoredByPatterns = (filePath: string, patterns: string[]): boolean => {
-	let ignored = false;
+	let isIgnored = false;
 
 	for (const pattern of patterns) {
 		if (pattern.startsWith('!')) {
 			if (pathMatchesPattern(filePath, pattern.slice(1))) {
-				ignored = false;
+				isIgnored = false;
 			}
 
 			continue;
 		}
 
 		if (pathMatchesPattern(filePath, pattern)) {
-			ignored = true;
+			isIgnored = true;
 		}
 	}
 
-	return ignored;
+	return isIgnored;
 };
 
 const isIgnoredFile = (cwd: string, filePath: string, patterns: string[]): boolean => isIgnoredByPatterns(path.relative(cwd, filePath), patterns);
@@ -136,7 +130,7 @@ const getIgnoredExplicitFileResults = async (cwd: string, globs: string[], eslin
 const isGlobalIgnoreConfig = (config: XoConfigItem): boolean => {
 	const keys = Object.keys(config);
 
-	return Boolean(config.ignores && (keys.length === 1 || (keys.length === 2 && config.name)));
+	return config.ignores !== undefined && (keys.length === 1 || (keys.length === 2 && config.name !== undefined));
 };
 
 const expandIgnoreNegationForEslint = (pattern: string): string[] => {
@@ -144,7 +138,7 @@ const expandIgnoreNegationForEslint = (pattern: string): string[] => {
 	const {base, isGlob} = micromatch.scan(negatedPattern, {parts: true});
 	const parentPath = isGlob ? base : path.posix.dirname(negatedPattern);
 
-	if (!parentPath || parentPath === '.') {
+	if (parentPath === '' || parentPath === '.') {
 		return [pattern];
 	}
 
@@ -169,7 +163,7 @@ const expandGlobalIgnoreConfigForEslint = (config: XoConfigItem): XoConfigItem =
 
 const stripDefaultIgnoreConfigs = (configs: Linter.Config[]): Linter.Config[] => configs.map(configItem => {
 	const {ignores} = configItem;
-	const isDefaultIgnoreConfig = ignores?.length && ignores.every(pattern => defaultIgnores.includes(pattern));
+	const isDefaultIgnoreConfig = ignores !== undefined && ignores.length > 0 && ignores.every(pattern => defaultIgnores.includes(pattern));
 
 	if (!isDefaultIgnoreConfig) {
 		return configItem;
@@ -182,14 +176,15 @@ const stripDefaultIgnoreConfigs = (configs: Linter.Config[]): Linter.Config[] =>
 
 const defaultIgnoreOverlapsReopenedPattern = (defaultIgnore: string, pattern: string): boolean => {
 	const {base, isGlob} = micromatch.scan(pattern, {parts: true});
-	const reopenedBase = isGlob ? base : path.posix.dirname(pattern) || pattern;
+	const patternDirname = path.posix.dirname(pattern);
+	const reopenedBase = isGlob ? base : (patternDirname === '' ? pattern : patternDirname);
 	const {base: defaultBase, isGlob: isDefaultGlob} = micromatch.scan(defaultIgnore, {parts: true});
 	const ignoreBase = isDefaultGlob ? defaultBase : defaultIgnore;
 
 	return micromatch.isMatch(pattern, defaultIgnore, {dot: true})
 		|| micromatch.isMatch(defaultIgnore, pattern, {dot: true})
-		|| !ignoreBase
-		|| !reopenedBase
+		|| ignoreBase === ''
+		|| reopenedBase === ''
 		|| ignoreBase.startsWith(`${reopenedBase}/`)
 		|| reopenedBase.startsWith(`${ignoreBase}/`);
 };
@@ -429,7 +424,7 @@ export class Xo {
 		// Combine base config with per-file configs from Map
 		// Deduplicate configs since multiple files can share the same config object
 		const [baseConfig = {}, ...resolvedConfigs] = this._xoConfig;
-		const configWithoutCliIgnores = Object.fromEntries(Object.entries(baseConfig).filter(([key]) => key !== 'ignores'));
+		const {ignores, ...configWithoutCliIgnores} = baseConfig;
 		const expandedResolvedConfigs = resolvedConfigs.map(config => expandGlobalIgnoreConfigForEslint(config));
 		const uniqueFileConfigs = [...new Set(this.#fileConfigs.values())];
 		const cliIgnoreConfig = cliIgnores.length > 0 ? [{ignores: expandIgnoreNegationsForEslint(cliIgnores)}] : [];
@@ -454,8 +449,12 @@ export class Xo {
 				await fs.rm(this._cacheLocation, {recursive: true, force: true});
 				await fs.mkdir(this._cacheLocation, {recursive: true});
 			}
-		} catch {
-			// If not exists, create the directory
+		} catch (error) {
+			// If not exists, create the directory. Rethrow any other error (for example, permission issues).
+			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+				throw error;
+			}
+
 			await fs.mkdir(this._cacheLocation, {recursive: true});
 		}
 	}
@@ -540,7 +539,7 @@ export class Xo {
 	@throws Error
 	*/
 	async lintFiles(globs?: string | string[]): Promise<XoLintResult> {
-		if (!globs || (Array.isArray(globs) && globs.length === 0)) {
+		if (globs === undefined || (Array.isArray(globs) && globs.length === 0)) {
 			globs = `**/*.{${allExtensions.join(',')}}`;
 		}
 
@@ -568,13 +567,7 @@ export class Xo {
 			reopenedDefaultPatterns,
 		});
 
-		if (this._linterOptions.suppressionsLocation) {
-			const suppressionsFilePath = path.resolve(this._linterOptions.cwd, this._linterOptions.suppressionsLocation);
-
-			if (!syncFs.existsSync(suppressionsFilePath)) {
-				throw createErrorWithExitCode(suppressionsFileMissingErrorMessage, 2);
-			}
-		}
+		await this.assertSuppressionsFileExists();
 
 		await this.initEslint(files, cliIgnores, true);
 
@@ -608,15 +601,9 @@ export class Xo {
 		code: string,
 		lintTextOptions: LintTextOptions,
 	): Promise<XoLintResult> {
-		const {filePath, warnIgnored} = lintTextOptions;
+		const {filePath, warnIgnored: shouldWarnIgnored} = lintTextOptions;
 
-		if (this._linterOptions.suppressionsLocation) {
-			const suppressionsFilePath = path.resolve(this._linterOptions.cwd, this._linterOptions.suppressionsLocation);
-
-			if (!syncFs.existsSync(suppressionsFilePath)) {
-				throw createErrorWithExitCode(suppressionsFileMissingErrorMessage, 2);
-			}
-		}
+		await this.assertSuppressionsFileExists();
 
 		await this.initEslint([filePath]);
 
@@ -624,14 +611,14 @@ export class Xo {
 			throw new Error('Failed to initialize ESLint');
 		}
 
-		const results = await this.#eslint?.lintText(code, {
+		const results = await this.#eslint.lintText(code, {
 			filePath,
-			warnIgnored,
+			warnIgnored: shouldWarnIgnored,
 		});
 
-		const rulesMeta = this.#eslint.getRulesMetaForResults(results ?? []);
+		const rulesMeta = this.#eslint.getRulesMetaForResults(results);
 
-		return this.processReport(results ?? [], {rulesMeta});
+		return this.processReport(results, {rulesMeta});
 	}
 
 	async calculateConfigForFile(filePath: string): Promise<Linter.Config> {
@@ -641,7 +628,6 @@ export class Xo {
 			throw new Error('Failed to initialize ESLint');
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 		return this.#eslint.calculateConfigForFile(filePath) as Promise<Linter.Config>;
 	}
 
@@ -669,13 +655,12 @@ export class Xo {
 			const tsconfigPath = path.join(this._cacheLocation, 'tsconfig.stdin.json');
 			const configIndex = this._xoConfig.findIndex(configItem => {
 				const {languageOptions} = configItem;
-				const parserOptionsCandidate = (languageOptions as Linter.LanguageOptions | undefined)?.parserOptions;
-				const parserOptions = parserOptionsCandidate as TypeScriptParserOptions | undefined;
+				const parserOptions = languageOptions?.['parserOptions'] as TypeScriptParserOptions | undefined;
 				return parserOptions?.project === tsconfigPath;
 			});
 
 			if (nextVirtualFiles.size > 0) {
-				const filesArray = nextVirtualFiles.values().toArray();
+				const filesArray = [...nextVirtualFiles];
 				const relativeFiles = filesArray.map(file => path.relative(this._linterOptions.cwd, file));
 
 				const tsconfigContent = {
@@ -817,6 +802,23 @@ export class Xo {
 		}
 
 		return statistics;
+	}
+
+	/**
+	Throws if a suppressions location was provided but the file does not exist.
+	*/
+	private async assertSuppressionsFileExists() {
+		if (this._linterOptions.suppressionsLocation === undefined) {
+			return;
+		}
+
+		const suppressionsFilePath = path.resolve(this._linterOptions.cwd, this._linterOptions.suppressionsLocation);
+
+		try {
+			await fs.access(suppressionsFilePath);
+		} catch {
+			throw createErrorWithExitCode(suppressionsFileMissingErrorMessage, 2);
+		}
 	}
 }
 

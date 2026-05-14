@@ -1,4 +1,4 @@
-/* eslint-disable complexity */
+/* eslint-disable complexity -- Translating every XO config option into ESLint rules is inherently branchy. */
 import arrify from 'arrify';
 import {type Linter, type ESLint} from 'eslint';
 import eslintConfigXoReact from 'eslint-config-xo-react';
@@ -17,7 +17,7 @@ Rules from eslint-config-prettier's "special rules" list that XO configures and 
 const prettierCompatibleSpecialRules: Linter.RulesRecord = {
 	curly: 'error',
 	'no-unexpected-multiline': 'error',
-	'@stylistic/quotes': ['error', 'single', {avoidEscape: true}], // eslint-disable-line @typescript-eslint/naming-convention
+	'@stylistic/quotes': ['error', 'single', {avoidEscape: true}],
 	'@stylistic/no-mixed-operators': [
 		'error',
 		{
@@ -113,11 +113,11 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		}
 
 		/** Special case global ignores */
-		if (xoConfigItem.ignores) {
+		if (xoConfigItem.ignores !== undefined) {
 			if (keysOfXoConfig.length === 1) {
 				baseConfig.push({ignores: arrify(xoConfigItem.ignores)});
 				continue;
-			} else if (keysOfXoConfig.length === 2 && xoConfigItem.name) {
+			} else if (keysOfXoConfig.length === 2 && xoConfigItem.name !== undefined) {
 				baseConfig.push({name: xoConfigItem.name, ignores: arrify(xoConfigItem.ignores)});
 				continue;
 			}
@@ -127,6 +127,8 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		An ESLint config item derived from the XO config item with rules and files initialized.
 		*/
 		const eslintConfigItem = xoToEslintConfigItem(xoConfigItem);
+
+		const isUsingSpaces = Boolean(xoConfigItem.space);
 
 		if (xoConfigItem.semicolon === false) {
 			eslintConfigItem.rules ??= {};
@@ -141,7 +143,7 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 			];
 		}
 
-		if (xoConfigItem.space) {
+		if (isUsingSpaces) {
 			const spaces = typeof xoConfigItem.space === 'number' ? xoConfigItem.space : 2;
 			eslintConfigItem.rules ??= {};
 			eslintConfigItem.rules['@stylistic/indent'] = ['error', spaces, {SwitchCase: 1}]; // eslint-disable-line @typescript-eslint/naming-convention
@@ -155,14 +157,14 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 		if (xoConfigItem.react) {
 			// Ensure the files applied to the React config are the same as the config they are derived from
 			// TODO: Remove `fixupConfigRules` wrapping when eslint-plugin-react supports ESLint 10 natively.
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Space` includes `string` for legacy reasons but react config only accepts `boolean | number`.
+
 			for (const reactConfig of fixupConfigRules(eslintConfigXoReact({space: xoConfigItem.space as boolean | number | undefined}))) {
 				baseConfig.push({...reactConfig, ...(eslintConfigItem.files ? {files: eslintConfigItem.files} : {})});
 			}
 		}
 
 		// Prettier should generally be the last config in the array
-		if (xoConfigItem.prettier) {
+		if (xoConfigItem.prettier !== undefined && xoConfigItem.prettier !== false) {
 			if (xoConfigItem.prettier === 'compat') {
 				baseConfig.push({
 					...eslintConfigPrettier,
@@ -179,7 +181,7 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 					throw new Error(`The Prettier config \`semi\` is ${prettierOptions.semi} while Xo \`semicolon\` is ${xoConfigItem.semicolon}, also check your .editorconfig for inconsistencies.`);
 				}
 
-				if (((xoConfigItem.space ?? typeof xoConfigItem.space === 'number') && prettierOptions.useTabs === true) || (!xoConfigItem.space && prettierOptions.useTabs === false)) {
+				if ((isUsingSpaces && prettierOptions.useTabs === true) || (!isUsingSpaces && prettierOptions.useTabs === false)) {
 					throw new Error(`The Prettier config \`useTabs\` is ${prettierOptions.useTabs} while Xo \`space\` is ${xoConfigItem.space}, also check your .editorconfig for inconsistencies.`);
 				}
 
@@ -200,7 +202,7 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 					bracketSameLine: false,
 					trailingComma: 'all',
 					tabWidth: typeof xoConfigItem.space === 'number' ? xoConfigItem.space : 2,
-					useTabs: !xoConfigItem.space,
+					useTabs: !isUsingSpaces,
 					semi: xoConfigItem.semicolon,
 					...prettierOptions,
 				};
@@ -208,9 +210,9 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				// Configure Prettier rules
 				const rulesWithPrettier: Linter.RulesRecord = {
 					...eslintConfigItem.rules,
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+
 					...(pluginPrettier.configs?.['recommended'] as ESLint.ConfigData)?.rules,
-					// eslint-disable-next-line @typescript-eslint/naming-convention
+
 					'prettier/prettier': ['error', prettierConfig],
 					...eslintConfigPrettier.rules,
 					...prettierCompatibleSpecialRules,

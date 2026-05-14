@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+
 import fs from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
@@ -247,7 +247,7 @@ test('plugin > js > eslint-plugin-import import-x/extensions', async t => {
 	t.is(results[0]?.messages?.[0]?.ruleId, 'import-x/extensions');
 });
 
-test('plugin > ts > eslint-plugin-import import-x/extensions', async t => {
+test('plugin > ts > eslint-plugin-import import-x/extensions is disabled for TypeScript', async t => {
 	const {cwd} = t.context;
 	const filePath = path.join(cwd, 'test.ts');
 	const text = dedent`
@@ -257,9 +257,8 @@ test('plugin > ts > eslint-plugin-import import-x/extensions', async t => {
 	`;
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
-	t.true(results[0]?.messages?.length === 1);
-	t.truthy(results[0]?.messages?.[0]);
-	t.is(results[0]?.messages?.[0]?.ruleId, 'import-x/extensions');
+	// `import-x/extensions` is intentionally disabled for TypeScript because it cannot model TS ESM's `.js`-extension-for-`.ts` convention.
+	t.false(results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/extensions'));
 });
 
 test('plugin > ts > eslint-plugin-import import-x/no-absolute-path', async t => {
@@ -363,8 +362,9 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	await fs.writeFile(filePath, text, 'utf8');
 
 	const {results: resultsNoConfig} = await Xo.lintText(text, {cwd, filePath});
-	// Ensure that with no config, the text is linted and errors are found
-	t.true(resultsNoConfig[0]?.errorCount === 3);
+	// Ensure that with no config, the text is linted and errors are found.
+	// `FOO_BAR` is valid because UPPER_CASE is allowed for module-level `const`, so only `FooBar` and `foo_bar` violate the rule.
+	t.true(resultsNoConfig[0]?.errorCount === 2);
 
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),

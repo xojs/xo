@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+
 import test from 'ava';
 import {type XoConfigItem} from '../lib/types.js';
 import {validateXoConfig, preProcessXoConfig} from '../lib/utils.js';

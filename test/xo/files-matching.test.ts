@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 
 import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
 import {preProcessXoConfig, matchFilesForTsConfig} from '../../lib/utils.js';
@@ -42,6 +41,29 @@ test('empty config', t => {
 
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 
+	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
+
+	t.deepEqual(matchedFiles, [
+		'/path/to/project/index.ts',
+		'/path/to/project/index.test.ts',
+		'/path/to/project/index.mts',
+		'/path/to/project/index.cts',
+		'/path/to/project/index.tsx',
+		'/path/to/project/src/index.ts',
+		'/path/to/project/src/index.test.ts',
+		'/path/to/project/src/index.mts',
+		'/path/to/project/src/index.cts',
+	], 'Only TypeScript files should be matched');
+});
+
+test('single base config item only', t => {
+	const {config, tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig([{}]);
+
+	t.deepEqual(config, [{}], 'Base config should be passed through unmodified');
+	t.deepEqual(additionalTsFilesGlob, []);
+	t.deepEqual(tsFilesIgnoresGlob, []);
+
+	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
 
 	t.deepEqual(matchedFiles, [

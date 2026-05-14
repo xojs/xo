@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+
 import process from 'node:process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -621,7 +621,7 @@ test('handles TypeScript path aliases correctly', async t => {
 			moduleResolution: 'NodeNext',
 			baseUrl: '.',
 			paths: {
-				// eslint-disable-next-line @typescript-eslint/naming-convention
+
 				'@utils/*': ['utils/*'],
 			},
 			strictNullChecks: true,

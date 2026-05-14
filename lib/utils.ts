@@ -3,7 +3,7 @@ import micromatch from 'micromatch';
 import {type Linter} from 'eslint';
 import arrify from 'arrify';
 import {typescriptParser} from 'eslint-config-xo';
-import {type XoConfigItem} from './types.js';
+import {type XoConfigItem, type TypeScriptParserOptions} from './types.js';
 import {
 	allFilesGlob,
 	jsExtensions,
@@ -12,13 +12,6 @@ import {
 
 export {typescriptParser}; // eslint-disable-line unicorn/prefer-export-from -- Also used locally
 
-type TypeScriptParserOptions = Linter.ParserOptions & {
-	project?: string | string[];
-	projectService?: boolean;
-	tsconfigRootDir?: string;
-	programs?: unknown[];
-};
-
 /**
 Convert a `xo` config item to an ESLint config item.
 
@@ -26,8 +19,8 @@ In a flat structure these config items represent the config object items.
 
 Files and rules will always be defined and all other ESLint config properties are preserved.
 
-@param xoConfig
-@returns eslintConfig
+@param xoConfig - The XO config item to convert.
+@returns The equivalent ESLint config item.
 */
 export const xoToEslintConfigItem = (xoConfig: XoConfigItem): Linter.Config => {
 	const {
@@ -36,14 +29,14 @@ export const xoToEslintConfigItem = (xoConfig: XoConfigItem): Linter.Config => {
 		space,
 		prettier,
 		ignores,
-		semicolon,
-		react,
+		semicolon: hasSemicolon,
+		react: hasReact,
 		..._xoConfig
 	} = xoConfig;
 
 	const eslintConfig: Linter.Config = {
 		..._xoConfig,
-		...(xoConfig.files ? {files: arrify(xoConfig.files)} : {}),
+		...(xoConfig.files === undefined ? {} : {files: arrify(xoConfig.files)}),
 		...(xoConfig.rules ? {rules: xoConfig.rules} : {}),
 	};
 
@@ -97,7 +90,7 @@ export const validateXoConfig = (xoConfig: XoConfigItem[]): void => {
 	for (const config of xoConfig.values().drop(1)) {
 		for (const key of Object.keys(config)) {
 			const hint = legacyPropertyHints[key];
-			if (hint) {
+			if (hint !== undefined) {
 				throw new Error(`Invalid XO config property \`${key}\`. ${hint}`);
 			}
 		}
@@ -123,15 +116,15 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 	const processedConfig: XoConfigItem[] = xoConfig[0] ? [{...xoConfig[0]}] : [];
 
 	for (const {...config} of xoConfig.values().drop(1)) {
-		const languageOptions = config.languageOptions as Linter.LanguageOptions | undefined;
-		const parserOptions = languageOptions?.parserOptions as TypeScriptParserOptions | undefined;
+		const {languageOptions} = config;
+		const parserOptions = languageOptions?.['parserOptions'] as TypeScriptParserOptions | undefined;
 
 		// Use TS parser/plugin for JS files if the config contains TypeScript rules which are applied to JS files.
 		// typescript-eslint rules set to "off" are ignored and not applied to JS files.
 		if (
 			config.rules
-			// eslint-disable-next-line @typescript-eslint/dot-notation
-			&& !languageOptions?.['parser']
+
+			&& languageOptions?.['parser'] === undefined
 			&& parserOptions?.project === undefined
 			&& parserOptions?.programs === undefined
 			&& !config.plugins?.['@typescript-eslint']
@@ -153,7 +146,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 			if (hasTsRules) {
 				let isAppliedToJsFiles = false;
 
-				if (config.files) {
+				if (config.files !== undefined) {
 					const normalizedFiles = arrify(config.files).flat().map(file => path.normalize(file));
 					// Strip the basename off any globs
 					const globs = normalizedFiles.map(file => micromatch.scan(file, {dot: true}).glob).filter(Boolean);

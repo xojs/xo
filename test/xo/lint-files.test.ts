@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+
 import {realpathSync} from 'node:fs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -559,8 +559,8 @@ test('normalize cwd path casing', async t => {
 	try {
 		await fs.mkdir(canonicalDirectory);
 
-		const mismatchedCaseDirectoryExists = await fs.stat(mismatchedCaseDirectory).then(() => true, () => false);
-		const cwd = mismatchedCaseDirectoryExists ? mismatchedCaseDirectory : canonicalDirectory;
+		const hasMismatchedCaseDirectory = await fs.stat(mismatchedCaseDirectory).then(() => true, () => false);
+		const cwd = hasMismatchedCaseDirectory ? mismatchedCaseDirectory : canonicalDirectory;
 		const xo = new Xo({cwd});
 		t.is(xo._linterOptions.cwd, realpathSync.native(cwd));
 	} finally {

@@ -133,7 +133,7 @@ const baseXoConfigOptions: XoConfigOptions = {
 
 const linterOptions: LinterOptions = {
 	fix: cliOptions.fix || cliOptions.fixDryRun,
-	cwd: (cliOptions.cwd && path.resolve(cliOptions.cwd)) ?? process.cwd(),
+	cwd: cliOptions.cwd === '' ? process.cwd() : path.resolve(cliOptions.cwd),
 	quiet: cliOptions.quiet,
 	ts: true,
 	configPath: cliOptions.configPath,
@@ -160,10 +160,12 @@ if (typeof cliOptions.space === 'string') {
 	}
 }
 
+const isGitHubActions = Boolean(process.env['GITHUB_ACTIONS']);
+
 if (
-	process.env['GITHUB_ACTIONS']
+	isGitHubActions
 	&& !linterOptions.fix
-	&& !cliOptions.reporter
+	&& cliOptions.reporter === undefined
 ) {
 	linterOptions.quiet = true;
 }
@@ -238,7 +240,7 @@ try {
 		// For TypeScript, we need a file on the filesystem to lint it or else @typescript-eslint will blow up.
 		// We create a temporary file in the node_modules/.cache/xo-linter directory to avoid conflicts with the user's files and lint that file as if it were the stdin input as a work around.
 		// We clean up the file after linting.
-		if (cliOptions.stdinFilename && tsExtensions.includes(path.extname(cliOptions.stdinFilename).slice(1))) {
+		if (cliOptions.stdinFilename !== '' && tsExtensions.includes(path.extname(cliOptions.stdinFilename).slice(1))) {
 			const absoluteFilePath = path.resolve(cliOptions.cwd, cliOptions.stdinFilename);
 			if (!await pathExists(absoluteFilePath)) {
 				const cacheDir = findCacheDirectory({name: cacheDirName, cwd: linterOptions.cwd}) ?? path.join(cliOptions.cwd, 'node_modules', '.cache', cacheDirName);
