@@ -24,9 +24,8 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 			options.cwd = path.resolve(process.cwd(), options.cwd);
 		}
 
-		const stopDirectory = path.dirname(options.cwd);
-
 		const flatConfigExplorer = cosmiconfig(moduleName, {
+			searchStrategy: 'project',
 			searchPlaces: [
 				'package.json',
 				`${moduleName}.config.js`,
@@ -38,7 +37,6 @@ export async function resolveXoConfig(options: LinterOptions): Promise<{
 				'.ts': loadTypeScriptConfig,
 				'.mts': loadTypeScriptConfig,
 			},
-			stopDir: stopDirectory,
 			cache: true,
 		});
 
