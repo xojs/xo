@@ -30,7 +30,6 @@ export const xoToEslintConfigItem = (xoConfig: XoConfigItem): Linter.Config => {
 		prettier,
 		ignores,
 		semicolon: hasSemicolon,
-		react: hasReact,
 		..._xoConfig
 	} = xoConfig;
 
@@ -78,6 +77,7 @@ const legacyPropertyHints: Record<string, string> = {
 	noInlineConfig: 'Move to `linterOptions.noInlineConfig`.',
 	reportUnusedDisableDirectives: 'Move to `linterOptions.reportUnusedDisableDirectives`.',
 	ignorePatterns: 'Use `ignores` instead.',
+	react: 'Install `eslint-config-xo-react` and spread it into your XO config instead.',
 };
 
 /**

@@ -1,11 +1,10 @@
 /* eslint-disable complexity -- Translating every XO config option into ESLint rules is inherently branchy. */
 import arrify from 'arrify';
 import {type Linter, type ESLint} from 'eslint';
-import eslintConfigXoReact from 'eslint-config-xo-react';
 import {type Options} from 'prettier';
 import pluginPrettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
-import {fixupPluginRules, fixupConfigRules} from '@eslint/compat';
+import {fixupPluginRules} from '@eslint/compat';
 import {type XoConfigItem} from './types.js';
 import {config} from './config.js';
 import {xoToEslintConfigItem} from './utils.js';
@@ -152,15 +151,6 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 			eslintConfigItem.rules ??= {};
 			eslintConfigItem.rules['@stylistic/indent'] = ['error', 'tab', {SwitchCase: 1}]; // eslint-disable-line @typescript-eslint/naming-convention
 			eslintConfigItem.rules['@stylistic/indent-binary-ops'] = ['error', 'tab'];
-		}
-
-		if (xoConfigItem.react) {
-			// Ensure the files applied to the React config are the same as the config they are derived from
-			// TODO: Remove `fixupConfigRules` wrapping when eslint-plugin-react supports ESLint 10 natively.
-
-			for (const reactConfig of fixupConfigRules(eslintConfigXoReact({space: xoConfigItem.space as boolean | number | undefined}))) {
-				baseConfig.push({...reactConfig, ...(eslintConfigItem.files ? {files: eslintConfigItem.files} : {})});
-			}
 		}
 
 		// Prettier should generally be the last config in the array

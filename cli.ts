@@ -27,7 +27,6 @@ const cli = meow(
     --space                   Use space indent instead of tabs [Default: 2]
     --config                  Path to a XO configuration file
     --semicolon               Use semicolons [Default: true]
-    --react                   Include React specific parsing and xo-react linting rules [Default: false]
     --prettier                Format with prettier or turn off Prettier-conflicted rules when set to 'compat' [Default: false]
     --print-config            Print the effective ESLint config for the given file
     --version                 Print XO version
@@ -79,10 +78,6 @@ const cli = meow(
 			prettier: {
 				type: 'boolean',
 			},
-			react: {
-				type: 'boolean',
-				default: false,
-			},
 			cwd: {
 				type: 'string',
 				default: process.cwd(),
@@ -128,7 +123,6 @@ const baseXoConfigOptions: XoConfigOptions = {
 	semicolon: cliOptions.semicolon,
 	prettier: cliOptions.prettier,
 	ignores: cliOptions.ignore,
-	react: cliOptions.react,
 };
 
 const linterOptions: LinterOptions = {

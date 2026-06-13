@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Linter} from 'eslint';
+import {type Linter} from 'eslint';
 import micromatch from 'micromatch';
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {frameworkExtensions} from '../lib/constants.js';
@@ -125,28 +125,6 @@ test('with prettier option and space', () => {
 	]);
 });
 
-test('with react option', () => {
-	const flatConfig = xoToEslintConfig([{react: true}]);
-
-	const reactPlugin = flatConfig.find(config =>
-		typeof config?.plugins?.['react'] === 'object');
-
-	const reactHooksPlugin = flatConfig.find(config =>
-		typeof config?.plugins?.['react-hooks'] === 'object');
-
-	assert.ok(reactPlugin instanceof Object);
-	assert.ok(reactHooksPlugin instanceof Object);
-	assert.equal(flatConfig.at(-1)?.rules?.['react/no-danger'], 'error');
-});
-
-test('react option without files does not set files property', () => {
-	const flatConfig = xoToEslintConfig([{react: true}]);
-
-	const reactConfig = flatConfig.find(config => config.rules?.['react/self-closing-comp'] !== undefined);
-	assert.ok(reactConfig);
-	assert.ok(!('files' in reactConfig), 'react config should not have a files property when no files are specified');
-});
-
 test('prettier compat option without files does not set files property', () => {
 	const flatConfig = xoToEslintConfig([{prettier: 'compat'}]);
 
@@ -156,53 +134,33 @@ test('prettier compat option without files does not set files property', () => {
 	assert.ok(!('files' in compatConfig), 'prettier compat config should not have a files property when no files are specified');
 });
 
-test('react hooks config works with react option', () => {
-	const userReactHooksPlugin = {rules: {}};
-
-	const flatConfig = xoToEslintConfig([
-		{react: true},
-		{
-			plugins: {'react-hooks': userReactHooksPlugin},
-			rules: {
-				'react-hooks/rules-of-hooks': 'error',
-			},
-		},
-	]);
-
-	const reactHooksPlugins = flatConfig.filter(config =>
-		typeof config?.plugins?.['react-hooks'] === 'object');
-
-	assert.equal(reactHooksPlugins.length, 1);
-	assert.equal(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
-	assert.equal(flatConfig.at(-1)?.rules?.['react-hooks/rules-of-hooks'], 'error');
-});
-
 test('user plugin overrides win regardless of order', () => {
-	const userReactHooksPlugin = {rules: {}};
+	const userPrettierPlugin = {rules: {}};
 
 	const flatConfig = xoToEslintConfig([
 		{
-			plugins: {'react-hooks': userReactHooksPlugin},
+			plugins: {prettier: userPrettierPlugin},
 		},
-		{react: true},
+		{prettier: true},
 	]);
 
-	const reactHooksPlugins = flatConfig.filter(config =>
-		typeof config?.plugins?.['react-hooks'] === 'object');
+	const prettierPlugins = flatConfig.filter(config =>
+		typeof config?.plugins?.['prettier'] === 'object');
 
-	assert.equal(reactHooksPlugins.length, 1);
-	assert.equal(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
+	assert.equal(prettierPlugins.length, 1);
+	assert.equal(prettierPlugins[0]?.plugins?.['prettier'], userPrettierPlugin);
 });
 
 test('all plugins are consolidated into a single config entry', () => {
-	const flatConfig = xoToEslintConfig([{react: true, prettier: true}]);
+	const jsonPlugin = {rules: {}};
+
+	const flatConfig = xoToEslintConfig([{plugins: {json: jsonPlugin}, prettier: true}]);
 
 	const pluginConfigs = flatConfig.filter(config => config.plugins && Object.keys(config.plugins).length > 0);
 
 	assert.equal(pluginConfigs.length, 1);
 	assert.equal(pluginConfigs[0]?.name, 'xo/plugins');
-	assert.ok(pluginConfigs[0]?.plugins?.['react']);
-	assert.ok(pluginConfigs[0]?.plugins?.['react-hooks']);
+	assert.ok(pluginConfigs[0]?.plugins?.['json']);
 	assert.ok(pluginConfigs[0]?.plugins?.['prettier']);
 });
 
@@ -295,23 +253,6 @@ test('prettier: compat preserves special rules while keeping formatting rules of
 			],
 		},
 	]);
-});
-
-test('react config lints JSX without throwing', () => {
-	const flatConfig = xoToEslintConfig([{react: true}]);
-	const linter = new Linter();
-
-	// Regression test for https://github.com/xojs/xo/issues/868
-	// Should not throw: "Cannot read properties of undefined (reading 'bind')"
-	assert.doesNotThrow(() => {
-		linter.verify('const x = () => <div />;', flatConfig, {filename: 'test.jsx'});
-	});
-});
-
-test('prettier rules are applied after react rules', () => {
-	const flatConfig = xoToEslintConfig([{prettier: 'compat', react: true}]);
-
-	assert.equal(flatConfig.at(-1)?.rules?.['react/jsx-tag-spacing'], 'off');
 });
 
 test('global ignores are respected', () => {

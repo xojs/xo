@@ -17,6 +17,7 @@ const legacyProperties: Array<[string, string]> = [
 	['noInlineConfig', 'Move to `linterOptions.noInlineConfig`.'],
 	['reportUnusedDisableDirectives', 'Move to `linterOptions.reportUnusedDisableDirectives`.'],
 	['ignorePatterns', 'Use `ignores` instead.'],
+	['react', 'Install `eslint-config-xo-react` and spread it into your XO config instead.'],
 ];
 
 for (const [property, hint] of legacyProperties) {
@@ -43,7 +44,6 @@ test('does not throw for valid flat config properties', () => {
 			space: true,
 			semicolon: false,
 			prettier: true,
-			react: true,
 		},
 	];
 

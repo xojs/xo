@@ -266,7 +266,6 @@ export class Xo {
 				suppressionsLocation: options.suppressionsLocation,
 			},
 			{
-				react: options.react,
 				space: options.space,
 				semicolon: options.semicolon,
 				prettier: options.prettier,
@@ -295,7 +294,6 @@ export class Xo {
 				suppressionsLocation: options.suppressionsLocation,
 			},
 			{
-				react: options.react,
 				space: options.space,
 				semicolon: options.semicolon,
 				prettier: options.prettier,

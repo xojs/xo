@@ -34,7 +34,6 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Open all files with errors at the correct line in your editor with `$ xo --open`.
 - Specify [indent](#space) and [semicolon](#semicolon) preferences easily without messing with the rule config.
 - Optionally use the [Prettier](https://github.com/prettier/prettier) code style or turn off all Prettier rules with the `compat` option.
-- Optionally use `eslint-config-xo-react` for easy JSX and React linting with zero config.
 - Optionally use with ESLint [directly](#usage-as-an-eslint-configuration)
 - Great [editor plugins](#editor-plugins).
 
@@ -46,7 +45,7 @@ npm install xo --save-dev
 
 *You must install XO locally. You can run it directly with `$ npx xo`.*
 
-*For framework-specific linting, see [Astro](#astro), [Svelte](#svelte), and [Vue](#vue).*
+*For framework-specific linting, see [Astro](#astro), [React](#react), [Svelte](#svelte), and [Vue](#vue).*
 
 ## Usage
 
@@ -63,7 +62,6 @@ $ xo --help
 		--space                   Use space indent instead of tabs [Default: 2]
 		--config                  Path to a XO configuration file
 		--semicolon               Use semicolons [Default: true]
-		--react                   Include React specific parsing and xo-react linting rules [Default: false]
 		--prettier                Format with prettier or turn off Prettier-conflicted rules when set to 'compat' [Default: false]
 		--print-config            Print the effective ESLint config for the given file
 		--version                 Print XO version
@@ -210,13 +208,6 @@ If contradicting options are set for both Prettier and XO, an error will be thro
 
 If the Prettier option is set to `compat`, instead of formatting your code automatically, XO will turn off all rules that conflict with Prettier code style and allow you to pass your formatting to the Prettier tool directly.
 
-### react
-
-Type: `boolean`\
-Default: `false`
-
-Adds `eslint-plugin-react`, `eslint-plugin-react-hooks`, and `eslint-config-xo-react` to get all the React best practices applied automatically.
-
 ### Astro
 
 To lint [Astro](https://astro.build) files, install [`eslint-plugin-astro`](https://github.com/ota-meshi/eslint-plugin-astro):
@@ -236,6 +227,29 @@ const xoConfig = [
 
 export default xoConfig;
 ```
+
+### React
+
+To lint [React](https://react.dev) files, install [`eslint-config-xo-react`](https://github.com/xojs/eslint-config-xo-react):
+
+```sh
+npm install --save-dev eslint-config-xo-react
+```
+
+Then spread it in your `xo.config.js`:
+
+```js
+import xoReact from 'eslint-config-xo-react';
+
+const xoConfig = [
+	...xoReact(),
+];
+
+export default xoConfig;
+```
+
+> [!NOTE]
+> Until `eslint-plugin-react` supports ESLint 10 natively, you may need to wrap the config with [`fixupConfigRules`](https://github.com/eslint/rewrite/tree/main/packages/compat) from `@eslint/compat`.
 
 ### Svelte
 
