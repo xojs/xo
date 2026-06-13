@@ -126,7 +126,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 		// typescript-eslint rules set to "off" are ignored and not applied to JS files.
 		if (
 			config.rules
-			&& !languageOptions?.['parser']
+			&& languageOptions?.['parser'] === undefined
 			&& parserOptions?.['project'] === undefined
 			&& parserOptions?.['programs'] === undefined
 			&& !config.plugins?.['@typescript-eslint']
