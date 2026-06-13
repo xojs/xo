@@ -1,134 +1,125 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
+import test, {beforeEach, afterEach} from 'node:test';
+import assert from 'node:assert/strict';
 import {type PackageJson} from 'type-fest';
 import {resolveXoConfig} from '../lib/resolve-config.js';
 import {copyTestProject} from './helpers/copy-test-project.js';
 
-const test = _test as TestFn<{cwd: string}>;
+let cwd: string;
 
-test.beforeEach(async t => {
-	t.context.cwd = await copyTestProject();
+beforeEach(async () => {
+	cwd = await copyTestProject();
 });
 
-test.afterEach.always(async t => {
-	await fs.rm(t.context.cwd, {recursive: true, force: true});
+afterEach(async () => {
+	await fs.rm(cwd, {recursive: true, force: true});
 });
 
-test('no config', async t => {
-	const {flatOptions, flatConfigPath} = await resolveXoConfig({
-		cwd: t.context.cwd,
-	});
-	t.deepEqual(flatOptions, []);
-	t.is(flatConfigPath, '');
+test('no config', async () => {
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd});
+	assert.deepEqual(flatOptions, []);
+	assert.equal(flatConfigPath, '');
 });
 
-test('resolves xo flat config', async t => {
+test('resolves xo flat config', async () => {
 	const testConfig = `export default [
 		{
 			space: true,
 		},
 	];`;
 	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		testConfig,
 		'utf8',
 	);
-	const {flatOptions, flatConfigPath} = await resolveXoConfig({
-		cwd: t.context.cwd,
-	});
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd});
 
-	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'xo.config.js'));
-	t.deepEqual(flatOptions, [{space: true}]);
+	assert.deepEqual(flatConfigPath, path.join(cwd, 'xo.config.js'));
+	assert.deepEqual(flatOptions, [{space: true}]);
 });
 
-test('resolves xo object config', async t => {
+test('resolves xo object config', async () => {
 	const testConfig = `export default {
 			space: true,
 		};`;
 	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		testConfig,
 		'utf8',
 	);
-	const {flatOptions, flatConfigPath} = await resolveXoConfig({
-		cwd: t.context.cwd,
-	});
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd});
 
-	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'xo.config.js'));
-	t.deepEqual(flatOptions, [{space: true}]);
+	assert.deepEqual(flatConfigPath, path.join(cwd, 'xo.config.js'));
+	assert.deepEqual(flatOptions, [{space: true}]);
 });
 
-test('resolves package.json flat config', async t => {
+test('resolves package.json flat config', async () => {
 	const pkg = JSON.parse(await fs.readFile(
-		path.join(t.context.cwd, 'package.json'),
+		path.join(cwd, 'package.json'),
 		'utf8',
 	)) as PackageJson;
 
 	pkg['xo'] = [{space: true}];
 
 	await fs.rm(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		{recursive: true, force: true},
 	);
 
 	await fs.writeFile(
-		path.join(t.context.cwd, 'package.json'),
+		path.join(cwd, 'package.json'),
 		JSON.stringify(pkg),
 		'utf8',
 	);
-	const {flatOptions, flatConfigPath} = await resolveXoConfig({
-		cwd: t.context.cwd,
-	});
-	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'package.json'));
-	t.deepEqual(flatOptions, [{space: true}]);
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd});
+	assert.deepEqual(flatConfigPath, path.join(cwd, 'package.json'));
+	assert.deepEqual(flatOptions, [{space: true}]);
 });
 
-test('resolves package.json object config', async t => {
+test('resolves package.json object config', async () => {
 	const pkg = JSON.parse(await fs.readFile(
-		path.join(t.context.cwd, 'package.json'),
+		path.join(cwd, 'package.json'),
 		'utf8',
 	)) as PackageJson;
 
 	pkg['xo'] = {space: true};
 
 	await fs.rm(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		{recursive: true, force: true},
 	);
 
 	await fs.writeFile(
-		path.join(t.context.cwd, 'package.json'),
+		path.join(cwd, 'package.json'),
 		JSON.stringify(pkg),
 		'utf8',
 	);
-	const {flatOptions, flatConfigPath} = await resolveXoConfig({
-		cwd: t.context.cwd,
-	});
-	t.deepEqual(flatConfigPath, path.join(t.context.cwd, 'package.json'));
-	t.deepEqual(flatOptions, [{space: true}]);
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd});
+	assert.deepEqual(flatConfigPath, path.join(cwd, 'package.json'));
+	assert.deepEqual(flatOptions, [{space: true}]);
 });
 
-test('resolves all config extensions types', async t => {
+test('resolves all config extensions types', async () => {
 	const testConfigEsm = `export default [
 		{
 			space: true,
 		},
 	];`;
 
-	const jsFile = path.join(t.context.cwd, 'xo.config.js');
-	const mjsFile = path.join(t.context.cwd, 'xo.config.mjs');
-	const tsFile = path.join(t.context.cwd, 'xo.config.ts');
-	const mtsFile = path.join(t.context.cwd, 'xo.config.mts');
+	const jsFile = path.join(cwd, 'xo.config.js');
+	const mjsFile = path.join(cwd, 'xo.config.mjs');
+	const tsFile = path.join(cwd, 'xo.config.ts');
+	const mtsFile = path.join(cwd, 'xo.config.mts');
 
 	for (const file of [jsFile, mjsFile, tsFile, mtsFile]) {
 		// eslint-disable-next-line no-await-in-loop
 		await fs.writeFile(file, testConfigEsm, 'utf8');
 		// eslint-disable-next-line no-await-in-loop
-		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd});
-		t.deepEqual(flatConfigPath, file);
-		t.deepEqual(flatOptions, [{space: true}]);
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd});
+		assert.deepEqual(flatConfigPath, file);
+		assert.deepEqual(flatOptions, [{space: true}]);
 		// eslint-disable-next-line no-await-in-loop
 		await fs.rm(file);
 	}
@@ -141,13 +132,13 @@ test('resolves all config extensions types', async t => {
 
 	for (const file of [jsFileRelative, mjsFileRelative, tsFileRelative, mtsFileRelative]) {
 		// eslint-disable-next-line no-await-in-loop
-		await fs.writeFile(path.join(t.context.cwd, file), testConfigEsm, 'utf8');
+		await fs.writeFile(path.join(cwd, file), testConfigEsm, 'utf8');
 		// eslint-disable-next-line no-await-in-loop
-		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
-		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
-		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd, configPath: file});
+		assert.deepEqual(flatConfigPath, path.join(cwd, file), 'Config path should match' + file);
+		assert.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
 		// eslint-disable-next-line no-await-in-loop
-		await fs.rm(path.join(t.context.cwd, file));
+		await fs.rm(path.join(cwd, file));
 	}
 
 	// Relative paths with dot slashes
@@ -158,17 +149,17 @@ test('resolves all config extensions types', async t => {
 
 	for (const file of [jsFileRelativeDot, mjsFileRelativeDot, tsFileRelativeDot, mtsFileRelativeDot]) {
 		// eslint-disable-next-line no-await-in-loop
-		await fs.writeFile(path.join(t.context.cwd, file), testConfigEsm, 'utf8');
+		await fs.writeFile(path.join(cwd, file), testConfigEsm, 'utf8');
 		// eslint-disable-next-line no-await-in-loop
-		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
-		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
-		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd, configPath: file});
+		assert.deepEqual(flatConfigPath, path.join(cwd, file), 'Config path should match' + file);
+		assert.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
 		// eslint-disable-next-line no-await-in-loop
-		await fs.rm(path.join(t.context.cwd, file));
+		await fs.rm(path.join(cwd, file));
 	}
 });
 
-test('loading TypeScript config does not create temporary files', async t => {
+test('loading TypeScript config does not create temporary files', async () => {
 	const testConfig = `export default [
 		{
 			space: true,
@@ -176,45 +167,45 @@ test('loading TypeScript config does not create temporary files', async t => {
 	];`;
 
 	for (const extension of ['.ts', '.mts']) {
-		const configFile = path.join(t.context.cwd, `xo.config${extension}`);
+		const configFile = path.join(cwd, `xo.config${extension}`);
 		// eslint-disable-next-line no-await-in-loop
 		await fs.writeFile(configFile, testConfig, 'utf8');
 
 		// eslint-disable-next-line no-await-in-loop
-		const filesBefore = await fs.readdir(t.context.cwd);
+		const filesBefore = await fs.readdir(cwd);
 		// eslint-disable-next-line no-await-in-loop
-		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd});
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd});
 		// eslint-disable-next-line no-await-in-loop
-		const filesAfter = await fs.readdir(t.context.cwd);
+		const filesAfter = await fs.readdir(cwd);
 
-		t.deepEqual(flatConfigPath, configFile);
-		t.deepEqual(flatOptions, [{space: true}]);
-		t.deepEqual(filesAfter, filesBefore, `No temporary files should be created when loading xo.config${extension}`);
+		assert.deepEqual(flatConfigPath, configFile);
+		assert.deepEqual(flatOptions, [{space: true}]);
+		assert.deepEqual(filesAfter, filesBefore, `No temporary files should be created when loading xo.config${extension}`);
 
 		// eslint-disable-next-line no-await-in-loop
 		await fs.rm(configFile);
 	}
 });
 
-test('resolves all custom config extensions types', async t => {
+test('resolves all custom config extensions types', async () => {
 	const testConfigEsm = `export default [
 		{
 			space: true,
 		},
 	];`;
 
-	const jsFile = path.join(t.context.cwd, 'custom.xo.config.js');
-	const mjsFile = path.join(t.context.cwd, 'custom.xo.config.mjs');
-	const tsFile = path.join(t.context.cwd, 'custom.xo.config.ts');
-	const mtsFile = path.join(t.context.cwd, 'custom.xo.config.mts');
+	const jsFile = path.join(cwd, 'custom.xo.config.js');
+	const mjsFile = path.join(cwd, 'custom.xo.config.mjs');
+	const tsFile = path.join(cwd, 'custom.xo.config.ts');
+	const mtsFile = path.join(cwd, 'custom.xo.config.mts');
 
 	for (const file of [jsFile, mjsFile, tsFile, mtsFile]) {
 		// eslint-disable-next-line no-await-in-loop
 		await fs.writeFile(file, testConfigEsm, 'utf8');
 		// eslint-disable-next-line no-await-in-loop
-		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
-		t.deepEqual(flatConfigPath, file, 'Config path should match' + file);
-		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd, configPath: file});
+		assert.deepEqual(flatConfigPath, file, 'Config path should match' + file);
+		assert.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
 		// eslint-disable-next-line no-await-in-loop
 		await fs.rm(file);
 	}
@@ -226,13 +217,13 @@ test('resolves all custom config extensions types', async t => {
 
 	for (const file of [jsFileRelative, mjsFileRelative, tsFileRelative, mtsFileRelative]) {
 		// eslint-disable-next-line no-await-in-loop
-		await fs.writeFile(path.join(t.context.cwd, file), testConfigEsm, 'utf8');
+		await fs.writeFile(path.join(cwd, file), testConfigEsm, 'utf8');
 		// eslint-disable-next-line no-await-in-loop
-		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
-		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
-		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd, configPath: file});
+		assert.deepEqual(flatConfigPath, path.join(cwd, file), 'Config path should match' + file);
+		assert.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
 		// eslint-disable-next-line no-await-in-loop
-		await fs.rm(path.join(t.context.cwd, file));
+		await fs.rm(path.join(cwd, file));
 	}
 
 	// Relative paths with dot slashes
@@ -243,12 +234,12 @@ test('resolves all custom config extensions types', async t => {
 
 	for (const file of [jsFileRelativeDot, mjsFileRelativeDot, tsFileRelativeDot, mtsFileRelativeDot]) {
 		// eslint-disable-next-line no-await-in-loop
-		await fs.writeFile(path.join(t.context.cwd, file), testConfigEsm, 'utf8');
+		await fs.writeFile(path.join(cwd, file), testConfigEsm, 'utf8');
 		// eslint-disable-next-line no-await-in-loop
-		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd: t.context.cwd, configPath: file});
-		t.deepEqual(flatConfigPath, path.join(t.context.cwd, file), 'Config path should match' + file);
-		t.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
+		const {flatOptions, flatConfigPath} = await resolveXoConfig({cwd, configPath: file});
+		assert.deepEqual(flatConfigPath, path.join(cwd, file), 'Config path should match' + file);
+		assert.deepEqual(flatOptions, [{space: true}], 'Flat options should match expected value' + file);
 		// eslint-disable-next-line no-await-in-loop
-		await fs.rm(path.join(t.context.cwd, file));
+		await fs.rm(path.join(cwd, file));
 	}
 });

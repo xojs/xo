@@ -1,49 +1,47 @@
 
-import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import {preProcessXoConfig, matchFilesForTsConfig} from '../../lib/utils.js';
 import {type XoConfigItem} from '../../lib/types.js';
 import {allFilesGlob, jsFilesGlob, tsFilesGlob} from '../../lib/constants.js';
-
-const test = _test as TestFn<{cwd: string; files: string[]}>;
 
 // These tests are designed to validate the functionality of the utility functions in the `utils.js` file.
 // These utility functions are used together in xo in a specific way, so the tests are structured to ensure that they work correctly in that context.
 // each test checks the integration of the utility functions together, rather than testing them in isolation.
 
-test.beforeEach(t => {
-	// Set a fake working directory for the tests
-	t.context.cwd = '/path/to/project';
-	// Represents a set of files in a project directory, including all supported TypeScript and JavaScript files.
-	t.context.files = [
-		'/path/to/project/index.ts',
-		'/path/to/project/index.test.ts',
-		'/path/to/project/index.mts',
-		'/path/to/project/index.cts',
-		'/path/to/project/index.tsx',
-		'/path/to/project/src/index.ts',
-		'/path/to/project/src/index.test.ts',
-		'/path/to/project/src/index.mts',
-		'/path/to/project/src/index.cts',
-		'/path/to/project/index.js',
-		'/path/to/project/index.test.js',
-		'/path/to/project/index.mjs',
-		'/path/to/project/index.cjs',
-		'/path/to/project/src/index.js',
-		'/path/to/project/src/index.test.js',
-		'/path/to/project/src/index.mjs',
-		'/path/to/project/src/index.cjs',
-		'/path/to/project/index.jsx',
-	];
-});
+// A fake working directory for the tests.
+const cwd = '/path/to/project';
 
-test('empty config', t => {
+// Represents a set of files in a project directory, including all supported TypeScript and JavaScript files.
+const files = [
+	'/path/to/project/index.ts',
+	'/path/to/project/index.test.ts',
+	'/path/to/project/index.mts',
+	'/path/to/project/index.cts',
+	'/path/to/project/index.tsx',
+	'/path/to/project/src/index.ts',
+	'/path/to/project/src/index.test.ts',
+	'/path/to/project/src/index.mts',
+	'/path/to/project/src/index.cts',
+	'/path/to/project/index.js',
+	'/path/to/project/index.test.js',
+	'/path/to/project/index.mjs',
+	'/path/to/project/index.cjs',
+	'/path/to/project/src/index.js',
+	'/path/to/project/src/index.test.js',
+	'/path/to/project/src/index.mjs',
+	'/path/to/project/src/index.cjs',
+	'/path/to/project/index.jsx',
+];
+
+test('empty config', () => {
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig([]);
 
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
 
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
 
-	t.deepEqual(matchedFiles, [
+	assert.deepEqual(matchedFiles, [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -56,17 +54,17 @@ test('empty config', t => {
 	], 'Only TypeScript files should be matched');
 });
 
-test('single base config item only', t => {
+test('single base config item only', () => {
 	const {config, tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig([{}]);
 
-	t.deepEqual(config, [{}], 'Base config should be passed through unmodified');
-	t.deepEqual(additionalTsFilesGlob, []);
-	t.deepEqual(tsFilesIgnoresGlob, []);
+	assert.deepEqual(config, [{}], 'Base config should be passed through unmodified');
+	assert.deepEqual(additionalTsFilesGlob, []);
+	assert.deepEqual(tsFilesIgnoresGlob, []);
 
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
 
-	t.deepEqual(matchedFiles, [
+	assert.deepEqual(matchedFiles, [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -79,7 +77,7 @@ test('single base config item only', t => {
 	], 'Only TypeScript files should be matched');
 });
 
-test('config with no "files" and @typescript-eslint rules set to "off"', t => {
+test('config with no "files" and @typescript-eslint rules set to "off"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -91,8 +89,8 @@ test('config with no "files" and @typescript-eslint rules set to "off"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -104,7 +102,7 @@ test('config with no "files" and @typescript-eslint rules set to "off"', t => {
 		'/path/to/project/src/index.cts',
 	], 'Only TypeScript files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "0"', t => {
+test('config with no "files" and @typescript-eslint rules set to "0"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -116,8 +114,8 @@ test('config with no "files" and @typescript-eslint rules set to "0"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -129,7 +127,7 @@ test('config with no "files" and @typescript-eslint rules set to "0"', t => {
 		'/path/to/project/src/index.cts',
 	], 'Only TypeScript files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "[off]"', t => {
+test('config with no "files" and @typescript-eslint rules set to "[off]"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -141,8 +139,8 @@ test('config with no "files" and @typescript-eslint rules set to "[off]"', t => 
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -154,7 +152,7 @@ test('config with no "files" and @typescript-eslint rules set to "[off]"', t => 
 		'/path/to/project/src/index.cts',
 	], 'Only TypeScript files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "[0]"', t => {
+test('config with no "files" and @typescript-eslint rules set to "[0]"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -166,8 +164,8 @@ test('config with no "files" and @typescript-eslint rules set to "[0]"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -179,7 +177,7 @@ test('config with no "files" and @typescript-eslint rules set to "[0]"', t => {
 		'/path/to/project/src/index.cts',
 	], 'Only TypeScript files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "warn"', t => {
+test('config with no "files" and @typescript-eslint rules set to "warn"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -191,10 +189,10 @@ test('config with no "files" and @typescript-eslint rules set to "warn"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "1"', t => {
+test('config with no "files" and @typescript-eslint rules set to "1"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -206,10 +204,10 @@ test('config with no "files" and @typescript-eslint rules set to "1"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "[warn]"', t => {
+test('config with no "files" and @typescript-eslint rules set to "[warn]"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -221,10 +219,10 @@ test('config with no "files" and @typescript-eslint rules set to "[warn]"', t =>
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "[1]"', t => {
+test('config with no "files" and @typescript-eslint rules set to "[1]"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -236,10 +234,10 @@ test('config with no "files" and @typescript-eslint rules set to "[1]"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "error"', t => {
+test('config with no "files" and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -251,10 +249,10 @@ test('config with no "files" and @typescript-eslint rules set to "error"', t => 
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "2"', t => {
+test('config with no "files" and @typescript-eslint rules set to "2"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -266,10 +264,10 @@ test('config with no "files" and @typescript-eslint rules set to "2"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "["error"]"', t => {
+test('config with no "files" and @typescript-eslint rules set to "["error"]"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -281,10 +279,10 @@ test('config with no "files" and @typescript-eslint rules set to "["error"]"', t
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
-test('config with no "files" and @typescript-eslint rules set to "[2]"', t => {
+test('config with no "files" and @typescript-eslint rules set to "[2]"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -296,11 +294,11 @@ test('config with no "files" and @typescript-eslint rules set to "[2]"', t => {
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
 
-test('config with js "files" glob and @typescript-eslint rules set to "off"', t => {
+test('config with js "files" glob and @typescript-eslint rules set to "off"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -313,8 +311,8 @@ test('config with js "files" glob and @typescript-eslint rules set to "off"', t 
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -327,7 +325,7 @@ test('config with js "files" glob and @typescript-eslint rules set to "off"', t 
 	], 'Only TypeScript files should be matched');
 });
 
-test('config with js "files" glob and @typescript-eslint rules set to "error"', t => {
+test('config with js "files" glob and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -340,11 +338,11 @@ test('config with js "files" glob and @typescript-eslint rules set to "error"', 
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
 
-test('config with mixed "files" glob and @typescript-eslint rules set to "error"', t => {
+test('config with mixed "files" glob and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -357,11 +355,11 @@ test('config with mixed "files" glob and @typescript-eslint rules set to "error"
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, t.context.files, 'All files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, files, 'All files should be matched');
 });
 
-test('config with mixed "files" glob filtered and @typescript-eslint rules set to "error"', t => {
+test('config with mixed "files" glob filtered and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -374,8 +372,8 @@ test('config with mixed "files" glob filtered and @typescript-eslint rules set t
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.toSorted(), [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -392,7 +390,7 @@ test('config with mixed "files" glob filtered and @typescript-eslint rules set t
 	].toSorted(), 'All Ts files and only .js files should be matched');
 });
 
-test('config with mixed relative glob "files" and @typescript-eslint rules set to "error"', t => {
+test('config with mixed relative glob "files" and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -405,8 +403,8 @@ test('config with mixed relative glob "files" and @typescript-eslint rules set t
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.toSorted(), [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -421,7 +419,7 @@ test('config with mixed relative glob "files" and @typescript-eslint rules set t
 	].toSorted(), 'All Ts files and only .js files in src dir should be matched');
 });
 
-test('config with mixed relative trickier glob "files" and @typescript-eslint rules set to "error"', t => {
+test('config with mixed relative trickier glob "files" and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -434,8 +432,8 @@ test('config with mixed relative trickier glob "files" and @typescript-eslint ru
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.toSorted(), [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -450,7 +448,7 @@ test('config with mixed relative trickier glob "files" and @typescript-eslint ru
 	].toSorted(), 'All Ts files and only .js files in src dir should be matched');
 });
 
-test('config with mixed relative filepath "files" and @typescript-eslint rules set to "error"', t => {
+test('config with mixed relative filepath "files" and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -463,8 +461,8 @@ test('config with mixed relative filepath "files" and @typescript-eslint rules s
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.toSorted(), [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -478,7 +476,7 @@ test('config with mixed relative filepath "files" and @typescript-eslint rules s
 	].toSorted(), 'All Ts files and single .js files in src dir should be matched');
 });
 
-test('config with js glob "files" and @typescript-eslint rules set to "error" and ignores a file', t => {
+test('config with js glob "files" and @typescript-eslint rules set to "error" and ignores a file', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -492,8 +490,8 @@ test('config with js glob "files" and @typescript-eslint rules set to "error" an
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles.toSorted(), [
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles.toSorted(), [
 		'/path/to/project/index.ts',
 		'/path/to/project/index.test.ts',
 		'/path/to/project/index.mts',
@@ -507,7 +505,7 @@ test('config with js glob "files" and @typescript-eslint rules set to "error" an
 	].toSorted(), 'All Ts files and .js files in root dir should be matched');
 });
 
-test('config with custom languageOptions and @typescript-eslint rules set to "error"', t => {
+test('config with custom languageOptions and @typescript-eslint rules set to "error"', () => {
 	const xoConfig: XoConfigItem[] = [
 		// Base config needs to be the first item in the array
 		{},
@@ -525,6 +523,6 @@ test('config with custom languageOptions and @typescript-eslint rules set to "er
 	];
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig(xoConfig);
 	const globs = [tsFilesGlob, ...additionalTsFilesGlob];
-	const matchedFiles = matchFilesForTsConfig(t.context.cwd, t.context.files, globs, tsFilesIgnoresGlob);
-	t.deepEqual(matchedFiles, [], 'No files should be matched');
+	const matchedFiles = matchFilesForTsConfig(cwd, files, globs, tsFilesIgnoresGlob);
+	assert.deepEqual(matchedFiles, [], 'No files should be matched');
 });

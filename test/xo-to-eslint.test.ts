@@ -1,64 +1,53 @@
-import fs from 'node:fs/promises';
-import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import {Linter} from 'eslint';
 import micromatch from 'micromatch';
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {frameworkExtensions} from '../lib/constants.js';
-import {copyTestProject} from './helpers/copy-test-project.js';
 
-const test = _test as TestFn<{cwd: string}>;
-
-test.beforeEach(async t => {
-	t.context.cwd = await copyTestProject();
-});
-
-test.afterEach.always(async t => {
-	await fs.rm(t.context.cwd, {recursive: true, force: true});
-});
-
-test('base config rules', t => {
+test('base config rules', () => {
 	const flatConfig = xoToEslintConfig(undefined);
 
-	t.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/indent'], [
+	assert.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/indent'], [
 		'error',
 		'tab',
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		{SwitchCase: 1},
 	]);
-	t.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/semi'], ['error', 'always']);
-	t.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/quotes'], ['error', 'single']);
+	assert.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/semi'], ['error', 'always']);
+	assert.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/quotes'], ['error', 'single']);
 });
 
-test('empty config rules', t => {
+test('empty config rules', () => {
 	const flatConfig = xoToEslintConfig([]);
 
-	t.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/indent'], [
+	assert.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/indent'], [
 		'error',
 		'tab',
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		{SwitchCase: 1},
 	]);
-	t.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/semi'], ['error', 'always']);
-	t.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/quotes'], ['error', 'single']);
+	assert.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/semi'], ['error', 'always']);
+	assert.deepEqual(flatConfig.find(config => config.name === 'xo/base')?.rules?.['@stylistic/quotes'], ['error', 'single']);
 });
 
-test('config with space option', t => {
+test('config with space option', () => {
 	const flatConfig = xoToEslintConfig([{space: true}]);
 
-	t.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/indent'], [
+	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/indent'], [
 		'error',
 		2,
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		{SwitchCase: 1},
 	]);
-	t.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/indent-binary-ops'], ['error', 2]);
+	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/indent-binary-ops'], ['error', 2]);
 });
 
-test('config with semi false option', t => {
+test('config with semi false option', () => {
 	const flatConfig = xoToEslintConfig([{semicolon: false}]);
 
-	t.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/semi'], ['error', 'never']);
-	t.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/member-delimiter-style'], [
+	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/semi'], ['error', 'never']);
+	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/member-delimiter-style'], [
 		'error',
 		{
 			multiline: {delimiter: 'none'},
@@ -67,24 +56,24 @@ test('config with semi false option', t => {
 	]);
 });
 
-test('config with rules', t => {
+test('config with rules', () => {
 	const flatConfig = xoToEslintConfig([{rules: {'no-console': 'error'}}]);
 
-	t.is(flatConfig.at(-1)?.rules?.['no-console'], 'error');
+	assert.equal(flatConfig.at(-1)?.rules?.['no-console'], 'error');
 });
 
-test('with prettier option', t => {
+test('with prettier option', () => {
 	const flatConfig = xoToEslintConfig([{prettier: true}]);
 
 	const prettierPluginConfig = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object');
 
-	t.truthy(prettierPluginConfig);
+	assert.ok(prettierPluginConfig);
 
 	const prettierRuleConfig = flatConfig.find(config =>
 		config?.rules?.['prettier/prettier'] !== undefined);
 
-	t.deepEqual(prettierRuleConfig?.rules?.['prettier/prettier'], [
+	assert.deepEqual(prettierRuleConfig?.rules?.['prettier/prettier'], [
 		'error',
 		{
 			bracketSameLine: false,
@@ -98,31 +87,31 @@ test('with prettier option', t => {
 	]);
 });
 
-test('with prettier option compat', t => {
+test('with prettier option compat', () => {
 	const flatConfig = xoToEslintConfig([{prettier: 'compat'}]);
 
-	t.is(flatConfig.at(-1)?.rules?.['@typescript-eslint/semi'], 'off');
+	assert.equal(flatConfig.at(-1)?.rules?.['@typescript-eslint/semi'], 'off');
 
 	const prettierConfigJs = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object');
 
-	t.falsy(prettierConfigJs, undefined);
+	assert.ok(!prettierConfigJs);
 
-	t.is(flatConfig.at(-1)?.rules?.['@stylistic/semi'], 'off');
+	assert.equal(flatConfig.at(-1)?.rules?.['@stylistic/semi'], 'off');
 });
 
-test('with prettier option and space', t => {
+test('with prettier option and space', () => {
 	const flatConfig = xoToEslintConfig([{prettier: true, space: true}]);
 
 	const prettierPluginConfig = flatConfig.find(config =>
 		typeof config?.plugins?.['prettier'] === 'object');
 
-	t.truthy(prettierPluginConfig);
+	assert.ok(prettierPluginConfig);
 
 	const prettierRuleConfig = flatConfig.find(config =>
 		config?.rules?.['prettier/prettier'] !== undefined);
 
-	t.deepEqual(prettierRuleConfig?.rules?.['prettier/prettier'], [
+	assert.deepEqual(prettierRuleConfig?.rules?.['prettier/prettier'], [
 		'error',
 		{
 			bracketSameLine: false,
@@ -136,7 +125,7 @@ test('with prettier option and space', t => {
 	]);
 });
 
-test('with react option', t => {
+test('with react option', () => {
 	const flatConfig = xoToEslintConfig([{react: true}]);
 
 	const reactPlugin = flatConfig.find(config =>
@@ -145,29 +134,29 @@ test('with react option', t => {
 	const reactHooksPlugin = flatConfig.find(config =>
 		typeof config?.plugins?.['react-hooks'] === 'object');
 
-	t.true(reactPlugin instanceof Object);
-	t.true(reactHooksPlugin instanceof Object);
-	t.is(flatConfig.at(-1)?.rules?.['react/no-danger'], 'error');
+	assert.ok(reactPlugin instanceof Object);
+	assert.ok(reactHooksPlugin instanceof Object);
+	assert.equal(flatConfig.at(-1)?.rules?.['react/no-danger'], 'error');
 });
 
-test('react option without files does not set files property', t => {
+test('react option without files does not set files property', () => {
 	const flatConfig = xoToEslintConfig([{react: true}]);
 
 	const reactConfig = flatConfig.find(config => config.rules?.['react/self-closing-comp'] !== undefined);
-	t.truthy(reactConfig);
-	t.false('files' in reactConfig!, 'react config should not have a files property when no files are specified');
+	assert.ok(reactConfig);
+	assert.ok(!('files' in reactConfig), 'react config should not have a files property when no files are specified');
 });
 
-test('prettier compat option without files does not set files property', t => {
+test('prettier compat option without files does not set files property', () => {
 	const flatConfig = xoToEslintConfig([{prettier: 'compat'}]);
 
 	const compatConfig = flatConfig.find(config =>
 		config?.rules?.['@stylistic/semi'] === 'off');
-	t.truthy(compatConfig);
-	t.false('files' in compatConfig!, 'prettier compat config should not have a files property when no files are specified');
+	assert.ok(compatConfig);
+	assert.ok(!('files' in compatConfig), 'prettier compat config should not have a files property when no files are specified');
 });
 
-test('react hooks config works with react option', t => {
+test('react hooks config works with react option', () => {
 	const userReactHooksPlugin = {rules: {}};
 
 	const flatConfig = xoToEslintConfig([
@@ -183,12 +172,12 @@ test('react hooks config works with react option', t => {
 	const reactHooksPlugins = flatConfig.filter(config =>
 		typeof config?.plugins?.['react-hooks'] === 'object');
 
-	t.is(reactHooksPlugins.length, 1);
-	t.is(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
-	t.is(flatConfig.at(-1)?.rules?.['react-hooks/rules-of-hooks'], 'error');
+	assert.equal(reactHooksPlugins.length, 1);
+	assert.equal(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
+	assert.equal(flatConfig.at(-1)?.rules?.['react-hooks/rules-of-hooks'], 'error');
 });
 
-test('user plugin overrides win regardless of order', t => {
+test('user plugin overrides win regardless of order', () => {
 	const userReactHooksPlugin = {rules: {}};
 
 	const flatConfig = xoToEslintConfig([
@@ -201,23 +190,23 @@ test('user plugin overrides win regardless of order', t => {
 	const reactHooksPlugins = flatConfig.filter(config =>
 		typeof config?.plugins?.['react-hooks'] === 'object');
 
-	t.is(reactHooksPlugins.length, 1);
-	t.is(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
+	assert.equal(reactHooksPlugins.length, 1);
+	assert.equal(reactHooksPlugins[0]?.plugins?.['react-hooks'], userReactHooksPlugin);
 });
 
-test('all plugins are consolidated into a single config entry', t => {
+test('all plugins are consolidated into a single config entry', () => {
 	const flatConfig = xoToEslintConfig([{react: true, prettier: true}]);
 
 	const pluginConfigs = flatConfig.filter(config => config.plugins && Object.keys(config.plugins).length > 0);
 
-	t.is(pluginConfigs.length, 1);
-	t.is(pluginConfigs[0]?.name, 'xo/plugins');
-	t.truthy(pluginConfigs[0]?.plugins?.['react']);
-	t.truthy(pluginConfigs[0]?.plugins?.['react-hooks']);
-	t.truthy(pluginConfigs[0]?.plugins?.['prettier']);
+	assert.equal(pluginConfigs.length, 1);
+	assert.equal(pluginConfigs[0]?.name, 'xo/plugins');
+	assert.ok(pluginConfigs[0]?.plugins?.['react']);
+	assert.ok(pluginConfigs[0]?.plugins?.['react-hooks']);
+	assert.ok(pluginConfigs[0]?.plugins?.['prettier']);
 });
 
-test('non-js/ts plugin is hoisted without affecting file-scoped rules', t => {
+test('non-js/ts plugin is hoisted without affecting file-scoped rules', () => {
 	const jsonPlugin = {rules: {'no-duplicate-keys': {create: () => ({})}}};
 
 	const flatConfig = xoToEslintConfig([
@@ -232,38 +221,38 @@ test('non-js/ts plugin is hoisted without affecting file-scoped rules', t => {
 
 	// Plugin should be hoisted into the single plugins entry
 	const pluginConfigs = flatConfig.filter(config => config.plugins && Object.keys(config.plugins).length > 0);
-	t.is(pluginConfigs.length, 1);
-	t.is(pluginConfigs[0]?.plugins?.['json'], jsonPlugin);
+	assert.equal(pluginConfigs.length, 1);
+	assert.equal(pluginConfigs[0]?.plugins?.['json'], jsonPlugin);
 
 	// The rule should still be scoped to the correct files
 	const jsonRuleConfig = flatConfig.find(config =>
 		config?.rules?.['json/no-duplicate-keys'] !== undefined);
-	t.deepEqual(jsonRuleConfig?.files, ['**/*.json']);
+	assert.deepEqual(jsonRuleConfig?.files, ['**/*.json']);
 });
 
-test('supports files config option as a string', t => {
+test('supports files config option as a string', () => {
 	const flatConfig = xoToEslintConfig([{files: 'src/**/*.ts'}]);
 
-	t.deepEqual(flatConfig.at(-1)?.files, ['src/**/*.ts']);
+	assert.deepEqual(flatConfig.at(-1)?.files, ['src/**/*.ts']);
 });
 
-test('no files config option remains undefined', t => {
+test('no files config option remains undefined', () => {
 	const flatConfig = xoToEslintConfig([{files: undefined, space: true}]);
 
-	t.is(flatConfig.at(-1)?.files, undefined);
+	assert.equal(flatConfig.at(-1)?.files, undefined);
 });
 
-test('prettier: true preserves special rules but keeps non-special formatting rules off', t => {
+test('prettier: true preserves special rules but keeps non-special formatting rules off', () => {
 	const flatConfig = xoToEslintConfig([{prettier: true}]);
 
 	const prettierRuleConfig = flatConfig.find(config =>
 		config?.rules?.['prettier/prettier'] !== undefined);
 
 	// Special rules are re-enabled
-	t.is(prettierRuleConfig?.rules?.['curly'], 'error');
-	t.is(prettierRuleConfig?.rules?.['no-unexpected-multiline'], 'error');
-	t.deepEqual(prettierRuleConfig?.rules?.['@stylistic/quotes'], ['error', 'single', {avoidEscape: true}]);
-	t.deepEqual(prettierRuleConfig?.rules?.['@stylistic/no-mixed-operators'], [
+	assert.equal(prettierRuleConfig?.rules?.['curly'], 'error');
+	assert.equal(prettierRuleConfig?.rules?.['no-unexpected-multiline'], 'error');
+	assert.deepEqual(prettierRuleConfig?.rules?.['@stylistic/quotes'], ['error', 'single', {avoidEscape: true}]);
+	assert.deepEqual(prettierRuleConfig?.rules?.['@stylistic/no-mixed-operators'], [
 		'error',
 		{
 			groups: [
@@ -275,26 +264,26 @@ test('prettier: true preserves special rules but keeps non-special formatting ru
 			],
 		},
 	]);
-	t.deepEqual(prettierRuleConfig?.rules?.['prefer-arrow-callback'], ['error', {allowNamedFunctions: true}]);
-	t.is(prettierRuleConfig?.rules?.['arrow-body-style'], 'error');
+	assert.deepEqual(prettierRuleConfig?.rules?.['prefer-arrow-callback'], ['error', {allowNamedFunctions: true}]);
+	assert.equal(prettierRuleConfig?.rules?.['arrow-body-style'], 'error');
 
 	// Non-special formatting rules remain off
-	t.is(prettierRuleConfig?.rules?.['@stylistic/semi'], 'off');
-	t.is(prettierRuleConfig?.rules?.['@stylistic/indent'], 'off');
+	assert.equal(prettierRuleConfig?.rules?.['@stylistic/semi'], 'off');
+	assert.equal(prettierRuleConfig?.rules?.['@stylistic/indent'], 'off');
 });
 
-test('prettier: compat preserves special rules while keeping formatting rules off', t => {
+test('prettier: compat preserves special rules while keeping formatting rules off', () => {
 	const flatConfig = xoToEslintConfig([{prettier: 'compat'}]);
 
 	const compatConfig = flatConfig.find(config =>
 		config?.rules?.['@stylistic/semi'] === 'off');
 
-	t.truthy(compatConfig);
-	t.is(compatConfig?.rules?.['@stylistic/indent'], 'off');
-	t.is(compatConfig?.rules?.['curly'], 'error');
-	t.is(compatConfig?.rules?.['no-unexpected-multiline'], 'error');
-	t.deepEqual(compatConfig?.rules?.['@stylistic/quotes'], ['error', 'single', {avoidEscape: true}]);
-	t.deepEqual(compatConfig?.rules?.['@stylistic/no-mixed-operators'], [
+	assert.ok(compatConfig);
+	assert.equal(compatConfig?.rules?.['@stylistic/indent'], 'off');
+	assert.equal(compatConfig?.rules?.['curly'], 'error');
+	assert.equal(compatConfig?.rules?.['no-unexpected-multiline'], 'error');
+	assert.deepEqual(compatConfig?.rules?.['@stylistic/quotes'], ['error', 'single', {avoidEscape: true}]);
+	assert.deepEqual(compatConfig?.rules?.['@stylistic/no-mixed-operators'], [
 		'error',
 		{
 			groups: [
@@ -308,48 +297,48 @@ test('prettier: compat preserves special rules while keeping formatting rules of
 	]);
 });
 
-test('react config lints JSX without throwing', t => {
+test('react config lints JSX without throwing', () => {
 	const flatConfig = xoToEslintConfig([{react: true}]);
 	const linter = new Linter();
 
 	// Regression test for https://github.com/xojs/xo/issues/868
 	// Should not throw: "Cannot read properties of undefined (reading 'bind')"
-	t.notThrows(() => {
+	assert.doesNotThrow(() => {
 		linter.verify('const x = () => <div />;', flatConfig, {filename: 'test.jsx'});
 	});
 });
 
-test('prettier rules are applied after react rules', t => {
+test('prettier rules are applied after react rules', () => {
 	const flatConfig = xoToEslintConfig([{prettier: 'compat', react: true}]);
 
-	t.is(flatConfig.at(-1)?.rules?.['react/jsx-tag-spacing'], 'off');
+	assert.equal(flatConfig.at(-1)?.rules?.['react/jsx-tag-spacing'], 'off');
 });
 
-test('global ignores are respected', t => {
+test('global ignores are respected', () => {
 	const flatConfig = xoToEslintConfig([
 		{ignores: ['**/test']},
 	]);
 
-	t.deepEqual(flatConfig.at(-1), {ignores: ['**/test']});
+	assert.deepEqual(flatConfig.at(-1), {ignores: ['**/test']});
 });
 
-test('global ignores as strings are respected', t => {
+test('global ignores as strings are respected', () => {
 	const flatConfig = xoToEslintConfig([
 		{ignores: '**/test'},
 	]);
 
-	t.deepEqual(flatConfig.at(-1), {ignores: ['**/test']});
+	assert.deepEqual(flatConfig.at(-1), {ignores: ['**/test']});
 });
 
-test('global ignores with names are respected', t => {
+test('global ignores with names are respected', () => {
 	const flatConfig = xoToEslintConfig([
 		{name: 'test-ignores', ignores: '**/test'},
 	]);
 
-	t.deepEqual(flatConfig.at(-1), {name: 'test-ignores', ignores: ['**/test']});
+	assert.deepEqual(flatConfig.at(-1), {name: 'test-ignores', ignores: ['**/test']});
 });
 
-test('empty configs are filtered', t => {
+test('empty configs are filtered', () => {
 	const flatConfig = xoToEslintConfig([
 		{name: 'test-ignores', ignores: '**/test'},
 		{},
@@ -358,16 +347,16 @@ test('empty configs are filtered', t => {
 		{rules: {}},
 	]);
 
-	t.deepEqual(flatConfig.at(-2), {name: 'test-ignores', ignores: ['**/test']});
+	assert.deepEqual(flatConfig.at(-2), {name: 'test-ignores', ignores: ['**/test']});
 });
 
-test('supports ESLint-native files format with nested arrays', t => {
+test('supports ESLint-native files format with nested arrays', () => {
 	const flatConfig = xoToEslintConfig([{files: ['**/*.svelte', ['**/*.test.*', '**/*.spec.*']]}]);
 
-	t.deepEqual(flatConfig.at(-1)?.files, ['**/*.svelte', ['**/*.test.*', '**/*.spec.*']]);
+	assert.deepEqual(flatConfig.at(-1)?.files, ['**/*.svelte', ['**/*.test.*', '**/*.spec.*']]);
 });
 
-test('Linter.Config objects are accepted as XoConfigItem', t => {
+test('Linter.Config objects are accepted as XoConfigItem', () => {
 	// Simulates spreading an ESLint plugin config (typed as Linter.Config) into XO config
 	const eslintPluginConfig: Linter.Config = {
 		files: ['**/*.svelte'],
@@ -376,11 +365,11 @@ test('Linter.Config objects are accepted as XoConfigItem', t => {
 
 	const flatConfig = xoToEslintConfig([eslintPluginConfig]);
 
-	t.deepEqual(flatConfig.at(-1)?.files, ['**/*.svelte']);
-	t.is(flatConfig.at(-1)?.rules?.['no-console'], 'warn');
+	assert.deepEqual(flatConfig.at(-1)?.files, ['**/*.svelte']);
+	assert.equal(flatConfig.at(-1)?.rules?.['no-console'], 'warn');
 });
 
-test('base config applies to framework file types', t => {
+test('base config applies to framework file types', () => {
 	const flatConfig = xoToEslintConfig(undefined);
 	const baseConfig = flatConfig.find(config => config.name === 'xo/base');
 	const filesGlob = baseConfig?.files?.[0];
@@ -390,7 +379,7 @@ test('base config applies to framework file types', t => {
 	}
 
 	for (const extension of frameworkExtensions) {
-		t.true(
+		assert.ok(
 			micromatch.isMatch(`test.${extension}`, filesGlob),
 			`base config should match .${extension} files`,
 		);

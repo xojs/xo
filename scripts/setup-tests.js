@@ -48,7 +48,10 @@ await fs.writeFile(
 	}),
 );
 
-const copyDependency = async parts => {
+// Symlink the dependencies rather than copying them. This keeps setup near-instant and, since
+// `fs.cp` preserves symlinks, makes each per-test project copy tiny instead of duplicating ~25 MB
+// of TypeScript files for all 200+ tests.
+const linkDependency = async parts => {
 	const source = path.join(rootNodeModules, ...parts);
 
 	if (!(await pathExists(source))) {
@@ -57,7 +60,7 @@ const copyDependency = async parts => {
 
 	const target = path.join(cwd, 'node_modules', ...parts);
 	await fs.mkdir(path.dirname(target), {recursive: true});
-	await fs.cp(source, target, {recursive: true});
+	await fs.symlink(source, target);
 };
 
-await Promise.all(dependencies.map(dependency => copyDependency(dependency)));
+await Promise.all(dependencies.map(dependency => linkDependency(dependency)));

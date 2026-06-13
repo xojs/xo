@@ -27,7 +27,7 @@
 		"lint": "node dist/cli.js",
 		"prepare": "npm run build && husky",
 		"release": "np",
-		"test": "npm run build && npm run lint && npm run test:setup && ava",
+		"test": "npm run build && npm run lint && npm run test:setup && node --enable-source-maps --test \"dist/test/**/*.test.js\"",
 		"test:setup": "node scripts/setup-tests"
 	},
 	"files": [
@@ -94,7 +94,6 @@
 	"devDependencies": {
 		"@types/micromatch": "^4.0.10",
 		"@types/node": "^25.8.0",
-		"ava": "^8.0.0",
 		"dedent": "^1.7.2",
 		"eslint-plugin-vue": "^10.9.1",
 		"execa": "^9.6.1",
@@ -103,38 +102,10 @@
 		"temp-dir": "^3.0.0",
 		"xo": "file:."
 	},
-	"ava": {
-		"files": [
-			"dist/test/**/*.js",
-			"!dist/test/fixtures/**",
-			"!dist/test/helpers/**",
-			"!dist/test/scripts/**"
-		],
-		"nodeArguments": [
-			"--enable-source-maps"
-		],
-		"timeout": "1m",
-		"verbose": true,
-		"watchMode": {
-			"ignoreChanges": [
-				".history",
-				".history/**/*",
-				"node_modules",
-				"package.json",
-				"xo.config.*",
-				"**/*.ts"
-			]
-		}
-	},
 	"nyc": {
 		"reporter": [
 			"text",
 			"lcov"
 		]
-	},
-	"xo": {
-		"rules": {
-			"ava/no-ignored-test-files": "off"
-		}
 	}
 }

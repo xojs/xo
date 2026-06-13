@@ -2,47 +2,48 @@
 import fs from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
-import _test, {type TestFn} from 'ava'; // eslint-disable-line ava/use-test
+import test, {beforeEach, afterEach} from 'node:test';
+import assert from 'node:assert/strict';
 import dedent from 'dedent';
 import {pathExists} from 'path-exists';
 import {Xo} from '../../lib/xo.js';
 import {copyTestProject} from '../helpers/copy-test-project.js';
+import {rejectionOf} from '../helpers/rejection-of.js';
 
-const test = _test as TestFn<{cwd: string}>;
+let cwd: string;
 
-test.beforeEach(async t => {
-	t.context.cwd = await copyTestProject();
+beforeEach(async () => {
+	cwd = await copyTestProject();
 });
 
-test.afterEach.always(async t => {
-	await fs.rm(t.context.cwd, {recursive: true, force: true});
+afterEach(async () => {
+	await fs.rm(cwd, {recursive: true, force: true});
 });
 
-test('no config > js > semi', async t => {
-	const filePath = path.join(t.context.cwd, 'test.js');
-	const {results} = await new Xo({cwd: t.context.cwd}).lintText(
+test('no config > js > semi', async () => {
+	const filePath = path.join(cwd, 'test.js');
+	const {results} = await new Xo({cwd}).lintText(
 		dedent`console.log('hello')\n`,
 		{filePath},
 	);
-	t.is(results.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	assert.equal(results.length, 1);
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-test('no config > ts > semi', async t => {
-	const {cwd} = t.context;
+test('no config > ts > semi', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	const text = dedent`console.log('hello')\n`;
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 
-	t.is(results?.[0]?.messages?.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	assert.equal(results?.[0]?.messages?.length, 1);
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-test('flat config > js > semi', async t => {
-	const filePath = path.join(t.context.cwd, 'test.js');
+test('flat config > js > semi', async () => {
+	const filePath = path.join(cwd, 'test.js');
 	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		dedent`
 			export default [
 			  {
@@ -52,16 +53,15 @@ test('flat config > js > semi', async t => {
 		`,
 		'utf8',
 	);
-	const xo = new Xo({cwd: t.context.cwd});
+	const xo = new Xo({cwd});
 	const {results} = await xo.lintText(dedent`console.log('hello');\n`, {
 		filePath,
 	});
-	t.is(results?.[0]?.messages?.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	assert.equal(results?.[0]?.messages?.length, 1);
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-test('flat config > ts > semi', async t => {
-	const {cwd} = t.context;
+test('flat config > ts > semi', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
@@ -78,12 +78,11 @@ test('flat config > ts > semi', async t => {
 	await fs.writeFile(filePath, text, 'utf8');
 	const xo = new Xo({cwd});
 	const {results} = await xo.lintText(text, {filePath});
-	t.is(results?.[0]?.messages?.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	assert.equal(results?.[0]?.messages?.length, 1);
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-test('flat config > ts > semicolon false > member-delimiter-style', async t => {
-	const {cwd} = t.context;
+test('flat config > ts > semicolon false > member-delimiter-style', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
@@ -107,14 +106,14 @@ test('flat config > ts > semicolon false > member-delimiter-style', async t => {
 	const xo = new Xo({cwd});
 	const {results} = await xo.lintText(text, {filePath});
 	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.false(ruleIds.includes('@stylistic/member-delimiter-style'), 'member-delimiter-style should not report when semicolon is false');
+	assert.ok(!ruleIds.includes('@stylistic/member-delimiter-style'), 'member-delimiter-style should not report when semicolon is false');
 });
 
-test('flat config > ts > semi > no tsconfig', async t => {
-	const filePath = path.join(t.context.cwd, 'test.ts');
-	await fs.rm(path.join(t.context.cwd, 'tsconfig.json'));
+test('flat config > ts > semi > no tsconfig', async () => {
+	const filePath = path.join(cwd, 'test.ts');
+	await fs.rm(path.join(cwd, 'tsconfig.json'));
 	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		dedent`
 			export default [
 			  {
@@ -129,18 +128,18 @@ test('flat config > ts > semi > no tsconfig', async t => {
 	// If the file does not exist, linting ts will fail, js lint text does not require a file to exist
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await Xo.lintText(text, {
-		cwd: t.context.cwd,
+		cwd,
 		filePath,
 	});
-	t.is(results?.[0]?.messages?.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	assert.equal(results?.[0]?.messages?.length, 1);
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
-test('flat config > js > space', async t => {
-	const filePath = path.join(t.context.cwd, 'test.js');
+test('flat config > js > space', async () => {
+	const filePath = path.join(cwd, 'test.js');
 
 	await fs.writeFile(
-		path.join(t.context.cwd, 'xo.config.js'),
+		path.join(cwd, 'xo.config.js'),
 		dedent`
 			export default [
 			  {
@@ -151,7 +150,7 @@ test('flat config > js > space', async t => {
 		'utf8',
 	);
 
-	const xo = new Xo({cwd: t.context.cwd});
+	const xo = new Xo({cwd});
 	const {results} = await xo.lintText(
 		dedent`
 			export function foo() {
@@ -162,13 +161,12 @@ test('flat config > js > space', async t => {
 			filePath,
 		},
 	);
-	t.is(results?.[0]?.messages.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
+	assert.equal(results?.[0]?.messages.length, 1);
+	assert.equal(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
 });
 
-test('flat config > ts > space', async t => {
-	const {cwd} = t.context;
+test('flat config > ts > space', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 
 	await fs.writeFile(
@@ -192,13 +190,12 @@ test('flat config > ts > space', async t => {
 
 	const xo = new Xo({cwd});
 	const {results} = await xo.lintText(text, {filePath});
-	t.is(results?.[0]?.messages.length, 1);
-	t.is(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
+	assert.equal(results?.[0]?.messages.length, 1);
+	assert.equal(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
 });
 
-test('plugin > js > eslint-plugin-import import-x/order', async t => {
-	const {cwd} = t.context;
+test('plugin > js > eslint-plugin-import import-x/order', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	const {results} = await (new Xo({cwd}).lintText(
 		dedent`
@@ -210,13 +207,12 @@ test('plugin > js > eslint-plugin-import import-x/order', async t => {
 		{filePath},
 	));
 
-	t.true(results[0]?.messages?.length === 1);
-	t.truthy(results[0]?.messages?.[0]);
-	t.is(results[0]?.messages?.[0]?.ruleId, 'import-x/order');
+	assert.equal(results[0]?.messages?.length, 1);
+	assert.ok(results[0]?.messages?.[0]);
+	assert.equal(results[0]?.messages?.[0]?.ruleId, 'import-x/order');
 });
 
-test('plugin > ts > eslint-plugin-import import-x/order', async t => {
-	const {cwd} = t.context;
+test('plugin > ts > eslint-plugin-import import-x/order', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	const text = dedent`
 		import foo from 'foo';
@@ -227,12 +223,11 @@ test('plugin > ts > eslint-plugin-import import-x/order', async t => {
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.true(ruleIds.includes('import-x/order'));
-	t.truthy(results[0]?.messages?.[0]);
+	assert.ok(ruleIds.includes('import-x/order'));
+	assert.ok(results[0]?.messages?.[0]);
 });
 
-test('plugin > js > eslint-plugin-import import-x/extensions', async t => {
-	const {cwd} = t.context;
+test('plugin > js > eslint-plugin-import import-x/extensions', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	const {results} = await new Xo({cwd}).lintText(
 		dedent`
@@ -242,13 +237,12 @@ test('plugin > js > eslint-plugin-import import-x/extensions', async t => {
 		`,
 		{filePath},
 	);
-	t.true(results[0]?.messages?.length === 1);
-	t.truthy(results[0]?.messages?.[0]);
-	t.is(results[0]?.messages?.[0]?.ruleId, 'import-x/extensions');
+	assert.equal(results[0]?.messages?.length, 1);
+	assert.ok(results[0]?.messages?.[0]);
+	assert.equal(results[0]?.messages?.[0]?.ruleId, 'import-x/extensions');
 });
 
-test('plugin > ts > eslint-plugin-import import-x/extensions is disabled for TypeScript', async t => {
-	const {cwd} = t.context;
+test('plugin > ts > eslint-plugin-import import-x/extensions is disabled for TypeScript', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	const text = dedent`
 		import foo from './foo';
@@ -258,11 +252,10 @@ test('plugin > ts > eslint-plugin-import import-x/extensions is disabled for Typ
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	// `import-x/extensions` is intentionally disabled for TypeScript because it cannot model TS ESM's `.js`-extension-for-`.ts` convention.
-	t.false(results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/extensions'));
+	assert.ok(!results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/extensions'));
 });
 
-test('plugin > ts > eslint-plugin-import import-x/no-absolute-path', async t => {
-	const {cwd} = t.context;
+test('plugin > ts > eslint-plugin-import import-x/no-absolute-path', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	const text = dedent`
 		import foo from '/foo';
@@ -271,11 +264,10 @@ test('plugin > ts > eslint-plugin-import import-x/no-absolute-path', async t => 
 	`;
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
-	t.true(results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/no-absolute-path'));
+	assert.ok(results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/no-absolute-path'));
 });
 
-test('plugin > js > eslint-plugin-import import-x/no-anonymous-default-export', async t => {
-	const {cwd} = t.context;
+test('plugin > js > eslint-plugin-import import-x/no-anonymous-default-export', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	const {results} = await new Xo({cwd}).lintText(
 		dedent`
@@ -284,11 +276,10 @@ test('plugin > js > eslint-plugin-import import-x/no-anonymous-default-export', 
 		{filePath},
 	);
 
-	t.true(results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/no-anonymous-default-export'));
+	assert.ok(results[0]?.messages?.some(({ruleId}) => ruleId === 'import-x/no-anonymous-default-export'));
 });
 
-test('plugin > js > eslint-plugin-n n/prefer-global/process', async t => {
-	const {cwd} = t.context;
+test('plugin > js > eslint-plugin-n n/prefer-global/process', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	const {results} = await new Xo({cwd}).lintText(
 		dedent`
@@ -296,13 +287,12 @@ test('plugin > js > eslint-plugin-n n/prefer-global/process', async t => {
 		`,
 		{filePath},
 	);
-	t.true(results[0]?.messages?.length === 1);
-	t.truthy(results[0]?.messages?.[0]);
-	t.is(results[0]?.messages?.[0]?.ruleId, 'n/prefer-global/process');
+	assert.equal(results[0]?.messages?.length, 1);
+	assert.ok(results[0]?.messages?.[0]);
+	assert.equal(results[0]?.messages?.[0]?.ruleId, 'n/prefer-global/process');
 });
 
-test('plugin > ts > eslint-plugin-n n/prefer-global/process', async t => {
-	const {cwd} = t.context;
+test('plugin > ts > eslint-plugin-n n/prefer-global/process', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	const text = dedent`
 		process.cwd();\n
@@ -310,12 +300,11 @@ test('plugin > ts > eslint-plugin-n n/prefer-global/process', async t => {
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.true(ruleIds.includes('n/prefer-global/process'));
-	t.truthy(results[0]?.messages?.[0]);
+	assert.ok(ruleIds.includes('n/prefer-global/process'));
+	assert.ok(results[0]?.messages?.[0]);
 });
 
-test('plugin > js > eslint-plugin-eslint-comments enable-duplicate-disable', async t => {
-	const {cwd} = t.context;
+test('plugin > js > eslint-plugin-eslint-comments enable-duplicate-disable', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	const {results} = await new Xo({
 		cwd,
@@ -327,12 +316,11 @@ test('plugin > js > eslint-plugin-eslint-comments enable-duplicate-disable', asy
 		`,
 		{filePath},
 	);
-	t.true(results[0]?.messages.some(({ruleId}) =>
+	assert.ok(results[0]?.messages.some(({ruleId}) =>
 		ruleId === '@eslint-community/eslint-comments/no-duplicate-disable'));
 });
 
-test('plugin > ts > eslint-plugin-eslint-comments no-duplicate-disable', async t => {
-	const {cwd} = t.context;
+test('plugin > ts > eslint-plugin-eslint-comments no-duplicate-disable', async () => {
 	const tsFilePath = path.join(cwd, 'test.ts');
 	const text = dedent`
 		/* eslint-disable no-undef */
@@ -341,13 +329,11 @@ test('plugin > ts > eslint-plugin-eslint-comments no-duplicate-disable', async t
 	`;
 	await fs.writeFile(tsFilePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath: tsFilePath});
-	t.true(results[0]?.messages.some(({ruleId}) =>
+	assert.ok(results[0]?.messages.some(({ruleId}) =>
 		ruleId === '@eslint-community/eslint-comments/no-duplicate-disable'));
 });
 
-test('lint-text can be ran multiple times in a row with top level typescript rules', async t => {
-	const {cwd} = t.context;
-
+test('lint-text can be ran multiple times in a row with top level typescript rules', async () => {
 	const filePath = path.join(cwd, 'test.ts');
 	// Text should violate the @typescript-eslint/naming-convention rule
 	const text = dedent`
@@ -364,7 +350,7 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	const {results: resultsNoConfig} = await Xo.lintText(text, {cwd, filePath});
 	// Ensure that with no config, the text is linted and errors are found.
 	// `FOO_BAR` is valid because UPPER_CASE is allowed for module-level `const`, so only `FooBar` and `foo_bar` violate the rule.
-	t.true(resultsNoConfig[0]?.errorCount === 2);
+	assert.equal(resultsNoConfig[0]?.errorCount, 2);
 
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
@@ -385,17 +371,16 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	// and should not have naming-convention messages when ran multiple times
 	const {results} = await Xo.lintText(text, {cwd, filePath});
 	const firstRuleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.false(firstRuleIds.includes('@typescript-eslint/naming-convention'));
+	assert.ok(!firstRuleIds.includes('@typescript-eslint/naming-convention'));
 	const {results: results2} = await Xo.lintText(text, {cwd, filePath});
 	const secondRuleIds = results2[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.deepEqual(secondRuleIds, firstRuleIds);
+	assert.deepEqual(secondRuleIds, firstRuleIds);
 	const {results: results3} = await Xo.lintText(text, {cwd, filePath});
 	const thirdRuleIds = results3[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.deepEqual(thirdRuleIds, firstRuleIds);
+	assert.deepEqual(thirdRuleIds, firstRuleIds);
 });
 
-test('lint-text refreshes TypeScript program for unincluded files', async t => {
-	const {cwd} = t.context;
+test('lint-text refreshes TypeScript program for unincluded files', async () => {
 	const filePath = path.join(cwd, 'excluded', 'stale.ts');
 	const xo = new Xo({cwd, ts: true});
 
@@ -423,8 +408,8 @@ test('lint-text refreshes TypeScript program for unincluded files', async t => {
 	await fs.writeFile(filePath, unsafeText, 'utf8');
 	const {results: unsafeResults} = await xo.lintText(unsafeText, {filePath});
 	const unsafeRuleIds = unsafeResults[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.true(unsafeRuleIds.includes('@typescript-eslint/no-unsafe-assignment'));
-	t.true(unsafeRuleIds.includes('@typescript-eslint/no-unsafe-member-access'));
+	assert.ok(unsafeRuleIds.includes('@typescript-eslint/no-unsafe-assignment'));
+	assert.ok(unsafeRuleIds.includes('@typescript-eslint/no-unsafe-member-access'));
 
 	const safeText = dedent`
 		const parsed = {count: 1};
@@ -434,12 +419,11 @@ test('lint-text refreshes TypeScript program for unincluded files', async t => {
 	await fs.writeFile(filePath, safeText, 'utf8');
 	const {results: safeResults} = await xo.lintText(safeText, {filePath});
 	const safeRuleIds = safeResults[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.false(safeRuleIds.includes('@typescript-eslint/no-unsafe-assignment'));
-	t.false(safeRuleIds.includes('@typescript-eslint/no-unsafe-member-access'));
+	assert.ok(!safeRuleIds.includes('@typescript-eslint/no-unsafe-assignment'));
+	assert.ok(!safeRuleIds.includes('@typescript-eslint/no-unsafe-member-access'));
 });
 
-test('virtual TypeScript configs are pruned when no virtual files remain', async t => {
-	const {cwd} = t.context;
+test('virtual TypeScript configs are pruned when no virtual files remain', async () => {
 	const xo = new Xo({cwd, ts: true});
 	const {_cacheLocation} = xo;
 	const tsconfigPath = path.join(_cacheLocation, 'tsconfig.stdin.json');
@@ -450,12 +434,12 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 
 	await xo.lintText('export const virtualValue = 1;\n', {filePath: virtualFilePath});
 
-	t.true(await pathExists(tsconfigPath));
+	assert.ok(await pathExists(tsconfigPath));
 	const virtualConfig = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
-	t.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
+	assert.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
 
 	const existingFilePath = path.join(cwd, 'src', 'existing.ts');
 	await fs.mkdir(path.dirname(existingFilePath), {recursive: true});
@@ -463,16 +447,15 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 
 	await xo.lintText('export const existingValue = 1;\n', {filePath: existingFilePath});
 
-	t.false(await pathExists(tsconfigPath));
+	assert.ok(!(await pathExists(tsconfigPath)));
 	const configAfterCleanup = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
-	t.is(configAfterCleanup, undefined);
+	assert.equal(configAfterCleanup, undefined);
 });
 
-test('virtual TypeScript files are reclassified once they exist on disk', async t => {
-	const {cwd} = t.context;
+test('virtual TypeScript files are reclassified once they exist on disk', async () => {
 	const xo = new Xo({cwd, ts: true});
 	const {_cacheLocation} = xo;
 	const tsconfigPath = path.join(_cacheLocation, 'tsconfig.stdin.json');
@@ -495,29 +478,27 @@ test('virtual TypeScript files are reclassified once they exist on disk', async 
 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
-	t.true(await pathExists(tsconfigPath));
+	assert.ok(await pathExists(tsconfigPath));
 	const virtualConfig = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
-	t.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
+	assert.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
 
 	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
 	await fs.writeFile(virtualFilePath, source, 'utf8');
 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
-	t.false(await pathExists(tsconfigPath));
+	assert.ok(!(await pathExists(tsconfigPath)));
 	const configAfterReclassification = xo._xoConfig?.find(({languageOptions}) => {
 		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
 		return parserOptions?.project === tsconfigPath;
 	});
-	t.is(configAfterReclassification, undefined);
+	assert.equal(configAfterReclassification, undefined);
 });
 
-test('config with custom plugin', async t => {
-	const {cwd} = t.context;
-
+test('config with custom plugin', async () => {
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
 		dedent`
@@ -557,26 +538,23 @@ test('config with custom plugin', async t => {
 		filePath: path.join(cwd, 'test.js'),
 	});
 
-	t.is(results[0]?.messages?.length, 1);
-	t.is(results[0]?.messages[0]?.ruleId, 'test-plugin/test-rule');
-	t.is(results[0]?.messages[0]?.message, 'Custom error');
+	assert.equal(results[0]?.messages?.length, 1);
+	assert.equal(results[0]?.messages[0]?.ruleId, 'test-plugin/test-rule');
+	assert.equal(results[0]?.messages[0]?.message, 'Custom error');
 });
 
-test('rulesMeta is included in lint results', async t => {
-	const {cwd} = t.context;
+test('rulesMeta is included in lint results', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	const {rulesMeta, results} = await new Xo({cwd}).lintText(
 		dedent`console.log('hello')\n`,
 		{filePath},
 	);
-	t.is(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
-	t.truthy(rulesMeta);
-	t.truthy(rulesMeta['@stylistic/semi']);
-	t.is(rulesMeta['@stylistic/semi']?.type, 'layout');
+	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	assert.ok(rulesMeta['@stylistic/semi']);
+	assert.equal(rulesMeta['@stylistic/semi']?.type, 'layout');
 });
 
-test('no-mixed-operators catches ?? mixed with comparison', async t => {
-	const {cwd} = t.context;
+test('no-mixed-operators catches ?? mixed with comparison', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
@@ -605,11 +583,10 @@ test('no-mixed-operators catches ?? mixed with comparison', async t => {
 		{filePath},
 	);
 	const messages = results?.[0]?.messages ?? [];
-	t.true(messages.some(m => m.ruleId === '@stylistic/no-mixed-operators'));
+	assert.ok(messages.some(m => m.ruleId === '@stylistic/no-mixed-operators'));
 });
 
-test('prettier > unicorn/template-indent is disabled', async t => {
-	const {cwd} = t.context;
+test('prettier > unicorn/template-indent is disabled', async () => {
 	const filePath = path.join(cwd, 'test.js');
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
@@ -631,14 +608,13 @@ test('prettier > unicorn/template-indent is disabled', async t => {
 	`;
 	const {results} = await new Xo({cwd}).lintText(code, {filePath});
 	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.false(ruleIds.includes('unicorn/template-indent'));
+	assert.ok(!ruleIds.includes('unicorn/template-indent'));
 });
 
 // Anchor createRequire to a path inside the xo project tree so test configs can resolve eslint-plugin-vue
 const vuePluginRequireAnchor = JSON.stringify(fileURLToPath(import.meta.url));
 
-test('vue > lints vue files with eslint-plugin-vue', async t => {
-	const {cwd} = t.context;
+test('vue > lints vue files with eslint-plugin-vue', async () => {
 	const filePath = path.join(cwd, 'test.vue');
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
@@ -669,11 +645,10 @@ test('vue > lints vue files with eslint-plugin-vue', async t => {
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.true(ruleIds.includes('vue/multi-word-component-names'));
+	assert.ok(ruleIds.includes('vue/multi-word-component-names'));
 });
 
-test('vue > semicolon option applies to vue files', async t => {
-	const {cwd} = t.context;
+test('vue > semicolon option applies to vue files', async () => {
 	const filePath = path.join(cwd, 'test.vue');
 	await fs.writeFile(
 		path.join(cwd, 'xo.config.js'),
@@ -704,11 +679,10 @@ test('vue > semicolon option applies to vue files', async t => {
 	await fs.writeFile(filePath, text, 'utf8');
 	const {results} = await new Xo({cwd}).lintText(text, {filePath});
 	const ruleIds = results[0]?.messages?.map(({ruleId}) => ruleId) ?? [];
-	t.true(ruleIds.includes('@stylistic/semi'));
+	assert.ok(ruleIds.includes('@stylistic/semi'));
 });
 
-test('negated default ignore in config allows lintText on files in default-ignored directories', async t => {
-	const {cwd} = t.context;
+test('negated default ignore in config allows lintText on files in default-ignored directories', async () => {
 	const distDirectory = path.join(cwd, 'dist');
 	await fs.mkdir(distDirectory, {recursive: true});
 	const filePath = path.join(distDirectory, 'index.js');
@@ -723,22 +697,22 @@ test('negated default ignore in config allows lintText on files in default-ignor
 	`, 'utf8');
 	const xo = new Xo({cwd});
 	const {results} = await xo.lintText(text, {filePath});
-	t.is(results.length, 1);
-	t.is(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
+	assert.equal(results.length, 1);
+	assert.equal(results[0]?.messages[0]?.ruleId, '@stylistic/semi');
 });
 
-test('suppressions > lintText respects suppressions file', async t => {
-	const filePath = path.join(t.context.cwd, 'test.js');
-	const suppressionsPath = path.join(t.context.cwd, 'eslint-suppressions.json');
+test('suppressions > lintText respects suppressions file', async () => {
+	const filePath = path.join(cwd, 'test.js');
+	const suppressionsPath = path.join(cwd, 'eslint-suppressions.json');
 	await fs.writeFile(suppressionsPath, '{"test.js": {"@stylistic/semi": {"count": 1}}}', 'utf8');
 
-	const {results} = await new Xo({cwd: t.context.cwd, suppressionsLocation: 'eslint-suppressions.json'}).lintText('console.log(1)\n', {filePath});
-	t.is(results[0]?.messages.length, 0);
+	const {results} = await new Xo({cwd, suppressionsLocation: 'eslint-suppressions.json'}).lintText('console.log(1)\n', {filePath});
+	assert.equal(results[0]?.messages.length, 0);
 });
 
-test('suppressions > lintText throws for missing custom suppressionsLocation', async t => {
-	const filePath = path.join(t.context.cwd, 'test.js');
+test('suppressions > lintText throws for missing custom suppressionsLocation', async () => {
+	const filePath = path.join(cwd, 'test.js');
 
-	const error = await t.throwsAsync(new Xo({cwd: t.context.cwd, suppressionsLocation: 'missing-suppressions.json'}).lintText('console.log(1)\n', {filePath}));
-	t.is(error?.message, 'The suppressions file does not exist. Please run the command with `--suppress-all` or `--suppress-rule` to create it.');
+	const error = await rejectionOf<Error>(new Xo({cwd, suppressionsLocation: 'missing-suppressions.json'}).lintText('console.log(1)\n', {filePath}));
+	assert.equal(error.message, 'The suppressions file does not exist. Please run the command with `--suppress-all` or `--suppress-rule` to create it.');
 });
