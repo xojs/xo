@@ -2,7 +2,7 @@
 import process from 'node:process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {availableParallelism} from 'node:os';
+import {availableParallelism, tmpdir} from 'node:os';
 import test, {describe, type TestContext} from 'node:test';
 import assert from 'node:assert/strict';
 import dedent from 'dedent';
@@ -50,6 +50,25 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		const {stdout} = await $({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd} --ignore="test.js" test.js`;
 		assert.ok(stdout.includes(ignoredFileWarningMessage));
+	});
+
+	test('xo warns when the project TypeScript is older than the bundled version', async t => {
+		const cwd = await fs.mkdtemp(path.join(tmpdir(), 'xo-ts-version-'));
+		t.after(async () => {
+			await fs.rm(cwd, {recursive: true, force: true});
+		});
+
+		await fs.writeFile(path.join(cwd, 'package.json'), JSON.stringify({type: 'module', name: 'ts-version-test'}), 'utf8');
+		await fs.writeFile(path.join(cwd, 'tsconfig.json'), '{}', 'utf8');
+		await fs.writeFile(path.join(cwd, 'foo.ts'), dedent`export const x = 1;\n`, 'utf8');
+
+		// Simulate an older-major project-level TypeScript so the version-mismatch warning triggers.
+		await fs.mkdir(path.join(cwd, 'node_modules', 'typescript'), {recursive: true});
+		await fs.writeFile(path.join(cwd, 'node_modules', 'typescript', 'package.json'), JSON.stringify({name: 'typescript', version: '5.0.0'}), 'utf8');
+
+		const {stderr} = await $({reject: false})`node ./dist/cli --cwd ${cwd} foo.ts`;
+		assert.ok(stderr.includes('XO bundles TypeScript'));
+		assert.ok(stderr.includes('5.0.0'));
 	});
 
 	test('xo fails with exit code 2 for missing custom suppressions file', async t => {

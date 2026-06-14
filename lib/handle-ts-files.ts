@@ -1,8 +1,39 @@
 import path from 'node:path';
 import fs from 'node:fs';
+import {createRequire} from 'node:module';
 import ts from 'typescript';
 import {getTsconfig, createFilesMatcher} from 'get-tsconfig';
 import {tsconfigDefaults} from './constants.js';
+
+let hasWarnedAboutTypeScriptVersion = false;
+
+/**
+Warns once if the project's own TypeScript is an older major than the version XO bundles. Mixing TypeScript versions in one process can crash type-aware linting (notably under pnpm), because the TypeFlags enum was renumbered in TypeScript 6.
+*/
+const warnOnOutdatedProjectTypeScript = (cwd: string): void => {
+	if (hasWarnedAboutTypeScriptVersion) {
+		return;
+	}
+
+	let projectVersion: string;
+	try {
+		const require = createRequire(path.join(cwd, 'noop.js'));
+		({version: projectVersion} = require('typescript/package.json') as {version: string});
+	} catch {
+		// No project-level TypeScript resolvable; XO's bundled version is used, so there is no mismatch.
+		return;
+	}
+
+	const projectMajor = Number.parseInt(projectVersion, 10);
+	const bundledMajor = Number.parseInt(ts.version, 10);
+
+	if (projectMajor >= bundledMajor) {
+		return;
+	}
+
+	hasWarnedAboutTypeScriptVersion = true;
+	console.warn(`XO bundles TypeScript ${ts.version}, but your project has TypeScript ${projectVersion}. Mixing TypeScript versions in one process can crash type-aware linting (notably with pnpm). Upgrade your project's \`typescript\` to ${bundledMajor} or later, or pin it (for example, a pnpm \`overrides\` entry).`);
+};
 
 const createInMemoryProgram = (files: string[], cwd: string): ts.Program | undefined => {
 	if (files.length === 0) {
@@ -74,6 +105,8 @@ If no tsconfig is found, it will create an in-memory TypeScript Program for type
 @returns The unmatched files and an in-memory TypeScript Program.
 */
 export function handleTsconfig({files, cwd, cacheLocation}: {files: string[]; cwd: string; cacheLocation?: string}) {
+	warnOnOutdatedProjectTypeScript(cwd);
+
 	const unincludedFiles: string[] = [];
 	const filesMatcherCache = new Map<string, ReturnType<typeof createFilesMatcher>>();
 
