@@ -114,8 +114,6 @@ const cli = meow(
 	},
 );
 
-export type CliOptions = typeof cli;
-
 const {input, flags: cliOptions, showVersion} = cli;
 
 const baseXoConfigOptions: XoConfigOptions = {
@@ -139,7 +137,7 @@ if (typeof cliOptions.space === 'string') {
 	cliOptions.space = cliOptions.space.trim();
 
 	if (/^\d+$/v.test(cliOptions.space)) {
-		baseXoConfigOptions.space = Number.parseInt(cliOptions.space, 10);
+		baseXoConfigOptions.space = Number(cliOptions.space);
 	} else if (cliOptions.space === 'true') {
 		baseXoConfigOptions.space = true;
 	} else if (cliOptions.space === 'false') {
@@ -256,9 +254,10 @@ try {
 
 		if (linterOptions.fix) {
 			const xo = new Xo(linterOptions, baseXoConfigOptions);
-			const {results: [result]} = await xo.lintText(stdin, {
+			const {results} = await xo.lintText(stdin, {
 				filePath: cliOptions.stdinFilename,
 			});
+			const [result] = results;
 			process.stdout.write((result?.output) ?? stdin);
 			process.exit(0);
 		}

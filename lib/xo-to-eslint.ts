@@ -1,40 +1,10 @@
 /* eslint-disable complexity -- Translating every XO config option into ESLint rules is inherently branchy. */
 import arrify from 'arrify';
-import {type Linter, type ESLint} from 'eslint';
-import {type Options} from 'prettier';
-import pluginPrettier from 'eslint-plugin-prettier';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import {type Linter} from 'eslint';
+import {getPrettierConfig} from 'eslint-config-xo';
 import {type XoConfigItem} from './types.js';
 import {config} from './config.js';
 import {xoToEslintConfigItem} from './utils.js';
-
-/**
-Rules from eslint-config-prettier's "special rules" list that XO configures and are safe to use with Prettier.
-@see https://github.com/prettier/eslint-config-prettier#special-rules
-*/
-const prettierCompatibleSpecialRules: Linter.RulesRecord = {
-	curly: 'error',
-	'no-unexpected-multiline': 'error',
-	'@stylistic/quotes': ['error', 'single', {avoidEscape: true}],
-	'@stylistic/no-mixed-operators': [
-		'error',
-		{
-			groups: [
-				['+', '-', '*', '/', '%', '**', '??'],
-				['&', '|', '^', '~', '<<', '>>', '>>>', '??'],
-				['==', '!=', '===', '!==', '>', '>=', '<', '<=', '??'],
-				['&&', '||', '??'],
-				['in', 'instanceof', '??'],
-			],
-		},
-	],
-	'prefer-arrow-callback': ['error', {allowNamedFunctions: true}],
-	'arrow-body-style': 'error',
-};
-
-export type CreateConfigOptions = {
-	prettierOptions?: Options;
-};
 
 type Plugins = NonNullable<Linter.Config['plugins']>;
 type Plugin = Plugins[string];
@@ -82,9 +52,9 @@ const hoistPlugins = (configs: Linter.Config[], userPluginOverrides: Map<string,
 };
 
 /**
-Takes a XO flat config and returns an ESlint flat config.
+Takes an XO flat config and returns an ESLint flat config.
 */
-export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {prettierOptions = {}}: CreateConfigOptions = {}): Linter.Config[] {
+export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined): Linter.Config[] {
 	const baseConfig = [...config];
 	const userPluginOverrides = new Map<string, Plugin>();
 
@@ -115,7 +85,9 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 			if (keysOfXoConfig.length === 1) {
 				baseConfig.push({ignores: arrify(xoConfigItem.ignores)});
 				continue;
-			} else if (keysOfXoConfig.length === 2 && xoConfigItem.name !== undefined) {
+			}
+
+			if (keysOfXoConfig.length === 2 && xoConfigItem.name !== undefined) {
 				baseConfig.push({name: xoConfigItem.name, ignores: arrify(xoConfigItem.ignores)});
 				continue;
 			}
@@ -152,73 +124,28 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 			eslintConfigItem.rules['@stylistic/indent-binary-ops'] = ['error', 'tab'];
 		}
 
-		// Prettier should generally be the last config in the array
-		if (xoConfigItem.prettier !== undefined && xoConfigItem.prettier !== false) {
-			if (xoConfigItem.prettier === 'compat') {
-				baseConfig.push({
-					...eslintConfigPrettier,
-					rules: {
-						...eslintConfigPrettier.rules,
-						...prettierCompatibleSpecialRules,
-					},
-					...(eslintConfigItem.files ? {files: eslintConfigItem.files} : {}),
-				});
-			} else {
-				// Validate that Prettier options match other `xoConfig` options.
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				if ((xoConfigItem.semicolon && prettierOptions.semi === false) || (!xoConfigItem.semicolon && prettierOptions.semi === true)) {
-					throw new Error(`The Prettier config \`semi\` is ${prettierOptions.semi} while Xo \`semicolon\` is ${xoConfigItem.semicolon}, also check your .editorconfig for inconsistencies.`);
-				}
+		// Delegate Prettier integration to `eslint-config-xo`. Its config is pushed after `eslintConfigItem` below so it comes last, disabling the conflicting stylistic rules set above.
+		const prettierConfig = getPrettierConfig({
+			prettier: xoConfigItem.prettier,
+			// `Space` allows `string` for legacy reasons, but Prettier only needs `boolean | number`.
+			space: xoConfigItem.space as boolean | number | undefined,
+			semicolon: xoConfigItem.semicolon,
+			files: eslintConfigItem.files,
+		});
 
-				if ((isUsingSpaces && prettierOptions.useTabs === true) || (!isUsingSpaces && prettierOptions.useTabs === false)) {
-					throw new Error(`The Prettier config \`useTabs\` is ${prettierOptions.useTabs} while Xo \`space\` is ${xoConfigItem.space}, also check your .editorconfig for inconsistencies.`);
-				}
-
-				if (typeof xoConfigItem.space === 'number' && typeof prettierOptions.tabWidth === 'number' && xoConfigItem.space !== prettierOptions.tabWidth) {
-					throw new Error(`The Prettier config \`tabWidth\` is ${prettierOptions.tabWidth} while Xo \`space\` is ${xoConfigItem.space}, also check your .editorconfig for inconsistencies.`);
-				}
-
-				// Add Prettier plugin
-				eslintConfigItem.plugins = {
-					...eslintConfigItem.plugins,
-					prettier: pluginPrettier,
-				};
-
-				const prettierConfig = {
-					singleQuote: true,
-					bracketSpacing: false,
-					bracketSameLine: false,
-					trailingComma: 'all',
-					tabWidth: typeof xoConfigItem.space === 'number' ? xoConfigItem.space : 2,
-					useTabs: !isUsingSpaces,
-					semi: xoConfigItem.semicolon,
-					...prettierOptions,
-				};
-
-				// Configure Prettier rules
-				const rulesWithPrettier: Linter.RulesRecord = {
-					...eslintConfigItem.rules,
-
-					...(pluginPrettier.configs?.['recommended'] as ESLint.ConfigData)?.rules,
-
-					'prettier/prettier': ['error', prettierConfig],
-					...eslintConfigPrettier.rules,
-					...prettierCompatibleSpecialRules,
-				};
-
-				eslintConfigItem.rules = rulesWithPrettier;
-			}
-		} else if (xoConfigItem.prettier === false) {
+		if (xoConfigItem.prettier === false) {
 			// Turn Prettier off for a subset of files
 			eslintConfigItem.rules ??= {};
 			eslintConfigItem.rules['prettier/prettier'] = 'off';
 		}
 
-		if (Object.keys(eslintConfigItem).length === 0) {
-			continue;
+		if (Object.keys(eslintConfigItem).length > 0) {
+			baseConfig.push(eslintConfigItem);
 		}
 
-		baseConfig.push(eslintConfigItem);
+		if (prettierConfig) {
+			baseConfig.push(prettierConfig);
+		}
 	}
 
 	// User plugins should always win, even if XO injects plugins later in the config list.

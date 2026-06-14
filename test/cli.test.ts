@@ -280,7 +280,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		assert.equal(results.length, 2);
 		assert.deepEqual(
-			results.map(result => path.basename(result.filePath)).toSorted(),
+			results.map(result => path.basename(result.filePath)).toSorted((a, b) => a.localeCompare(b)),
 			['error.js', 'warning.js'],
 		);
 	});
@@ -1248,25 +1248,6 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		// Verify the eslint cache file was created
 		const cachedFiles = await fs.readdir(cacheDir);
 		assert.ok(cachedFiles.some(file => file.startsWith('.cache')), 'ESLint cache should exist');
-	});
-
-	test('prettier validation detects semicolon conflicts', async t => {
-		const cwd = await createProject(t);
-		const filePath = path.join(cwd, 'test.js');
-		await fs.writeFile(filePath, 'const x = true\n', 'utf8'); // No semicolon
-
-		// XO: no semicolons, Prettier: semicolons = conflict
-		const packageJson = {
-			xo: {
-				semicolon: false,
-				prettier: true,
-			},
-		};
-		await fs.writeFile(path.join(cwd, 'package.json'), JSON.stringify(packageJson), 'utf8');
-		await fs.writeFile(path.join(cwd, '.prettierrc'), '{"semi": true}', 'utf8');
-
-		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok(error.message.includes('semicolon'));
 	});
 
 	test('xo --max-warnings=0 fails when file has warnings', async t => {

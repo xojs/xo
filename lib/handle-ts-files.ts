@@ -24,8 +24,8 @@ const warnOnOutdatedProjectTypeScript = (cwd: string): void => {
 		return;
 	}
 
-	const projectMajor = Number.parseInt(projectVersion, 10);
-	const bundledMajor = Number.parseInt(ts.version, 10);
+	const projectMajor = Number(projectVersion.split('.', 1)[0]);
+	const bundledMajor = Number(ts.version.split('.', 1)[0]);
 
 	if (projectMajor >= bundledMajor) {
 		return;

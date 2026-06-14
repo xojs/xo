@@ -13,8 +13,14 @@
 	"type": "module",
 	"bin": "./dist/cli.js",
 	"exports": {
-		"types": "./dist/index.d.ts",
-		"default": "./dist/index.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./eslint-adapter": {
+			"types": "./dist/lib/eslint-adapter.d.ts",
+			"default": "./dist/lib/eslint-adapter.js"
+		}
 	},
 	"sideEffects": false,
 	"engines": {
@@ -69,13 +75,11 @@
 	"dependencies": {
 		"@sindresorhus/tsconfig": "^8.1.0",
 		"arrify": "^3.0.0",
-		"cosmiconfig": "^9.0.1",
+		"cosmiconfig": "^9.0.2",
 		"define-lazy-prop": "^3.0.0",
-		"eslint": "^10.3.0",
-		"eslint-config-prettier": "^10.1.8",
-		"eslint-config-xo": "^0.52.0",
+		"eslint": "^10.5.0",
+		"eslint-config-xo": "^0.53.1",
 		"eslint-formatter-pretty": "^7.1.0",
-		"eslint-plugin-prettier": "^5.5.5",
 		"find-cache-directory": "^6.0.0",
 		"get-stdin": "^10.0.0",
 		"get-tsconfig": "^4.14.0",
@@ -85,15 +89,15 @@
 		"micromatch": "^4.0.8",
 		"open-editor": "^6.0.0",
 		"path-exists": "^5.0.0",
-		"prettier": "^3.8.3",
-		"type-fest": "^5.6.0",
+		"prettier": "^3.8.4",
+		"type-fest": "^5.7.0",
 		"typescript": "^6.0.3"
 	},
 	"devDependencies": {
 		"@types/micromatch": "^4.0.10",
-		"@types/node": "^25.8.0",
+		"@types/node": "^25.9.3",
 		"dedent": "^1.7.2",
-		"eslint-plugin-vue": "^10.9.1",
+		"eslint-plugin-vue": "^10.9.2",
 		"execa": "^9.6.1",
 		"husky": "^9.1.7",
 		"np": "^11.2.1",

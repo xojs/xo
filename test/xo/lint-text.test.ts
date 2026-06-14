@@ -1,12 +1,15 @@
 
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import test, {beforeEach, afterEach} from 'node:test';
 import assert from 'node:assert/strict';
 import dedent from 'dedent';
 import {pathExists} from 'path-exists';
+import findCacheDirectory from 'find-cache-directory';
 import {Xo} from '../../lib/xo.js';
+import {cacheDirName} from '../../lib/constants.js';
 import {copyTestProject} from '../helpers/copy-test-project.js';
 import {rejectionOf} from '../helpers/rejection-of.js';
 
@@ -425,21 +428,17 @@ test('lint-text refreshes TypeScript program for unincluded files', async () => 
 
 test('virtual TypeScript configs are pruned when no virtual files remain', async () => {
 	const xo = new Xo({cwd, ts: true});
-	const {_cacheLocation} = xo;
-	const tsconfigPath = path.join(_cacheLocation, 'tsconfig.stdin.json');
-	const virtualFilePath = path.join(_cacheLocation, 'stdin', 'virtual.ts');
+	const cacheLocation = findCacheDirectory({name: cacheDirName, cwd}) ?? path.join(os.tmpdir(), cacheDirName);
+	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
+	const virtualFilePath = path.join(cacheLocation, 'stdin', 'virtual.ts');
 
 	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
 	await fs.writeFile(virtualFilePath, 'export const virtualValue = 1;\n', 'utf8');
 
 	await xo.lintText('export const virtualValue = 1;\n', {filePath: virtualFilePath});
 
+	// After linting a virtual (non-disk) file the virtual tsconfig must exist.
 	assert.ok(await pathExists(tsconfigPath));
-	const virtualConfig = xo._xoConfig?.find(({languageOptions}) => {
-		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
-		return parserOptions?.project === tsconfigPath;
-	});
-	assert.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
 
 	const existingFilePath = path.join(cwd, 'src', 'existing.ts');
 	await fs.mkdir(path.dirname(existingFilePath), {recursive: true});
@@ -447,18 +446,14 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 
 	await xo.lintText('export const existingValue = 1;\n', {filePath: existingFilePath});
 
+	// Once no virtual files remain the virtual tsconfig must be pruned.
 	assert.ok(!(await pathExists(tsconfigPath)));
-	const configAfterCleanup = xo._xoConfig?.find(({languageOptions}) => {
-		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
-		return parserOptions?.project === tsconfigPath;
-	});
-	assert.equal(configAfterCleanup, undefined);
 });
 
 test('virtual TypeScript files are reclassified once they exist on disk', async () => {
 	const xo = new Xo({cwd, ts: true});
-	const {_cacheLocation} = xo;
-	const tsconfigPath = path.join(_cacheLocation, 'tsconfig.stdin.json');
+	const cacheLocation = findCacheDirectory({name: cacheDirName, cwd}) ?? path.join(os.tmpdir(), cacheDirName);
+	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
 	const virtualFilePath = path.join(cwd, 'excluded', 'virtual.ts');
 	const source = 'export const virtualValue = 1;\n';
 
@@ -478,24 +473,16 @@ test('virtual TypeScript files are reclassified once they exist on disk', async 
 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
+	// File does not exist on disk yet: virtual tsconfig must be created.
 	assert.ok(await pathExists(tsconfigPath));
-	const virtualConfig = xo._xoConfig?.find(({languageOptions}) => {
-		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
-		return parserOptions?.project === tsconfigPath;
-	});
-	assert.deepEqual(virtualConfig?.files, [path.relative(cwd, virtualFilePath)]);
 
 	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
 	await fs.writeFile(virtualFilePath, source, 'utf8');
 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
+	// File now exists on disk: virtual tsconfig must be pruned.
 	assert.ok(!(await pathExists(tsconfigPath)));
-	const configAfterReclassification = xo._xoConfig?.find(({languageOptions}) => {
-		const parserOptions = (languageOptions?.['parserOptions'] ?? {}) as {project?: string};
-		return parserOptions?.project === tsconfigPath;
-	});
-	assert.equal(configAfterReclassification, undefined);
 });
 
 test('config with custom plugin', async () => {

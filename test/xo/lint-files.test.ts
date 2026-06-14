@@ -121,11 +121,9 @@ test('flat config > js > space', async () => {
 
 		dedent`
 			export function foo() {
-				console.log('hello');
-			}
-
-			console.log('hello'
-				+ 'world');\n
+				return 'hello'
+					+ 'world';
+			}\n
 		`,
 	);
 	const {results} = await xo.lintFiles();
@@ -156,11 +154,9 @@ test('flat config > ts > space', async () => {
 		filePath,
 		dedent`
 			export function foo() {
-				console.log('hello');
-			}
-
-			console.log('hello'
-				+ 'world');\n
+				return 'hello'
+					+ 'world';
+			}\n
 		`,
 	);
 	const {results} = await xo.lintFiles();
@@ -563,8 +559,19 @@ test('normalize cwd path casing', async () => {
 
 		const hasMismatchedCaseDirectory = await fs.stat(mismatchedCaseDirectory).then(() => true, () => false);
 		const resolvedCwd = hasMismatchedCaseDirectory ? mismatchedCaseDirectory : canonicalDirectory;
+
+		// Write a JS file in the canonical directory so lintFiles has something to process.
+		const fileName = 'test-casing.js';
+		await fs.writeFile(path.join(canonicalDirectory, fileName), 'const x = 1;\n', 'utf8');
+
 		const xo = new Xo({cwd: resolvedCwd});
-		assert.equal(xo._linterOptions.cwd, realpathSync.native(resolvedCwd));
+		// Use a relative glob so ESLint resolves the absolute filePath from the instance's (realpath-normalized) cwd, not from the raw mismatched-case path.
+		const {results} = await xo.lintFiles('*.js');
+
+		// The returned filePath must use the realpath-canonical casing, not the mismatched-case path that was passed to the constructor.
+		const expectedFilePath = path.join(realpathSync.native(resolvedCwd), fileName);
+		assert.ok(results.length > 0, 'Expected at least one lint result');
+		assert.equal(results[0]?.filePath, expectedFilePath);
 	} finally {
 		await fs.rm(temporaryDirectory, {recursive: true, force: true});
 	}
@@ -642,7 +649,7 @@ test('respects core.excludesfile (global gitignore)', async () => {
 
 	try {
 		const {results} = await new Xo({cwd}).lintFiles('**/*.js');
-		assert.ok(!results.some(r => r.filePath === ignoredFilePath), 'globally-ignored.js should be excluded from lint results');
+		assert.ok(results.every(r => r.filePath !== ignoredFilePath), 'globally-ignored.js should be excluded from lint results');
 		assert.ok(results.some(r => r.filePath === normalFilePath), 'normal.js should still be linted');
 	} finally {
 		if (previousValue === undefined) {

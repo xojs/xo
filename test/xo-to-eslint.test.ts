@@ -92,10 +92,10 @@ test('with prettier option compat', () => {
 
 	assert.equal(flatConfig.at(-1)?.rules?.['@typescript-eslint/semi'], 'off');
 
-	const prettierConfigJs = flatConfig.find(config =>
+	const hasPrettierPlugin = flatConfig.some(config =>
 		typeof config?.plugins?.['prettier'] === 'object');
 
-	assert.ok(!prettierConfigJs);
+	assert.ok(!hasPrettierPlugin);
 
 	assert.equal(flatConfig.at(-1)?.rules?.['@stylistic/semi'], 'off');
 });

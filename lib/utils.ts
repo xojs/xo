@@ -35,8 +35,8 @@ export const xoToEslintConfigItem = (xoConfig: XoConfigItem): Linter.Config => {
 
 	const eslintConfig: Linter.Config = {
 		..._xoConfig,
-		...(xoConfig.files === undefined ? {} : {files: arrify(xoConfig.files)}),
-		...(xoConfig.rules ? {rules: xoConfig.rules} : {}),
+		...(xoConfig.files !== undefined && {files: arrify(xoConfig.files)}),
+		...(xoConfig.rules && {rules: xoConfig.rules}),
 	};
 
 	eslintConfig.ignores &&= arrify(xoConfig.ignores);

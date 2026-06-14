@@ -185,24 +185,17 @@ Default: `false`
 
 Format code with [Prettier](https://github.com/prettier/prettier).
 
-[Prettier options](https://prettier.io/docs/en/options.html) will be based on your [Prettier config](https://prettier.io/docs/en/configuration.html). XO will then **merge** your options with its own defaults:
+XO applies its own [Prettier options](https://prettier.io/docs/en/options.html):
 
 - [semi](https://prettier.io/docs/en/options.html#semicolons): based on [semicolon](#semicolon) option
 - [useTabs](https://prettier.io/docs/en/options.html#tabs): based on [space](#space) option
 - [tabWidth](https://prettier.io/docs/en/options.html#tab-width): based on [space](#space) option
 - [singleQuote](https://prettier.io/docs/en/options.html#quotes): `true`
 - [bracketSpacing](https://prettier.io/docs/en/options.html#bracket-spacing): `false`
+- [bracketSameLine](https://prettier.io/docs/en/options.html#bracket-line): `false`
+- [trailingComma](https://prettier.io/docs/en/options.html#trailing-commas): `all`
 
-To stick with Prettier's defaults, add this to your Prettier config:
-
-```js
-export default {
-	singleQuote: false,
-	bracketSpacing: true,
-};
-```
-
-If contradicting options are set for both Prettier and XO, an error will be thrown.
+Any options you set in a [Prettier config](https://prettier.io/docs/en/configuration.html) still apply for anything XO does not configure (like `printWidth` or plugins), but XO's own style settings take precedence.
 
 #### Compat
 
@@ -326,20 +319,33 @@ You can opt out of XO's automatic tsconfig handling by specifying your own `lang
 
 ## Usage as an ESLint Configuration
 
-With the introduction of the ESLint flat config, many of the original goals of `xo` were brought into the ESLint core, and shareable configs with plugins became possible. Although we highly recommend the use of the `xo` cli, we understand that some teams need to rely on ESLint directly.
+There are two different ways to use XO's rules with ESLint directly, depending on whether you use the `xo` CLI.
 
-For these purposes, you can still get most of the features of `xo` by using our ESLint configuration helpers.
+### Without the `xo` CLI
 
-### xoToEslintConfig
-
-The `xoToEslintConfig` function is designed for use in an `eslint.config.js` file. It is NOT for use in an `xo.config.js` file. This function takes a `FlatXoConfig` and outputs an ESLint config object. This function will neither be able to automatically handle TS integration for you nor automatic Prettier integration. You are responsible for configuring your other tools appropriately. The `xo` cli, will, however, handle all of these details for you.
+If you don't use the `xo` CLI and just want XO's rules in ESLint, use [`eslint-config-xo`](https://github.com/xojs/eslint-config-xo). It accepts the same core style options as XO, including Prettier integration:
 
 `eslint.config.js`
 
 ```js
-import xo from 'xo';
+import eslintConfigXo from 'eslint-config-xo';
 
-export default xo.xoToEslintConfig([{space: true, prettier: 'compat'}]);
+export default [
+	...eslintConfigXo({space: true, prettier: true}),
+];
+```
+
+> [!NOTE]
+> This replaces the old `xoToEslintConfig` helper. For example, `xoToEslintConfig([{space: true, prettier: true}])` becomes `eslintConfigXo({space: true, prettier: true})`. For per-file overrides, add normal ESLint config objects alongside it.
+
+### With the `xo` CLI (editor integration)
+
+If you use the `xo` CLI but your editor only has the ESLint extension (not [XO's](#editor-plugins)), add an `eslint.config.js` that re-exports the adapter. It reads your `xo.config.js` and generates the matching ESLint config automatically, so your editor shows the same errors as running `xo` — without duplicating your config.
+
+`eslint.config.js`
+
+```js
+export {default} from 'xo/eslint-adapter';
 ```
 
 ## Tips
@@ -374,7 +380,7 @@ When XO finds errors, warnings are automatically hidden to reduce noise and let 
 
 XO automatically respects an [`eslint-suppressions.json`](https://eslint.org/docs/latest/use/suppressions) file if one exists in the working directory. This lets you suppress existing violations while still enforcing rules on new code — useful for incrementally adopting stricter rules in a large codebase.
 
-To generate the suppressions file, create a temporary `eslint.config.js` using [`xoToEslintConfig`](#xotoeslintconfig) and run ESLint with `--suppress-all`:
+To generate the suppressions file, create a temporary `eslint.config.js` using [`xo/eslint-adapter`](#with-the-xo-cli-editor-integration) and run ESLint with `--suppress-all`:
 
 ```sh
 npx eslint --suppress-all
