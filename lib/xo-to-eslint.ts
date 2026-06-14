@@ -4,7 +4,6 @@ import {type Linter, type ESLint} from 'eslint';
 import {type Options} from 'prettier';
 import pluginPrettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
-import {fixupPluginRules} from '@eslint/compat';
 import {type XoConfigItem} from './types.js';
 import {config} from './config.js';
 import {xoToEslintConfigItem} from './utils.js';
@@ -180,10 +179,9 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined, {pret
 				}
 
 				// Add Prettier plugin
-				// TODO: Remove `fixupPluginRules` wrapping when eslint-plugin-prettier supports ESLint 10 natively.
 				eslintConfigItem.plugins = {
 					...eslintConfigItem.plugins,
-					prettier: fixupPluginRules(pluginPrettier),
+					prettier: pluginPrettier,
 				};
 
 				const prettierConfig = {

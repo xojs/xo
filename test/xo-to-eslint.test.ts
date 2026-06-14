@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {type Linter} from 'eslint';
+import {Linter} from 'eslint';
 import micromatch from 'micromatch';
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {frameworkExtensions} from '../lib/constants.js';
@@ -308,6 +308,18 @@ test('Linter.Config objects are accepted as XoConfigItem', () => {
 
 	assert.deepEqual(flatConfig.at(-1)?.files, ['**/*.svelte']);
 	assert.equal(flatConfig.at(-1)?.rules?.['no-console'], 'warn');
+});
+
+test('prettier option does not crash when linting JSON files', () => {
+	// A config item without `files` applies globally, so XO's injected `prettier/prettier`
+	// rule also runs on `package.json` (which uses the `json/json` language). The Prettier
+	// plugin must not be wrapped by `@eslint/compat`, which throws on non-JS languages.
+	const flatConfig = xoToEslintConfig([{space: true, prettier: true}]);
+	const linter = new Linter();
+
+	assert.doesNotThrow(() => {
+		linter.verify('{\n  "name": "foo"\n}\n', flatConfig, {filename: 'package.json'});
+	});
 });
 
 test('base config applies to framework file types', () => {

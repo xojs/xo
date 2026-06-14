@@ -67,7 +67,6 @@
 		"typescript"
 	],
 	"dependencies": {
-		"@eslint/compat": "^2.1.0",
 		"@sindresorhus/tsconfig": "^8.1.0",
 		"arrify": "^3.0.0",
 		"cosmiconfig": "^9.0.1",
