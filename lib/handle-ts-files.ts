@@ -82,11 +82,15 @@ const getFallbackCompilerOptions = (cwd: string): ts.CompilerOptions => {
 
 	const compilerOptions: ts.CompilerOptions = {
 		...compilerOptionsResult.options,
+		// Anchor module and `@types` resolution to the project directory. Without `configFilePath`, an option-only program resolves these from `process.cwd()`, which differs from `cwd` for programmatic callers. The file need not exist; only its directory is used.
+		configFilePath: path.join(cacheKey, 'tsconfig.json'),
 		esModuleInterop: true,
-		resolveJsonModules: true,
+		resolveJsonModule: true,
 		allowJs: true,
 		skipLibCheck: true,
 		skipDefaultLibCheck: true,
+		// TypeScript 6 only auto-includes `@types/*` packages when `types` contains `'*'`. Without this, files outside the tsconfig resolve imports to `any` and type-aware rules misfire.
+		types: ['*'],
 	};
 
 	fallbackCompilerOptionsCache.set(cacheKey, compilerOptions);

@@ -100,6 +100,30 @@ test('flat config > ts > semi > no tsconfig', async () => {
 	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
+test('flat config > ts > resolves types for files outside the tsconfig', async () => {
+	// A file not matched by the tsconfig `include` is type-checked through an in-memory program. It must still load `@types/*`, otherwise imports resolve to `any` and type-aware rules misfire. See https://github.com/xojs/xo/issues/886
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({include: ['source/**/*.ts']}),
+		'utf8',
+	);
+	await fs.mkdir(path.join(cwd, 'source'));
+	await fs.writeFile(path.join(cwd, 'source', 'index.ts'), dedent`export const x = 1;\n`, 'utf8');
+	const filePath = path.join(cwd, 'test', 'index.ts');
+	await fs.mkdir(path.join(cwd, 'test'));
+	await fs.writeFile(filePath, dedent`
+		import test from 'node:test';
+
+		test('foo', () => {});
+	`, 'utf8');
+	const xo = new Xo({cwd, ts: true});
+	const {results} = await xo.lintFiles();
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.ok(lintResult, 'test/index.ts should be linted');
+	const unsafeCall = lintResult.messages.find(message => message.ruleId === '@typescript-eslint/no-unsafe-call');
+	assert.equal(unsafeCall, undefined, '`node:test` should resolve to a callable type, not `any`');
+});
+
 test('flat config > js > space', async () => {
 	const filePath = path.join(cwd, 'test.js');
 

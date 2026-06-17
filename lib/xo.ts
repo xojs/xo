@@ -452,6 +452,8 @@ export class Xo {
 						moduleResolution: 'NodeNext',
 						esModuleInterop: true,
 						skipLibCheck: true,
+						// TypeScript 6 only auto-includes `@types/*` packages when `types` contains `'*'`. Without this, virtual/stdin files resolve imports to `any` and type-aware rules misfire.
+						types: ['*'],
 					},
 					files: filesArray,
 				};
