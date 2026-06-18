@@ -3,13 +3,13 @@ import os from 'node:os';
 import syncFs from 'node:fs';
 import fs from 'node:fs/promises';
 import process from 'node:process';
+import {createHash} from 'node:crypto';
 import {ESLint, type Linter} from 'eslint';
 import findCacheDirectory from 'find-cache-directory';
 import {globby, isDynamicPattern} from 'globby';
 import micromatch from 'micromatch';
 import arrify from 'arrify';
 import defineLazyProperty from 'define-lazy-prop';
-import type ts from 'typescript';
 import {
 	type XoLintResult,
 	type LinterOptions,
@@ -68,6 +68,19 @@ const createIgnoredLintResult = (filePath: string): ESLint.LintResult => ({
 const normalizeGlobPath = (filePath: string): string => filePath.split(path.sep).join('/');
 
 const pathMatchesPattern = (filePath: string, pattern: string): boolean => micromatch.isMatch(normalizeGlobPath(filePath), normalizeGlobPath(pattern), {dot: true});
+
+const isPathInside = (parentPath: string, childPath: string): boolean => {
+	const relativePath = path.relative(parentPath, childPath);
+	return relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
+};
+
+const getGeneratedTsconfigPath = (directory: string, files: string[]): string => {
+	const hash = createHash('sha256')
+		.update(JSON.stringify(files.toSorted((first, second) => first.localeCompare(second))))
+		.digest('hex')
+		.slice(0, 16);
+	return path.join(directory, `tsconfig.generated.${hash}.json`);
+};
 
 const isIgnoredByPatterns = (filePath: string, patterns: string[]): boolean => {
 	let isIgnored = false;
@@ -316,6 +329,16 @@ export class Xo {
 	readonly #cacheLocation: string;
 
 	/**
+	Directory for generated tsconfigs for unincluded TypeScript files.
+	*/
+	readonly #generatedTsconfigDirectory: string;
+
+	/**
+	File path to the currently active generated tsconfig.
+	*/
+	#currentGeneratedTsconfigPath?: string;
+
+	/**
 	XO config derived from both the base config and the resolved flat config.
 	*/
 	#xoConfig?: XoConfigItem[];
@@ -347,19 +370,6 @@ export class Xo {
 	*/
 	readonly #tsFilesIgnoresGlob: string[] = [];
 
-	/**
-	Store per-file configs separately from base config to prevent unbounded array growth.
-	Key: file path, Value: config for that file.
-	This prevents memory bloat in long-running processes (e.g., language servers).
-	*/
-	readonly #fileConfigs = new Map<string, XoConfigItem>();
-
-	/**
-	Track virtual/stdin files that share a single tsconfig.stdin.json.
-	These are handled differently from regular files.
-	*/
-	readonly #virtualFiles = new Set<string>();
-
 	constructor(_linterOptions: LinterOptions, _baseXoConfig: XoConfigOptions = {}) {
 		this.#linterOptions = _linterOptions;
 		this.#baseXoConfig = _baseXoConfig;
@@ -378,6 +388,9 @@ export class Xo {
 		const backupCacheLocation = path.join(os.tmpdir(), cacheDirName);
 
 		this.#cacheLocation = findCacheDirectory({name: cacheDirName, cwd: this.#linterOptions.cwd}) ?? backupCacheLocation;
+		this.#generatedTsconfigDirectory = isPathInside(this.#linterOptions.cwd, this.#cacheLocation)
+			? this.#cacheLocation
+			: path.join(this.#linterOptions.cwd, 'node_modules', '.cache', cacheDirName);
 	}
 
 	/**
@@ -424,114 +437,82 @@ export class Xo {
 	}
 
 	/**
-	Add virtual files to the config with a tsconfig approach.
+	Add unincluded files to the config with a generated tsconfig approach. Passing an empty array removes the generated config entry.
+
+	This uses `parserOptions.project` rather than an in-memory `parserOptions.programs`. A pre-built program's AST is built once from the original file text and is never updated between ESLint's multiple `--fix` passes, so stale offsets corrupt the output. A file-based project is re-read on each pass, so autofix stays correct.
 	*/
-	private async addVirtualFilesToConfig(files: string[]): Promise<void> {
+	private async addUnincludedFilesToConfig(files: string[]): Promise<void> {
 		if (!this.#xoConfig) {
 			return;
 		}
 
 		try {
-			const nextVirtualFiles = new Set(files);
+			const previousTsconfigPath = this.#currentGeneratedTsconfigPath;
+			const configIndex = previousTsconfigPath === undefined
+				? -1
+				: this.#xoConfig.findIndex(configItem => {
+					const {languageOptions} = configItem;
+					const parserOptions = languageOptions?.['parserOptions'] as TypeScriptParserOptions | undefined;
+					return parserOptions?.project === previousTsconfigPath;
+				});
 
-			const tsconfigPath = path.join(this.#cacheLocation, 'tsconfig.stdin.json');
-			const configIndex = this.#xoConfig.findIndex(configItem => {
-				const {languageOptions} = configItem;
-				const parserOptions = languageOptions?.['parserOptions'] as TypeScriptParserOptions | undefined;
-				return parserOptions?.project === tsconfigPath;
-			});
-
-			if (nextVirtualFiles.size > 0) {
-				const filesArray = [...nextVirtualFiles];
-				const relativeFiles = filesArray.map(file => path.relative(this.#linterOptions.cwd, file));
-
-				const tsconfigContent = {
-					compilerOptions: {
-						...tsconfigDefaults.compilerOptions,
-						module: 'ESNext',
-						moduleResolution: 'NodeNext',
-						esModuleInterop: true,
-						skipLibCheck: true,
-						// TypeScript 6 only auto-includes `@types/*` packages when `types` contains `'*'`. Without this, virtual/stdin files resolve imports to `any` and type-aware rules misfire.
-						types: ['*'],
-					},
-					files: filesArray,
-				};
-
-				await fs.writeFile(tsconfigPath, JSON.stringify(tsconfigContent, null, 2));
-
-				if (configIndex === -1) {
-					const parserOptions: TypeScriptParserOptions = {
-						projectService: false,
-						project: tsconfigPath,
-						tsconfigRootDir: this.#linterOptions.cwd,
-					};
-					this.#xoConfig.push({
-						files: relativeFiles,
-						languageOptions: {
-							parser: typescriptParser,
-							parserOptions,
-						},
-					});
-				} else {
-					const existingConfig = this.#xoConfig[configIndex];
-					this.#xoConfig[configIndex] = {
-						...existingConfig,
-						files: relativeFiles,
-					};
+			if (files.length === 0) {
+				if (configIndex !== -1) {
+					this.#xoConfig.splice(configIndex, 1);
 				}
 
-				this.#virtualFiles.clear();
-				for (const file of nextVirtualFiles) {
-					this.#virtualFiles.add(file);
+				if (previousTsconfigPath !== undefined) {
+					this.#currentGeneratedTsconfigPath = undefined;
 				}
 
 				return;
 			}
 
-			if (configIndex >= 0) {
-				this.#xoConfig.splice(configIndex, 1);
+			const tsconfigPath = getGeneratedTsconfigPath(this.#generatedTsconfigDirectory, files);
+
+			// The generated tsconfig references files by absolute path; the ESLint config matches them by path relative to `cwd`.
+			const relativeFiles = files.map(file => path.relative(this.#linterOptions.cwd, file));
+
+			const tsconfigContent = {
+				compilerOptions: {
+					...tsconfigDefaults.compilerOptions,
+					module: 'ESNext',
+					moduleResolution: 'NodeNext',
+					esModuleInterop: true,
+					resolveJsonModule: true,
+					skipLibCheck: true,
+					// JS files are routed here too (type-aware rules apply to JS). Without `allowJs`, TypeScript does not load them as source files, so the parser reports "file not found in project".
+					allowJs: true,
+					// TypeScript 6 only auto-includes `@types/*` packages when `types` contains `'*'`. Without this, unincluded files resolve imports to `any` and type-aware rules misfire.
+					types: ['*'],
+				},
+				files,
+			};
+
+			await fs.mkdir(path.dirname(tsconfigPath), {recursive: true});
+			await fs.writeFile(tsconfigPath, JSON.stringify(tsconfigContent, null, 2));
+			this.#currentGeneratedTsconfigPath = tsconfigPath;
+
+			const parserOptions: TypeScriptParserOptions = {
+				projectService: false,
+				project: tsconfigPath,
+				tsconfigRootDir: this.#linterOptions.cwd,
+			};
+			const generatedConfig: XoConfigItem = {
+				files: relativeFiles,
+				languageOptions: {
+					parser: typescriptParser,
+					parserOptions,
+				},
+			};
+
+			if (configIndex === -1) {
+				this.#xoConfig.push(generatedConfig);
+			} else {
+				this.#xoConfig[configIndex] = generatedConfig;
 			}
-
-			this.#virtualFiles.clear();
-
-			await fs.rm(tsconfigPath, {force: true});
 		} catch (error) {
-			console.warn('XO: Failed to create tsconfig for virtual files. Type-aware linting will be disabled for these files.', error instanceof Error ? error.message : String(error));
-		}
-	}
-
-	/**
-	Add existing files to the config with an in-memory TypeScript Program.
-	*/
-	private addExistingFilesToConfig(files: string[], program?: ts.Program): void {
-		if (!this.#xoConfig || files.length === 0) {
-			return;
-		}
-
-		const parserOptions: TypeScriptParserOptions = {
-			project: false,
-			projectService: false,
-		};
-
-		if (program) {
-			parserOptions.programs = [program];
-		}
-
-		const config: XoConfigItem = {
-			files: files.map(file => path.relative(this.#linterOptions.cwd, file)),
-			languageOptions: {
-				parser: typescriptParser,
-				parserOptions,
-			},
-		};
-
-		// IMPORTANT: All files intentionally share the same config object reference for memory efficiency.
-		// This prevents unbounded memory growth in long-running processes (e.g., language servers).
-		// The config is immutable after creation, so sharing is safe.
-		// Deduplication happens in setEslintConfig() via Set to avoid duplicate configs in the final array.
-		for (const file of files) {
-			this.#fileConfigs.set(file, config);
+			console.warn('XO: Failed to create tsconfig for unincluded files. Type-aware linting will be disabled for these files.', error instanceof Error ? error.message : String(error));
 		}
 	}
 
@@ -630,14 +611,11 @@ export class Xo {
 			throw new Error('"Xo.setEslintConfig" failed');
 		}
 
-		// Combine base config with per-file configs from Map
-		// Deduplicate configs since multiple files can share the same config object
 		const [baseConfig = {}, ...resolvedConfigs] = this.#xoConfig;
 		const {ignores, ...configWithoutCliIgnores} = baseConfig;
 		const expandedResolvedConfigs = resolvedConfigs.map(config => expandGlobalIgnoreConfigForEslint(config));
-		const uniqueFileConfigs = [...new Set(this.#fileConfigs.values())];
 		const cliIgnoreConfig = cliIgnores.length > 0 ? [{ignores: expandIgnoreNegationsForEslint(cliIgnores)}] : [];
-		const allConfigs = [configWithoutCliIgnores, ...expandedResolvedConfigs, ...cliIgnoreConfig, ...uniqueFileConfigs];
+		const allConfigs = [configWithoutCliIgnores, ...expandedResolvedConfigs, ...cliIgnoreConfig];
 
 		// Always regenerate to support instance reuse with new files
 		this.#eslintConfig = xoToEslintConfig(allConfigs);
@@ -669,41 +647,28 @@ export class Xo {
 	}
 
 	/**
-	Checks every TS file to ensure its included in the tsconfig and any that are not included are added to an in-memory TypeScript Program for type aware linting.
+	Checks every TS file to ensure it is included in the tsconfig. Any that are not included are routed through a generated tsconfig (`tsconfig.generated.json`) so that autofix works correctly across multiple ESLint passes.
 
 	@param files - The TypeScript files being linted.
 	*/
 	async handleUnincludedTsFiles(files?: string[]): Promise<void> {
-		if (!this.#linterOptions.ts || !files || files.length === 0) {
+		if (!this.#linterOptions.ts) {
 			return;
 		}
 
-		// Get ALL TypeScript files being linted (both new and previously handled)
+		if (!files || files.length === 0) {
+			await this.addUnincludedFilesToConfig([]);
+			return;
+		}
+
+		// Get ALL TypeScript files being linted
 		const allTsFiles = matchFilesForTsConfig(this.#linterOptions.cwd, files, this.#tsFilesGlob, this.#tsFilesIgnoresGlob);
 
-		if (allTsFiles.length === 0) {
-			this.#fileConfigs.clear();
+		const unincludedFiles = allTsFiles.length === 0
+			? []
+			: handleTsconfig({files: allTsFiles, cwd: this.#linterOptions.cwd});
 
-			if (this.#virtualFiles.size > 0) {
-				await this.addVirtualFilesToConfig([]);
-			}
-
-			return;
-		}
-
-		const {program, existingFiles, virtualFiles} = handleTsconfig({
-			files: allTsFiles,
-			cwd: this.#linterOptions.cwd,
-			cacheLocation: this.#cacheLocation,
-		});
-
-		this.#fileConfigs.clear();
-
-		if (existingFiles.length > 0) {
-			this.addExistingFilesToConfig(existingFiles, program);
-		}
-
-		await this.addVirtualFilesToConfig(virtualFiles);
+		await this.addUnincludedFilesToConfig(unincludedFiles);
 	}
 
 	/**

@@ -101,7 +101,7 @@ test('flat config > ts > semi > no tsconfig', async () => {
 });
 
 test('flat config > ts > resolves types for files outside the tsconfig', async () => {
-	// A file not matched by the tsconfig `include` is type-checked through an in-memory program. It must still load `@types/*`, otherwise imports resolve to `any` and type-aware rules misfire. See https://github.com/xojs/xo/issues/886
+	// A file not matched by the tsconfig `include` is type-checked through a generated tsconfig. It must still load `@types/*`, otherwise imports resolve to `any` and type-aware rules misfire. See https://github.com/xojs/xo/issues/886
 	await fs.writeFile(
 		path.join(cwd, 'tsconfig.json'),
 		JSON.stringify({include: ['source/**/*.ts']}),
@@ -122,6 +122,159 @@ test('flat config > ts > resolves types for files outside the tsconfig', async (
 	assert.ok(lintResult, 'test/index.ts should be linted');
 	const unsafeCall = lintResult.messages.find(message => message.ruleId === '@typescript-eslint/no-unsafe-call');
 	assert.equal(unsafeCall, undefined, '`node:test` should resolve to a callable type, not `any`');
+});
+
+test('flat config > ts > resolves json imports for files outside the tsconfig', async () => {
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({include: ['source/**/*.ts']}),
+		'utf8',
+	);
+	await fs.mkdir(path.join(cwd, 'source'));
+	await fs.writeFile(path.join(cwd, 'source', 'index.ts'), dedent`export const x = 1;\n`, 'utf8');
+	const filePath = path.join(cwd, 'test', 'index.ts');
+	await fs.mkdir(path.join(cwd, 'test'));
+	await fs.writeFile(path.join(cwd, 'test', 'data.json'), JSON.stringify({count: 1}), 'utf8');
+	await fs.writeFile(filePath, dedent`
+		import data from './data.json';
+
+		const count: number = data.count;
+		count.toFixed(1);
+	`, 'utf8');
+	const xo = new Xo({cwd, ts: true});
+	const {results} = await xo.lintFiles();
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.ok(lintResult, 'test/index.ts should be linted');
+	const ruleIds = new Set(lintResult.messages.map(({ruleId}) => ruleId));
+	assert.ok(!ruleIds.has('@typescript-eslint/no-unsafe-assignment'));
+	assert.ok(!ruleIds.has('@typescript-eslint/no-unsafe-member-access'));
+});
+
+test('flat config > ts > resolves cwd ambient types for files outside the tsconfig without package json', async () => {
+	await fs.rm(path.join(cwd, 'package.json'), {force: true});
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({include: ['source/**/*.ts']}),
+		'utf8',
+	);
+	await fs.mkdir(path.join(cwd, 'source'));
+	await fs.writeFile(path.join(cwd, 'source', 'index.ts'), dedent`export const x = 1;\n`, 'utf8');
+	await fs.mkdir(path.join(cwd, 'node_modules', '@types', 'cwd-globals'), {recursive: true});
+	await fs.writeFile(
+		path.join(cwd, 'node_modules', '@types', 'cwd-globals', 'index.d.ts'),
+		dedent`
+			declare const cwdGlobal: {
+				count: number;
+			};
+		`,
+		'utf8',
+	);
+	const filePath = path.join(cwd, 'test', 'index.ts');
+	await fs.mkdir(path.join(cwd, 'test'));
+	await fs.writeFile(filePath, dedent`
+		const count: number = cwdGlobal.count;
+		count.toFixed(1);
+	`, 'utf8');
+	const xo = new Xo({cwd, ts: true});
+	const {results} = await xo.lintFiles();
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.ok(lintResult, 'test/index.ts should be linted');
+	const ruleIds = new Set(lintResult.messages.map(({ruleId}) => ruleId));
+	assert.ok(!ruleIds.has('@typescript-eslint/no-unsafe-assignment'));
+	assert.ok(!ruleIds.has('@typescript-eslint/no-unsafe-member-access'));
+});
+
+test('flat config > ts > fix does not mangle files outside the tsconfig', async () => {
+	// `--fix` runs multiple passes. A file outside the tsconfig `include` must be re-parsed against its current text on every pass, otherwise fixes computed against the previous pass's stale offsets corrupt the file. Two byte-identical files, one inside `include` and one outside, must therefore produce identical fixed output. See https://github.com/xojs/xo/issues/887
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({include: ['source/**/*']}),
+		'utf8',
+	);
+	// The redundant type assertions are removed by a type-aware rule across several fix passes, which is what triggers the stale-offset corruption.
+	const fileContent = dedent`
+		const first: number = 1;
+		const second = first as number;
+		const third = second as number;
+		export {third};
+	`
+		+ '\n';
+	await fs.mkdir(path.join(cwd, 'source'));
+	await fs.mkdir(path.join(cwd, 'test'));
+	const includedFilePath = path.join(cwd, 'source', 'index.ts');
+	const unincludedFilePath = path.join(cwd, 'test', 'index.ts');
+	await fs.writeFile(includedFilePath, fileContent, 'utf8');
+	await fs.writeFile(unincludedFilePath, fileContent, 'utf8');
+	const xo = new Xo({cwd, ts: true, fix: true});
+	const {results} = await xo.lintFiles();
+	const includedResult = results?.find(result => result.filePath === includedFilePath);
+	const unincludedResult = results?.find(result => result.filePath === unincludedFilePath);
+	assert.ok(includedResult, 'source/index.ts should be linted');
+	assert.ok(unincludedResult, 'test/index.ts should be linted');
+	// The included file always uses the project tsconfig and is fixed correctly, so it is the oracle for the expected output.
+	assert.ok(includedResult.output !== undefined && includedResult.output !== fileContent, 'the included file should have been fixed');
+	assert.equal(unincludedResult.output, includedResult.output, 'the file outside the tsconfig must be fixed identically, not mangled');
+});
+
+test('flat config > ts > fix works for multiple files outside the tsconfig', async () => {
+	// All unincluded files share a single generated tsconfig that must list every one of them, so a run with several unincluded files must type-aware fix each independently. See https://github.com/xojs/xo/issues/887
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({include: ['source/**/*']}),
+		'utf8',
+	);
+	const fileContent = dedent`
+		const first: number = 1;
+		const second = first as number;
+		export {second};
+	`
+		+ '\n';
+	await fs.mkdir(path.join(cwd, 'source'));
+	await fs.mkdir(path.join(cwd, 'test'));
+	const includedFilePath = path.join(cwd, 'source', 'index.ts');
+	const unincludedFilePaths = [
+		path.join(cwd, 'test', 'one.ts'),
+		path.join(cwd, 'test', 'two.ts'),
+	];
+	await fs.writeFile(includedFilePath, fileContent, 'utf8');
+	for (const filePath of unincludedFilePaths) {
+		// eslint-disable-next-line no-await-in-loop
+		await fs.writeFile(filePath, fileContent, 'utf8');
+	}
+
+	const xo = new Xo({cwd, ts: true, fix: true});
+	const {results} = await xo.lintFiles();
+	const includedResult = results?.find(result => result.filePath === includedFilePath);
+	assert.ok(includedResult?.output !== undefined && includedResult.output !== fileContent, 'the included file should have been fixed');
+
+	for (const filePath of unincludedFilePaths) {
+		const result = results?.find(result => result.filePath === filePath);
+		assert.ok(result, `${filePath} should be linted`);
+		assert.equal(result.output, includedResult.output, 'each file outside the tsconfig must be fixed identically, not mangled');
+	}
+});
+
+test('flat config > ts > reused instance works with changing unincluded file sets', async () => {
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({include: ['source/**/*']}),
+		'utf8',
+	);
+	await fs.mkdir(path.join(cwd, 'excluded'));
+	const firstFilePath = path.join(cwd, 'excluded', 'first.ts');
+	const secondFilePath = path.join(cwd, 'excluded', 'second.ts');
+	await fs.writeFile(firstFilePath, 'export const firstValue = 1\n', 'utf8');
+	await fs.writeFile(secondFilePath, 'export const secondValue = 2\n', 'utf8');
+	const xo = new Xo({cwd, ts: true});
+
+	const {results: firstResults} = await xo.lintFiles('excluded/first.ts');
+	const {results} = await xo.lintFiles('excluded/second.ts');
+	const firstRuleIds = new Set(firstResults?.[0]?.messages.map(({ruleId}) => ruleId));
+	const secondRuleIds = new Set(results?.[0]?.messages.map(({ruleId}) => ruleId));
+
+	assert.equal(results?.[0]?.fatalErrorCount, 0);
+	assert.ok(firstRuleIds.has('@stylistic/semi'));
+	assert.ok(secondRuleIds.has('@stylistic/semi'));
 });
 
 test('flat config > js > space', async () => {

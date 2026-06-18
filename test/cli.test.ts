@@ -571,7 +571,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-		// Run XO on the entire directory structure - should handle unincluded files with in-memory programs
+		// Run XO on the entire directory structure - should handle unincluded files via a generated tsconfig
 		await $`node ./dist/cli --cwd ${cwd}`;
 	});
 
@@ -854,7 +854,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-		// Run XO - should handle both TS and JS files with in-memory TypeScript programs
+		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
@@ -901,7 +901,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-		// Run XO - should handle both TS and JS files with in-memory TypeScript programs
+		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
@@ -948,7 +948,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-		// Run XO - should handle both TS and JS files with in-memory TypeScript programs
+		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
@@ -999,7 +999,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-		// Run XO - should handle both TS and JS files with in-memory TypeScript programs
+		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
@@ -1050,7 +1050,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-		// Run XO - should handle both TS and JS files with in-memory TypeScript programs
+		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
 		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');

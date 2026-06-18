@@ -6,7 +6,6 @@ import path from 'node:path';
 import test, {beforeEach, afterEach} from 'node:test';
 import assert from 'node:assert/strict';
 import dedent from 'dedent';
-import {pathExists} from 'path-exists';
 import findCacheDirectory from 'find-cache-directory';
 import {Xo} from '../../lib/xo.js';
 import {cacheDirName} from '../../lib/constants.js';
@@ -14,6 +13,19 @@ import {copyTestProject} from '../helpers/copy-test-project.js';
 import {rejectionOf} from '../helpers/rejection-of.js';
 
 let cwd: string;
+
+const getGeneratedTsconfigFiles = async (directory: string): Promise<string[]> => {
+	try {
+		const files = await fs.readdir(directory);
+		return files.filter(file => file.startsWith('tsconfig.generated.') && file.endsWith('.json'));
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+			return [];
+		}
+
+		throw error;
+	}
+};
 
 beforeEach(async () => {
 	cwd = await copyTestProject();
@@ -383,7 +395,7 @@ test('lint-text can be ran multiple times in a row with top level typescript rul
 	assert.deepEqual(thirdRuleIds, firstRuleIds);
 });
 
-test('lint-text refreshes TypeScript program for unincluded files', async () => {
+test('lint-text refreshes type information for unincluded files', async () => {
 	const filePath = path.join(cwd, 'excluded', 'stale.ts');
 	const xo = new Xo({cwd, ts: true});
 
@@ -426,10 +438,42 @@ test('lint-text refreshes TypeScript program for unincluded files', async () => 
 	assert.ok(!safeRuleIds.includes('@typescript-eslint/no-unsafe-member-access'));
 });
 
-test('virtual TypeScript configs are pruned when no virtual files remain', async () => {
+test('lint-text refreshes generated tsconfig when unincluded file set changes', async () => {
+	const firstFilePath = path.join(cwd, 'excluded', 'first.ts');
+	const secondFilePath = path.join(cwd, 'excluded', 'second.ts');
+	const xo = new Xo({cwd, ts: true});
+
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({
+			compilerOptions: {
+				module: 'node16',
+				target: 'ES2022',
+				strictNullChecks: true,
+				lib: ['DOM', 'DOM.Iterable', 'ES2022'],
+			},
+			exclude: ['node_modules', 'excluded'],
+		}),
+		'utf8',
+	);
+
+	await fs.mkdir(path.dirname(firstFilePath), {recursive: true});
+
+	const firstSource = 'export const firstValue = 1;\n';
+	const secondSource = 'export const secondValue = 2;\n';
+
+	await fs.writeFile(firstFilePath, firstSource, 'utf8');
+	await fs.writeFile(secondFilePath, secondSource, 'utf8');
+
+	await xo.lintText(firstSource, {filePath: firstFilePath});
+	const {results} = await xo.lintText(secondSource, {filePath: secondFilePath});
+
+	assert.equal(results[0]?.fatalErrorCount, 0);
+});
+
+test('generated tsconfig is retained when no unincluded files remain', async () => {
 	const xo = new Xo({cwd, ts: true});
 	const cacheLocation = findCacheDirectory({name: cacheDirName, cwd}) ?? path.join(os.tmpdir(), cacheDirName);
-	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
 	const virtualFilePath = path.join(cacheLocation, 'stdin', 'virtual.ts');
 
 	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
@@ -437,8 +481,9 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 
 	await xo.lintText('export const virtualValue = 1;\n', {filePath: virtualFilePath});
 
-	// After linting a virtual (non-disk) file the virtual tsconfig must exist.
-	assert.ok(await pathExists(tsconfigPath));
+	// After linting an unincluded file the generated tsconfig must exist.
+	const generatedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(generatedTsconfigFiles.length, 1);
 
 	const existingFilePath = path.join(cwd, 'src', 'existing.ts');
 	await fs.mkdir(path.dirname(existingFilePath), {recursive: true});
@@ -446,14 +491,94 @@ test('virtual TypeScript configs are pruned when no virtual files remain', async
 
 	await xo.lintText('export const existingValue = 1;\n', {filePath: existingFilePath});
 
-	// Once no virtual files remain the virtual tsconfig must be pruned.
-	assert.ok(!(await pathExists(tsconfigPath)));
+	// Generated tsconfig files stay in the cache because another XO process may still need them.
+	const retainedGeneratedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(retainedGeneratedTsconfigFiles.length, 1);
 });
 
-test('virtual TypeScript files are reclassified once they exist on disk', async () => {
+test('generated tsconfig is retained when initializing without files', async () => {
 	const xo = new Xo({cwd, ts: true});
 	const cacheLocation = findCacheDirectory({name: cacheDirName, cwd}) ?? path.join(os.tmpdir(), cacheDirName);
-	const tsconfigPath = path.join(cacheLocation, 'tsconfig.stdin.json');
+	const virtualFilePath = path.join(cacheLocation, 'stdin', 'virtual.ts');
+
+	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
+	await fs.writeFile(virtualFilePath, 'export const virtualValue = 1;\n', 'utf8');
+
+	await xo.lintText('export const virtualValue = 1;\n', {filePath: virtualFilePath});
+
+	const generatedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(generatedTsconfigFiles.length, 1);
+
+	await xo.getFormatter('stylish');
+
+	const retainedGeneratedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(retainedGeneratedTsconfigFiles.length, 1);
+});
+
+test('generated tsconfigs are retained across instances when unincluded file set changes', async () => {
+	const cacheLocation = findCacheDirectory({name: cacheDirName, cwd}) ?? path.join(os.tmpdir(), cacheDirName);
+	const firstFilePath = path.join(cwd, 'excluded', 'first.ts');
+	const secondFilePath = path.join(cwd, 'excluded', 'second.ts');
+
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({
+			compilerOptions: {
+				module: 'node16',
+				target: 'ES2022',
+				strictNullChecks: true,
+				lib: ['DOM', 'DOM.Iterable', 'ES2022'],
+			},
+			exclude: ['node_modules', 'excluded'],
+		}),
+		'utf8',
+	);
+
+	await fs.mkdir(path.dirname(firstFilePath), {recursive: true});
+	await fs.writeFile(firstFilePath, 'export const firstValue = 1;\n', 'utf8');
+	await fs.writeFile(secondFilePath, 'export const secondValue = 2;\n', 'utf8');
+
+	await new Xo({cwd, ts: true}).lintText('export const firstValue = 1;\n', {filePath: firstFilePath});
+
+	const firstGeneratedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(firstGeneratedTsconfigFiles.length, 1);
+	const [firstGeneratedTsconfigFile] = firstGeneratedTsconfigFiles;
+	if (firstGeneratedTsconfigFile === undefined) {
+		assert.fail('Expected a generated tsconfig file.');
+	}
+
+	const {results} = await new Xo({cwd, ts: true}).lintText('export const secondValue = 2;\n', {filePath: secondFilePath});
+
+	const secondGeneratedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(results[0]?.fatalErrorCount, 0);
+	assert.equal(secondGeneratedTsconfigFiles.length, 2);
+	assert.ok(secondGeneratedTsconfigFiles.includes(firstGeneratedTsconfigFile));
+});
+
+test('generated tsconfig path is deterministic for the same unincluded file set', async () => {
+	// The generated tsconfig name is hashed from the file set, so two separate runs over the same unincluded file must reuse the same tsconfig rather than accumulate a new one each time.
+	const cacheLocation = findCacheDirectory({name: cacheDirName, cwd}) ?? path.join(os.tmpdir(), cacheDirName);
+	const filePath = path.join(cwd, 'excluded', 'first.ts');
+	const source = 'export const firstValue = 1;\n';
+
+	await fs.writeFile(
+		path.join(cwd, 'tsconfig.json'),
+		JSON.stringify({include: ['source/**/*']}),
+		'utf8',
+	);
+	await fs.mkdir(path.dirname(filePath), {recursive: true});
+	await fs.writeFile(filePath, source, 'utf8');
+
+	await new Xo({cwd, ts: true}).lintText(source, {filePath});
+	await new Xo({cwd, ts: true}).lintText(source, {filePath});
+
+	const generatedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(generatedTsconfigFiles.length, 1);
+});
+
+test('unincluded TypeScript files always use generated tsconfig regardless of disk presence', async () => {
+	const xo = new Xo({cwd, ts: true});
+	const cacheLocation = findCacheDirectory({name: cacheDirName, cwd}) ?? path.join(os.tmpdir(), cacheDirName);
 	const virtualFilePath = path.join(cwd, 'excluded', 'virtual.ts');
 	const source = 'export const virtualValue = 1;\n';
 
@@ -473,16 +598,19 @@ test('virtual TypeScript files are reclassified once they exist on disk', async 
 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
-	// File does not exist on disk yet: virtual tsconfig must be created.
-	assert.ok(await pathExists(tsconfigPath));
+	// File does not exist on disk yet: generated tsconfig must be created.
+	const generatedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(generatedTsconfigFiles.length, 1);
 
 	await fs.mkdir(path.dirname(virtualFilePath), {recursive: true});
 	await fs.writeFile(virtualFilePath, source, 'utf8');
 
 	await xo.lintText(source, {filePath: virtualFilePath});
 
-	// File now exists on disk: virtual tsconfig must be pruned.
-	assert.ok(!(await pathExists(tsconfigPath)));
+	// File now exists on disk but is still excluded from tsconfig: generated tsconfig must persist.
+	// All unincluded files use the generated tsconfig regardless of whether they exist on disk.
+	const persistedGeneratedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
+	assert.equal(persistedGeneratedTsconfigFiles.length, 1);
 });
 
 test('config with custom plugin', async () => {
