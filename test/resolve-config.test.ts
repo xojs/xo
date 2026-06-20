@@ -101,6 +101,67 @@ test('resolves package.json object config', async () => {
 	assert.deepEqual(flatOptions, [{space: true}]);
 });
 
+test('resolves parent package.json config from nested package cwd', async () => {
+	const pkg = JSON.parse(await fs.readFile(
+		path.join(cwd, 'package.json'),
+		'utf8',
+	)) as PackageJson;
+
+	pkg['xo'] = {space: true};
+	pkg.workspaces = ['packages/*'];
+
+	await fs.writeFile(
+		path.join(cwd, 'package.json'),
+		JSON.stringify(pkg),
+		'utf8',
+	);
+
+	const packageCwd = path.join(cwd, 'packages', 'app');
+	await fs.mkdir(packageCwd, {recursive: true});
+	await fs.writeFile(
+		path.join(packageCwd, 'package.json'),
+		JSON.stringify({name: 'app'}),
+		'utf8',
+	);
+
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({
+		cwd: packageCwd,
+	});
+
+	assert.deepEqual(flatConfigPath, path.join(cwd, 'package.json'));
+	assert.deepEqual(flatOptions, [{space: true}]);
+});
+
+test('does not resolve unrelated ancestor package.json config from nested package cwd', async () => {
+	const pkg = JSON.parse(await fs.readFile(
+		path.join(cwd, 'package.json'),
+		'utf8',
+	)) as PackageJson;
+
+	pkg['xo'] = {space: true};
+
+	await fs.writeFile(
+		path.join(cwd, 'package.json'),
+		JSON.stringify(pkg),
+		'utf8',
+	);
+
+	const packageCwd = path.join(cwd, 'packages', 'app');
+	await fs.mkdir(packageCwd, {recursive: true});
+	await fs.writeFile(
+		path.join(packageCwd, 'package.json'),
+		JSON.stringify({name: 'app'}),
+		'utf8',
+	);
+
+	const {flatOptions, flatConfigPath} = await resolveXoConfig({
+		cwd: packageCwd,
+	});
+
+	assert.equal(flatConfigPath, '');
+	assert.deepEqual(flatOptions, []);
+});
+
 test('resolves all config extensions types', async () => {
 	const testConfigEsm = `export default [
 		{

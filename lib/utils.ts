@@ -3,7 +3,7 @@ import micromatch from 'micromatch';
 import {type Linter} from 'eslint';
 import arrify from 'arrify';
 import {typescriptParser} from 'eslint-config-xo';
-import {type XoConfigItem, type TypeScriptParserOptions} from './types.js';
+import {type XoConfigItem} from './types.js';
 import {
 	allFilesGlob,
 	jsExtensions,
@@ -80,6 +80,8 @@ const legacyPropertyHints: Record<string, string> = {
 	react: 'Install `eslint-config-xo-react` and spread it into your XO config instead.',
 };
 
+const isObjectRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+
 /**
 Validate an XO config array for legacy ESLint config properties that are not supported in flat config.
 
@@ -117,16 +119,16 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 
 	for (const {...config} of xoConfig.values().drop(1)) {
 		const {languageOptions} = config;
-		const parserOptions = languageOptions?.['parserOptions'] as TypeScriptParserOptions | undefined;
+		const parserOptionsCandidate = languageOptions?.['parserOptions'];
+		const parserOptions = isObjectRecord(parserOptionsCandidate) ? parserOptionsCandidate : undefined;
 
 		// Use TS parser/plugin for JS files if the config contains TypeScript rules which are applied to JS files.
 		// typescript-eslint rules set to "off" are ignored and not applied to JS files.
 		if (
 			config.rules
-
 			&& languageOptions?.['parser'] === undefined
-			&& parserOptions?.project === undefined
-			&& parserOptions?.programs === undefined
+			&& parserOptions?.['project'] === undefined
+			&& parserOptions?.['programs'] === undefined
 			&& !config.plugins?.['@typescript-eslint']
 		) {
 			const hasTsRules = Object.entries(config.rules).some(rulePair => {
@@ -170,10 +172,10 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 		}
 
 		// If the config sets `parserOptions.project`, `projectService`, `tsconfigRootDir`, or `programs`, treat those files as opt-out for XO's automatic program wiring.
-		if (parserOptions?.project !== undefined
-			|| parserOptions?.projectService !== undefined
-			|| parserOptions?.tsconfigRootDir !== undefined
-			|| parserOptions?.programs !== undefined) {
+		if (parserOptions?.['project'] !== undefined
+			|| parserOptions?.['projectService'] !== undefined
+			|| parserOptions?.['tsconfigRootDir'] !== undefined
+			|| parserOptions?.['programs'] !== undefined) {
 			// The glob itself should NOT be negated
 			tsFilesIgnoresGlob.push(...arrify(config.files ?? allFilesGlob).flat());
 		}
