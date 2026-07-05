@@ -3,6 +3,3 @@ contact_links:
   - name: Rule-related issues
     url: https://github.com/xojs/eslint-config-xo/issues
     about: For issues about specific rules (enabling/disabling a rule, rule behavior, requesting a new rule), use the eslint-config-xo issue tracker.
-  - name: TypeScript rule-related issues
-    url: https://github.com/xojs/eslint-config-xo-typescript/issues
-    about: For issues about specific TypeScript rules, use the eslint-config-xo-typescript issue tracker.
