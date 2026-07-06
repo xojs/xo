@@ -33,8 +33,8 @@ const resultToFile = (result: ESLint.LintResult) => {
 	};
 };
 
-const getFiles = (report: XoLintResult, predicate: (result: ESLint.LintResult) => boolean) => report.results
-	.filter(result => predicate(result))
+const getFiles = (report: XoLintResult, isMatchingResult: (result: ESLint.LintResult) => boolean) => report.results
+	.filter(result => isMatchingResult(result))
 	.toSorted(sortResults)
 	.map(result => resultToFile(result));
 

@@ -47,16 +47,16 @@ test('does not throw for valid flat config properties', () => {
 		},
 	];
 
-	assert.doesNotThrow(() => {
-		validateXoConfig(config);
-	});
+	const originalConfig = structuredClone(config);
+	validateXoConfig(config);
+	assert.deepEqual(config, originalConfig, 'validateXoConfig should not mutate the config');
 });
 
 test('does not throw for unknown properties', () => {
 	const config = [{}, {somethingRandom: true}] as XoConfigItem[];
-	assert.doesNotThrow(() => {
-		validateXoConfig(config);
-	});
+	const originalConfig = structuredClone(config);
+	validateXoConfig(config);
+	assert.deepEqual(config, originalConfig, 'validateXoConfig should not mutate the config');
 });
 
 test('throws for legacy property in later config items', () => {
@@ -68,9 +68,9 @@ test('throws for legacy property in later config items', () => {
 
 test('skips base config at index 0', () => {
 	const config = [{overrides: true} as unknown as XoConfigItem];
-	assert.doesNotThrow(() => {
-		validateXoConfig(config);
-	});
+	const originalConfig = structuredClone(config);
+	validateXoConfig(config);
+	assert.deepEqual(config, originalConfig, 'validateXoConfig should not mutate the config');
 });
 
 test('preProcessXoConfig throws for legacy properties', () => {

@@ -67,7 +67,7 @@ const createIgnoredLintResult = (filePath: string): ESLint.LintResult => ({
 
 const normalizeGlobPath = (filePath: string): string => filePath.split(path.sep).join('/');
 
-const pathMatchesPattern = (filePath: string, pattern: string): boolean => micromatch.isMatch(normalizeGlobPath(filePath), normalizeGlobPath(pattern), {dot: true});
+const isPathMatchingPattern = (filePath: string, pattern: string): boolean => micromatch.isMatch(normalizeGlobPath(filePath), normalizeGlobPath(pattern), {dot: true});
 
 const isPathInside = (parentPath: string, childPath: string): boolean => {
 	const relativePath = path.relative(parentPath, childPath);
@@ -87,14 +87,14 @@ const isIgnoredByPatterns = (filePath: string, patterns: string[]): boolean => {
 
 	for (const pattern of patterns) {
 		if (pattern.startsWith('!')) {
-			if (pathMatchesPattern(filePath, pattern.slice(1))) {
+			if (isPathMatchingPattern(filePath, pattern.slice(1))) {
 				isIgnored = false;
 			}
 
 			continue;
 		}
 
-		if (pathMatchesPattern(filePath, pattern)) {
+		if (isPathMatchingPattern(filePath, pattern)) {
 			isIgnored = true;
 		}
 	}
@@ -186,7 +186,7 @@ const stripDefaultIgnoreConfigs = (configs: Linter.Config[]): Linter.Config[] =>
 	return configWithoutIgnores;
 });
 
-const defaultIgnoreOverlapsReopenedPattern = (defaultIgnore: string, pattern: string): boolean => {
+const doesDefaultIgnoreOverlapReopenedPattern = (defaultIgnore: string, pattern: string): boolean => {
 	const {base, isGlob} = micromatch.scan(pattern, {parts: true});
 	const patternDirname = path.posix.dirname(pattern);
 	const reopenedBase = isGlob ? base : (patternDirname === '' ? pattern : patternDirname);
@@ -204,7 +204,7 @@ const defaultIgnoreOverlapsReopenedPattern = (defaultIgnore: string, pattern: st
 const getReopenedDefaultPatterns = (patterns: string[]): string[] => patterns
 	.filter(pattern => pattern.startsWith('!'))
 	.map(pattern => pattern.slice(1))
-	.filter(pattern => defaultIgnores.some(defaultIgnore => defaultIgnoreOverlapsReopenedPattern(defaultIgnore, pattern)));
+	.filter(pattern => defaultIgnores.some(defaultIgnore => doesDefaultIgnoreOverlapReopenedPattern(defaultIgnore, pattern)));
 
 /**
 XO only compensates for negations that reopen its built-in default ignores.
@@ -243,7 +243,7 @@ const discoverLintFiles = async ({cwd, globs, positiveGlobalIgnores, discoveryIg
 	const reopenedFiles = await globby(globs, {
 		ignore: [
 			...positiveGlobalIgnores,
-			...defaultIgnores.filter(defaultIgnore => reopenedDefaultPatterns.every(pattern => !defaultIgnoreOverlapsReopenedPattern(defaultIgnore, pattern))),
+			...defaultIgnores.filter(defaultIgnore => reopenedDefaultPatterns.every(pattern => !doesDefaultIgnoreOverlapReopenedPattern(defaultIgnore, pattern))),
 		],
 		onlyFiles: true,
 		gitignore: true,
@@ -396,14 +396,14 @@ export class Xo {
 	/**
 	Initializes the ESLint flat config on the XO instance.
 	*/
-	private async prepareEslintConfig(files?: string[], cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), stripDefaultIgnores = false): Promise<Linter.Config[]> {
+	private async prepareEslintConfig(files?: string[], cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), shouldStripDefaultIgnores = false): Promise<Linter.Config[]> {
 		await this.setXoConfig();
 
 		await this.ensureCacheDirectory();
 
 		await this.handleUnincludedTsFiles(files);
 
-		this.setEslintConfig(cliIgnores, stripDefaultIgnores);
+		this.setEslintConfig(cliIgnores, shouldStripDefaultIgnores);
 
 		if (!this.#eslintConfig) {
 			throw new Error('"Xo.prepareEslintConfig" failed');
@@ -531,19 +531,15 @@ export class Xo {
 		};
 
 		defineLazyProperty(result, 'usedDeprecatedRules', () => {
-			const seenRules = new Set();
-			const rules = [];
-
-			for (const {usedDeprecatedRules} of report) {
-				for (const rule of usedDeprecatedRules) {
-					if (!seenRules.has(rule.ruleId)) {
-						seenRules.add(rule.ruleId);
-						rules.push(rule);
-					}
+			const seenRuleIds = new Set();
+			return report.flatMap(({usedDeprecatedRules}) => usedDeprecatedRules).filter(rule => {
+				if (seenRuleIds.has(rule.ruleId)) {
+					return false;
 				}
-			}
 
-			return rules;
+				seenRuleIds.add(rule.ruleId);
+				return true;
+			});
 		});
 
 		return result;
@@ -606,7 +602,7 @@ export class Xo {
 		this.#tsFilesIgnoresGlob.push(...tsFilesIgnoresGlob);
 	}
 
-	setEslintConfig(cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), stripDefaultIgnores = false) {
+	setEslintConfig(cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), shouldStripDefaultIgnores = false) {
 		if (!this.#xoConfig) {
 			throw new Error('"Xo.setEslintConfig" failed');
 		}
@@ -620,7 +616,7 @@ export class Xo {
 		// Always regenerate to support instance reuse with new files
 		this.#eslintConfig = xoToEslintConfig(allConfigs);
 
-		if (stripDefaultIgnores) {
+		if (shouldStripDefaultIgnores) {
 			this.#eslintConfig = stripDefaultIgnoreConfigs(this.#eslintConfig);
 		}
 	}
@@ -674,8 +670,8 @@ export class Xo {
 	/**
 	Initializes the ESLint instance on the XO instance.
 	*/
-	public async initEslint(files?: string[], cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), stripDefaultIgnores = false) {
-		await this.prepareEslintConfig(files, cliIgnores, stripDefaultIgnores);
+	public async initEslint(files?: string[], cliIgnores: string[] = arrify(this.#baseXoConfig.ignores), shouldStripDefaultIgnores = false) {
+		await this.prepareEslintConfig(files, cliIgnores, shouldStripDefaultIgnores);
 
 		if (!this.#xoConfig) {
 			throw new Error('"Xo.initEslint" failed');

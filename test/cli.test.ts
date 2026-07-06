@@ -4,7 +4,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {availableParallelism, tmpdir} from 'node:os';
 import test, {describe, type TestContext} from 'node:test';
-import assert from 'node:assert/strict';
 import dedent from 'dedent';
 import {$} from 'execa';
 import {pathExists} from 'path-exists';
@@ -29,30 +28,31 @@ const createProject = async (t: TestContext) => {
 // The tests run concurrently because each gets its own project directory and only shells out to the CLI.
 // Concurrency is capped at the core count since each test spawns a CPU-heavy `node ./dist/cli` subprocess.
 describe('xo CLI', {concurrency: availableParallelism()}, () => {
-	test('xo --cwd', async t => {
+	test('xo --cwd', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 	});
 
-	test('xo throws when no files match explicit pattern', async t => {
+	test('xo throws when no files match explicit pattern', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} nonexistent.js`);
-		assert.ok((error.stderr as string)?.includes(noFilesFoundErrorMessage));
+		t.assert.ok((error.stderr as string)?.includes(noFilesFoundErrorMessage));
 	});
 
-	test('xo warns when explicit file is ignored', async t => {
+	test('xo warns when explicit file is ignored', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		const {stdout} = await $({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd} --ignore="test.js" test.js`;
-		assert.ok(stdout.includes(ignoredFileWarningMessage));
+		t.assert.ok(stdout.includes(ignoredFileWarningMessage));
 	});
 
-	test('xo warns when the project TypeScript is older than the bundled version', async t => {
+	test('xo warns when the project TypeScript is older than the bundled version', async (t: TestContext) => {
 		const cwd = await fs.mkdtemp(path.join(tmpdir(), 'xo-ts-version-'));
 		t.after(async () => {
 			await fs.rm(cwd, {recursive: true, force: true});
@@ -67,131 +67,131 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		await fs.writeFile(path.join(cwd, 'node_modules', 'typescript', 'package.json'), JSON.stringify({name: 'typescript', version: '5.0.0'}), 'utf8');
 
 		const {stderr} = await $({reject: false})`node ./dist/cli --cwd ${cwd} foo.ts`;
-		assert.ok(stderr.includes('XO bundles TypeScript'));
-		assert.ok(stderr.includes('5.0.0'));
+		t.assert.ok(stderr.includes('XO bundles TypeScript'));
+		t.assert.ok(stderr.includes('5.0.0'));
 	});
 
-	test('xo fails with exit code 2 for missing custom suppressions file', async t => {
+	test('xo fails with exit code 2 for missing custom suppressions file', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --suppressions-location missing-suppressions.json`);
-		assert.equal(error.exitCode, 2);
-		assert.ok((error.stderr as string).includes('The suppressions file does not exist.'));
+		t.assert.strictEqual(error.exitCode, 2);
+		t.assert.ok((error.stderr as string).includes('The suppressions file does not exist.'));
 	});
 
-	test('xo --fix', async t => {
+	test('xo --fix', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 		await $`node ./dist/cli --cwd ${cwd} --fix`;
 		const fileContent = await fs.readFile(filePath, 'utf8');
-		assert.equal(fileContent, dedent`console.log('hello');\n`);
+		t.assert.strictEqual(fileContent, dedent`console.log('hello');\n`);
 	});
 
-	test('xo --fix-dry-run', async t => {
+	test('xo --fix-dry-run', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		const original = dedent`console.log('hello')\n`;
 		await fs.writeFile(filePath, original, 'utf8');
 		await $`node ./dist/cli --cwd ${cwd} --fix-dry-run`;
 		const fileContent = await fs.readFile(filePath, 'utf8');
-		assert.equal(fileContent, original, 'File should not be modified with --fix-dry-run');
+		t.assert.strictEqual(fileContent, original, 'File should not be modified with --fix-dry-run');
 	});
 
-	test('xo --fix --space', async t => {
+	test('xo --fix --space', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`function test() {\n   return true;\n}\n`, 'utf8');
 		await rejectionOf($`node ./dist/cli --cwd ${cwd} --fix --space`);
 		const fileContent = await fs.readFile(filePath, 'utf8');
-		assert.equal(fileContent, 'function test() {\n  return true;\n}\n');
+		t.assert.strictEqual(fileContent, 'function test() {\n  return true;\n}\n');
 	});
 
-	test('xo --fix --semicolon=false', async t => {
+	test('xo --fix --semicolon=false', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		await $`node ./dist/cli --cwd ${cwd} --fix --semicolon=false`;
 		const fileContent = await fs.readFile(filePath, 'utf8');
-		assert.equal(fileContent, dedent`console.log('hello')\n`);
+		t.assert.strictEqual(fileContent, dedent`console.log('hello')\n`);
 	});
 
-	test('xo --fix --no-semicolon', async t => {
+	test('xo --fix --no-semicolon', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		await $`node ./dist/cli --cwd ${cwd} --fix --no-semicolon`;
 		const fileContent = await fs.readFile(filePath, 'utf8');
-		assert.equal(fileContent, dedent`console.log('hello')\n`);
+		t.assert.strictEqual(fileContent, dedent`console.log('hello')\n`);
 	});
 
-	test('xo --fix --prettier', async t => {
+	test('xo --fix --prettier', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`function test(){return true}\n`, 'utf8');
 		await rejectionOf($`node ./dist/cli --cwd ${cwd} --fix --prettier`);
 		const fileContent = await fs.readFile(filePath, 'utf8');
-		assert.equal(fileContent, 'function test() {\n\treturn true;\n}\n');
+		t.assert.strictEqual(fileContent, 'function test() {\n\treturn true;\n}\n');
 	});
 
-	test('xo --space', async t => {
+	test('xo --space', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`function test() {\n   return true;\n}\n`, 'utf8');
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --space`);
-		assert.ok(error.message.includes('@stylistic/indent'));
+		t.assert.ok(error.message.includes('@stylistic/indent'));
 	});
 
-	test('xo --semicolon=false', async t => {
+	test('xo --semicolon=false', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --semicolon=false`);
 
-		assert.ok(error.message.includes('@stylistic/semi'));
+		t.assert.ok(error.message.includes('@stylistic/semi'));
 	});
 
-	test('xo --no-semicolon', async t => {
+	test('xo --no-semicolon', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --no-semicolon`);
-		assert.ok(error.message.includes('@stylistic/semi'));
+		t.assert.ok(error.message.includes('@stylistic/semi'));
 	});
 
-	test('xo --prettier', async t => {
+	test('xo --prettier', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`export function test(){return true}\n`, 'utf8');
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --prettier`);
-		assert.ok(error.message.includes('prettier/prettier'));
+		t.assert.ok(error.message.includes('prettier/prettier'));
 	});
 
-	test('xo --print-config', async t => {
+	test('xo --print-config', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		const {stdout} = await $`node ./dist/cli --cwd ${cwd} --print-config=${filePath}`;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const config = JSON.parse(stdout);
-		assert.ok(typeof config === 'object');
-		assert.ok('rules' in config);
+		t.assert.strictEqual(typeof config, 'object');
+		t.assert.ok('rules' in config);
 	});
 
-	test('xo --print-config ts', async t => {
+	test('xo --print-config ts', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.ts');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		const {stdout} = await $`node ./dist/cli --cwd ${cwd} --print-config=${filePath}`;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const config = JSON.parse(stdout);
-		assert.ok(typeof config === 'object');
-		assert.ok('rules' in config);
+		t.assert.strictEqual(typeof config, 'object');
+		t.assert.ok('rules' in config);
 	});
 
-	test('xo --print-config relative path', async t => {
+	test('xo --print-config relative path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const fileName = 'test.ts';
 		const filePath = path.join(cwd, fileName);
@@ -199,17 +199,17 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		const {stdout} = await $`node ./dist/cli --cwd ${cwd} --print-config=${fileName}`;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const config = JSON.parse(stdout);
-		assert.ok(typeof config === 'object');
-		assert.ok('rules' in config);
+		t.assert.strictEqual(typeof config, 'object');
+		t.assert.ok('rules' in config);
 	});
 
-	test('xo --print-config no path', async t => {
+	test('xo --print-config no path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const {stderr} = await rejectionOf($`node ./dist/cli --cwd ${cwd} --print-config`);
-		assert.equal(stderr?.toString() ?? '', 'The `--print-config` flag must be used with exactly one filename');
+		t.assert.strictEqual(stderr?.toString() ?? '', 'The `--print-config` flag must be used with exactly one filename');
 	});
 
-	test('xo --ignore', async t => {
+	test('xo --ignore', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const testFile = path.join(cwd, 'test.js');
 		const ignoredFile = path.join(cwd, 'ignored.js');
@@ -218,41 +218,41 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		await fs.writeFile(ignoredFile, dedent`console.log('ignored');\n`, 'utf8');
 
 		const {stdout} = await $`node ./dist/cli --cwd ${cwd} --ignore="ignored.js"`;
-		assert.ok(!stdout.includes('ignored.js'));
+		t.assert.ok(!stdout.includes('ignored.js'));
 	});
 
-	test('xo --stdin', async t => {
+	test('xo --stdin', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const {stdout} = await $`echo ${'const x = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin`;
-		assert.ok(stdout.includes('stdin.js'));
+		t.assert.ok(stdout.includes('stdin.js'));
 	});
 
-	test('xo --stdin --fix', async t => {
+	test('xo --stdin --fix', async (t: TestContext) => {
 		const cwd = await createProject(t);
-		const {stdout} = await $`echo ${'const x = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --fix`;
+		const {stdout} = await $`echo ${'const isValid = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --fix`;
 		// Not sure what these extra escaped single quotes are
-		assert.equal(stdout, 'const x = true;');
+		t.assert.strictEqual(stdout, 'const isValid = true;');
 	});
 
-	test('xo --stdin --fix-dry-run', async t => {
+	test('xo --stdin --fix-dry-run', async (t: TestContext) => {
 		const cwd = await createProject(t);
-		const {stdout} = await $`echo ${'const x = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --fix-dry-run`;
-		assert.equal(stdout, 'const x = true;');
+		const {stdout} = await $`echo ${'const isValid = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --fix-dry-run`;
+		t.assert.strictEqual(stdout, 'const isValid = true;');
 	});
 
-	test('xo --stdin --stdin-filename=test.js', async t => {
+	test('xo --stdin --stdin-filename=test.js', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const {stdout} = await $`echo ${'const x = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --stdin-filename=test.js`;
-		assert.ok(stdout.includes('test.js'));
+		t.assert.ok(stdout.includes('test.js'));
 	});
 
-	test('xo --stdin --stdin-filename=test.ts', async t => {
+	test('xo --stdin --stdin-filename=test.ts', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const {stdout} = await $`echo ${'const x: boolean = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --stdin-filename=test.ts`;
-		assert.ok(stdout.includes('test.ts'));
+		t.assert.ok(stdout.includes('test.ts'));
 	});
 
-	test('xo --reporter json', async t => {
+	test('xo --reporter json', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
@@ -262,12 +262,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const results: unknown[] = JSON.parse(error?.stdout?.toString() ?? '');
 
-		assert.ok(Array.isArray(results));
-		assert.equal(results.length, 1);
-		assert.equal(typeof results[0], 'object');
+		t.assert.ok(Array.isArray(results));
+		t.assert.strictEqual(results.length, 1);
+		t.assert.strictEqual(typeof results[0], 'object');
 	});
 
-	test('xo --reporter json keeps warning-only results when errors exist', async t => {
+	test('xo --reporter json keeps warning-only results when errors exist', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const warningFilePath = path.join(cwd, 'warning.js');
 		const errorFilePath = path.join(cwd, 'error.js');
@@ -278,20 +278,20 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		const results = JSON.parse(error?.stdout?.toString() ?? '') as Array<{filePath: string}>;
 
-		assert.equal(results.length, 2);
-		assert.deepEqual(
+		t.assert.strictEqual(results.length, 2);
+		t.assert.deepStrictEqual(
 			results.map(result => path.basename(result.filePath)).toSorted((a, b) => a.localeCompare(b)),
 			['error.js', 'warning.js'],
 		);
 	});
 
-	test('xo --stdin --stdin-filename=test.ts --fix', async t => {
+	test('xo --stdin --stdin-filename=test.ts --fix', async (t: TestContext) => {
 		const cwd = await createProject(t);
-		const {stdout} = await $`echo ${'const x: boolean = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --stdin-filename=test.ts --fix`;
-		assert.equal(stdout, 'const x = true;');
+		const {stdout} = await $`echo ${'const isValid: boolean = true'}`.pipe`node ./dist/cli --cwd=${cwd} --stdin --stdin-filename=test.ts --fix`;
+		t.assert.strictEqual(stdout, 'const isValid = true;');
 	});
 
-	test('xo lints ts files with no tsconfig.json', async t => {
+	test('xo lints ts files with no tsconfig.json', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.ts');
 		const tsConfigPath = path.join(cwd, 'tsconfig.json');
@@ -300,12 +300,13 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		await fs.writeFile(xoTsConfigPath, tsConfig);
 		await fs.rm(tsConfigPath);
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 		await fs.writeFile(tsConfigPath, tsConfig);
 		await fs.rm(xoTsConfigPath);
 	});
 
-	test('xo lints ts files explicitly excluded from tsconfig.json', async t => {
+	test('xo lints ts files explicitly excluded from tsconfig.json', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.ts');
 		const tsConfigPath = path.join(cwd, 'tsconfig.json');
@@ -322,11 +323,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		}, null, 2);
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		await fs.writeFile(tsConfigPath, tsConfigContent, 'utf8');
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 		await fs.writeFile(xoTsConfigPath, originalTsConfig);
 	});
 
-	test('xo lints ts files implicitly excluded from tsconfig.json', async t => {
+	test('xo lints ts files implicitly excluded from tsconfig.json', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.ts');
 		const tsConfigPath = path.join(cwd, 'tsconfig.json');
@@ -344,11 +346,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		}, null, 2);
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		await fs.writeFile(tsConfigPath, tsConfigContent, 'utf8');
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 		await fs.writeFile(xoTsConfigPath, originalTsConfig);
 	});
 
-	test('xo lints ts files implicitly excluded from tsconfig.json with baseUrl', async t => {
+	test('xo lints ts files implicitly excluded from tsconfig.json with baseUrl', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.ts');
 		const tsConfigPath = path.join(cwd, 'tsconfig.json');
@@ -367,11 +370,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		}, null, 2);
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		await fs.writeFile(tsConfigPath, tsConfigContent, 'utf8');
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 		await fs.writeFile(xoTsConfigPath, originalTsConfig);
 	});
 
-	test('xo lints ts files implicitly excluded from tsconfig.json with rootDir', async t => {
+	test('xo lints ts files implicitly excluded from tsconfig.json with rootDir', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.ts');
 		const tsConfigPath = path.join(cwd, 'tsconfig.json');
@@ -390,13 +394,14 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		}, null, 2);
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 		await fs.writeFile(tsConfigPath, tsConfigContent, 'utf8');
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 		await fs.writeFile(xoTsConfigPath, originalTsConfig);
 	});
 
 	// For some reason, this test fails on CI but not locally on my mac
 	// the following test is identical with a dot file and it passes CI for some unknown reason
-	// test.skip('ts rules properly split to avoid errors with cjs files when no options.files is set', async t => {
+	// test.skip('ts rules properly split to avoid errors with cjs files when no options.files is set', async (t: TestContext) => {
 	// 	// Write the test.cjs file
 	// 	const filePath = path.join(cwd, 'whatever.cjs');
 	// 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
@@ -419,7 +424,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 	// 	await t.notThrowsAsync($`node ./dist/cli --cwd ${cwd}`);
 	// });
 
-	test('applies type aware lint rules to .lintstagedrc.cjs', async t => {
+	test('applies type aware lint rules to .lintstagedrc.cjs', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Write the test.cjs file
 		const filePath = path.join(cwd, '.lintstagedrc.cjs');
@@ -441,10 +446,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 	});
 
-	test('gives helpful error message when config creates a circular dependency', async t => {
+	test('gives helpful error message when config creates a circular dependency', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
@@ -458,10 +464,10 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stderr as string)?.includes('Error resolving XO config'));
+		t.assert.ok((error.stderr as string)?.includes('Error resolving XO config'));
 	});
 
-	test('Config errors bubble up from ESLint when incorrect config options are set', async t => {
+	test('Config errors bubble up from ESLint when incorrect config options are set', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
@@ -476,10 +482,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stderr as string)?.includes('ConfigError:') && (error.stderr as string)?.includes('Unexpected key "invalidOption" found'));
+		t.assert.ok((error.stderr as string)?.includes('ConfigError:'));
+		t.assert.ok((error.stderr as string)?.includes('Unexpected key "invalidOption" found'));
 	});
 
-	test('ts in nested directory', async t => {
+	test('ts in nested directory', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'nested', 'src', 'test.ts');
 		const baseTsConfigPath = path.join(cwd, 'tsconfig.json');
@@ -518,10 +525,10 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		`;
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 		await $`node ./dist/cli --cwd ${cwd}`;
-		assert.ok(!(await pathExists(tsconfigCachePath)), 'tsconfig.xo.json should not be created in the cache directory when tsconfig.json is present in the nested directory');
+		t.assert.ok(!(await pathExists(tsconfigCachePath)), 'tsconfig.xo.json should not be created in the cache directory when tsconfig.json is present in the nested directory');
 	});
 
-	test('handles mixed project structure with nested tsconfig and root ts files', async t => {
+	test('handles mixed project structure with nested tsconfig and root ts files', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Set up nested TypeScript files with a tsconfig
 		const nestedFilePath = path.join(cwd, 'nested', 'src', 'test.ts');
@@ -572,10 +579,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
 		// Run XO on the entire directory structure - should handle unincluded files via a generated tsconfig
-		await $`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 	});
 
-	test('handles basic TypeScript imports between files', async t => {
+	test('handles basic TypeScript imports between files', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create directories
 		const srcDir = path.join(cwd, 'src');
@@ -639,14 +647,14 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 
 		// Verify that the error is related to an import error
-		assert.ok(
+		t.assert.ok(
 			(error.stderr as string)?.includes('@typescript-eslint/')
 			|| (error.stdout as string)?.includes('@typescript-eslint/'),
 			'Error should be reported for invalid import',
 		);
 	});
 
-	test('handles TypeScript path aliases correctly', async t => {
+	test('handles TypeScript path aliases correctly', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a directory structure with source and utility files
 		const srcDir = path.join(cwd, 'src');
@@ -708,14 +716,14 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 
 		// Verify that the error is related to an unresolved import
-		assert.ok(
+		t.assert.ok(
 			(error.stderr as string)?.includes('no-unsafe')
 			|| (error.stdout as string)?.includes('no-unsafe'),
 			'Error should mention unresolved import',
 		);
 	});
 
-	test('respects custom tsconfig with manually set parserOptions.project', async t => {
+	test('respects custom tsconfig with manually set parserOptions.project', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create necessary directories
 		const srcDir = path.join(cwd, 'src');
@@ -781,7 +789,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
 
 		// Verify the error is specifically related to our custom tsconfig's noImplicitAny rule
-		assert.ok(
+		t.assert.ok(
 			(error.stdout as string)?.includes('@typescript-eslint/no-unsafe')
 			|| (error.stderr as string)?.includes('@typescript-eslint/no-unsafe'),
 			'Error should mention no-unsafe rules',
@@ -789,7 +797,7 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Make sure no cache tsconfig was created (since we've manually specified one)
 		const tsconfigCachePath = path.join(cwd, 'node_modules', '.cache', 'xo-linter', 'tsconfig.xo.json');
-		assert.ok(!(await pathExists(tsconfigCachePath)), 'Cache tsconfig should not be created when manually specifying parserOptions.project');
+		t.assert.ok(!(await pathExists(tsconfigCachePath)), 'Cache tsconfig should not be created when manually specifying parserOptions.project');
 
 		// Fix the TypeScript file to pass the strict check
 		const fixedTsContent = dedent`
@@ -809,13 +817,13 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		const {stdout} = await $`node ./dist/cli --cwd ${cwd} --print-config=${tsFilePath}`;
 
 		// Verify the path to our custom tsconfig appears in the printed config
-		assert.ok(
+		t.assert.ok(
 			stdout.includes('tsconfig.custom.json'),
 			'Printed config should include reference to custom tsconfig path',
 		);
 	});
 
-	test('ts rules apply to js files when "files" is not set', async t => {
+	test('ts rules apply to js files when "files" is not set', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create TS and JS files with similar content
 		const tsFilePath = path.join(cwd, 'test.ts');
@@ -856,12 +864,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
-		assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
+		t.assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 
-	test('ts rules apply to js files when "files" is set to a glob', async t => {
+	test('ts rules apply to js files when "files" is set to a glob', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create TS and JS files with similar content
 		const tsFilePath = path.join(cwd, 'test.ts');
@@ -903,12 +911,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
-		assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
+		t.assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 
-	test('ts rules apply to js files when "files" is set to a file path', async t => {
+	test('ts rules apply to js files when "files" is set to a file path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create TS and JS files with similar content
 		const tsFilePath = path.join(cwd, 'test.ts');
@@ -950,12 +958,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
-		assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
+		t.assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 
-	test('ts rules apply to js files when "files" is set to a relative file path', async t => {
+	test('ts rules apply to js files when "files" is set to a relative file path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create src folder
 		const srcDir = path.join(cwd, 'src');
@@ -1001,12 +1009,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
-		assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
+		t.assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 
-	test('ts rules apply to js files when "files" is set to a relative glob path', async t => {
+	test('ts rules apply to js files when "files" is set to a relative glob path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create src folder
 		const srcDir = path.join(cwd, 'src');
@@ -1052,13 +1060,13 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO - should handle both TS and JS files via a generated tsconfig
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
-		assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.ts'), 'Error should be reported for the TypeScript file');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Errors should be reported for the JavaScript file');
+		t.assert.ok((error.stdout as string)?.includes('@typescript-eslint/naming-convention'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 
 	// Supports a custom config file
-	test('supports a custom config file with absolute path', async t => {
+	test('supports a custom config file with absolute path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a simple JS file
 		const filePath = path.join(cwd, 'test.js');
@@ -1080,11 +1088,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO with the custom config file
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --config ${customConfigPath}`);
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
-		assert.ok((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
 	});
 
-	test('supports a custom config file with relative path', async t => {
+	test('supports a custom config file with relative path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a simple JS file
 		const filePath = path.join(cwd, 'test.js');
@@ -1106,11 +1114,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO with the custom config file with relative path
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --config ${path.relative(cwd, customConfigPath)}`);
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
-		assert.ok((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
 	});
 
-	test('supports a custom config file with relative dot slash path', async t => {
+	test('supports a custom config file with relative dot slash path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a simple JS file
 		const filePath = path.join(cwd, 'test.js');
@@ -1132,12 +1140,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO with the custom config file with relative path
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --config ./${path.relative(cwd, customConfigPath)}`);
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
-		assert.ok((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'The specific rule should be mentioned in the output');
 	});
 
 	// Supports custom config file with ts path
-	test('supports a custom config file with absolute path for TypeScript', async t => {
+	test('supports a custom config file with absolute path for TypeScript', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a simple TS file
 		const filePath = path.join(cwd, 'test.js');
@@ -1159,12 +1167,12 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO with the custom config file
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --config ${customConfigPath}`);
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
-		assert.ok((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 
 	// Supports custom config file with ts path
-	test('supports a custom config file with relative path for TypeScript', async t => {
+	test('supports a custom config file with relative path for TypeScript', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a simple TS file
 		const filePath = path.join(cwd, 'test.js');
@@ -1186,11 +1194,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO with the custom config file
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --config ${path.relative(cwd, customConfigPath)}`);
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
-		assert.ok((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 	// Supports custom config file with ts path
-	test('supports a custom config file with relative dot slash path for TypeScript', async t => {
+	test('supports a custom config file with relative dot slash path for TypeScript', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a simple TS file
 		const filePath = path.join(cwd, 'test.js');
@@ -1212,11 +1220,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Run XO with the custom config file
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --config ./${path.relative(cwd, customConfigPath)}`);
-		assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
-		assert.ok((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
+		t.assert.ok((error.stdout as string)?.includes('test.js'), 'Error should be reported for the test.js file');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'The specific TypeScript rule should be mentioned in the output');
 	});
 
-	test('replaces cache file with directory when file exists at cache path', async t => {
+	test('replaces cache file with directory when file exists at cache path', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		// Create a simple TS file that will trigger cache creation
 		const filePath = path.join(cwd, 'test.ts');
@@ -1236,21 +1244,21 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// Verify the file exists before running XO
 		const statsBeforeRun = await fs.stat(cacheDir);
-		assert.ok(statsBeforeRun.isFile(), 'Cache path should initially be a file');
+		t.assert.ok(statsBeforeRun.isFile(), 'Cache path should initially be a file');
 
 		// Run XO - this should handle the file-to-directory conversion
 		await $`node ./dist/cli --cwd ${cwd}`;
 
 		// Verify the cache path is now a directory
 		const statsAfterRun = await fs.stat(cacheDir);
-		assert.ok(statsAfterRun.isDirectory(), 'Cache path should now be a directory');
+		t.assert.ok(statsAfterRun.isDirectory(), 'Cache path should now be a directory');
 
 		// Verify the eslint cache file was created
 		const cachedFiles = await fs.readdir(cacheDir);
-		assert.ok(cachedFiles.some(file => file.startsWith('.cache')), 'ESLint cache should exist');
+		t.assert.ok(cachedFiles.some(file => file.startsWith('.cache')), 'ESLint cache should exist');
 	});
 
-	test('xo --max-warnings=0 fails when file has warnings', async t => {
+	test('xo --max-warnings=0 fails when file has warnings', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
@@ -1270,10 +1278,10 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		const error = await rejectionOf($({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd} --max-warnings=0`);
-		assert.ok((error.stderr as string)?.includes('XO found too many warnings (maximum: 0).'));
+		t.assert.ok((error.stderr as string)?.includes('XO found too many warnings (maximum: 0).'));
 	});
 
-	test('xo --max-warnings=1 succeeds when warning count is within threshold', async t => {
+	test('xo --max-warnings=1 succeeds when warning count is within threshold', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
@@ -1292,18 +1300,20 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention
-		await $({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd} --max-warnings=1`;
+		const {exitCode} = await $({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd} --max-warnings=1`;
+		t.assert.strictEqual(exitCode, 0);
 	});
 
-	test('xo --max-warnings=0 succeeds when file has no warnings', async t => {
+	test('xo --max-warnings=0 succeeds when file has no warnings', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 
-		await $`node ./dist/cli --cwd ${cwd} --max-warnings=0`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${cwd} --max-warnings=0`;
+		t.assert.strictEqual(exitCode, 0);
 	});
 
-	test('xo default does not fail on warnings', async t => {
+	test('xo default does not fail on warnings', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
@@ -1322,10 +1332,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		await fs.writeFile(xoConfigPath, xoConfig, 'utf8');
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention
-		await $({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd}`;
+		const {exitCode} = await $({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd}`;
+		t.assert.strictEqual(exitCode, 0);
 	});
 
-	test('xo hides warnings when file has both errors and warnings', async t => {
+	test('xo hides warnings when file has both errors and warnings', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`
@@ -1350,11 +1361,11 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		const error = await rejectionOf($({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd}`);
-		assert.ok((error.stdout as string)?.includes('no-console'), 'Error should appear in output');
-		assert.ok(!(error.stdout as string)?.includes('no-var'), 'Warning should be hidden when errors exist');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'Error should appear in output');
+		t.assert.ok(!(error.stdout as string)?.includes('no-var'), 'Warning should be hidden when errors exist');
 	});
 
-	test('xo shows warnings when file has both errors and warnings with --max-warnings', async t => {
+	test('xo shows warnings when file has both errors and warnings with --max-warnings', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const filePath = path.join(cwd, 'test.js');
 		await fs.writeFile(filePath, dedent`
@@ -1379,17 +1390,18 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		const error = await rejectionOf($({env: {...process.env, GITHUB_ACTIONS: ''}})`node ./dist/cli --cwd ${cwd} --max-warnings=0`);
-		assert.ok((error.stdout as string)?.includes('no-console'), 'Error should appear in output');
-		assert.ok((error.stdout as string)?.includes('no-var'), 'Warning should appear when --max-warnings is set');
+		t.assert.ok((error.stdout as string)?.includes('no-console'), 'Error should appear in output');
+		t.assert.ok((error.stdout as string)?.includes('no-var'), 'Warning should appear when --max-warnings is set');
 	});
 
-	test('xo does not hang when node_modules is missing', async t => {
+	test('xo does not hang when node_modules is missing', async (t: TestContext) => {
 		const cwd = await createProject(t);
 		const noModulesCwd = path.join(cwd, 'no-modules');
 		await fs.mkdir(noModulesCwd, {recursive: true});
 		await fs.writeFile(path.join(noModulesCwd, 'package.json'), '{}', 'utf8');
 		await fs.writeFile(path.join(noModulesCwd, 'test.js'), 'console.log(\'hello\');\n', 'utf8');
 
-		await $`node ./dist/cli --cwd ${noModulesCwd}`;
+		const {exitCode} = await $`node ./dist/cli --cwd ${noModulesCwd}`;
+		t.assert.strictEqual(exitCode, 0);
 	});
 });

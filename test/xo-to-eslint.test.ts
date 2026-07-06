@@ -240,7 +240,8 @@ test('prettier: compat preserves special rules while keeping formatting rules of
 	assert.equal(compatConfig?.rules?.['@stylistic/indent'], 'off');
 	assert.equal(compatConfig?.rules?.['curly'], 'error');
 	assert.equal(compatConfig?.rules?.['no-unexpected-multiline'], 'error');
-	assert.deepEqual(compatConfig?.rules?.['@stylistic/quotes'], ['error', 'single', {avoidEscape: true}]);
+	// `eslint-config-prettier` disables quotes in compat mode since the user's own Prettier config controls quote style.
+	assert.equal(compatConfig?.rules?.['@stylistic/quotes'], 0);
 	assert.deepEqual(compatConfig?.rules?.['@stylistic/no-mixed-operators'], [
 		'error',
 		{
@@ -317,9 +318,8 @@ test('prettier option does not crash when linting JSON files', () => {
 	const flatConfig = xoToEslintConfig([{space: true, prettier: true}]);
 	const linter = new Linter();
 
-	assert.doesNotThrow(() => {
-		linter.verify('{\n  "name": "foo"\n}\n', flatConfig, {filename: 'package.json'});
-	});
+	const messages = linter.verify('{\n  "name": "foo"\n}\n', flatConfig, {filename: 'package.json'});
+	assert.ok(messages.every(message => !message.fatal), 'linting JSON should not produce fatal errors');
 });
 
 test('base config applies to framework file types', () => {
@@ -331,10 +331,6 @@ test('base config applies to framework file types', () => {
 		throw new TypeError('expected xo/base files[0] to be a string glob');
 	}
 
-	for (const extension of frameworkExtensions) {
-		assert.ok(
-			micromatch.isMatch(`test.${extension}`, filesGlob),
-			`base config should match .${extension} files`,
-		);
-	}
+	const unmatchedExtensions = frameworkExtensions.filter(extension => !micromatch.isMatch(`test.${extension}`, filesGlob));
+	assert.deepEqual(unmatchedExtensions, [], 'base config should match all framework file extensions');
 });

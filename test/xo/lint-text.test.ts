@@ -543,16 +543,15 @@ test('generated tsconfigs are retained across instances when unincluded file set
 	const firstGeneratedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
 	assert.equal(firstGeneratedTsconfigFiles.length, 1);
 	const [firstGeneratedTsconfigFile] = firstGeneratedTsconfigFiles;
-	if (firstGeneratedTsconfigFile === undefined) {
-		assert.fail('Expected a generated tsconfig file.');
-	}
+	assert.notStrictEqual(firstGeneratedTsconfigFile, undefined, 'Expected a generated tsconfig file.');
 
 	const {results} = await new Xo({cwd, ts: true}).lintText('export const secondValue = 2;\n', {filePath: secondFilePath});
 
 	const secondGeneratedTsconfigFiles = await getGeneratedTsconfigFiles(cacheLocation);
 	assert.equal(results[0]?.fatalErrorCount, 0);
 	assert.equal(secondGeneratedTsconfigFiles.length, 2);
-	assert.ok(secondGeneratedTsconfigFiles.includes(firstGeneratedTsconfigFile));
+	const isTsconfigReused = firstGeneratedTsconfigFile !== undefined && secondGeneratedTsconfigFiles.includes(firstGeneratedTsconfigFile);
+	assert.ok(isTsconfigReused, 'the tsconfig generated for the first file should be reused for the second');
 });
 
 test('generated tsconfig path is deterministic for the same unincluded file set', async () => {

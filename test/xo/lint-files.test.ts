@@ -4,12 +4,27 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import test, {beforeEach, afterEach} from 'node:test';
+import test, {beforeEach, afterEach, type TestContext} from 'node:test';
 import assert from 'node:assert/strict';
 import dedent from 'dedent';
 import {Xo, ignoredFileWarningMessage, noFilesFoundErrorMessage} from '../../lib/xo.js';
 import {copyTestProject} from '../helpers/copy-test-project.js';
 import {rejectionOf} from '../helpers/rejection-of.js';
+
+/**
+Temporarily sets an environment variable for the duration of a test, restoring its previous value afterwards.
+*/
+const withEnvironmentVariable = (t: TestContext, name: string, value: string): void => {
+	const previousValue = process.env[name];
+	process.env[name] = value;
+	t.after(() => {
+		if (previousValue === undefined) {
+			Reflect.deleteProperty(process.env, name);
+		} else {
+			process.env[name] = previousValue;
+		}
+	});
+};
 
 let cwd: string;
 
@@ -212,7 +227,8 @@ test('flat config > ts > fix does not mangle files outside the tsconfig', async 
 	assert.ok(includedResult, 'source/index.ts should be linted');
 	assert.ok(unincludedResult, 'test/index.ts should be linted');
 	// The included file always uses the project tsconfig and is fixed correctly, so it is the oracle for the expected output.
-	assert.ok(includedResult.output !== undefined && includedResult.output !== fileContent, 'the included file should have been fixed');
+	assert.notStrictEqual(includedResult.output, undefined, 'the included file should have been fixed');
+	assert.notStrictEqual(includedResult.output, fileContent, 'the included file should have been fixed');
 	assert.equal(unincludedResult.output, includedResult.output, 'the file outside the tsconfig must be fixed identically, not mangled');
 });
 
@@ -245,13 +261,13 @@ test('flat config > ts > fix works for multiple files outside the tsconfig', asy
 	const xo = new Xo({cwd, ts: true, fix: true});
 	const {results} = await xo.lintFiles();
 	const includedResult = results?.find(result => result.filePath === includedFilePath);
-	assert.ok(includedResult?.output !== undefined && includedResult.output !== fileContent, 'the included file should have been fixed');
+	assert.ok(includedResult, 'source/index.ts should be linted');
+	assert.notStrictEqual(includedResult.output, undefined, 'the included file should have been fixed');
+	assert.notStrictEqual(includedResult.output, fileContent, 'the included file should have been fixed');
 
-	for (const filePath of unincludedFilePaths) {
-		const result = results?.find(result => result.filePath === filePath);
-		assert.ok(result, `${filePath} should be linted`);
-		assert.equal(result.output, includedResult.output, 'each file outside the tsconfig must be fixed identically, not mangled');
-	}
+	const unincludedResults = unincludedFilePaths.map(filePath => results?.find(result => result.filePath === filePath));
+	assert.ok(unincludedResults.every(result => result !== undefined), 'every file outside the tsconfig should be linted');
+	assert.deepEqual(unincludedResults.map(result => result?.output), unincludedFilePaths.map(() => includedResult.output), 'each file outside the tsconfig must be fixed identically, not mangled');
 });
 
 test('flat config > ts > reused instance works with changing unincluded file sets', async () => {
@@ -719,11 +735,13 @@ test('mixed explicit files: some ignored, some not', async () => {
 });
 
 test('does not throw for dynamic glob pattern with no matches', async () => {
-	await new Xo({cwd}).lintFiles('nonexistent/**/*.js');
+	const {results} = await new Xo({cwd}).lintFiles('nonexistent/**/*.js');
+	assert.deepEqual(results, []);
 });
 
 test('does not throw when no globs provided and no files found', async () => {
-	await new Xo({cwd}).lintFiles();
+	const {results} = await new Xo({cwd}).lintFiles();
+	assert.deepEqual(results, []);
 });
 
 test('normalize cwd path casing', async () => {
@@ -809,7 +827,7 @@ test('suppressions > relative suppressionsLocation path is resolved from cwd', a
 	assert.equal(lintResult?.messages.length, 0);
 });
 
-test('respects core.excludesfile (global gitignore)', async () => {
+test('respects core.excludesfile (global gitignore)', async (t: TestContext) => {
 	const ignoredFilePath = path.join(cwd, 'globally-ignored.js');
 	const normalFilePath = path.join(cwd, 'normal.js');
 	await fs.writeFile(ignoredFilePath, 'console.log("hello")\n', 'utf8');
@@ -821,18 +839,9 @@ test('respects core.excludesfile (global gitignore)', async () => {
 	const gitConfigPath = path.join(cwd, '.gitconfig');
 	await fs.writeFile(gitConfigPath, `[core]\n\texcludesfile = ${gitignorePath}\n`, 'utf8');
 
-	const previousValue = process.env['GIT_CONFIG_GLOBAL'];
-	process.env['GIT_CONFIG_GLOBAL'] = gitConfigPath;
+	withEnvironmentVariable(t, 'GIT_CONFIG_GLOBAL', gitConfigPath);
 
-	try {
-		const {results} = await new Xo({cwd}).lintFiles('**/*.js');
-		assert.ok(results.every(r => r.filePath !== ignoredFilePath), 'globally-ignored.js should be excluded from lint results');
-		assert.ok(results.some(r => r.filePath === normalFilePath), 'normal.js should still be linted');
-	} finally {
-		if (previousValue === undefined) {
-			delete process.env['GIT_CONFIG_GLOBAL'];
-		} else {
-			process.env['GIT_CONFIG_GLOBAL'] = previousValue;
-		}
-	}
+	const {results} = await new Xo({cwd}).lintFiles('**/*.js');
+	t.assert.ok(results.every(r => r.filePath !== ignoredFilePath), 'globally-ignored.js should be excluded from lint results');
+	t.assert.ok(results.some(r => r.filePath === normalFilePath), 'normal.js should still be linted');
 });

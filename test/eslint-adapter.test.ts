@@ -2,7 +2,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import test, {type TestContext} from 'node:test';
-import assert from 'node:assert/strict';
 import dedent from 'dedent';
 import {$} from 'execa';
 import {copyTestProject} from './helpers/copy-test-project.js';
@@ -70,7 +69,7 @@ const lintWithAdapter = async ({cwd, lintCwd = cwd, files, argv = []}: {
 	return ruleIds;
 };
 
-test('adapter keeps XO ts fallback for projects without tsconfig.json', async t => {
+test('adapter keeps XO ts fallback for projects without tsconfig.json', async (t: TestContext) => {
 	const cwd = await createProject(t);
 	const filePath = path.join(cwd, 'test.ts');
 	await fs.rm(path.join(cwd, 'tsconfig.json'));
@@ -81,10 +80,10 @@ test('adapter keeps XO ts fallback for projects without tsconfig.json', async t 
 		files: [filePath],
 	});
 
-	assert.ok(ruleIds.includes('@stylistic/semi'));
+	t.assert.ok(ruleIds.includes('@stylistic/semi'));
 });
 
-test('adapter resolves root xo config from nested cwd using eslint config auto-discovery', async t => {
+test('adapter resolves root xo config from nested cwd using eslint config auto-discovery', async (t: TestContext) => {
 	const cwd = await createProject(t);
 	const packageDirectory = path.join(cwd, 'packages', 'foo');
 	const filePath = path.join(packageDirectory, 'test.js');
@@ -104,10 +103,10 @@ test('adapter resolves root xo config from nested cwd using eslint config auto-d
 		files: [filePath],
 	});
 
-	assert.ok(ruleIds.includes('@stylistic/semi'));
+	t.assert.ok(ruleIds.includes('@stylistic/semi'));
 });
 
-test('adapter preprocesses typed rules so JS files lint like XO', async t => {
+test('adapter preprocesses typed rules so JS files lint like XO', async (t: TestContext) => {
 	const cwd = await createProject(t);
 	const filePath = path.join(cwd, 'test.js');
 	await fs.writeFile(filePath, dedent`Promise.resolve(1);\n`, 'utf8');
@@ -126,10 +125,10 @@ test('adapter preprocesses typed rules so JS files lint like XO', async t => {
 		files: [filePath],
 	});
 
-	assert.ok(ruleIds.includes('@typescript-eslint/no-floating-promises'));
+	t.assert.ok(ruleIds.includes('@typescript-eslint/no-floating-promises'));
 });
 
-test('adapter applies the Prettier option from the XO config', async t => {
+test('adapter applies the Prettier option from the XO config', async (t: TestContext) => {
 	const cwd = await createProject(t);
 	const filePath = path.join(cwd, 'test.js');
 	// Double quotes violate XO's Prettier style (`singleQuote: true`).
@@ -147,10 +146,10 @@ test('adapter applies the Prettier option from the XO config', async t => {
 		files: [filePath],
 	});
 
-	assert.ok(ruleIds.includes('prettier/prettier'));
+	t.assert.ok(ruleIds.includes('prettier/prettier'));
 });
 
-test('adapter resolves xo config relative to the eslint config path', async t => {
+test('adapter resolves xo config relative to the eslint config path', async (t: TestContext) => {
 	const cwd = await createProject(t);
 	const packageDirectory = path.join(cwd, 'packages', 'foo');
 	const filePath = path.join(packageDirectory, 'test.js');
@@ -178,5 +177,5 @@ test('adapter resolves xo config relative to the eslint config path', async t =>
 		argv: ['--config', 'packages/foo/eslint.config.js'],
 	});
 
-	assert.ok(ruleIds.includes('@stylistic/semi'));
+	t.assert.ok(ruleIds.includes('@stylistic/semi'));
 });
