@@ -1,13 +1,43 @@
-/* eslint-disable complexity -- Translating every XO config option into ESLint rules is inherently branchy. */
 import arrify from 'arrify';
 import {type Linter} from 'eslint';
-import {getPrettierConfig} from 'eslint-config-xo';
+import eslintConfigXo, {type Options} from 'eslint-config-xo';
 import {type XoConfigItem} from './types.js';
-import {config} from './config.js';
 import {xoToEslintConfigItem} from './utils.js';
 
 type Plugins = NonNullable<Linter.Config['plugins']>;
 type Plugin = Plugins[string];
+
+type GlobalOptions = Pick<Options, 'space' | 'semicolon' | 'prettier'>;
+
+const getGlobalOptions = (xoConfig: XoConfigItem[]): GlobalOptions => {
+	const options: GlobalOptions = {};
+
+	for (const xoConfigItem of xoConfig) {
+		const hasScopedOptions = xoConfigItem.files !== undefined
+			|| xoConfigItem.basePath !== undefined
+			|| xoConfigItem.ignores !== undefined;
+		const hasStyleOptions = xoConfigItem.space !== undefined
+			|| xoConfigItem.semicolon !== undefined
+			|| xoConfigItem.prettier !== undefined;
+		if (hasScopedOptions && hasStyleOptions) {
+			throw new TypeError('XO style options only support global config items. Use ESLint rules for file-scoped overrides.');
+		}
+
+		if (xoConfigItem.space !== undefined) {
+			options.space = xoConfigItem.space as Options['space'];
+		}
+
+		if (xoConfigItem.semicolon !== undefined) {
+			options.semicolon = xoConfigItem.semicolon;
+		}
+
+		if (xoConfigItem.prettier !== undefined) {
+			options.prettier = xoConfigItem.prettier;
+		}
+	}
+
+	return options;
+};
 
 /**
 Merge all plugins from every config into a single config entry at the start of the array, ensuring user-provided plugins take precedence. This avoids ESLint's flat config rejecting duplicate plugin names.
@@ -55,25 +85,25 @@ const hoistPlugins = (configs: Linter.Config[], userPluginOverrides: Map<string,
 Takes an XO flat config and returns an ESLint flat config.
 */
 export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined): Linter.Config[] {
-	const baseConfig = [...config];
-	const userPluginOverrides = new Map<string, Plugin>();
-
-	for (const xoConfigItem of flatXoConfig ?? []) {
-		const {plugins} = xoConfigItem;
-
-		if (!plugins) {
-			continue;
-		}
-
-		for (const [pluginName, plugin] of Object.entries(plugins)) {
-			userPluginOverrides.set(pluginName, plugin);
-		}
+	const xoConfig = flatXoConfig ?? [];
+	const baseConfig = eslintConfigXo(getGlobalOptions(xoConfig));
+	const prettierConfig = baseConfig.find(config => config.name === 'xo/prettier' || config.name === 'xo/prettier-compat');
+	if (prettierConfig) {
+		// XO's global Prettier option applies to every language config, not only the JavaScript and TypeScript files covered by eslint-config-xo.
+		delete prettierConfig.files;
 	}
 
-	/**
-	Since configs are merged and the last config takes precedence this means we need to handle both true AND false cases for each option. For example, we need to turn `prettier`, `space`, `semi`, etc. on or off for a specific file.
-	*/
-	for (const xoConfigItem of flatXoConfig ?? []) {
+	const userPluginOverrides = new Map<string, Plugin>();
+
+	for (const xoConfigItem of xoConfig) {
+		const {plugins} = xoConfigItem;
+
+		if (plugins) {
+			for (const [pluginName, plugin] of Object.entries(plugins)) {
+				userPluginOverrides.set(pluginName, plugin);
+			}
+		}
+
 		const keysOfXoConfig = Object.keys(xoConfigItem);
 
 		if (keysOfXoConfig.length === 0) {
@@ -98,53 +128,8 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined): Lint
 		*/
 		const eslintConfigItem = xoToEslintConfigItem(xoConfigItem);
 
-		const isUsingSpaces = Boolean(xoConfigItem.space);
-
-		if (xoConfigItem.semicolon === false) {
-			eslintConfigItem.rules ??= {};
-			eslintConfigItem.rules['@stylistic/semi'] = ['error', 'never'];
-			eslintConfigItem.rules['@stylistic/semi-spacing'] = ['error', {before: false, after: true}];
-			eslintConfigItem.rules['@stylistic/member-delimiter-style'] = [
-				'error',
-				{
-					multiline: {delimiter: 'none'},
-					singleline: {delimiter: 'comma', requireLast: false},
-				},
-			];
-		}
-
-		if (isUsingSpaces) {
-			const spaces = typeof xoConfigItem.space === 'number' ? xoConfigItem.space : 2;
-			eslintConfigItem.rules ??= {};
-			eslintConfigItem.rules['@stylistic/indent'] = ['error', spaces, {SwitchCase: 1}]; // eslint-disable-line @typescript-eslint/naming-convention
-			eslintConfigItem.rules['@stylistic/indent-binary-ops'] = ['error', spaces];
-		} else if (xoConfigItem.space === false) {
-			eslintConfigItem.rules ??= {};
-			eslintConfigItem.rules['@stylistic/indent'] = ['error', 'tab', {SwitchCase: 1}]; // eslint-disable-line @typescript-eslint/naming-convention
-			eslintConfigItem.rules['@stylistic/indent-binary-ops'] = ['error', 'tab'];
-		}
-
-		// Delegate Prettier integration to `eslint-config-xo`. Its config is pushed after `eslintConfigItem` below so it comes last, disabling the conflicting stylistic rules set above.
-		const prettierConfig = getPrettierConfig({
-			prettier: xoConfigItem.prettier,
-			// `Space` allows `string` for legacy reasons, but Prettier only needs `boolean | number`.
-			space: xoConfigItem.space as boolean | number | undefined,
-			semicolon: xoConfigItem.semicolon,
-			files: eslintConfigItem.files,
-		});
-
-		if (xoConfigItem.prettier === false) {
-			// Turn Prettier off for a subset of files
-			eslintConfigItem.rules ??= {};
-			eslintConfigItem.rules['prettier/prettier'] = 'off';
-		}
-
 		if (Object.keys(eslintConfigItem).length > 0) {
 			baseConfig.push(eslintConfigItem);
-		}
-
-		if (prettierConfig) {
-			baseConfig.push(prettierConfig);
 		}
 	}
 

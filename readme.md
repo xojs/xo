@@ -169,6 +169,8 @@ Default: `false` *(tab indentation)*
 
 Set it to `true` to get 2-space indentation or specify the number of spaces.
 
+Global only. For file-specific indentation, use the [`@stylistic/indent`](https://eslint.style/rules/indent) and [`@html-eslint/indent`](https://html-eslint.org/docs/rules/indent) rules.
+
 This option exists for pragmatic reasons, but I would strongly recommend you read [“Why tabs are superior”](http://lea.verou.me/2012/01/why-tabs-are-clearly-superior/).
 
 ### semicolon
@@ -178,12 +180,16 @@ Default: `true` *(Semicolons required)*
 
 Set it to `false` to enforce no-semicolon style.
 
+Global only. For file-specific semicolon rules, use the [`@stylistic/semi`](https://eslint.style/rules/semi) rule.
+
 ### prettier
 
 Type: `boolean | 'compat'`\
 Default: `false`
 
 Format code with [Prettier](https://github.com/prettier/prettier).
+
+Global only. For file-specific Prettier overrides, configure the [`prettier/prettier`](https://github.com/prettier/eslint-plugin-prettier#options) rule.
 
 XO applies its own [Prettier options](https://prettier.io/docs/en/options.html):
 

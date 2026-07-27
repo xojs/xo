@@ -5,6 +5,13 @@ import micromatch from 'micromatch';
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
 import {frameworkExtensions} from '../lib/constants.js';
 
+const getHtmlIndentationMessage = (flatConfig: Linter.Config[], filename: string) => {
+	const linter = new Linter();
+	const messages = linter.verify('<div>\n<div>foo</div>\n</div>\n', flatConfig, {filename});
+
+	return messages.find(message => message.ruleId === '@html-eslint/indent')?.message;
+};
+
 test('base config rules', () => {
 	const flatConfig = xoToEslintConfig(undefined);
 
@@ -33,21 +40,25 @@ test('empty config rules', () => {
 
 test('config with space option', () => {
 	const flatConfig = xoToEslintConfig([{space: true}]);
+	const baseConfig = flatConfig.find(config => config.name === 'xo/base');
 
-	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/indent'], [
+	assert.deepEqual(baseConfig?.rules?.['@stylistic/indent'], [
 		'error',
 		2,
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		{SwitchCase: 1},
 	]);
-	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/indent-binary-ops'], ['error', 2]);
+	assert.deepEqual(baseConfig?.rules?.['@stylistic/indent-binary-ops'], ['error', 2]);
+	assert.deepEqual(flatConfig.find(config => config.name === 'xo/html')?.rules?.['@html-eslint/indent'], ['error', 2]);
 });
 
 test('config with semi false option', () => {
 	const flatConfig = xoToEslintConfig([{semicolon: false}]);
+	const baseConfig = flatConfig.find(config => config.name === 'xo/base');
+	const typescriptConfig = flatConfig.find(config => config.name === 'xo/typescript');
 
-	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/semi'], ['error', 'never']);
-	assert.deepEqual(flatConfig.at(-1)?.rules?.['@stylistic/member-delimiter-style'], [
+	assert.deepEqual(baseConfig?.rules?.['@stylistic/semi'], ['error', 'never']);
+	assert.deepEqual(typescriptConfig?.rules?.['@stylistic/member-delimiter-style'], [
 		'error',
 		{
 			multiline: {delimiter: 'none'},
@@ -78,7 +89,7 @@ test('with prettier option', () => {
 		{
 			bracketSameLine: false,
 			bracketSpacing: false,
-			semi: undefined,
+			semi: true,
 			singleQuote: true,
 			tabWidth: 2,
 			trailingComma: 'all',
@@ -116,7 +127,7 @@ test('with prettier option and space', () => {
 		{
 			bracketSameLine: false,
 			bracketSpacing: false,
-			semi: undefined,
+			semi: true,
 			singleQuote: true,
 			tabWidth: 2,
 			trailingComma: 'all',
@@ -125,13 +136,13 @@ test('with prettier option and space', () => {
 	]);
 });
 
-test('prettier compat option without files does not set files property', () => {
+test('prettier compat option applies globally', () => {
 	const flatConfig = xoToEslintConfig([{prettier: 'compat'}]);
 
 	const compatConfig = flatConfig.find(config =>
 		config?.rules?.['@stylistic/semi'] === 'off');
 	assert.ok(compatConfig);
-	assert.ok(!('files' in compatConfig), 'prettier compat config should not have a files property when no files are specified');
+	assert.ok(!('files' in compatConfig));
 });
 
 test('user plugin overrides win regardless of order', () => {
@@ -195,7 +206,7 @@ test('supports files config option as a string', () => {
 });
 
 test('no files config option remains undefined', () => {
-	const flatConfig = xoToEslintConfig([{files: undefined, space: true}]);
+	const flatConfig = xoToEslintConfig([{files: undefined, rules: {'no-console': 'error'}}]);
 
 	assert.equal(flatConfig.at(-1)?.files, undefined);
 });
@@ -228,6 +239,38 @@ test('prettier: true preserves special rules but keeps non-special formatting ru
 	// Non-special formatting rules remain off
 	assert.equal(prettierRuleConfig?.rules?.['@stylistic/semi'], 'off');
 	assert.equal(prettierRuleConfig?.rules?.['@stylistic/indent'], 'off');
+});
+
+test('prettier option disables HTML indentation', () => {
+	const flatConfig = xoToEslintConfig([{space: true}, {prettier: true}]);
+
+	assert.equal(flatConfig.find(config => config.name === 'xo/html')?.rules?.['@html-eslint/indent'], 'off');
+});
+
+test('file-scoped style options are rejected', () => {
+	assert.throws(() => xoToEslintConfig([{files: ['**/*.html'], space: true}]), /only support global config items/v);
+	assert.throws(() => xoToEslintConfig([{files: ['**/*.html'], semicolon: false}]), /only support global config items/v);
+	assert.throws(() => xoToEslintConfig([{files: ['**/*.html'], prettier: false}]), /only support global config items/v);
+});
+
+test('file-scoped HTML indentation uses ESLint rules', () => {
+	const flatConfig = xoToEslintConfig([{
+		files: ['**/*.html'],
+		rules: {'@html-eslint/indent': ['error', 2]},
+	}]);
+
+	assert.ok(getHtmlIndentationMessage(flatConfig, 'index.html')?.includes('2 space'));
+});
+
+test('file-scoped ESLint rules override global style options', () => {
+	const flatConfig = xoToEslintConfig([
+		{files: ['**/*.js'], rules: {'@stylistic/indent': 'off'}},
+		{space: true},
+	]);
+	const linter = new Linter();
+	const messages = linter.verify('const object = {\nfoo: true,\n};\n', flatConfig, {filename: 'index.js'});
+
+	assert.ok(messages.every(message => message.ruleId !== '@stylistic/indent'));
 });
 
 test('prettier: compat preserves special rules while keeping formatting rules off', () => {

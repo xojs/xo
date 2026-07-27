@@ -15,16 +15,22 @@ export type XoConfigOptions = {
 	Use spaces for indentation.
 
 	Tabs are used if the value is `false`, otherwise the value is the number of spaces to use or true, the default number of spaces is 2.
+
+	Global only. Use the [`@stylistic/indent`](https://eslint.style/rules/indent) and [`@html-eslint/indent`](https://html-eslint.org/docs/rules/indent) rules for file-specific indentation.
 	*/
 	space?: Space;
 
 	/**
 	Use semicolons at the end of statements or error for semi-colon usage.
+
+	Global only. Use the [`@stylistic/semi`](https://eslint.style/rules/semi) rule for file-specific semicolon rules.
 	*/
 	semicolon?: boolean;
 
 	/**
 	Use Prettier to format code.
+
+	Global only. Use the [`prettier/prettier`](https://github.com/prettier/eslint-plugin-prettier#options) rule for file-specific Prettier overrides.
 
 	If `compat` is used, XO will not format with Prettier but will produce Prettier compatible code so Prettier can be used as a separate formatting tool.
 	*/
