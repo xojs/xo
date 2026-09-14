@@ -54,12 +54,13 @@ Function used to match files which should be included in the `tsconfig.json` fil
 @returns An array of file paths that match the globs and do not match the ignores.
 */
 export const matchFilesForTsConfig = (cwd: string, files: string[] | undefined, globs: string[], ignores: string[]) => micromatch(
-	files?.map(file => path.normalize(path.relative(cwd, file))) ?? [],
-	// https://github.com/micromatch/micromatch/issues/217
-	globs.map(glob => path.normalize(glob)),
+	// Relative file paths avoid the leading `./` mismatch described in https://github.com/micromatch/micromatch/issues/217
+	files?.map(file => path.relative(cwd, file)) ?? [],
+	// Keep glob and ignore patterns unchanged because micromatch treats backslashes as escape characters, including on Windows.
+	globs,
 	{
 		dot: true,
-		ignore: ignores.map(file => path.normalize(file)),
+		ignore: ignores,
 		cwd,
 	},
 ).map(file => path.resolve(cwd, file));
@@ -100,7 +101,7 @@ export const validateXoConfig = (xoConfig: XoConfigItem[]): void => {
 /**
 Once a config is resolved, it is pre-processed to ensure that all properties are set correctly.
 
-This includes ensuring that user-defined properties can override XO defaults, and that files are parsed correctly and performantly based on the users XO config.
+This includes ensuring that user-defined properties can override XO defaults, and that files are parsed correctly and performantly based on the user's XO config.
 
 @param xoConfig - The flat XO config to pre-process.
 @returns The pre-processed flat XO config.
@@ -130,7 +131,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 			&& !config.plugins?.['@typescript-eslint']
 		) {
 			const hasTsRules = Object.entries(config.rules).some(rulePair => {
-				// If its not a @typescript-eslint rule, we don't care
+				// If it's not a @typescript-eslint rule, we don't care
 				if (!rulePair[0].startsWith('@typescript-eslint/')) {
 					return false;
 				}
@@ -147,13 +148,17 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 				let isAppliedToJsFiles = false;
 
 				if (config.files !== undefined) {
-					const normalizedFiles = arrify(config.files).flat().map(file => path.normalize(file));
-					// Strip the basename off any globs
-					const globs = normalizedFiles.map(file => micromatch.scan(file, {dot: true}).glob).filter(Boolean);
-					// Check if the files globs match a test file with a js extension
-					// If not, check that the file paths match a js extension
-					isAppliedToJsFiles = micromatch.some(jsExtensions.map(ext => `test.${ext}`), globs, {dot: true})
-						|| micromatch.some(normalizedFiles, jsFilesGlob, {dot: true});
+					// Config files are glob patterns, so path normalization would corrupt them on Windows.
+					const filePatterns = arrify(config.files).flat();
+					// Extract the glob portion from each pattern.
+					const globPatterns = filePatterns.map(pattern => micromatch.scan(pattern, {dot: true}).glob).filter(Boolean);
+					// Check whether the file globs match a test file with a JavaScript extension
+					// If not, check literal file paths. The format callback removes the leading `./` that micromatch preserves on literal paths.
+					isAppliedToJsFiles = micromatch.some(jsExtensions.map(ext => `test.${ext}`), globPatterns, {dot: true})
+						|| micromatch.some(filePatterns, jsFilesGlob, {
+							dot: true,
+							format: filePattern => filePattern.startsWith('./') ? filePattern.slice(2) : filePattern,
+						});
 				} else if (config.files === undefined) {
 					isAppliedToJsFiles = true;
 				}

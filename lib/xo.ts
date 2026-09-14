@@ -65,9 +65,9 @@ const createIgnoredLintResult = (filePath: string): ESLint.LintResult => ({
 	usedDeprecatedRules: [],
 });
 
-const normalizeGlobPath = (filePath: string): string => filePath.split(path.sep).join('/');
+const normalizeFilePathForGlob = (filePath: string): string => filePath.replaceAll(path.sep, '/');
 
-const isPathMatchingPattern = (filePath: string, pattern: string): boolean => micromatch.isMatch(normalizeGlobPath(filePath), normalizeGlobPath(pattern), {dot: true});
+const isPathMatchingPattern = (filePath: string, pattern: string): boolean => micromatch.isMatch(normalizeFilePathForGlob(filePath), pattern, {dot: true});
 
 const isPathInside = (parentPath: string, childPath: string): boolean => {
 	const relativePath = path.relative(parentPath, childPath);
@@ -470,8 +470,8 @@ export class Xo {
 
 			const tsconfigPath = getGeneratedTsconfigPath(this.#generatedTsconfigDirectory, files);
 
-			// The generated tsconfig references files by absolute path; the ESLint config matches them by path relative to `cwd`.
-			const relativeFiles = files.map(file => path.relative(this.#linterOptions.cwd, file));
+			// The generated tsconfig references files by absolute path; ESLint config patterns use forward slashes on every platform.
+			const relativeFiles = files.map(file => normalizeFilePathForGlob(path.relative(this.#linterOptions.cwd, file)));
 
 			const tsconfigContent = {
 				compilerOptions: {

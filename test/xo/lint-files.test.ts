@@ -115,6 +115,32 @@ test('flat config > ts > semi > no tsconfig', async () => {
 	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
+test('declaration files without a tsconfig are linted', async () => {
+	await fs.rm(path.join(cwd, 'tsconfig.json'));
+	await fs.mkdir(path.join(cwd, 'source'));
+	const declarationFiles = ['index.d.ts', 'source/index.d.ts'].map(file => path.resolve(cwd, file));
+	await Promise.all(declarationFiles.map(async filePath => fs.writeFile(filePath, 'export const value: string\n')));
+
+	const {results} = await new Xo({cwd, ts: true}).lintFiles();
+	const declarationResults = declarationFiles.map(filePath => results?.find(result => result.filePath === filePath));
+	// A real lint diagnostic proves both files reached ESLint instead of silently disappearing from discovery or fallback configuration.
+	assert.deepEqual(declarationResults.map(result => result?.messages.map(message => message.ruleId)), [['@stylistic/semi'], ['@stylistic/semi']]);
+});
+
+test('generated ESLint config uses forward-slash file patterns on Windows', async (t: TestContext) => {
+	await fs.rm(path.join(cwd, 'tsconfig.json'));
+	await fs.mkdir(path.join(cwd, 'source'));
+	await fs.writeFile(path.join(cwd, 'source', 'index.d.ts'), 'export const value: string;\n');
+
+	// Simulate the path values produced by `path.relative()` on Windows while keeping the test filesystem native.
+	const {relative} = path;
+	t.mock.method(path, 'relative', (from: string, to: string) => relative(from, to).replaceAll('/', '\\'));
+	t.mock.property(path, 'sep', '\\');
+
+	const config = await new Xo({cwd, ts: true}).getProjectEslintConfig();
+	t.assert.deepStrictEqual(config.at(-1)?.files, ['source/index.d.ts']);
+});
+
 test('flat config > ts > resolves types for files outside the tsconfig', async () => {
 	// A file not matched by the tsconfig `include` is type-checked through a generated tsconfig. It must still load `@types/*`, otherwise imports resolve to `any` and type-aware rules misfire. See https://github.com/xojs/xo/issues/886
 	await fs.writeFile(

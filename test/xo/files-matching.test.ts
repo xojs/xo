@@ -1,13 +1,14 @@
 
-import test from 'node:test';
+import path from 'node:path';
+import test, {type TestContext} from 'node:test';
 import assert from 'node:assert/strict';
-import {preProcessXoConfig, matchFilesForTsConfig} from '../../lib/utils.js';
+import {preProcessXoConfig, matchFilesForTsConfig, typescriptParser} from '../../lib/utils.js';
 import {type XoConfigItem} from '../../lib/types.js';
 import {allFilesGlob, jsFilesGlob, tsFilesGlob} from '../../lib/constants.js';
 
 // These tests are designed to validate the functionality of the utility functions in the `utils.js` file.
 // These utility functions are used together in xo in a specific way, so the tests are structured to ensure that they work correctly in that context.
-// each test checks the integration of the utility functions together, rather than testing them in isolation.
+// Each test checks the integration of the utility functions together, rather than testing them in isolation.
 
 // A fake working directory for the tests.
 const cwd = '/path/to/project';
@@ -33,6 +34,66 @@ const files = [
 	'/path/to/project/src/index.cjs',
 	'/path/to/project/index.jsx',
 ];
+
+test('does not normalize glob patterns on Windows', (t: TestContext) => {
+	const projectDirectory = path.resolve('project');
+	const declarationFile = path.join(projectDirectory, 'index.d.ts');
+	const javascriptFile = path.join(projectDirectory, 'index.js');
+
+	// Reproduce the old Windows corruption if path normalization is reintroduced.
+	t.mock.method(path, 'normalize', path.win32.normalize);
+
+	t.assert.deepStrictEqual(matchFilesForTsConfig(projectDirectory, [declarationFile, javascriptFile], [tsFilesGlob], []), [declarationFile]);
+});
+
+test('does not normalize ignore patterns on Windows', (t: TestContext) => {
+	const projectDirectory = path.resolve('project');
+	const declarationFile = path.join(projectDirectory, 'index.d.ts');
+	const ignoredFile = path.join(projectDirectory, 'index.test.d.ts');
+
+	// Reproduce the old Windows corruption if path normalization is reintroduced.
+	t.mock.method(path, 'normalize', path.win32.normalize);
+
+	// A slash-free include pattern isolates ignore handling, so a broken include cannot hide a broken ignore.
+	t.assert.deepStrictEqual(matchFilesForTsConfig(projectDirectory, [declarationFile, ignoredFile], ['*.ts'], ['./**/*.test.d.ts']), [declarationFile]);
+});
+
+test('preserves escaped metacharacters in globs and ignores', () => {
+	const projectDirectory = path.resolve('project');
+	const literalFile = path.resolve(projectDirectory, 'src/[generated].ts');
+	const characterClassMatch = path.resolve(projectDirectory, 'src/g.ts');
+	const escapedPattern = String.raw`./src/\[generated\].ts`;
+
+	assert.deepEqual(matchFilesForTsConfig(projectDirectory, [literalFile, characterClassMatch], [escapedPattern], []), [literalFile]);
+	assert.deepEqual(matchFilesForTsConfig(projectDirectory, [literalFile, characterClassMatch], [tsFilesGlob], [escapedPattern]), [characterClassMatch]);
+});
+
+test('excludes files with an explicit parser project', () => {
+	const projectDirectory = path.resolve('project');
+	const declarationFile = path.join(projectDirectory, 'index.d.ts');
+	const configuredFile = path.resolve(projectDirectory, 'src/index.ts');
+	const {tsFilesIgnoresGlob} = preProcessXoConfig([{}, {
+		files: './src/**/*.ts',
+		languageOptions: {
+			parserOptions: {project: './src/tsconfig.json'},
+		},
+	}]);
+
+	assert.deepEqual(matchFilesForTsConfig(projectDirectory, [declarationFile, configuredFile], [tsFilesGlob], tsFilesIgnoresGlob), [declarationFile]);
+});
+
+test('detects JavaScript in mixed config globs on Windows', (t: TestContext) => {
+	// Replacing `path.normalize()` reproduces the behavior that previously corrupted this pattern before it reached micromatch.
+	t.mock.method(path, 'normalize', path.win32.normalize);
+
+	const {config, tsFilesGlob: additionalTsFilesGlob} = preProcessXoConfig([{}, {
+		files: './src/**/*.{js,ts}',
+		rules: {'@typescript-eslint/no-unused-vars': 'error'},
+	}]);
+
+	t.assert.deepStrictEqual(additionalTsFilesGlob, ['./src/**/*.{js,ts}']);
+	t.assert.strictEqual(config[1]?.languageOptions?.['parser'], typescriptParser);
+});
 
 test('empty config', () => {
 	const {tsFilesGlob: additionalTsFilesGlob, tsFilesIgnoresGlob} = preProcessXoConfig([]);
