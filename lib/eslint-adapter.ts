@@ -56,11 +56,9 @@ function resolveConfigPathFromArgv(): string | undefined {
 function resolveAdapterCwd(): string {
 	const configPath = resolveConfigPathFromArgv();
 
-	if (configPath !== undefined && configPath !== '') {
-		return path.dirname(path.resolve(process.cwd(), configPath));
-	}
-
-	return findEslintConfigDirectory(process.cwd()) ?? process.cwd();
+	return configPath !== undefined && configPath !== ''
+		? path.dirname(path.resolve(process.cwd(), configPath))
+		: findEslintConfigDirectory(process.cwd()) ?? process.cwd();
 }
 
 /*

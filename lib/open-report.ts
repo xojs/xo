@@ -19,11 +19,7 @@ const resultToFile = (result: ESLint.LintResult) => {
 				return -1;
 			}
 
-			if (a.line > b.line) {
-				return 1;
-			}
-
-			return 0;
+			return a.line > b.line ? 1 : 0;
 		});
 
 	return {

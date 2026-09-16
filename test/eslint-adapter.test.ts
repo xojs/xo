@@ -30,13 +30,7 @@ const writeEslintConfig = async (cwd: string): Promise<void> => {
 	await fs.writeFile(path.join(cwd, 'eslint.config.js'), 'export {default} from \'xo/eslint-adapter\';\n', 'utf8');
 };
 
-const isRuleIdMatrix = (value: unknown): value is string[][] => {
-	if (!Array.isArray(value)) {
-		return false;
-	}
-
-	return value.every(result => Array.isArray(result) && result.every(ruleId => typeof ruleId === 'string'));
-};
+const isRuleIdMatrix = (value: unknown): value is string[][] => Array.isArray(value) ? value.every(result => Array.isArray(result) && result.every(ruleId => typeof ruleId === 'string')) : false;
 
 const lintWithAdapter = async ({cwd, lintCwd = cwd, files, argv = []}: {
 	cwd: string;

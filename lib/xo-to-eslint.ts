@@ -110,7 +110,9 @@ export function xoToEslintConfig(flatXoConfig: XoConfigItem[] | undefined): Lint
 			continue;
 		}
 
-		/** Special case global ignores */
+		/**
+		Special case global ignores
+		*/
 		if (xoConfigItem.ignores !== undefined) {
 			if (keysOfXoConfig.length === 1) {
 				baseConfig.push({ignores: arrify(xoConfigItem.ignores)});

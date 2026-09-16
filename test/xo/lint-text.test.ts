@@ -242,19 +242,20 @@ test('plugin > ts > eslint-plugin-import import-x/order', async () => {
 	assert.ok(results[0]?.messages?.[0]);
 });
 
-test('plugin > js > eslint-plugin-import import-x/extensions', async () => {
+test('plugin > js > eslint-plugin-n n/file-extension-in-import', async () => {
 	const filePath = path.join(cwd, 'test.js');
-	const {results} = await new Xo({cwd}).lintText(
-		dedent`
-			import foo from './foo';
+	const text = dedent`
+		import foo from './foo';
 
-			console.log(foo);\n
-		`,
-		{filePath},
-	);
+		console.log(foo);\n
+	`;
+	// The rule only reports imports that resolve to an existing file.
+	await fs.writeFile(path.join(cwd, 'foo.js'), 'export default 1;\n', 'utf8');
+	await fs.writeFile(filePath, text, 'utf8');
+	const {results} = await new Xo({cwd}).lintText(text, {filePath});
+	// `import-x/extensions` is disabled whenever TypeScript is active, so `n/file-extension-in-import` enforces extensions for JavaScript too.
 	assert.equal(results[0]?.messages?.length, 1);
-	assert.ok(results[0]?.messages?.[0]);
-	assert.equal(results[0]?.messages?.[0]?.ruleId, 'import-x/extensions');
+	assert.equal(results[0]?.messages?.[0]?.ruleId, 'n/file-extension-in-import');
 });
 
 test('plugin > ts > eslint-plugin-import import-x/extensions is disabled for TypeScript', async () => {

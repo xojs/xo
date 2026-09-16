@@ -778,7 +778,7 @@ test('normalize cwd path casing', async () => {
 	try {
 		await fs.mkdir(canonicalDirectory);
 
-		const hasMismatchedCaseDirectory = await fs.stat(mismatchedCaseDirectory).then(() => true, () => false);
+		const hasMismatchedCaseDirectory = await fs.stat(mismatchedCaseDirectory).then(() => true).catch(() => false);
 		const resolvedCwd = hasMismatchedCaseDirectory ? mismatchedCaseDirectory : canonicalDirectory;
 
 		// Write a JS file in the canonical directory so lintFiles has something to process.

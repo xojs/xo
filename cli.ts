@@ -213,10 +213,12 @@ const log = async (report: {
 
 	process.exitCode = report.errorCount === 0 ? 0 : 1;
 
-	if (cliOptions.maxWarnings >= 0 && report.warningCount > cliOptions.maxWarnings) {
-		console.error(`XO found too many warnings (maximum: ${cliOptions.maxWarnings}).`);
-		process.exitCode = 1;
+	if (!(cliOptions.maxWarnings >= 0 && report.warningCount > cliOptions.maxWarnings)) {
+		return;
 	}
+
+	console.error(`XO found too many warnings (maximum: ${cliOptions.maxWarnings}).`);
+	process.exitCode = 1;
 };
 
 try {
