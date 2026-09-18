@@ -96,7 +96,7 @@ export type LintTextOptions = {
 
 export type XoConfigItem = Simplify<XoConfigOptions & Omit<Linter.Config, 'files' | 'ignores'> & {
 	/**
-	An array of glob patterns indicating the files that the configuration object should apply to. If not specified, the configuration object applies to all files.
+	An array of glob patterns indicating the files that the configuration object should apply to. If not specified, the configuration object applies to all JavaScript, TypeScript, and framework files. To configure other file types, such as HTML, Markdown, JSON, or CSS, set `files` explicitly.
 
 	Accepts a single glob string, an array of globs, or ESLint's native format where nested arrays create AND patterns.
 

@@ -24,7 +24,7 @@ It uses [ESLint](https://eslint.org) underneath, so issues regarding built-in ru
 - Beautiful output.
 - Zero-config, but [configurable when needed](#config).
 - Enforces readable code, because you read more code than you write.
-- No need to specify file paths to lint as it lints all JS/TS files except for [commonly ignored paths](#ignores).
+- No need to specify file paths to lint as it lints all JS/TS, HTML, Markdown, JSON (including `package.json`), and CSS files except for [commonly ignored paths](#ignores).
 - [Flat config customization.](#config)
 - [TypeScript supported by default.](#typescript)
 - Includes many useful ESLint plugins, like [`unicorn`](https://github.com/sindresorhus/eslint-plugin-unicorn), [`import-x`](https://github.com/un-ts/eslint-plugin-import-x), [`ava`](https://github.com/avajs/eslint-plugin-ava), [`n`](https://github.com/eslint-community/eslint-plugin-n) and more.
@@ -109,7 +109,7 @@ Simply run `$ npm init xo` (with any options) to add XO to create an `xo.config.
 
 ## Config
 
-You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` file in the root directory of your project, or you can add an `xo` field to your `package.json`. XO supports all js/ts file extensions (js,cjs,mjs,ts,cts,mts) and popular framework extensions (vue,svelte,astro) automatically. A XO config is an extension of ESLint's Flat Config. Like ESLint, an XO config exports an array of XO config objects. XO config objects extend [ESLint Configuration Objects](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects). This means all the available configuration params for ESLint also work for `XO`. However, `XO` enhances and adds extra params to the configuration objects to make them easier to work with.
+You can configure XO options by creating an `xo.config.js` or an `xo.config.ts` file in the root directory of your project, or you can add an `xo` field to your `package.json`. XO supports all js/ts file extensions (js,jsx,mjs,cjs,ts,tsx,mts,cts), popular framework extensions (vue,svelte,astro), HTML, Markdown, JSON, and CSS automatically. A XO config is an extension of ESLint's Flat Config. Like ESLint, an XO config exports an array of XO config objects. XO config objects extend [ESLint Configuration Objects](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects). This means all the available configuration params for ESLint also work for `XO`. However, `XO` enhances and adds extra params to the configuration objects to make them easier to work with.
 
 ### Config types
 
@@ -138,9 +138,9 @@ export default [...] satisfies import('xo').FlatXoConfig
 ### files
 
 Type: `string | (string | string[])[]`\
-Default: `**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,vue,svelte,astro}`
+Default: `**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue,svelte,astro}`
 
-A glob string, array of globs, or ESLint's native format (where nested arrays create AND patterns) indicating which files the config object applies to. By default `XO` will apply the configuration to [all files](lib/constants.ts). This is compatible with ESLint plugin configs, so you can spread them directly into your XO config.
+A glob string, array of globs, or ESLint's native format (where nested arrays create AND patterns) indicating which files the config object applies to. By default `XO` will apply the configuration to [all JavaScript, TypeScript, and framework files](lib/constants.ts). To configure other file types, such as HTML, Markdown, JSON, or CSS, set `files` explicitly. This is compatible with ESLint plugin configs, so you can spread them directly into your XO config.
 
 > Tip: If you are adding additional `@typescript-eslint` rules to your config, these rules will apply to JS files as well unless you separate them appropriately with the `files` option. `@typescript-eslint` rules set to `'off'` or `0`, however, will have no effect on JS linting.
 
@@ -148,7 +148,7 @@ A glob string, array of globs, or ESLint's native format (where nested arrays cr
 
 Type: `string | string[]`
 
-Some [paths](lib/constants.ts) are ignored by default, including paths in `.gitignore`. Additional ignores can be added here.
+Some [paths](lib/constants.ts) are ignored by default, including lockfiles and paths in `.gitignore`. Additional ignores can be added here.
 
 > Tip: For *global* ignores, keep `ignores` as the only key in the config item. You can optionally set a `name` property. Adding more properties will cause ignores to be scoped down to your files selection, which may have unexpected effects.
 

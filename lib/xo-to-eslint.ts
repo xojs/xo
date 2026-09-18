@@ -59,7 +59,8 @@ const hoistPlugins = (configs: Linter.Config[], userPluginOverrides: Map<string,
 
 		const {plugins: _ignored, ...configWithoutPlugins} = configItem;
 
-		if (Object.keys(configWithoutPlugins).length > 0) {
+		// A leftover with only `files` has no effect, so drop it.
+		if (Object.keys(configWithoutPlugins).some(key => key !== 'files')) {
 			configsWithoutPlugins.push(configWithoutPlugins);
 		}
 	}

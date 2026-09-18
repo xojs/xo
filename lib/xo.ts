@@ -21,7 +21,7 @@ import {
 import {
 	defaultIgnores,
 	cacheDirName,
-	allExtensions,
+	defaultFilesGlob,
 	tsFilesGlob,
 	tsconfigDefaults,
 } from './constants.js';
@@ -174,10 +174,11 @@ const expandGlobalIgnoreConfigForEslint = (config: XoConfigItem): XoConfigItem =
 };
 
 const stripDefaultIgnoreConfigs = (configs: Linter.Config[]): Linter.Config[] => configs.map(configItem => {
-	const {ignores} = configItem;
-	const isDefaultIgnoreConfig = ignores !== undefined && ignores.length > 0 && ignores.every(pattern => defaultIgnores.includes(pattern));
+	const {files, ignores} = configItem;
+	// Only global ignore items are stripped. A scoped item with `files` uses its `ignores` to exclude files from that item, so they must stay.
+	const isGlobalDefaultIgnoreConfig = files === undefined && ignores !== undefined && ignores.length > 0 && ignores.every(pattern => defaultIgnores.includes(pattern));
 
-	if (!isDefaultIgnoreConfig) {
+	if (!isGlobalDefaultIgnoreConfig) {
 		return configItem;
 	}
 
@@ -700,7 +701,7 @@ export class Xo {
 	Create an ESLint flat config for editor integrations using the same XO pipeline as the CLI.
 	*/
 	public async getProjectEslintConfig(): Promise<Linter.Config[]> {
-		const {cliIgnores, files} = await this.discoverFiles([`**/*.{${allExtensions.join(',')}}`]);
+		const {cliIgnores, files} = await this.discoverFiles([defaultFilesGlob]);
 
 		return this.prepareEslintConfig(files, cliIgnores);
 	}
@@ -713,7 +714,7 @@ export class Xo {
 	*/
 	async lintFiles(globs?: string | string[]): Promise<XoLintResult> {
 		if (globs === undefined || (Array.isArray(globs) && globs.length === 0)) {
-			globs = `**/*.{${allExtensions.join(',')}}`;
+			globs = defaultFilesGlob;
 		}
 
 		globs = arrify(globs);

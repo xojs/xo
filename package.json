@@ -5,13 +5,8 @@
 	"license": "MIT",
 	"repository": "xojs/xo",
 	"funding": "https://github.com/sponsors/sindresorhus",
-	"author": {
-		"name": "Sindre Sorhus",
-		"email": "sindresorhus@gmail.com",
-		"url": "https://sindresorhus.com"
-	},
+	"author": "Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)",
 	"type": "module",
-	"bin": "./dist/cli.js",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -22,6 +17,7 @@
 			"default": "./dist/lib/eslint-adapter.js"
 		}
 	},
+	"bin": "./dist/cli.js",
 	"sideEffects": false,
 	"engines": {
 		"node": ">=22"
@@ -37,17 +33,16 @@
 		"test:setup": "node scripts/setup-tests"
 	},
 	"files": [
+		"dist/*.js",
+		"dist/*.d.ts",
 		"dist/lib/*.js",
 		"dist/lib/*.d.ts",
 		"dist/lib/rules/*.js",
-		"dist/lib/rules/*.d.ts",
-		"dist/*.js",
-		"dist/*.d.ts"
+		"dist/lib/rules/*.d.ts"
 	],
 	"keywords": [
 		"cli-app",
 		"cli",
-		"xo",
 		"xoxo",
 		"happy",
 		"happiness",
@@ -78,7 +73,7 @@
 		"cosmiconfig": "^10.0.0",
 		"define-lazy-prop": "^3.0.0",
 		"eslint": "^10.8.0",
-		"eslint-config-xo": "^3.0.1",
+		"eslint-config-xo": "^3.0.2",
 		"eslint-formatter-pretty": "^7.1.0",
 		"find-cache-directory": "^6.0.0",
 		"get-stdin": "^10.0.0",

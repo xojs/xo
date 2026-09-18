@@ -259,12 +259,10 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 
 		const error = await rejectionOf($`node ./dist/cli --cwd ${cwd} --reporter=json`);
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		const results: unknown[] = JSON.parse(error?.stdout?.toString() ?? '');
+		const results = JSON.parse(error?.stdout?.toString() ?? '') as Array<{filePath: string}>;
 
 		t.assert.ok(Array.isArray(results));
-		t.assert.strictEqual(results.length, 1);
-		t.assert.strictEqual(typeof results[0], 'object');
+		t.assert.strictEqual(typeof results.find(result => result.filePath === filePath), 'object');
 	});
 
 	test('xo --reporter json keeps warning-only results when errors exist', async (t: TestContext) => {
@@ -1398,7 +1396,13 @@ describe('xo CLI', {concurrency: availableParallelism()}, () => {
 		const cwd = await createProject(t);
 		const noModulesCwd = path.join(cwd, 'no-modules');
 		await fs.mkdir(noModulesCwd, {recursive: true});
-		await fs.writeFile(path.join(noModulesCwd, 'package.json'), '{}', 'utf8');
+		await fs.writeFile(path.join(noModulesCwd, 'package.json'), JSON.stringify({
+			name: 'no-modules',
+			version: '1.0.0',
+			private: true,
+			type: 'module',
+			engines: {node: '>=22'},
+		}), 'utf8');
 		await fs.writeFile(path.join(noModulesCwd, 'test.js'), 'console.log(\'hello\');\n', 'utf8');
 
 		const {exitCode} = await $`node ./dist/cli --cwd ${noModulesCwd}`;

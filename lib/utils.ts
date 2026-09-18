@@ -5,7 +5,7 @@ import arrify from 'arrify';
 import {typescriptParser} from 'eslint-config-xo';
 import {type XoConfigItem, type TypeScriptParserOptions} from './types.js';
 import {
-	allFilesGlob,
+	codeFilesGlob,
 	jsExtensions,
 	jsFilesGlob,
 } from './constants.js';
@@ -17,7 +17,7 @@ Convert a `xo` config item to an ESLint config item.
 
 In a flat structure these config items represent the config object items.
 
-Files and rules will always be defined and all other ESLint config properties are preserved.
+XO-only options (`space`, `semicolon`, `prettier`) are stripped, `files` and `ignores` are normalized to arrays, and all other ESLint config properties are preserved. A non-empty item without `files` is scoped to code files. Empty items stay empty so the caller can drop them.
 
 @param xoConfig - The XO config item to convert.
 @returns The equivalent ESLint config item.
@@ -35,11 +35,14 @@ export const xoToEslintConfigItem = (xoConfig: XoConfigItem): Linter.Config => {
 
 	const eslintConfig: Linter.Config = {
 		..._xoConfig,
-		...(xoConfig.files !== undefined && {files: arrify(xoConfig.files)}),
-		...(xoConfig.rules && {rules: xoConfig.rules}),
+		...(ignores !== undefined && {ignores: arrify(ignores)}),
+		...(rules && {rules}),
 	};
 
-	eslintConfig.ignores &&= arrify(xoConfig.ignores);
+	// Without `files`, ESLint applies a config item to every linted file, including HTML, Markdown, JSON, and CSS. Scoping it to code files keeps JavaScript-specific settings, such as the TypeScript parser and type-aware rules, away from those files.
+	if (files !== undefined || Object.keys(eslintConfig).length > 0) {
+		eslintConfig.files = arrify(files ?? codeFilesGlob);
+	}
 
 	return eslintConfig;
 };
@@ -147,7 +150,9 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 			if (hasTsRules) {
 				let isAppliedToJsFiles = false;
 
-				if (config.files !== undefined) {
+				if (config.files === undefined) {
+					isAppliedToJsFiles = true;
+				} else {
 					// Config files are glob patterns, so path normalization would corrupt them on Windows.
 					const filePatterns = arrify(config.files).flat();
 					// Extract the glob portion from each pattern.
@@ -159,8 +164,6 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 							dot: true,
 							format: filePattern => filePattern.startsWith('./') ? filePattern.slice(2) : filePattern,
 						});
-				} else if (config.files === undefined) {
-					isAppliedToJsFiles = true;
 				}
 
 				if (isAppliedToJsFiles) {
@@ -168,7 +171,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 						? {...languageOptions, parser: typescriptParser}
 						: {parser: typescriptParser};
 					config.languageOptions = updatedLanguageOptions;
-					tsFilesGlob.push(...arrify(config.files ?? allFilesGlob).flat());
+					tsFilesGlob.push(...arrify(config.files ?? codeFilesGlob).flat());
 					tsFilesIgnoresGlob.push(...arrify(config.ignores));
 				}
 			}
@@ -180,7 +183,7 @@ export const preProcessXoConfig = (xoConfig: XoConfigItem[]): {config: XoConfigI
 			|| parserOptions?.tsconfigRootDir !== undefined
 			|| parserOptions?.programs !== undefined) {
 			// The glob itself should NOT be negated
-			tsFilesIgnoresGlob.push(...arrify(config.files ?? allFilesGlob).flat());
+			tsFilesIgnoresGlob.push(...arrify(config.files ?? codeFilesGlob).flat());
 		}
 
 		processedConfig.push(config);

@@ -25,12 +25,17 @@ if (await pathExists(cwd)) {
 // Create the test project directory
 await fs.mkdir(cwd, {recursive: true});
 
-// Create a package.json file
+// Create a package.json file. `private` and `engines` keep the `package-json/*` rules quiet since `package.json` is linted by default.
 await fs.writeFile(
 	path.join(cwd, 'package.json'),
 	JSON.stringify({
-		type: 'module',
 		name: 'test-project',
+		version: '1.0.0',
+		private: true,
+		type: 'module',
+		engines: {
+			node: '>=22',
+		},
 	}),
 );
 

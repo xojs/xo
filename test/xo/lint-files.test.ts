@@ -70,8 +70,9 @@ test('flat config > js > semi', async () => {
 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 	const xo = new Xo({cwd});
 	const {results} = await xo.lintFiles();
-	assert.equal(results?.[0]?.messages?.length, 1);
-	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages?.length, 1);
+	assert.equal(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('flat config > ts > semi', async () => {
@@ -90,8 +91,9 @@ test('flat config > ts > semi', async () => {
 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 	const xo = new Xo({cwd});
 	const {results} = await xo.lintFiles();
-	assert.equal(results?.[0]?.messages?.length, 1);
-	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages?.length, 1);
+	assert.equal(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('flat config > ts > semi > no tsconfig', async () => {
@@ -111,8 +113,9 @@ test('flat config > ts > semi > no tsconfig', async () => {
 	await fs.writeFile(filePath, dedent`console.log('hello');\n`, 'utf8');
 	const xo = new Xo({cwd, ts: true});
 	const {results} = await xo.lintFiles();
-	assert.equal(results?.[0]?.messages?.length, 1);
-	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages?.length, 1);
+	assert.equal(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('declaration files without a tsconfig are linted', async () => {
@@ -346,11 +349,12 @@ test('flat config > js > space', async () => {
 		`,
 	);
 	const {results} = await xo.lintFiles();
-	assert.equal(results?.[0]?.messages.length, 2);
-	assert.equal(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
-	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
-	assert.equal(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
-	assert.equal(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages.length, 2);
+	assert.equal(lintResult?.messages?.[0]?.messageId, 'wrongIndentation');
+	assert.equal(lintResult?.messages?.[0]?.ruleId, '@stylistic/indent');
+	assert.equal(lintResult?.messages?.[1]?.messageId, 'wrongIndentation');
+	assert.equal(lintResult?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
 });
 
 test('flat config > ts > space', async () => {
@@ -379,26 +383,29 @@ test('flat config > ts > space', async () => {
 		`,
 	);
 	const {results} = await xo.lintFiles();
-	assert.equal(results?.[0]?.messages.length, 2);
-	assert.equal(results?.[0]?.messages?.[0]?.messageId, 'wrongIndentation');
-	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/indent');
-	assert.equal(results?.[0]?.messages?.[1]?.messageId, 'wrongIndentation');
-	assert.equal(results?.[0]?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages.length, 2);
+	assert.equal(lintResult?.messages?.[0]?.messageId, 'wrongIndentation');
+	assert.equal(lintResult?.messages?.[0]?.ruleId, '@stylistic/indent');
+	assert.equal(lintResult?.messages?.[1]?.messageId, 'wrongIndentation');
+	assert.equal(lintResult?.messages?.[1]?.ruleId, '@stylistic/indent-binary-ops');
 });
 
 test('lints dotfiles', async () => {
-	await fs.writeFile(path.join(cwd, '.foo.js'), dedent`console.log('hello')\n`, 'utf8');
+	const filePath = path.join(cwd, '.foo.js');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 	const {results} = await new Xo({cwd}).lintFiles();
-	assert.equal(results.length, 1);
-	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('lints dotfiles in subdirectories', async () => {
+	const filePath = path.join(cwd, '.config', 'test.js');
 	await fs.mkdir(path.join(cwd, '.config'), {recursive: true});
-	await fs.writeFile(path.join(cwd, '.config', 'test.js'), dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
 	const {results} = await new Xo({cwd}).lintFiles();
-	assert.equal(results.length, 1);
-	assert.equal(results?.[0]?.messages?.[0]?.ruleId, '@stylistic/semi');
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages?.[0]?.ruleId, '@stylistic/semi');
 });
 
 test('quiet mode suppresses ignored-file warning', async () => {
@@ -629,7 +636,6 @@ test('negated default ignore patterns via CLI can unignore a narrower built-in f
 	const siblingResult = results?.find(result => result.filePath.includes('vendor.min.js'));
 	assert.ok(lintedResult, 'app.min.js should be linted');
 	assert.ok(!siblingResult, 'vendor.min.js should still be ignored');
-	assert.equal(results.length, 1);
 	assert.equal(lintedResult?.messages[0]?.ruleId, '@stylistic/semi');
 });
 
@@ -766,6 +772,8 @@ test('does not throw for dynamic glob pattern with no matches', async () => {
 });
 
 test('does not throw when no globs provided and no files found', async () => {
+	await fs.rm(path.join(cwd, 'package.json'));
+	await fs.rm(path.join(cwd, 'tsconfig.json'));
 	const {results} = await new Xo({cwd}).lintFiles();
 	assert.deepEqual(results, []);
 });
@@ -870,4 +878,124 @@ test('respects core.excludesfile (global gitignore)', async (t: TestContext) => 
 	const {results} = await new Xo({cwd}).lintFiles('**/*.js');
 	t.assert.ok(results.every(r => r.filePath !== ignoredFilePath), 'globally-ignored.js should be excluded from lint results');
 	t.assert.ok(results.some(r => r.filePath === normalFilePath), 'normal.js should still be linted');
+});
+
+test('lints package.json by default', async () => {
+	const filePath = path.join(cwd, 'package.json');
+	await fs.writeFile(filePath, JSON.stringify({name: 'test-project', type: 'module'}), 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.ok(lintResult?.messages.some(message => message.ruleId?.startsWith('package-json/')));
+});
+
+test('ignores package-lock.json by default', async () => {
+	const filePath = path.join(cwd, 'package-lock.json');
+	await fs.writeFile(filePath, JSON.stringify({name: 'test-project', lockfileVersion: 3, packages: {'': {name: 'test-project'}}}), 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	assert.ok(results.every(result => result.filePath !== filePath));
+	const {results: explicitResults} = await new Xo({cwd}).lintFiles('package-lock.json');
+	assert.equal(explicitResults[0]?.messages[0]?.message, ignoredFileWarningMessage);
+});
+
+test('config items without files do not apply type-aware rules to non-code files', async () => {
+	await fs.writeFile(path.join(cwd, 'xo.config.js'), dedent`
+		export default [{ignores: ['xo.config.js']}, {rules: {'@typescript-eslint/no-floating-promises': 'error'}}];\n
+	`, 'utf8');
+	await fs.writeFile(path.join(cwd, 'readme.md'), '# Test\n', 'utf8');
+	await fs.writeFile(path.join(cwd, 'index.html'), '<!doctype html>\n<html lang="en"><head><title>Test</title></head><body></body></html>\n', 'utf8');
+	const filePath = path.join(cwd, 'test.ts');
+	await fs.writeFile(filePath, dedent`Promise.resolve();\n`, 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	assert.equal(results.find(result => result.filePath === path.join(cwd, 'package.json'))?.fatalErrorCount, 0);
+	assert.equal(results.find(result => result.filePath === path.join(cwd, 'readme.md'))?.fatalErrorCount, 0);
+	assert.equal(results.find(result => result.filePath === path.join(cwd, 'index.html'))?.fatalErrorCount, 0);
+	const lintResult = results.find(result => result.filePath === filePath);
+	assert.ok(lintResult?.messages.some(message => message.ruleId === '@typescript-eslint/no-floating-promises'));
+});
+
+test('scoped ignores that match default ignores are kept on the config item', async () => {
+	const reopenedFilePath = path.join(cwd, 'dist', 'test.js');
+	const filePath = path.join(cwd, 'test.js');
+	await fs.mkdir(path.join(cwd, 'dist'), {recursive: true});
+	await fs.writeFile(reopenedFilePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				ignores: ['!dist/**'],
+			},
+			{
+				rules: {
+					'@stylistic/semi': 'off',
+				},
+				ignores: ['dist/**'],
+			},
+		];
+	`, 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	const reopenedResult = results.find(result => result.filePath === reopenedFilePath);
+	const lintResult = results.find(result => result.filePath === filePath);
+	assert.ok(reopenedResult?.messages.some(message => message.ruleId === '@stylistic/semi'));
+	assert.equal(lintResult?.messages.some(message => message.ruleId === '@stylistic/semi'), false);
+});
+
+test('scoped ignores in config exclude the ignored files from the config item', async () => {
+	const ignoredFilePath = path.join(cwd, 'legacy', 'test.js');
+	const filePath = path.join(cwd, 'test.js');
+	await fs.mkdir(path.join(cwd, 'legacy'), {recursive: true});
+	await fs.writeFile(ignoredFilePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(filePath, dedent`console.log('hello')\n`, 'utf8');
+	await fs.writeFile(path.join(cwd, 'xo.config.js'), dedent`
+		export default [
+			{
+				rules: {
+					'@stylistic/semi': 'off',
+				},
+				ignores: ['legacy/**'],
+			},
+		];
+	`, 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	const ignoredResult = results.find(result => result.filePath === ignoredFilePath);
+	const lintResult = results.find(result => result.filePath === filePath);
+	assert.ok(ignoredResult?.messages.some(message => message.ruleId === '@stylistic/semi'));
+	assert.equal(lintResult?.messages.some(message => message.ruleId === '@stylistic/semi'), false);
+});
+
+test('lints CSS by default', async () => {
+	const filePath = path.join(cwd, 'style.css');
+	await fs.writeFile(filePath, 'a {}\n', 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	const lintResult = results?.find(result => result.filePath === filePath);
+	assert.equal(lintResult?.messages[0]?.ruleId, 'css/no-empty-blocks');
+});
+
+test('lints explicit JSON and CSS paths', async () => {
+	const jsonFilePath = path.join(cwd, 'package.json');
+	const cssFilePath = path.join(cwd, 'style.css');
+	await fs.writeFile(jsonFilePath, JSON.stringify({name: 'test-project', type: 'module'}), 'utf8');
+	await fs.writeFile(cssFilePath, 'a {}\n', 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles(['package.json', 'style.css']);
+	const jsonLintResult = results.find(result => result.filePath === jsonFilePath);
+	const cssLintResult = results.find(result => result.filePath === cssFilePath);
+	assert.ok(jsonLintResult?.messages.some(message => message.ruleId?.startsWith('package-json/')));
+	assert.equal(cssLintResult?.messages[0]?.ruleId, 'css/no-empty-blocks');
+});
+
+test('lints tsconfig.json with comments and trailing commas as JSONC', async () => {
+	const filePath = path.join(cwd, 'tsconfig.json');
+	await fs.writeFile(filePath, '{\n\t// comment\n\t"compilerOptions": {\n\t\t"strict": true,\n\t},\n}\n', 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	assert.equal(results.find(result => result.filePath === filePath)?.fatalErrorCount, 0);
+});
+
+test('config items with explicit files apply to Markdown', async () => {
+	await fs.writeFile(path.join(cwd, 'xo.config.js'), dedent`
+		export default [{files: ['**/*.md'], rules: {'markdown/no-html': 'error'}}];\n
+	`, 'utf8');
+	const filePath = path.join(cwd, 'readme.md');
+	await fs.writeFile(filePath, '# Test\n\n<b>bold</b>\n', 'utf8');
+	const {results} = await new Xo({cwd}).lintFiles();
+	const lintResult = results.find(result => result.filePath === filePath);
+	assert.ok(lintResult?.messages.some(message => message.ruleId === 'markdown/no-html'));
 });

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {Linter} from 'eslint';
 import micromatch from 'micromatch';
 import {xoToEslintConfig} from '../lib/xo-to-eslint.js';
-import {frameworkExtensions} from '../lib/constants.js';
+import {codeFilesGlob, frameworkExtensions} from '../lib/constants.js';
 
 const getHtmlIndentationMessage = (flatConfig: Linter.Config[], filename: string) => {
 	const linter = new Linter();
@@ -205,10 +205,10 @@ test('supports files config option as a string', () => {
 	assert.deepEqual(flatConfig.at(-1)?.files, ['src/**/*.ts']);
 });
 
-test('no files config option remains undefined', () => {
+test('no files config option defaults to code files', () => {
 	const flatConfig = xoToEslintConfig([{files: undefined, rules: {'no-console': 'error'}}]);
 
-	assert.equal(flatConfig.at(-1)?.files, undefined);
+	assert.deepEqual(flatConfig.at(-1)?.files, [codeFilesGlob]);
 });
 
 test('prettier: true preserves special rules but keeps non-special formatting rules off', () => {
